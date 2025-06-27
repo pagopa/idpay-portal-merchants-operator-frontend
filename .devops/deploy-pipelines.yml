@@ -28,9 +28,9 @@ variables:
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
     #KEYCLOAK ENV
-    react_app_url_keycloak: '$(UAT_REACT_APP_URL_KEYCLOAK)' 
-    react_app_keycloak_realm: '$(UAT_REACT_APP_KEYCLOAK_REALM)'
-    react_app_keycloak_client_id: '$(UAT_REACT_APP_KEYCLOAK_CLIENT_ID)'
+    react_app_url_keycloak: '$(UAT_VITE_APP_URL_KEYCLOAK)' 
+    react_app_keycloak_realm: '$(UAT_VITE_APP_KEYCLOAK_REALM)'
+    react_app_keycloak_client_id: '$(UAT_VITE_APP_KEYCLOAK_CLIENT_ID)'
 
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
@@ -50,9 +50,9 @@ variables:
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
     #KEYCLOAK ENV
-    react_app_url_keycloak: '$(PROD_REACT_APP_URL_KEYCLOAK)' 
-    react_app_keycloak_realm: '$(PROD_REACT_APP_KEYCLOAK_REALM)'
-    react_app_keycloak_client_id: '$(PROD_REACT_APP_KEYCLOAK_CLIENT_ID)'
+    react_app_url_keycloak: '$(PROD_VITE_APP_URL_KEYCLOAK)' 
+    react_app_keycloak_realm: '$(PROD_VITE_APP_KEYCLOAK_REALM)'
+    react_app_keycloak_client_id: '$(PROD_VITE_APP_KEYCLOAK_CLIENT_ID)'
 
 
   # every branch different from past will be considered as DEV
@@ -74,9 +74,9 @@ variables:
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
 
     #KEYCLOAK ENV
-    react_app_url_keycloak: '$(DEV_REACT_APP_URL_KEYCLOAK)' 
-    react_app_keycloak_realm: '$(DEV_REACT_APP_KEYCLOAK_REALM)'
-    react_app_keycloak_client_id: '$(DEV_REACT_APP_KEYCLOAK_CLIENT_ID)'
+    react_app_url_keycloak: '$(DEV_VITE_APP_URL_KEYCLOAK)' 
+    react_app_keycloak_realm: '$(DEV_VITE_APP_KEYCLOAK_REALM)'
+    react_app_keycloak_client_id: '$(DEV_VITE_APP_KEYCLOAK_CLIENT_ID)'
     
         
 
