@@ -73,5 +73,40 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "restoreMocks": true,
+    "clearMocks": true,
+    "resetMocks": true,
+    "coveragePathIgnorePatterns": [
+      "src/index.js",
+      "src/bootstrap.tsx",
+      "src/reportWebVitals.ts",
+      "src/api/generated"
+    ],
+    "moduleNameMapper": {
+      "next/router": "<rootDir>/__mocks__/next/router.js",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "^.+\\.(jpg|jpeg|png|gif|webp|avif|svg)$": "<rootDir>/__mocks__/file-mock.js",
+      "react-markdown": "<rootDir>/node_modules/react-markdown/react-markdown.min.js"
+    }
   }
 }

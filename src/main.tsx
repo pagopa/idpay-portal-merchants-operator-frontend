@@ -10,7 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 createRoot(document.getElementById('root')!).render(
   <KeycloakProvider client={keycloak} initOptions={{
     onLoad: 'login-required', checkLoginIframe: false,
-    redirectUri: 'http://localhost:5173'
+    redirectUri: import.meta.env.VITE_REDIRECT_URI
   }}>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
