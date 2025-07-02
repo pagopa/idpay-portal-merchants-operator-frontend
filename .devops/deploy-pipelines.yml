@@ -6,12 +6,15 @@ variables:
   # Execute agents (jobs) on latest Ubuntu version.
   vmImageNameDefault: 'ubuntu-latest'
 
-  basePath: portale-esercenti-op
+  basePath: portale-esercenti
+
 
   # global variables
   react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
 
-  ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
+
+  ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
+
     environment: 'UAT'
     azure_subscription: $(UAT_AZURE_SUBSCRIPTION)
     cdn_endpoint: '$(UAT_CDN_ENDPOINT)'
@@ -24,23 +27,15 @@ variables:
     react_app_url_fe_pre_login: '$(UAT_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(UAT_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
-    react_app_url_fe_assistance: '$(UAT_REACT_APP_URL_FE_ASSISTANCE_PORTAL)'
+
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
-    # react_app_one_trust_base_url: '$(UAT_REACT_APP_URL_CDN)/ot'
-    # react_app_analytics_enabled: '$(UAT_ANALYTICS_ENABLED)'
-    # react_app_analytics_mocked: '$(UAT_ANALYTICS_MOCKED)'
-    # react_app_mixpanel_token: '$(UAT_MIXPANEL_TOKEN)'
-    # react_app_onetrust_domain_id: '$(UAT_ONETRUST_DOMAIN_ID)'
+    #KEYCLOAK ENV
+    vite_keycloak_url: '$(UAT_VITE_KEYCLOAK_URL)' 
+    vite_keycloak_realm: '$(UAT_VITE_KEYCLOAK_REALM)'
+    vite_keycloak_client_id: '$(UAT_VITE_KEYCLOAK_CLIENT_ID)'
 
-    react_app_one_trust_otnotice_cdn_url: $(UAT_REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
-    react_app_one_trust_otnotice_cdn_settings: $(UAT_REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
-    react_app_one_trust_privacy_policy_id: $(UAT_REACT_APP_ONE_TRUST_PRIVACY_POLICY_ID)
-    react_app_one_trust_privacy_policy_json_url: $(UAT_REACT_APP_ONE_TRUST_PRIVACY_POLICY_JSON_URL)
-    react_app_one_trust_tos_id: $(UAT_REACT_APP_ONE_TRUST_TOS_ID)
-    react_app_one_trust_tos_json_url: $(UAT_REACT_APP_ONE_TRUST_TOS_JSON_URL)
-    react_app_url_api_role_permission:  $(UAT_REACT_APP_URL_API_ROLE_PERMISSION)
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -55,23 +50,15 @@ variables:
     react_app_url_fe_pre_login: '$(PROD_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(PROD_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
-    react_app_url_fe_assistance: '$(PROD_REACT_APP_URL_FE_ASSISTANCE_PORTAL)'
+
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
-    # react_app_one_trust_base_url: '$(PROD_REACT_APP_URL_CDN)/ot'
-    # react_app_analytics_enabled: '$(PROD_ANALYTICS_ENABLED)'
-    # react_app_analytics_mocked: '$(PROD_ANALYTICS_MOCKED)'
-    # react_app_mixpanel_token: '$(PROD_MIXPANEL_TOKEN)'
-    # react_app_onetrust_domain_id: '$(PROD_ONETRUST_DOMAIN_ID)'
+    #KEYCLOAK ENV
+    vite_keycloak_url: '$(PROD_VITE_KEYCLOAK_URL)' 
+    vite_keycloak_realm: '$(PROD_VITE_KEYCLOAK_REALM)'
+    vite_keycloak_client_id: '$(PROD_VITE_KEYCLOAK_CLIENT_ID)'
 
-    react_app_one_trust_otnotice_cdn_url: $(PROD_REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
-    react_app_one_trust_otnotice_cdn_settings: $(PROD_REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
-    react_app_one_trust_privacy_policy_id: $(PROD_REACT_APP_ONE_TRUST_PRIVACY_POLICY_ID)
-    react_app_one_trust_privacy_policy_json_url: $(PROD_REACT_APP_ONE_TRUST_PRIVACY_POLICY_JSON_URL)
-    react_app_one_trust_tos_id: $(PROD_REACT_APP_ONE_TRUST_TOS_ID)
-    react_app_one_trust_tos_json_url: $(PROD_REACT_APP_ONE_TRUST_TOS_JSON_URL)
-    react_app_url_api_role_permission:  $(PROD_REACT_APP_URL_API_ROLE_PERMISSION)
 
   # every branch different from past will be considered as DEV
   #  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
@@ -90,22 +77,13 @@ variables:
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
-    react_app_url_fe_assistance: '$(DEV_REACT_APP_URL_FE_ASSISTANCE_PORTAL)'
-    REACT_APP_URL_API_ASSET_REGISTER_PORTAL: ''
 
-    # react_app_one_trust_base_url: '$(DEV_REACT_APP_URL_CDN)/ot/test'
-    # react_app_analytics_enabled: '$(DEV_ANALYTICS_ENABLED)'
-    # react_app_analytics_mocked: '$(DEV_ANALYTICS_MOCKED)'
-    # react_app_mixpanel_token: '$(DEV_MIXPANEL_TOKEN)'
-    # react_app_onetrust_domain_id: '$(DEV_ONETRUST_DOMAIN_ID)'
 
-    react_app_one_trust_otnotice_cdn_url: $(DEV_REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
-    react_app_one_trust_otnotice_cdn_settings: $(DEV_REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
-    react_app_one_trust_privacy_policy_id: $(DEV_REACT_APP_ONE_TRUST_PRIVACY_POLICY_ID)
-    react_app_one_trust_privacy_policy_json_url: $(DEV_REACT_APP_ONE_TRUST_PRIVACY_POLICY_JSON_URL)
-    react_app_one_trust_tos_id: $(DEV_REACT_APP_ONE_TRUST_TOS_ID)
-    react_app_one_trust_tos_json_url: $(DEV_REACT_APP_ONE_TRUST_TOS_JSON_URL)
-    react_app_url_api_role_permission: '$(DEV_REACT_APP_URL_API_ROLE_PERMISSION)'
+    #KEYCLOAK ENV
+    vite_keycloak_url: '$(DEV_VITE_KEYCLOAK_URL)' 
+    vite_keycloak_realm: '$(DEV_VITE_KEYCLOAK_REALM)'
+    vite_keycloak_client_id: '$(DEV_VITE_KEYCLOAK_CLIENT_ID)'
+    
 
 
 # Automatically triggered on PR
@@ -114,7 +92,8 @@ trigger:
   branches:
     include:
       - main
-      - release-*
+      - uat
+      - develop
 
 pr: none
 
@@ -200,7 +179,12 @@ stages:
               REACT_APP_ONE_TRUST_PRIVACY_POLICY_ID: $(react_app_one_trust_privacy_policy_id)
               REACT_APP_ONE_TRUST_PRIVACY_POLICY_JSON_URL: $(react_app_one_trust_privacy_policy_json_url)
               REACT_APP_ONE_TRUST_TOS_ID: $(react_app_one_trust_tos_id)
-              REACT_APP_ONE_TRUST_TOS_JSON_URL: $(react_app_one_trust_tos_json_url)
+
+              REACT_APP_ONE_TRUST_TOS_JSON_URL: $(react_app_one_trust_tos_json_url)                  
+              
+              VITE_KEYCLOAK_URL: '$(vite_keycloak_url)' 
+              VITE_KEYCLOAK_REALM: '$(vite_keycloak_realm)'
+              VITE_KEYCLOAK_CLIENT_ID: '$(vite_keycloak_client_id)'
 
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
@@ -234,4 +218,6 @@ stages:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
               inlineScript: |
+
                 az cdn endpoint purge -g $(resource_group) -n $(cdn_endpoint) --profile-name $(cdn_profile) --content-paths "/$(basePath)" "/$(basePath)/*" "/"
+
