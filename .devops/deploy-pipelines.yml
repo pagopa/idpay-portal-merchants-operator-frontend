@@ -187,11 +187,11 @@ stages:
               VITE_KEYCLOAK_CLIENT_ID: '$(vite_keycloak_client_id)'
 
           - bash: |
-              printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
+              printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
             env:
               EXECUTION_ID: '$(Build.BuildNumber) - $(Build.DefinitionName)($(Build.BuildId))'
             displayName: 'Build info'
-          - publish: $(System.DefaultWorkingDirectory)/build
+          - publish: $(System.DefaultWorkingDirectory)/dist
             artifact: Bundle
 
   # Deploy bundle
