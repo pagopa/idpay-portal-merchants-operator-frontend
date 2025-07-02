@@ -8970,6 +8970,13 @@ keycloak-react-web@^0.1.19:
   dependencies:
     keycloak-js "^19.0.2"
 
+keycloak-react-web@^0.1.19:
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/keycloak-react-web/-/keycloak-react-web-0.1.19.tgz#d22ce1279c2df9794329977e1d6491887aa9648f"
+  integrity sha512-ECpJ75rajWPB77zjUcigzpCofi6ynqACKNDyhzx7fUI17JlsCsoRGGGDrDGPlVh+sMvurQNcmZHGhSNWnzCZAw==
+  dependencies:
+    keycloak-js "^19.0.2"
+
 keyv@^4.5.3, keyv@^4.5.4:
   version "4.5.4"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-4.5.4.tgz#a879a99e29452f942439f2a405e3af8b31d4de93"
