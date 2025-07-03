@@ -77,6 +77,7 @@ variables:
     vite_keycloak_url: '$(DEV_VITE_KEYCLOAK_URL)' 
     vite_keycloak_realm: '$(DEV_VITE_KEYCLOAK_REALM)'
     vite_keycloak_client_id: '$(DEV_VITE_KEYCLOAK_CLIENT_ID)'
+    vite_keycloak_redirect_uri: '$(DEV_VITE_KEYCLOAK_REDIRECT_URI)'
     
         
 
@@ -179,6 +180,8 @@ stages:
               VITE_KEYCLOAK_URL: '$(vite_keycloak_url)' 
               VITE_KEYCLOAK_REALM: '$(vite_keycloak_realm)'
               VITE_KEYCLOAK_CLIENT_ID: '$(vite_keycloak_client_id)'
+              VITE_KEYCLOAK_REDIRECT_URI: '$(vite_keycloak_redirect_uri)'
+
 
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
