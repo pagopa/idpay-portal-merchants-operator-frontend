@@ -4,13 +4,12 @@ import App from './App.tsx';
 import keycloak from './keycloak/keycloak';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
-import { KeycloakProvider } from "keycloak-react-web";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
 import { BrowserRouter } from 'react-router-dom';
 
 createRoot(document.getElementById('root')!).render(
-  <KeycloakProvider client={keycloak} initOptions={{
-    onLoad: 'login-required', checkLoginIframe: false,
-    redirectUri: import.meta.env.VITE_REDIRECT_URI
+  <ReactKeycloakProvider authClient={keycloak} initOptions={{
+    onLoad: 'login-required', checkLoginIframe: false
   }}>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
@@ -18,5 +17,5 @@ createRoot(document.getElementById('root')!).render(
         <App />
       </ThemeProvider>
     </BrowserRouter>
-  </KeycloakProvider>)
+  </ReactKeycloakProvider>)
 
