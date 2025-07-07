@@ -1,9 +1,9 @@
 import Keycloak from 'keycloak-js';
 
 const keycloak = new Keycloak({
-  url: 'https://api-mcshared.dev.cstar.pagopa.it/auth-itn', // URL del tuo server Keycloak
-  realm: 'merchant-operator',     // Nome del tuo realm
-  clientId: 'frontend',    // ID del tuo client
+  url: import.meta.env.VITE_KEYCLOAK_URL,
+  realm: import.meta.env.VITE_KEYCLOAK_REALM,
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID
 });
 
 export default keycloak;
