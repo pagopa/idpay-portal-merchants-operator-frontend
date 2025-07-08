@@ -31,6 +31,7 @@ variables:
     vite_keycloak_url: '$(UAT_VITE_KEYCLOAK_URL)' 
     vite_keycloak_realm: '$(UAT_VITE_KEYCLOAK_REALM)'
     vite_keycloak_client_id: '$(UAT_VITE_KEYCLOAK_CLIENT_ID)'
+    vite_keycloak_redirect_uri: '$(UAT_VITE_KEYCLOAK_REDIRECT_URI)'
 
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
@@ -53,6 +54,7 @@ variables:
     vite_keycloak_url: '$(PROD_VITE_KEYCLOAK_URL)' 
     vite_keycloak_realm: '$(PROD_VITE_KEYCLOAK_REALM)'
     vite_keycloak_client_id: '$(PROD_VITE_KEYCLOAK_CLIENT_ID)'
+    vite_keycloak_redirect_uri: '$(PROD_VITE_KEYCLOAK_REDIRECT_URI)'
 
 
   # every branch different from past will be considered as DEV
