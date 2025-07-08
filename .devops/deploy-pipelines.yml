@@ -8,10 +8,13 @@ variables:
 
   basePath: portale-esercenti
 
+
   # global variables
   react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
 
+
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
+
     environment: 'UAT'
     azure_subscription: $(UAT_AZURE_SUBSCRIPTION)
     cdn_endpoint: '$(UAT_CDN_ENDPOINT)'
@@ -24,6 +27,7 @@ variables:
     react_app_url_fe_pre_login: '$(UAT_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(UAT_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
+
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -47,6 +51,7 @@ variables:
     react_app_url_fe_pre_login: '$(PROD_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(PROD_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
+
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
@@ -75,15 +80,14 @@ variables:
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
 
+
     #KEYCLOAK ENV
     vite_keycloak_url: '$(DEV_VITE_KEYCLOAK_URL)' 
     vite_keycloak_realm: '$(DEV_VITE_KEYCLOAK_REALM)'
     vite_keycloak_client_id: '$(DEV_VITE_KEYCLOAK_CLIENT_ID)'
     vite_keycloak_redirect_uri: '$(DEV_VITE_KEYCLOAK_REDIRECT_URI)'
     
-        
-
-
+    
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
 trigger:
@@ -186,11 +190,11 @@ stages:
 
 
           - bash: |
-              printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/build/build.info
+              printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
             env:
               EXECUTION_ID: '$(Build.BuildNumber) - $(Build.DefinitionName)($(Build.BuildId))'
             displayName: 'Build info'
-          - publish: $(System.DefaultWorkingDirectory)/build
+          - publish: $(System.DefaultWorkingDirectory)/dist
             artifact: Bundle
 
   # Deploy bundle
@@ -217,4 +221,6 @@ stages:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
               inlineScript: |
+
                 az cdn endpoint purge -g $(resource_group) -n $(cdn_endpoint) --profile-name $(cdn_profile) --content-paths "/$(basePath)" "/$(basePath)/*" "/"
+

@@ -1,13 +1,29 @@
 import './App.css'
 
+import { useAuth } from 'react-oidc-context';
+
+// //components
+import Layout from './components/Layout/Layout';
+
+
 function App() {
+  const auth = useAuth();
+
+  if (auth.isLoading) {
+    return <div>Caricamento sessione...</div>;
+  }
+
+  if (!auth.isAuthenticated) {
+    auth.signinRedirect(); 
+    return <div>Reindirizzamento al login...</div>;
+  }
 
   return (
-    <div>
-      <h1 style={{ textAlign: 'center' }}>Portale operatore punto vendita</h1>
-      <p style={{ textAlign: 'center' }}>Web portal to serve the operators of the single point of sale in the idpay's ecosystem</p>
-    </div>
+    <Layout>
+    </Layout>
+
   )
 }
 
 export default App
+
