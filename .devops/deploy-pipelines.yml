@@ -221,6 +221,25 @@ stages:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
               inlineScript: |
+                echo "🔄 PURGE CDN START"
+                echo "📦 Resource Group: $(resource_group)"
+                echo "📦 CDN Endpoint: $(cdn_endpoint)"
+                echo "📦 CDN Profile: $(cdn_profile)"
+                echo "📂 Paths: /$(basePath), /$(basePath)/*, /"
+
+                az cdn endpoint purge \
+                  -g $(resource_group) \
+                  -n $(cdn_endpoint) \
+                  --profile-name $(cdn_profile) \
+                  --content-paths "/$(basePath)" "/$(basePath)/*" "/"
+
+                if [ $? -eq 0 ]; then
+                  echo "✅ CDN purge executed successfully."
+                else
+                  echo "❌ CDN purge failed with exit code $?"
+                  exit 1
+                fi
+
 
                 az cdn endpoint purge -g $(resource_group) -n $(cdn_endpoint) --profile-name $(cdn_profile) --content-paths "/$(basePath)" "/$(basePath)/*" "/"
 
