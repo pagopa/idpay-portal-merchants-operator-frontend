@@ -225,13 +225,13 @@ stages:
                 echo "📦 Resource Group: $(resource_group)"
                 echo "📦 CDN Endpoint: $(cdn_endpoint)"
                 echo "📦 CDN Profile: $(cdn_profile)"
-                echo "📂 Paths: /$(basePath), /$(basePath)/*, /"
+                echo "📂 Paths: /$(basePath)"
 
                 az cdn endpoint purge \
                   -g $(resource_group) \
                   -n $(cdn_endpoint) \
                   --profile-name $(cdn_profile) \
-                  --content-paths "/$(basePath)" "/$(basePath)/*" "/"
+                  --content-paths "/$(basePath)"
 
                 if [ $? -eq 0 ]; then
                   echo "✅ CDN purge executed successfully."
