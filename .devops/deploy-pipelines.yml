@@ -221,14 +221,16 @@ stages:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
               inlineScript: |
+                echo "🔧 Installing AFD extension if not present..."
+                if ! az extension show --name afd &>/dev/null; then
+                az extension add --name afd --yes
+                fi
+                
                 echo "🔄 PURGE CDN START"
                 echo "📦 Resource Group: $(resource_group)"
                 echo "📦 CDN Endpoint: $(cdn_endpoint)"
                 echo "📦 CDN Profile: $(cdn_profile)"
                 echo "📂 Paths: $(basePath)"
-
-                     # Install AFD extension
-                    az extension add --name afd --yes
 
                      # Execute purge
                      az afd endpoint purge \
@@ -237,10 +239,10 @@ stages:
                      --endpoint-name $(cdn_endpoint) \
                      --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
                      --debug
-  
-                  if [ $? -eq 0 ]; then
-                  echo "✅ CDN purge executed successfully."
+                
+                 if [ $? -eq 0 ]; then
+                echo "✅ Front Door purge executed successfully."
                 else
-                  echo "❌ CDN purge failed with exit code $?"
-                  exit 1
+                echo "❌ Front Door purge failed with exit code $?"
+                exit 1
                 fi
