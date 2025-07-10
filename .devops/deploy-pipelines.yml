@@ -225,6 +225,7 @@ stages:
                 echo "📦 Resource Group: $(resource_group)"
                 echo "📦 CDN Endpoint: $(cdn_endpoint)"
                 echo "📦 CDN Profile: $(cdn_profile)"
+                echo "📂 Paths: $(basePath)"
 
                 az cdn endpoint purge \
                 -g $(resource_group) \
