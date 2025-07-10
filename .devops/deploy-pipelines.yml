@@ -221,10 +221,8 @@ stages:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
               inlineScript: |
-                echo "🔧 Installing AFD extension if not present..."
-                if ! az extension show --name afd &>/dev/null; then
-                az extension add --name afd --yes
-                fi
+                echo "🔧 Forcing installation of AFD extension..."
+                az extension add --source https://aka.ms/azext_frontdoor --yes
                 
                 echo "🔄 PURGE CDN START"
                 echo "📦 Resource Group: $(resource_group)"
