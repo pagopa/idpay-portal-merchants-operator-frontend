@@ -227,11 +227,16 @@ stages:
                 echo "📦 CDN Profile: $(cdn_profile)"
                 echo "📂 Paths: $(basePath)"
 
-                az afd endpoint purge \
-                --resource-group $(resource_group) \
-                --profile-name $(cdn_profile) \
-                --endpoint-name $(cdn_endpoint) \
-                --content-paths "/$(basePath)" "/$(basePath)/*" "/"
+                     # Install AFD extension
+                    az extension add --name afd --yes
+
+                     # Execute purge
+                     az afd endpoint purge \
+                     --resource-group $(resource_group) \
+                     --profile-name $(cdn_profile) \
+                     --endpoint-name $(cdn_endpoint) \
+                     --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
+                     --debug
   
                   if [ $? -eq 0 ]; then
                   echo "✅ CDN purge executed successfully."
