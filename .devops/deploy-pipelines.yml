@@ -228,10 +228,10 @@ stages:
                 echo "📂 Paths: $(basePath)"
 
                      # Execute purge
-                     az afd endpoint purge \
+                     az cdn endpoint purge \
                      --resource-group $(resource_group) \
                      --profile-name $(cdn_profile) \
-                     --endpoint-name $(cdn_endpoint) \
+                     --name $(cdn_endpoint) \
                      --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
                      --debug
                 
