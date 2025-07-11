@@ -220,10 +220,7 @@ stages:
             inputs:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
-              inlineScript: |
-                echo "🔧 Forcing installation of AFD extension..."
-                az extension add --source https://aka.ms/azext_frontdoor --yes
-                
+              inlineScript: |      
                 echo "🔄 PURGE CDN START"
                 echo "📦 Resource Group: $(resource_group)"
                 echo "📦 CDN Endpoint: $(cdn_endpoint)"
