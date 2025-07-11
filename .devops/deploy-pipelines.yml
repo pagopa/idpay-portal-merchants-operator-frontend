@@ -220,7 +220,24 @@ stages:
             inputs:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
-              inlineScript: |
+              inlineScript: |      
+                echo "🔄 PURGE CDN START"
+                echo "📦 Resource Group: $(resource_group)"
+                echo "📦 CDN Endpoint: $(cdn_endpoint)"
+                echo "📦 CDN Profile: $(cdn_profile)"
+                echo "📂 Paths: $(basePath)"
 
-                az cdn endpoint purge -g $(resource_group) -n $(cdn_endpoint) --profile-name $(cdn_profile) --content-paths "/$(basePath)" "/$(basePath)/*" "/"
-
+                     # Execute purge
+                     az cdn endpoint purge \
+                     --resource-group $(resource_group) \
+                     --profile-name $(cdn_profile) \
+                     --name $(cdn_endpoint) \
+                     --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
+                     --debug
+                
+                 if [ $? -eq 0 ]; then
+                echo "✅ Front Door purge executed successfully."
+                else
+                echo "❌ Front Door purge failed with exit code $?"
+                exit 1
+                fi
