@@ -220,7 +220,11 @@ stages:
             inputs:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
-              inlineScript: |
-
-                az cdn endpoint purge -g $(resource_group) -n $(cdn_endpoint) --profile-name $(cdn_profile) --content-paths "/$(basePath)" "/$(basePath)/*" "/"
-
+              inlineScript: |   
+              
+                     az cdn endpoint purge \
+                     --resource-group $(resource_group) \
+                     --profile-name $(cdn_profile) \
+                     --name $(cdn_endpoint) \
+                     --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
+            
