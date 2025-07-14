@@ -35,8 +35,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (authenticated) {
           setIsAuthenticated(true);
           setToken(keycloak.token || null);
-          
-          // Carica le informazioni dell'utente
           const userProfile = await keycloak.loadUserProfile();
           setUser(userProfile);
         }
@@ -49,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initKeycloak();
 
-    // Refresh token automatico
+    // Automatic refresh token
     const refreshToken = () => {
       keycloak.updateToken(70).then((refreshed) => {
         if (refreshed) {
@@ -62,7 +60,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
     };
 
-    // Aggiorna il token ogni 60 secondi
     const interval = setInterval(refreshToken, 60000);
 
     return () => clearInterval(interval);
