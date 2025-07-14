@@ -233,7 +233,7 @@ stages:
                      --profile-name $(cdn_profile) \
                      --name $(cdn_endpoint) \
                      --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
-                     --debug
+                    
                 
                  if [ $? -eq 0 ]; then
                 echo "✅ Front Door purge executed successfully."
