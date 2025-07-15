@@ -6,7 +6,7 @@ variables:
   # Execute agents (jobs) on latest Ubuntu version.
   vmImageNameDefault: 'ubuntu-latest'
 
-  basePath: portale-esercenti
+  basePath: esercente
 
 
   # global variables
