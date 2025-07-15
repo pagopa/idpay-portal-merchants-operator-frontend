@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
 
@@ -65,25 +65,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const login = () => {
+  const login = useCallback(() => {
     keycloak.login();
-  };
+  },[]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     keycloak.logout();
     setIsAuthenticated(false);
     setUser(null);
     setToken(null);
-  };
+  }, [setIsAuthenticated, setUser, setToken]);
 
-  const value: AuthContextType = {
+  const value = useMemo(() => ({
     isAuthenticated,
     user,
     token,
-    login,
-    logout,
+    login, // Le funzioni login e logout dovrebbero essere avvolte in useCallback se cambiano ad ogni render
+    logout, // per evitare che siano "nuove" e causino una ricreazione del 'value'
     loading
-  };
+  }), [isAuthenticated, user, token, login, logout, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
