@@ -11,7 +11,7 @@ const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
 createRoot(rootElement).render(  
   <AuthProvider>
-    <BrowserRouter>
+    <BrowserRouter basename='/esercente'>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <App />
