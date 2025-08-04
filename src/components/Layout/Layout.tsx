@@ -1,5 +1,6 @@
-import { Box } from '@mui/material';
+import { Box ,Typography } from '@mui/material';
 import { Footer } from '@pagopa/selfcare-common-frontend/lib';
+
 
 //components
 import Header from '../Header/Header';
@@ -39,6 +40,13 @@ const Layout = () => {
           onExit={()=>{}}
         />
       </Box>
+        <Typography
+            variant="h1"
+            mb={2}
+
+        >
+            Portale Operatore Punto Vendita
+        </Typography>
       {/* {match !== null ? (
         <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
           <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
