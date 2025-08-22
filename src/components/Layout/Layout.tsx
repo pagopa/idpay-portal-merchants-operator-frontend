@@ -1,7 +1,9 @@
-import { Box ,Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { Footer } from '@pagopa/selfcare-common-frontend/lib';
 
-
+type Props = {
+  children?: React.ReactNode;
+};
 //components
 import Header from '../Header/Header';
 // import SideMenu from '../SideMenu/SideMenu';
@@ -11,7 +13,7 @@ import Header from '../Header/Header';
 //   children?: React.ReactNode;
 // };
 
-const Layout = () => {
+const Layout = ({ children }: Props) => {
 //   const location = useLocation();
 //   const [showAssistanceInfo, setShowAssistanceInfo] = useState(true);
 
@@ -40,13 +42,14 @@ const Layout = () => {
           onExit={()=>{}}
         />
       </Box>
-        <Typography
-            variant="h1"
-            mb={2}
+        {/*<Typography*/}
+        {/*    variant="h1"*/}
+        {/*    mb={2}*/}
 
-        >
-            Portale Operatore Punto Vendita
-        </Typography>
+        {/*>*/}
+        {/*    Portale Operatore Punto Vendita*/}
+        {/*</Typography>*/}
+      {children}
       {/* {match !== null ? (
         <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
           <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
