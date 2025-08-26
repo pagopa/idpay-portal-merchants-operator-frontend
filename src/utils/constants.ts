@@ -7,3 +7,4 @@ export const LOG_REDUX_ACTIONS = IS_DEVELOP;
 
 
 
+export const REQUIRED_FIELD_ERROR = "Campo obbligatorio";

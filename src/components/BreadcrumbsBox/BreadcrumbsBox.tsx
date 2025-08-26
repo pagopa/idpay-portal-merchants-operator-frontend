@@ -1,23 +1,22 @@
 import { Box, Breadcrumbs, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ButtonNaked } from '@pagopa/mui-italia';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   backLabel: string;
   items: Array<string | undefined>;
+  active: boolean;
 }
 
-const BreadcrumbsBox = ({ backLabel, items }: Props) => {
-  const history = useHistory();
+const BreadcrumbsBox = ({ backLabel, items, active }: Props) => {
+  const navigate = useNavigate();
   return (
     <Box sx={{ display: 'grid', gridColumn: 'span 12' }}>
       <Breadcrumbs aria-label="breadcrumb">
         <ButtonNaked
           component="button"
-          onClick={() => history.goBack()}
+          onClick={() => active && navigate(-1)}
           startIcon={<ArrowBackIcon />}
           sx={{ color: 'primary.main', fontSize: '1rem', marginBottom: '3px' }}
           weight="default"
@@ -26,7 +25,7 @@ const BreadcrumbsBox = ({ backLabel, items }: Props) => {
           {backLabel}
         </ButtonNaked>
         {items.map((label, index) => (
-          <Typography color="text.primary" variant="body2" key={index}>
+          <Typography color="text.primary" variant="body2" key={index}  >
             {label}
           </Typography>
         ))}

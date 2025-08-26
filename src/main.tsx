@@ -6,6 +6,7 @@ import { theme } from '@pagopa/mui-italia';
 import { BrowserRouter } from 'react-router-dom';
 
 import { AuthProvider } from "./contexts/AuthContext";
+import './locale';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');

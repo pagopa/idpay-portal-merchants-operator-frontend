@@ -19,6 +19,7 @@ export default function AcceptDiscountCard({ titleBox, children , subTitleBox ,i
                     mtTitle={2}
                     variantTitle="h6"
                     subTitle={subTitleBox}
+                    variantSubTitle="body2"
                 />
             </Box>
             <Box>

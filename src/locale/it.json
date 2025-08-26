@@ -145,6 +145,19 @@
       "spendingInfoTitle": "Qual è l'Importo totale della spesa?",
       "subtitle": "Compila i campi e genera buoni sconto da inviare ai tuoi clienti per usufruire dell’iniziativa.",
       "title": "Crea un nuovo buono sconto"
+    },
+    "acceptDiscount": {
+      "title": "Accetta Buono Sconto",
+      "subtitle": "Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa",
+      "selectProduct": "Seleziona il prodotto soggetto all'iniziativa",
+      "selectProductTitle": "Seleziona il prodotto",
+      "expenseAmount": "Qual'è l'importo totale della spesa?",
+      "insertAmount": "Inserisci l'importo totale della spesa,ci servirà per calcolare lo sconto massimo applicabile.",
+      "search": "Cerca",
+      "expenditureAmount": "Importo della spesa",
+      "whatDiscountCode": "Qual'è il codice sconto?",
+      "discountCode": "Codice sconto",
+      "insertDiscountCode": "Inserisci il codice sconto generato dal cliente."
     }
   },
   "roles": {

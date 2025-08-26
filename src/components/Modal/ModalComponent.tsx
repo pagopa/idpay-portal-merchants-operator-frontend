@@ -1,5 +1,5 @@
 import { Modal, Box } from "@mui/material";
-import React, {FC} from "react";
+import React from "react";
 
 interface ModalComponentProps {
     open: boolean;
@@ -9,7 +9,7 @@ interface ModalComponentProps {
     className?: string;
 }
 
-const ModalComponent: FC<ModalComponentProps> = ({ open, onClose, children, style, className }) => {
+const ModalComponent = ({ open, onClose, children, style, className }: ModalComponentProps) => {
 
     const handleClose = () => {
         onClose();

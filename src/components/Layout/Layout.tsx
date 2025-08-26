@@ -1,31 +1,20 @@
 import { Box } from '@mui/material';
 import { Footer } from '@pagopa/selfcare-common-frontend/lib';
+import { useLocation } from 'react-router-dom';
 
+import ROUTES from '../../routes';
 type Props = {
   children?: React.ReactNode;
 };
 //components
 import Header from '../Header/Header';
-// import SideMenu from '../SideMenu/SideMenu';
-// import ROUTES from '../../routes';
-
-// type Props = {
-//   children?: React.ReactNode;
-// };
+import SideMenu from '../SideMenu/SideMenu';
 
 const Layout = ({ children }: Props) => {
-//   const location = useLocation();
-//   const [showAssistanceInfo, setShowAssistanceInfo] = useState(true);
+  const location = useLocation();
 
-//   const match =
-//     matchPath({ path: ROUTES.HOME, end: true }, location.pathname) ||
-//     matchPath({ path: ROUTES.PRODUCTS, end: true }, location.pathname) ||
-//     matchPath({ path: ROUTES.UPLOADS, end: true }, location.pathname);
-
-//   useEffect(() => {
-//     setShowAssistanceInfo(location.pathname !== ROUTES.ASSISTANCE);
-//   }, [location.pathname]);
-
+  // const match = matchPath({ path: ROUTES.HOME, end: true }, location.pathname);
+  const match = null;
   return (
     <Box
       display="grid"
@@ -42,15 +31,7 @@ const Layout = ({ children }: Props) => {
           onExit={()=>{}}
         />
       </Box>
-        {/*<Typography*/}
-        {/*    variant="h1"*/}
-        {/*    mb={2}*/}
-
-        {/*>*/}
-        {/*    Portale Operatore Punto Vendita*/}
-        {/*</Typography>*/}
-      {children}
-      {/* {match !== null ? (
+      {match !== null ? (
         <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
           <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
             <SideMenu />
@@ -91,7 +72,7 @@ const Layout = ({ children }: Props) => {
             {children}
           </Box>
         </Box>
-      )} */}
+      )}
       <Box gridArea="footer">
         <Footer onExit={() =>{}} loggedUser={false} />
       </Box>
