@@ -1,4 +1,4 @@
-import { Header as CommonHeader } from '@pagopa/selfcare-common-frontend/lib';
+import { Header as CommonHeader } from '@pagopa/selfcare-common-frontend';
 
 type Props = {
   withSecondHeader: boolean;

@@ -1,30 +1,28 @@
 import { Box } from '@mui/material';
-import { Footer } from '@pagopa/selfcare-common-frontend/lib';
+import { Footer } from '@pagopa/selfcare-common-frontend';
+import { useLocation } from 'react-router-dom';
+import { matchPath } from 'react-router-dom';
+import ROUTES from '../../routes';
+import SideMenu from "../SideMenu/SideMenu";
 
 type Props = {
   children?: React.ReactNode;
 };
 //components
 import Header from '../Header/Header';
-// import SideMenu from '../SideMenu/SideMenu';
-// import ROUTES from '../../routes';
 
 // type Props = {
 //   children?: React.ReactNode;
 // };
 
 const Layout = ({ children }: Props) => {
-//   const location = useLocation();
-//   const [showAssistanceInfo, setShowAssistanceInfo] = useState(true);
+  const location = useLocation();
 
-//   const match =
-//     matchPath({ path: ROUTES.HOME, end: true }, location.pathname) ||
-//     matchPath({ path: ROUTES.PRODUCTS, end: true }, location.pathname) ||
-//     matchPath({ path: ROUTES.UPLOADS, end: true }, location.pathname);
-
-//   useEffect(() => {
-//     setShowAssistanceInfo(location.pathname !== ROUTES.ASSISTANCE);
-//   }, [location.pathname]);
+  const match = matchPath(location.pathname, {
+    path: [ROUTES.HOME],
+    exact: true,
+    strict: false,
+  });
 
   return (
     <Box
@@ -42,15 +40,7 @@ const Layout = ({ children }: Props) => {
           onExit={()=>{}}
         />
       </Box>
-        {/*<Typography*/}
-        {/*    variant="h1"*/}
-        {/*    mb={2}*/}
-
-        {/*>*/}
-        {/*    Portale Operatore Punto Vendita*/}
-        {/*</Typography>*/}
-      {children}
-      {/* {match !== null ? (
+      {match !== null ? (
         <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
           <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
             <SideMenu />
@@ -91,9 +81,9 @@ const Layout = ({ children }: Props) => {
             {children}
           </Box>
         </Box>
-      )} */}
+      )}
       <Box gridArea="footer">
-        <Footer onExit={() =>{}} loggedUser={false} />
+        <Footer onExit={() =>{}} loggedUser={true} />
       </Box>
     </Box>
   );

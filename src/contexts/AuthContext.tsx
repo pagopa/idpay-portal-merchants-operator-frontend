@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
 
 interface AuthContextType {
@@ -23,20 +22,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [keycloak, setKeycloak] = useState<any>(null);
+
   useEffect(() => {
+  let interval: any;
     const initKeycloak = async () => {
       try {
-        const authenticated = await keycloak.init({
+        const { default: Keycloak } = await import('keycloak-js');
+        const kc = new Keycloak({
+          url: process.env.REACT_APP_KEYCLOAK_URL!,
+          realm: process.env.REACT_APP_KEYCLOAK_REALM!,
+          clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID!
+        });
+        setKeycloak(kc) ;
+
+
+        const authenticated = await kc.init({
           onLoad: 'login-required',
-          checkLoginIframe: false,
           pkceMethod: 'S256'
         });
 
         if (authenticated) {
           setIsAuthenticated(true);
-          setToken(keycloak.token || null);
-          const userProfile = await keycloak.loadUserProfile();
+          setToken(kc.token || null);
+          const userProfile = await kc.loadUserProfile();
           setUser(userProfile);
+
+          interval = setInterval(async () => {
+            try {
+              const refreshed = await kc.updateToken(70);
+              if (refreshed) {
+                setToken(kc.token || null);
+                console.log('Token aggiornato');
+              }
+            } catch {
+              console.log('Impossibile aggiornare il token');
+              logout();
+            }
+          }, 60000);
         }
       } catch (error) {
         console.error('Errore inizializzazione Keycloak:', error);
@@ -46,21 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initKeycloak();
-
-    // Automatic refresh token
-    const refreshToken = () => {
-      keycloak.updateToken(70).then((refreshed) => {
-        if (refreshed) {
-          setToken(keycloak.token || null);
-          console.log('Token aggiornato');
-        }
-      }).catch(() => {
-        console.log('Impossibile aggiornare il token');
-        logout();
-      });
-    };
-
-    const interval = setInterval(refreshToken, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -80,8 +88,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     user,
     token,
-    login, // Le funzioni login e logout dovrebbero essere avvolte in useCallback se cambiano ad ogni render
-    logout, // per evitare che siano "nuove" e causino una ricreazione del 'value'
+    login,
+    logout,
     loading
   }), [isAuthenticated, user, token, login, logout, loading]);
 

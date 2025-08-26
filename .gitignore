@@ -1,26 +1,59 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+bin
+obj
+csx
+.vs
+edge
+Publish
+
+*.user
+*.suo
+*.cscfg
+*.Cache
+project.lock.json
+
+/packages
+/TestResults
+
+/tools/NuGet.exe
+/App_Data
+/secrets
+/data
+.secrets
+appsettings.json
+local.settings.json
 
 node_modules
+generated
 build
+local
 dist
-dist-ssr
-*.local
-.env
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+# Local python packages
+.python_packages/
+
+# Python Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+.eslintcache
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+coverage
+
+yarn-error.log
+
+*.zip
+
+!jest.config.js
+!.release-it.js
 .idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.vscode
+ 

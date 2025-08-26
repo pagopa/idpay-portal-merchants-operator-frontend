@@ -1,10 +1,10 @@
-import {Box, Button, Grid, TextField, Typography} from '@mui/material';
-import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
-import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import AcceptDiscountCard from './AcceptDiscountCard';
+import {Box, Button, Grid, TextField} from '@mui/material';
+import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import { TitleBox } from '@pagopa/selfcare-common-frontend';
+import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import ModalComponent from '../../components/Modal/ModalComponent';
+import AcceptDiscountCard from './AcceptDiscountCard';
 
 
 
@@ -16,6 +16,10 @@ const AcceptDiscount = () => {
         totalAmount?: number;
         discount?: string;
     }>({});
+
+    useEffect(() => {
+        console.log(setFieldErrors({}));
+    }, []);
 
 
     return (
@@ -30,30 +34,30 @@ const AcceptDiscount = () => {
                     subTitle={"Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa"}
                 />
             </Box>
-            <Grid container spacing={12} mb={3}>
-                <Grid item xs={12} md={12} lg={6}>
+            <Grid container spacing={2} mb={3}>
+                <Grid item xs={12} md={12} lg={12}>
                     <AcceptDiscountCard
                         titleBox={"Seleziona il prodotto soggetto all'iniziativa"}
                         inputTitle={"Seleziona il prodotto"}
                     >
-                     <TextField variant="outlined" label={"Cerca"} />
+                     <TextField variant="outlined" label={"Cerca"} sx={{mt: 2}} size='small'/>
                     </AcceptDiscountCard>
                 </Grid>
-                <Grid item xs={12} md={12} lg={6}>
+                <Grid item xs={12} md={12} lg={12}>
                     <AcceptDiscountCard
                         titleBox={"Qual'è l'importo totale della spesa?"}
                         subTitleBox={"Inserisci l'importo totale della spesa,ci servirà per calcolare lo sconto massimo applicabile."}
                     >
-                        <TextField variant="outlined" label={"Importo della spesa"} />
+                        <TextField variant="outlined" label={"Importo della spesa"} size='small' />
                     </AcceptDiscountCard>
                 </Grid>
-                <Grid item xs={12} md={12} lg={6}>
+                <Grid item xs={12} md={12} lg={12}>
                     <AcceptDiscountCard
                         titleBox={"Qual'è il codice sconto?"}
                         subTitleBox={"Inserisci il codice sconto generato dal cliente."}
                         inputTitle={"Inserisci codice sconto"}
                     >
-                        <TextField variant="outlined" label={"Codice sconto"}/>
+                        <TextField variant="outlined" label={"Codice sconto"} size='small' sx={{mt: 2}}/>
                     </AcceptDiscountCard>
                 </Grid>
             </Grid>
