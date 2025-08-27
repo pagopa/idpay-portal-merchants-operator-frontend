@@ -6,7 +6,7 @@
   ],
   "compilerOptions": {
     "typeRoots": ["./node_modules/@types"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "vitest"],
     "strict": false,
     "skipLibCheck": false
   }

@@ -1,27 +1,29 @@
 import { Header as CommonHeader } from '@pagopa/selfcare-common-frontend/lib';
+// import { User } from '@pagopa/selfcare-common-frontend/lib';
+import { useAuth } from '../../contexts/AuthContext';
 
 type Props = {
   withSecondHeader: boolean;
-  onExit: (exitAction: () => void) => void;
-//   loggedUser?: User;
 };
 
 const Header = ({ withSecondHeader }: /* , parties */ Props) => {
+
+  const { user }: any = useAuth();
+  console.log("USER", user)
 
   return (
     <CommonHeader
       onExit={() => {}}
       withSecondHeader={withSecondHeader}
       loggedUser={
-        false
-        // loggedUser
-        //   ? {
-        //       id: loggedUser ? loggedUser.uid : '',
-        //       name: loggedUser?.name,
-        //       surname: loggedUser?.surname,
-        //       email: loggedUser?.email,
-        //     }
-        //   : false
+        user
+          ? {
+              id: user ? user.id : '',
+              name: user?.username,
+              surname: user?.lastName,
+              email: user?.email,
+            }
+          : false
       }
       enableLogin={false}
     />

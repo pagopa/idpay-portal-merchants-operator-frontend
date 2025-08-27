@@ -27,8 +27,7 @@ const Layout = ({ children }: Props) => {
     >
       <Box gridArea="header">
         <Header
-          withSecondHeader={false}
-          onExit={()=>{}}
+          withSecondHeader={true}
         />
       </Box>
       {match !== null ? (
@@ -74,7 +73,7 @@ const Layout = ({ children }: Props) => {
         </Box>
       )}
       <Box gridArea="footer">
-        <Footer onExit={() =>{}} loggedUser={false} />
+        <Footer onExit={() =>{}} loggedUser={true} />
       </Box>
     </Box>
   );
