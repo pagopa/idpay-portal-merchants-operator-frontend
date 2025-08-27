@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
+import type { User } from '../utils/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: unknown;
+  user: User;
   token: string | null;
   login: () => void;
   logout: () => void;
@@ -19,7 +20,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<unknown>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
