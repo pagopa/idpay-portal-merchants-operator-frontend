@@ -3,9 +3,11 @@ import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { getProductsList } from '../../services/merchantService';
+
 
 interface FormData {
     product: string | null;
@@ -30,6 +32,19 @@ const AcceptDiscount = () => {
         discountCode: ''
     });
 
+    useEffect(() => {
+        fetchProductsList();
+    }, []);
+
+    const fetchProductsList = async () => {
+        try {
+            const productsList = await getProductsList();
+            console.log(productsList);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const handleValidateData = () => {
         const errors: Record<string, boolean> = {};
         let isValid = true;
@@ -50,6 +65,7 @@ const AcceptDiscount = () => {
         setFieldErrors(errors);
         if(isValid){
             console.log("VALID");
+
         }
       };
 

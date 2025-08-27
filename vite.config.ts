@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 
 const viteConfig = defineConfig({
   plugins: [react()],
+  define: {
+    'process.env': process.env,
+  },
   base: '/esercente/',
   build: {
     outDir: 'dist',

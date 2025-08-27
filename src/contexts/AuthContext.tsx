@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useMemo, useCall
 import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
 import type { JwtUser } from '../utils/types';
+import { authStore } from '../store/authStore';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -18,11 +19,14 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<JwtUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const initKeycloak = async () => {
@@ -81,8 +85,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     user,
     token,
-    login, // Le funzioni login e logout dovrebbero essere avvolte in useCallback se cambiano ad ogni render
-    logout, // per evitare che siano "nuove" e causino una ricreazione del 'value'
+    login,
+    logout,
     loading
   }), [isAuthenticated, user, token, login, logout, loading]);
 
@@ -90,9 +94,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 };
 
 export const useAuth = (): AuthContextType => {
+  const setJwtToken = authStore((state) => state.setJwtToken);
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth deve essere usato all\'interno di un AuthProvider');
   }
+  setJwtToken(context.token || null);
   return context;
 };

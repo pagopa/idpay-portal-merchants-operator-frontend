@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "generate": "npm-run-all generate:*",
     "clean:api-merchants": "rimraf src/api/generated/merchants && rimraf openApi/generated",
-    "generate:api-merchants": "yarn run clean:api-merchants && mkdirp openApi/generated && api-spec-converter --from=openapi_3 --to=swagger_2 openApi/merchants.openapi.yml > openApi/generated/merchants-swagger20.json && node ./node_modules/@pagopa/selfcare-common-frontend/utils/fixSwagger20ArraySchemaDef.js openApi/generated/merchants-swagger20.json && node ./openApi/scripts/api-merchants_fixPreGen.js && gen-api-models --api-spec openApi/generated/merchants-swagger20.json --out-dir src/api/generated/merchants --no-strict --request-types --response-decoders --client && node openApi/scripts/api-merchants_fixPostGen.js",
+    "generate:api-merchants": "yarn run clean:api-merchants && mkdirp openApi/generated && api-spec-converter --from=openapi_3 --to=swagger_2 openApi/openapi.merchants.op.portal.yml > openApi/generated/merchants-swagger20.json && node ./node_modules/@pagopa/selfcare-common-frontend/utils/fixSwagger20ArraySchemaDef.js openApi/generated/merchants-swagger20.json && node ./openApi/scripts/api-merchants_fixPreGen.js && gen-api-models --api-spec openApi/generated/merchants-swagger20.json --out-dir src/api/generated/merchants --no-strict --request-types --response-decoders --client && node openApi/scripts/api-merchants_fixPostGen.js",
     "clean:api-role-permission": "rimraf src/api/generated/role-permission",
     "generate:api-role-permission": "yarn run clean:api-role-permission && mkdirp openApi/generated && api-spec-converter --from=openapi_3 --to=swagger_2 openApi/role-permission.openapi.yml > openApi/generated/role-permission-swagger20.json && node ./node_modules/@pagopa/selfcare-common-frontend/utils/fixSwagger20ArraySchemaDef.js openApi/generated/role-permission-swagger20.json && node ./openApi/scripts/api-role-permission_fixPreGen.js && gen-api-models --api-spec openApi/generated/role-permission-swagger20.json --out-dir src/api/generated/role-permission --no-strict --request-types --response-decoders --client && node openApi/scripts/api-role-permission_fixPostGen.js",
     "clean:api-email-notification": "rimraf src/api/generated/email-notification",
@@ -45,7 +45,8 @@
     "react-dropzone": "^14.3.8",
     "react-i18next": "^15.1.2",
     "react-oidc-context": "^3.3.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
