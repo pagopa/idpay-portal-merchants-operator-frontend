@@ -1,26 +1,28 @@
 import './App.css'
-
-import { useAuth } from 'react-oidc-context';
-
-// //components
 import Layout from './components/Layout/Layout';
-
+import ProtectedRoute from './components/ProtectedRoute';
+// import {Switch} from "@mui/material";
+// import {Route} from "react-router-dom";
+import AcceptDiscount from "./pages/AcceptDiscount/AcceptDiscount.tsx";
 
 function App() {
-  const auth = useAuth();
-
-  if (auth.isLoading) {
-    return <div>Caricamento sessione...</div>;
-  }
-
-  if (!auth.isAuthenticated) {
-    auth.signinRedirect(); 
-    return <div>Reindirizzamento al login...</div>;
-  }
 
   return (
-    <Layout>
-    </Layout>
+    <div className="min-h-screen bg-gray-100">
+      <ProtectedRoute>
+            <Layout>
+                {/*<Switch>*/}
+                {/*    <Route path={"/accetta-buono-sconto"}>*/}
+                {/*        <AcceptDiscount />*/}
+                {/*        </Route>*/}
+                {/*    <Route path={"/accetta-buono"}>*/}
+                {/*        <AcceptDiscount />*/}
+                {/*    </Route>*/}
+                {/*</Switch>*/}
+                <AcceptDiscount />
+            </Layout>
+      </ProtectedRoute>
+    </div>
 
   )
 }

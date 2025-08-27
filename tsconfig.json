@@ -5,8 +5,10 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types", "./node_modules/keycloakify/types"],
-    "types": ["vite/client"]
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["vite/client", "vitest"],
+    "strict": false,
+    "skipLibCheck": false
   }
 }
 

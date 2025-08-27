@@ -5,23 +5,14 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { BrowserRouter } from 'react-router-dom';
 
-import { AuthProvider } from "react-oidc-context";
+import { AuthProvider } from "./contexts/AuthContext";
+import './locale';
 
-
-const oidcConfig = {
-  authority: import.meta.env.VITE_OIDC_AUTHORITY, //provider url
-  client_id: import.meta.env.VITE_OIDC_CLIENT_ID, //client univoque id
-  redirect_uri: import.meta.env.VITE_OIDC_REDIRECT_URI, //redirect uri after a successful login
-  automaticSilentRenew: true, // automatically renews tokens
-  onSigninCallback: () => {
-    // clean the url after a successful login
-    window.history.replaceState({}, document.title, window.location.pathname);
-  },
-};
-
-createRoot(document.getElementById('root')!).render(
-  <AuthProvider {...oidcConfig}>
-    <BrowserRouter>
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Failed to find the root element');
+createRoot(rootElement).render(  
+  <AuthProvider>
+    <BrowserRouter basename='/esercente'>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <App />

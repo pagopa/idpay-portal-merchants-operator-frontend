@@ -6,7 +6,7 @@ variables:
   # Execute agents (jobs) on latest Ubuntu version.
   vmImageNameDefault: 'ubuntu-latest'
 
-  basePath: portale-esercenti
+  basePath: esercente
 
 
   # global variables
@@ -32,9 +32,10 @@ variables:
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
     #KEYCLOAK ENV
-    vite_oidc_authority: '$(UAT_VITE_KEYCLOAK_URL)/realms/$(UAT_VITE_KEYCLOAK_REALM)' 
-    vite_oidc_client_id: '$(UAT_VITE_KEYCLOAK_CLIENT_ID)'
-    vite_oidc_redirect_uri: '$(UAT_VITE_KEYCLOAK_REDIRECT_URI)'
+    vite_keycloak_url: '$(UAT_VITE_KEYCLOAK_URL)' 
+    vite_keycloak_realm: '$(UAT_VITE_KEYCLOAK_REALM)'
+    vite_keycloak_client_id: '$(UAT_VITE_KEYCLOAK_CLIENT_ID)'
+    vite_keycloak_redirect_uri: '$(UAT_VITE_KEYCLOAK_REDIRECT_URI)'
 
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
@@ -55,9 +56,10 @@ variables:
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
     #KEYCLOAK ENV
-    vite_oidc_authority: '$(PROD_VITE_KEYCLOAK_URL)/realms/$(PROD_VITE_KEYCLOAK_REALM)' 
-    vite_oidc_client_id: '$(PROD_VITE_KEYCLOAK_CLIENT_ID)'
-    vite_oidc_redirect_uri: '$(PROD_VITE_KEYCLOAK_REDIRECT_URI)'
+    vite_keycloak_url: '$(PROD_VITE_KEYCLOAK_URL)' 
+    vite_keycloak_realm: '$(PROD_VITE_KEYCLOAK_REALM)'
+    vite_keycloak_client_id: '$(PROD_VITE_KEYCLOAK_CLIENT_ID)'
+    vite_keycloak_redirect_uri: '$(PROD_VITE_KEYCLOAK_REDIRECT_URI)'
 
 
   # every branch different from past will be considered as DEV
@@ -80,13 +82,12 @@ variables:
 
 
     #KEYCLOAK ENV
-    vite_oidc_authority: '$(DEV_VITE_KEYCLOAK_URL)/realms/$(DEV_VITE_KEYCLOAK_REALM)' 
-    vite_oidc_client_id: '$(DEV_VITE_KEYCLOAK_CLIENT_ID)'
-    vite_oidc_redirect_uri: '$(DEV_VITE_KEYCLOAK_REDIRECT_URI)'
+    vite_keycloak_url: '$(DEV_VITE_KEYCLOAK_URL)' 
+    vite_keycloak_realm: '$(DEV_VITE_KEYCLOAK_REALM)'
+    vite_keycloak_client_id: '$(DEV_VITE_KEYCLOAK_CLIENT_ID)'
+    vite_keycloak_redirect_uri: '$(DEV_VITE_KEYCLOAK_REDIRECT_URI)'
     
     
-
-
 # Automatically triggered on PR
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
 trigger:
@@ -180,12 +181,13 @@ stages:
               REACT_APP_ONE_TRUST_PRIVACY_POLICY_ID: $(react_app_one_trust_privacy_policy_id)
               REACT_APP_ONE_TRUST_PRIVACY_POLICY_JSON_URL: $(react_app_one_trust_privacy_policy_json_url)
               REACT_APP_ONE_TRUST_TOS_ID: $(react_app_one_trust_tos_id)
-
               REACT_APP_ONE_TRUST_TOS_JSON_URL: $(react_app_one_trust_tos_json_url)                  
               
-              VITE_OIDC_AUTHORITY: '$(vite_oidc_authority)' 
-              VITE_OIDC_CLIENT_ID: '$(vite_oidc_client_id)'
-              VITE_OIDC_REDIRECT_URI: '$(vite_oidc_redirect_uri)'
+              VITE_KEYCLOAK_URL: '$(vite_keycloak_url)' 
+              VITE_KEYCLOAK_REALM: '$(vite_keycloak_realm)'
+              VITE_KEYCLOAK_CLIENT_ID: '$(vite_keycloak_client_id)'
+              VITE_KEYCLOAK_REDIRECT_URI: '$(vite_keycloak_redirect_uri)'
+
 
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
@@ -218,7 +220,11 @@ stages:
             inputs:
               azureSubscription: '$(AZURE_SUBSCRIPTION)'
               scriptLocation: inlineScript
-              inlineScript: |
-
-                az cdn endpoint purge -g $(resource_group) -n $(cdn_endpoint) --profile-name $(cdn_profile) --content-paths "/$(basePath)" "/$(basePath)/*" "/"
-
+              inlineScript: |   
+              
+                     az cdn endpoint purge \
+                     --resource-group $(resource_group) \
+                     --profile-name $(cdn_profile) \
+                     --name $(cdn_endpoint) \
+                     --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
+            
