@@ -26,7 +26,9 @@ const vitestConfig = defineVitestConfig({
         branches: 80,
         functions: 80,
         statements: 80
-      }
+      },
+      exclude: ['**/openApi/**', '**/src/config/**', '**/src/utils/constants.ts',
+        ...coverageConfigDefaults.exclude]
     }
   },
 });
