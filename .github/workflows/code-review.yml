@@ -1,0 +1,53 @@
+name: 'coverage'
+
+on:
+  push:
+    branches:
+      - main
+      - uat
+      - develop
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install --immutable --check-cache || yarn install --force
+
+      - name: 'Run Vitest with Coverage'
+        run: yarn test:coverage
+
+      - name: 'Report Coverage'
+        # Set if: always() to also generate the report if tests are failing
+        # Only works if you set `reportOnFailure: true` in your vite config as specified above
+        if: always()
+        uses:  davelosert/vitest-coverage-report-action@8ab049ff5a2c6e78f78af446329379b318544a1a # v2.8.3
+
+      - name: SonarCloud Scan
+        if: always()
+        uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONARCLOUD_ORG }}
+            -Dsonar.projectKey=${{ vars.SONARCLOUD_PROJECT_KEY }}
+            -Dsonar.projectName="${{ vars.SONARCLOUD_PROJECT_NAME }}"
