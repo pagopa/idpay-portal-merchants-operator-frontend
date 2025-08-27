@@ -1,5 +1,5 @@
 import { defineConfig, mergeConfig } from 'vite';
-import { defineConfig as defineVitestConfig } from 'vitest/config';
+import { coverageConfigDefaults, defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 const viteConfig = defineConfig({
@@ -26,7 +26,9 @@ const vitestConfig = defineVitestConfig({
         branches: 80,
         functions: 80,
         statements: 80
-      }
+      },
+      exclude: ['**/openApi/**', '**/src/config/**', '**/src/utils/constants.ts',
+        ...coverageConfigDefaults.exclude]
     }
   },
 });
