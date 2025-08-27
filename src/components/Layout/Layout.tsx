@@ -26,9 +26,7 @@ const Layout = ({ children }: Props) => {
       minHeight="100vh"
     >
       <Box gridArea="header">
-        <Header
-          withSecondHeader={true}
-        />
+        <Header />
       </Box>
       {match !== null ? (
         <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">

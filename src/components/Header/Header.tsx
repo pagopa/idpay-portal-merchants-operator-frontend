@@ -1,11 +1,19 @@
 import type { ProductEntity } from '@pagopa/mui-italia';
 import { useAuth } from '../../contexts/AuthContext';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
+import type { LoggedUser } from '../../utils/types';
 
 const Header = () => {
 
   const { user } = useAuth();
-  console.log("USER", user)
+  const loggedUser: LoggedUser = {
+    id: user.id,
+    name: user.firstName,
+    email: user.email,
+    surname: user.lastName,
+  }
+
+
 
   const welfareProduct: ProductEntity = {
     // TODO check if correct
@@ -31,7 +39,7 @@ const Header = () => {
         label: "PagoPA S.p.A.",
         ariaLabel: "PagoPA S.p.A.",
         title: "PagoPA S.p.A.",
-      }} loggedUser={user} onAssistanceClick={() => { }} onLogin={() => { }} onLogout={() => { }}
+      }} loggedUser={loggedUser} onAssistanceClick={() => { }} onLogin={() => { }} onLogout={() => { }}
       />
 
       <HeaderProduct
