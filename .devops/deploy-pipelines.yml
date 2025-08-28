@@ -226,5 +226,4 @@ stages:
                 --profile-name $(cdn_profile) \
                 --endpoint-name $(cdn_endpoint) \
                 --domains $(cdn_domains) \
-                --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
-                --no-wait false
+                --content-paths "/$(basePath)" "/$(basePath)/*" "/"
