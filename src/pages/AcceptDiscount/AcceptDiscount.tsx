@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField } from '@mui/material';
+import { Box, Button, Grid, InputAdornment, TextField } from '@mui/material';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
@@ -7,7 +7,8 @@ import { useState, useEffect } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { getProductsList } from '../../services/merchantService';
-
+import AutocompleteVirtualized from '../../components/Autocomplete/AutocompleteVirtualized';
+// import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
 
 interface FormData {
     product: string | null;
@@ -32,6 +33,7 @@ const AcceptDiscount = () => {
         discountCode: ''
     });
 
+
     useEffect(() => {
         fetchProductsList();
     }, []);
@@ -41,35 +43,35 @@ const AcceptDiscount = () => {
             const productsList = await getProductsList();
             console.log(productsList);
         } catch (error) {
-            console.error(error);
+            console.log(error.status);
         }
     }
 
     const handleValidateData = () => {
         const errors: Record<string, boolean> = {};
         let isValid = true;
-      
+
         if (!formData.product) {
-          errors.product = true;
-          isValid = false;
+            errors.product = true;
+            isValid = false;
         }
         if (!formData.totalAmount) {
-          errors.totalAmount = true;
-          isValid = false;
+            errors.totalAmount = true;
+            isValid = false;
         }
         if (!formData.discountCode) {
-          errors.discountCode = true;
-          isValid = false;
+            errors.discountCode = true;
+            isValid = false;
         }
-      
+
         setFieldErrors(errors);
-        if(isValid){
+        if (isValid) {
             console.log("VALID");
 
         }
-      };
+    };
 
-      const handleFieldChange = (field: keyof FormData, value: any) => {
+    const handleFieldChange = (field: keyof FormData, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -94,17 +96,7 @@ const AcceptDiscount = () => {
                         titleBox={t('pages.acceptDiscount.selectProduct')}
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
-                        <TextField
-                            variant="outlined"
-                            label={t('pages.acceptDiscount.search')}
-                            size='small'
-                            sx={{
-                                mt: 2, '& .MuiFormLabel-root.Mui-error': {
-                                    color: '#5C6E82 !important',
-                                },
-                            }}
-                            error={!!fieldErrors.product} helperText={fieldErrors.product ? REQUIRED_FIELD_ERROR : ""} 
-                            onChange={(e) => handleFieldChange('product', e.target.value)}
+                        <AutocompleteVirtualized
                         />
                     </AcceptDiscountCard>
                 </Grid>
@@ -124,6 +116,11 @@ const AcceptDiscount = () => {
                             }}
                             error={!!fieldErrors.totalAmount} helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ""}
                             onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
+                            slotProps={{
+                                input: {
+                                  startAdornment: <InputAdornment position="start">€</InputAdornment>,
+                                },
+                              }}
                         />
                     </AcceptDiscountCard>
                 </Grid>
@@ -141,7 +138,7 @@ const AcceptDiscount = () => {
                                 mt: 2, '& .MuiFormLabel-root.Mui-error': {
                                     color: '#5C6E82 !important',
                                 },
-                            }} 
+                            }}
                             error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
                             onChange={(e) => handleFieldChange('discountCode', e.target.value)}
                         />

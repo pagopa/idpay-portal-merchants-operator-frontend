@@ -16,7 +16,7 @@ const withBearer: WithDefaultsT<'Bearer'> = (wrappedOperation) => (params: any) 
 
   const apiClient = createClient({
     baseUrl: import.meta.env.VITE_API_URL,
-    basePath: '',
+    basePath: "",
     fetchApi: buildFetchApi(import.meta.env.VITE_API_TIMEOUT_MS),
     withDefaults: withBearer,
   });
@@ -26,12 +26,21 @@ const withBearer: WithDefaultsT<'Bearer'> = (wrappedOperation) => (params: any) 
   }
 
   export const MerchantApi = {
-    getProducts: async (): Promise<ProductListDTO> => {
-      const response = await apiClient.getProducts({
-        status: 'APPROVED',
-        
+    getProducts: async (status, page, size, sort, category, eprelCode, gtinCode, productFileId, productName, organizationId): Promise<ProductListDTO> => {
+      const response: any = await apiClient.getProducts({
+        status,
+        page,
+        size,
+        sort,
+        category,
+        eprelCode,
+        gtinCode,
+        productFileId,
+        productName,
+        organizationId
       });
-      return extractResponse(response, 200, onRedirectToLogin);
+      console.log('API response:', response.left[0].value);
+      return extractResponse(response, 200, onRedirectToLogin, 404);
     },
   }
   
