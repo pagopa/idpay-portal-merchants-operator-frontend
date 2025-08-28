@@ -224,7 +224,7 @@ stages:
               inlineScript: |   
                 az afd endpoint purge -g $(resource_group) \
                 --profile-name $(cdn_profile) \
-                --endoint-name $(cdn_endpoint) \
+                --endpoint-name $(cdn_endpoint) \
                 --domains $(cdn_domains) \
                 --content-paths "/$(basePath)" "/$(basePath)/*" "/" \
                 --no-wait false
