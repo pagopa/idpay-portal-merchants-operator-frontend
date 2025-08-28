@@ -21,6 +21,7 @@ variables:
     cdn_profile: '$(UAT_CDN_PROFILE)'
     resource_group: '$(UAT_RESOURCE_GROUP)'
     storage_account: '$(UAT_STORAGE_ACCOUNT)'
+    cdn_domains: '$(UAT_CDN_DOMAINS)'
 
     react_app_url_cdn: '$(UAT_REACT_APP_URL_CDN)'
 
@@ -45,6 +46,7 @@ variables:
     cdn_profile: '$(PROD_CDN_PROFILE)'
     resource_group: '$(PROD_RESOURCE_GROUP)'
     storage_account: '$(PROD_STORAGE_ACCOUNT)'
+    cdn_domains: '$(PROD_CDN_DOMAINS)'
 
     react_app_url_cdn: '$(PROD_REACT_APP_URL_CDN)'
 
