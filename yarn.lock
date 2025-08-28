@@ -1439,6 +1439,14 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
+"@babel/types@^7.28.2":
+  version "7.28.2"
+  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.28.2.tgz#da9db0856a9a88e0a13b019881d7513588cf712b"
+  integrity sha512-ruv7Ae4J5dUYULmeXw1gmb7rYRz57OWCPM57pHojnLq/3Z1CK2lNSLTCVjxVk1F/TZHwOZZrOWi0ur95BbLxNQ==
+  dependencies:
+    "@babel/helper-string-parser" "^7.27.1"
+    "@babel/helper-validator-identifier" "^7.27.1"
+
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
@@ -4882,6 +4890,19 @@ babel-jest@^27.4.2, babel-jest@^27.5.1:
     babel-preset-jest "^27.5.1"
     chalk "^4.0.0"
     graceful-fs "^4.2.9"
+    slash "^3.0.0"
+
+babel-jest@^30.0.5:
+  version "30.0.5"
+  resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-30.0.5.tgz#7cc7dd03d0d613125d458521f635b8c2361e89cc"
+  integrity sha512-mRijnKimhGDMsizTvBTWotwNpzrkHr+VvZUQBof2AufXKB8NXrL1W69TG20EvOz7aevx6FTJIaBuBkYxS8zolg==
+  dependencies:
+    "@jest/transform" "30.0.5"
+    "@types/babel__core" "^7.20.5"
+    babel-plugin-istanbul "^7.0.0"
+    babel-preset-jest "30.0.1"
+    chalk "^4.1.2"
+    graceful-fs "^4.2.11"
     slash "^3.0.0"
 
 babel-jest@^30.0.5:

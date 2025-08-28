@@ -1,5 +1,5 @@
 import { defineConfig, mergeConfig } from 'vite';
-import { defineConfig as defineVitestConfig } from 'vitest/config';
+import { coverageConfigDefaults, defineConfig as defineVitestConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 const viteConfig = defineConfig({
@@ -20,6 +20,7 @@ const vitestConfig = defineVitestConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     coverage: {
+      provider: 'v8',
       // you can include other reporters, but 'json-summary' is required, json is recommended
       reporter: ['text', 'json-summary', 'json'],
       // If you want a coverage reports even if your tests are failing, include the reportOnFailure option
@@ -29,7 +30,9 @@ const vitestConfig = defineVitestConfig({
         branches: 80,
         functions: 80,
         statements: 80
-      }
+      },
+      exclude: ['**/openApi/**', '**/src/config/**', '**/src/utils/constants.ts',
+        ...coverageConfigDefaults.exclude]
     }
   },
 });

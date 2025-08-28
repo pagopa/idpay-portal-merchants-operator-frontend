@@ -3,6 +3,7 @@ import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
 import type { JwtUser } from '../utils/types';
 import { authStore } from '../store/authStore';
+import type { JwtUser } from '../utils/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
