@@ -33,7 +33,7 @@ const Header = () => {
   const welfareProduct: ProductEntity = {
     // TODO check if correct
     id: 'prod-idpay-merchants',
-    title: "portale esercenti",
+    title: "Portale Esercenti",
     productUrl: "test",
     linkType: 'internal',
   };
