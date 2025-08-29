@@ -1,7 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Layout from './components/Layout/Layout';
-// import {Switch} from "@mui/material";
 import AcceptDiscount from "./pages/AcceptDiscount/AcceptDiscount.tsx";
 import routes from './routes.ts';
 import Products from './pages/Products/Products.tsx';
@@ -22,6 +21,7 @@ function App() {
           <Route path={routes.BUY_MANAGEMENT} element={<Layout><Products /></Layout>} />
           <Route path={routes.REFUNDS_MANAGEMENT} element={<Layout><Products /></Layout>} />       
         </Route>
+        <Route path="*" element={<Navigate to={routes.HOME} />} />
       </Routes>
     </div>
 
