@@ -69,6 +69,13 @@
       "title": "Accetta un buono sconto",
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
+    "products": {
+      "category": "categoria",
+      "brand": "marca",
+      "model": "modello",
+      "gtin":"codice gtin/ean",
+      "eprelCode":"eprel"
+    },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
       "exitModalTitle": "Vuoi uscire?",

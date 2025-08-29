@@ -33,27 +33,27 @@ const AcceptDiscount = () => {
     const handleValidateData = () => {
         const errors: Record<string, boolean> = {};
         let isValid = true;
-      
+
         if (!formData.product) {
-          errors.product = true;
-          isValid = false;
+            errors.product = true;
+            isValid = false;
         }
         if (!formData.totalAmount) {
-          errors.totalAmount = true;
-          isValid = false;
+            errors.totalAmount = true;
+            isValid = false;
         }
         if (!formData.discountCode) {
-          errors.discountCode = true;
-          isValid = false;
+            errors.discountCode = true;
+            isValid = false;
         }
-      
+
         setFieldErrors(errors);
-        if(isValid){
+        if (isValid) {
             console.log("VALID");
         }
-      };
+    };
 
-      const handleFieldChange = (field: keyof FormData, value: any) => {
+    const handleFieldChange = (field: keyof FormData, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -78,18 +78,15 @@ const AcceptDiscount = () => {
                         titleBox={t('pages.acceptDiscount.selectProduct')}
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
-                        <TextField
-                            variant="outlined"
-                            label={t('pages.acceptDiscount.search')}
-                            size='small'
-                            sx={{
-                                mt: 2, '& .MuiFormLabel-root.Mui-error': {
-                                    color: '#5C6E82 !important',
-                                },
-                            }}
-                            error={!!fieldErrors.product} helperText={fieldErrors.product ? REQUIRED_FIELD_ERROR : ""} 
-                            onChange={(e) => handleFieldChange('product', e.target.value)}
-                        />
+                        <Box mt={2}>
+                            <TextField
+                                variant="outlined"
+                                label={t('pages.acceptDiscount.search')}
+                                size='small'
+                                error={!!fieldErrors.product} helperText={fieldErrors.product ? REQUIRED_FIELD_ERROR : ""}
+                                onChange={(e) => handleFieldChange('product', e.target.value)}
+                            />
+                        </Box>
                     </AcceptDiscountCard>
                 </Grid>
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
@@ -101,11 +98,6 @@ const AcceptDiscount = () => {
                             variant="outlined"
                             label={t('pages.acceptDiscount.expenditureAmount')}
                             size='small'
-                            sx={{
-                                '& .MuiFormLabel-root.Mui-error': {
-                                    color: '#5C6E82 !important',
-                                }
-                            }}
                             error={!!fieldErrors.totalAmount} helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ""}
                             onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
                         />
@@ -117,18 +109,15 @@ const AcceptDiscount = () => {
                         subTitleBox={t('pages.acceptDiscount.insertDiscountCode')}
                         inputTitle={"Inserisci codice sconto"}
                     >
-                        <TextField
-                            variant="outlined"
-                            label={t('pages.acceptDiscount.discountCode')}
-                            size='small'
-                            sx={{
-                                mt: 2, '& .MuiFormLabel-root.Mui-error': {
-                                    color: '#5C6E82 !important',
-                                },
-                            }} 
-                            error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
-                            onChange={(e) => handleFieldChange('discountCode', e.target.value)}
-                        />
+                        <Box mt={2}>
+                            <TextField
+                                variant="outlined"
+                                label={t('pages.acceptDiscount.discountCode')}
+                                size='small'
+                                error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
+                                onChange={(e) => handleFieldChange('discountCode', e.target.value)}
+                            />
+                        </Box>
                     </AcceptDiscountCard>
                 </Grid>
             </Grid>

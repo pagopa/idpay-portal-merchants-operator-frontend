@@ -1,27 +1,28 @@
+import { Route, Routes } from 'react-router-dom';
 import './App.css'
 import Layout from './components/Layout/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
 // import {Switch} from "@mui/material";
-// import {Route} from "react-router-dom";
 import AcceptDiscount from "./pages/AcceptDiscount/AcceptDiscount.tsx";
+import routes from './routes.ts';
+import Products from './pages/Products/Products.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 
 function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <ProtectedRoute>
-            <Layout>
-                {/*<Switch>*/}
-                {/*    <Route path={"/accetta-buono-sconto"}>*/}
-                {/*        <AcceptDiscount />*/}
-                {/*        </Route>*/}
-                {/*    <Route path={"/accetta-buono"}>*/}
-                {/*        <AcceptDiscount />*/}
-                {/*    </Route>*/}
-                {/*</Switch>*/}
-                <AcceptDiscount />
-            </Layout>
-      </ProtectedRoute>
+
+      <Routes>
+        <Route element={<ProtectedRoute children={''} />}>
+          <Route path="/" element={<Layout><Products /></Layout>} />
+          <Route path={routes.ACCEPT_DISCOUNT} element={<Layout><AcceptDiscount /></Layout>} />
+          {/* TODO: creare pagine sotto pages e poi i componenti sotto components. vedi products per esempio */}
+          <Route path={routes.PRODUCTS} element={<Layout><Products /></Layout>} />
+          <Route path={routes.PROFILE} element={<Layout><Products /></Layout>} />
+          <Route path={routes.BUY_MANAGEMENT} element={<Layout><Products /></Layout>} />
+          <Route path={routes.REFUNDS_MANAGEMENT} element={<Layout><Products /></Layout>} />       
+        </Route>
+      </Routes>
     </div>
 
   )
