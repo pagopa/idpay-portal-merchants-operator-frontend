@@ -208,7 +208,6 @@ const StyledPopper = styled(Popper)({
   padding: '12px 16px',
   transition: 'background-color 0.2s ease',
 
-  // Hover normale (grigio chiaro)
   '&:hover': {
     backgroundColor: '#0073E614 !important',
     color: "#0073E6",
@@ -245,55 +244,3 @@ function AutocompleteVirtualized({options}: {options: any[]}) {
 }
 
 export default AutocompleteVirtualized;
-
-// Esempio di utilizzo nel tuo componente:
-/*
-// Nel tuo componente, sostituisci il TextField esistente con:
-
-<VirtualizedProductAutocomplete
-  value={selectedProduct} // Stato per il prodotto selezionato
-  onChange={(newValue) => handleFieldChange('product', newValue)}
-  error={!!fieldErrors.product}
-  helperText={fieldErrors.product ? REQUIRED_FIELD_ERROR : ""}
-  t={t} // Se stai usando i18n
-/>
-
-// Assicurati di avere questi stati:
-const [selectedProduct, setSelectedProduct] = useState(null);
-
-// E modifica handleFieldChange per gestire l'oggetto prodotto:
-const handleFieldChange = (field, value) => {
-  setSelectedProduct(value);
-  // Logica di validazione esistente
-};
-*/
-
-
-// renderInput={(params) => (
-//   <TextField
-//     {...params}
-//     variant="outlined"
-//     label={label || (t && t('pages.acceptDiscount.search')) || 'Cerca prodotto'}
-//     size="small"
-//     error={error}
-//     helperText={helperText}
-//     sx={{
-//       mt: 2,
-//       '& .MuiFormLabel-root.Mui-error': {
-//         color: '#5C6E82 !important',
-//       },
-//       '& .MuiOutlinedInput-root': {
-//         '& fieldset': {
-//           borderColor: '#e0e0e0',
-//         },
-//         '&:hover fieldset': {
-//           borderColor: '#1976d2',
-//         },
-//         '&.Mui-focused fieldset': {
-//           borderColor: '#1976d2',
-//         },
-//       },
-//     }}
-//     placeholder="Cerca per nome, marca, modello o codice..."
-//   />
-// )}

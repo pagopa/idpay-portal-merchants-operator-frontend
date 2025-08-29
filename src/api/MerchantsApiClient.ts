@@ -51,6 +51,7 @@ const handleAxiosResponse = <T>(response: AxiosResponse<T>): T => {
 
 export const MerchantApi = {
   getProducts: async (
+   params: {
     status?: string, 
     page?: number, 
     size?: number, 
@@ -61,20 +62,9 @@ export const MerchantApi = {
     productFileId?: string, 
     productName?: string, 
     organizationId?: string
+   }
   ): Promise<ProductListDTO> => {
     try {
-      const params = {
-        status,
-        page,
-        size,
-        sort,
-        category,
-        eprelCode,
-        gtinCode,
-        productFileId,
-        productName,
-        organizationId
-      };
 
       // Remove undefined params
       const cleanParams = Object.fromEntries(

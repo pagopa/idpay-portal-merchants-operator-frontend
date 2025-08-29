@@ -14,3 +14,16 @@ export interface LoggedUser {
     email?: string;
     surname?: string;
 }
+
+export interface GetProductsParams {
+    productName?: string;
+    status?: string;
+    page?: number;
+    size?: number;
+    sort?: string;
+    category?: string;
+    eprelCode?: string;
+    gtinCode?: string;
+    productFileId?: string;
+    organizationId?: string;
+}
