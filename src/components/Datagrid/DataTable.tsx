@@ -96,7 +96,6 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
             columns={finalColumns}
             rowsPerPageOptions={[rowsPerPage]}
             disableSelectionOnClick
-            autoHeight
             sortingMode='server'
             paginationMode='server'
             onSortModelChange={handleSortModelChange}
