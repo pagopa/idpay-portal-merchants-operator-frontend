@@ -1,33 +1,69 @@
-import { createClient } from './generated/merchants/client';
-import type { WithDefaultsT } from './generated/merchants/client';
-import { buildFetchApi } from '@pagopa/selfcare-common-frontend/lib/utils/api-utils';
-import { extractResponse } from '@pagopa/selfcare-common-frontend/lib/utils/api-utils';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import type { ProductListDTO } from './generated/merchants/ProductListDTO';
 //store
 import { authStore } from '../store/authStore';
 
-const withBearer: WithDefaultsT<'Bearer'> = (wrappedOperation) => (params: any) => {
-    const {token} = authStore.getState();
-    return wrappedOperation({
-      ...params,
-      Bearer: `Bearer ${token}`,    
-    });
-  };
-
-  const apiClient = createClient({
-    baseUrl: import.meta.env.VITE_API_URL,
-    basePath: "",
-    fetchApi: buildFetchApi(import.meta.env.VITE_API_TIMEOUT_MS),
-    withDefaults: withBearer,
+//axios instance 
+const createAxiosInstance = (): AxiosInstance => {
+  const instance = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS) || 10000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 
-  const onRedirectToLogin = () => {
-    console.log("ERROR");
-  }
+  // Request Interceptor 
+  instance.interceptors.request.use((config) => {
+    const { token } = authStore.getState();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 
-  export const MerchantApi = {
-    getProducts: async (status, page, size, sort, category, eprelCode, gtinCode, productFileId, productName, organizationId): Promise<ProductListDTO> => {
-      const response: any = await apiClient.getProducts({
+  // Response Interceptor 
+  instance.interceptors.response.use(
+    (response: AxiosResponse) => {
+      return response;
+    },
+    (error: AxiosError) => {
+      console.log(error);
+      if (error.response?.status === 401) {
+        onRedirectToLogin();
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
+};
+
+const axiosInstance = createAxiosInstance();
+
+const onRedirectToLogin = () => {
+  console.log("ERROR 401");
+};
+
+const handleAxiosResponse = <T>(response: AxiosResponse<T>): T => {
+  return response.data;
+};
+
+export const MerchantApi = {
+  getProducts: async (
+    status?: string, 
+    page?: number, 
+    size?: number, 
+    sort?: string, 
+    category?: string, 
+    eprelCode?: string, 
+    gtinCode?: string, 
+    productFileId?: string, 
+    productName?: string, 
+    organizationId?: string
+  ): Promise<ProductListDTO> => {
+    try {
+      const params = {
         status,
         page,
         size,
@@ -38,9 +74,27 @@ const withBearer: WithDefaultsT<'Bearer'> = (wrappedOperation) => (params: any) 
         productFileId,
         productName,
         organizationId
+      };
+
+      // Remove undefined params
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== undefined)
+      );
+
+      const response = await axiosInstance.get('/products', {
+        params: cleanParams
       });
-      console.log('API response:', response.left[0].value);
-      return extractResponse(response, 200, onRedirectToLogin, 404);
-    },
-  }
-  
+      
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in getProducts:', error);
+      throw error;
+    }
+  },
+};
+
+
+
+
+

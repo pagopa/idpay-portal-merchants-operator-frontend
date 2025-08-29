@@ -32,6 +32,7 @@ const AcceptDiscount = () => {
         totalAmount: '',
         discountCode: ''
     });
+    const [productsList, setProductsList] = useState<any[]>([]);
 
 
     useEffect(() => {
@@ -40,10 +41,10 @@ const AcceptDiscount = () => {
 
     const fetchProductsList = async () => {
         try {
-            const productsList = await getProductsList();
-            console.log(productsList);
+            const {content} = await getProductsList();
+            setProductsList(content);
         } catch (error) {
-            console.log(error.status);
+            console.log(error);
         }
     }
 
@@ -97,6 +98,7 @@ const AcceptDiscount = () => {
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
                         <AutocompleteVirtualized
+                           options={productsList} 
                         />
                     </AcceptDiscountCard>
                 </Grid>

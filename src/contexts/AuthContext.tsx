@@ -3,7 +3,7 @@ import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
 import type { JwtUser } from '../utils/types';
 import { authStore } from '../store/authStore';
-import axios from 'axios';
+// import axios from 'axios';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -41,20 +41,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (authenticated) {
           setIsAuthenticated(true);
           setToken(keycloak.token || null);
-          try {
-            const response = await axios.get(
-              `${keycloak.authServerUrl}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
-              {
-                headers: {
-                  Authorization: `Bearer ${keycloak.token}`
-                }
-              }
-            );
-            setUser(response.data);
-          } catch (error) {
-            console.error('Errore inizializzazione Keycloak:', error);
-            keycloak.logout();
-          }
+          // try {
+          //   const response = await axios.get(
+          //     `${keycloak.authServerUrl}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
+          //     {
+          //       headers: {
+          //         Authorization: `Bearer ${keycloak.token}`
+          //       }
+          //     }
+          //   );
+          //   setUser(response.data);
+          // } catch (error) {
+          //   console.error('Errore inizializzazione Keycloak:', error);
+          //   keycloak.logout();
+          // }
         }
       } catch (error) {
         console.error('Errore inizializzazione Keycloak:', error);

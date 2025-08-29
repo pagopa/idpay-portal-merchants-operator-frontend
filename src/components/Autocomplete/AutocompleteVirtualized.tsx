@@ -218,7 +218,7 @@ const StyledPopper = styled(Popper)({
 },
 });
 
-function AutocompleteVirtualized() {
+function AutocompleteVirtualized({options}: {options: any[]}) {
 
 
   return (
@@ -226,7 +226,7 @@ function AutocompleteVirtualized() {
       sx={{ width: 360 }}
       popupIcon={null}
       disableListWrap
-      options={MOCKPRODUCTS}
+      options={options ? options : MOCKPRODUCTS}
       getOptionLabel={(option) => option.productName}
       renderInput={(params) => <TextField {...params} label="Cerca" size='small' />}
       renderOption={(props, option, state) =>
