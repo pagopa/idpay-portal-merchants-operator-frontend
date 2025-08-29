@@ -9,7 +9,7 @@ import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { getProductsList } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
-
+import EuroIcon from '@mui/icons-material/Euro';
 interface FormData {
     product: string | null;
     totalAmount: string;
@@ -42,7 +42,7 @@ const AcceptDiscount = () => {
 
     const fetchProductsList = async (productName?: string) => {
         try {
-            const {content} = await getProductsList({productName});
+            const { content } = await getProductsList({ productName });
             setProductsList([...content]);
         } catch (error) {
             console.log(error);
@@ -86,12 +86,12 @@ const AcceptDiscount = () => {
     }
 
     const handleExpenditureFocus = () => {
-       setIsExpenditureFocused(true);
+        setIsExpenditureFocused(true);
     }
 
     const handleExpenditureBlur = () => {
         setIsExpenditureFocused(false);
-      };
+    };
 
     return (
         <Box>
@@ -112,14 +112,12 @@ const AcceptDiscount = () => {
                         titleBox={t('pages.acceptDiscount.selectProduct')}
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
-                       <Autocomplete
-                        options={productsList}
-                        onChangeDebounce={(value) => handleChangeAutocomplete(value)}
-                        onChange={(value) => handleFieldChange('product', value)}
-                        inputError={!!fieldErrors.product}
-                       />
-
-
+                        <Autocomplete
+                            options={productsList}
+                            onChangeDebounce={(value) => handleChangeAutocomplete(value)}
+                            onChange={(value) => handleFieldChange('product', value)}
+                            inputError={!!fieldErrors.product}
+                        />
                     </AcceptDiscountCard>
                 </Grid>
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
@@ -137,14 +135,14 @@ const AcceptDiscount = () => {
                             onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
                             slotProps={{
                                 input: {
-                                  startAdornment: isExpenditureFocused || formData.totalAmount ? (
-                                    <InputAdornment position="start">€</InputAdornment>
-                                  ) : null,
+                                    startAdornment: isExpenditureFocused || formData.totalAmount ? (
+                                        <InputAdornment position="start"><EuroIcon fontSize='small' /></InputAdornment>
+                                    ) : null,
                                 },
                                 inputLabel: {
-                                  shrink: Boolean(isExpenditureFocused || formData.totalAmount),
+                                    shrink: Boolean(isExpenditureFocused || formData.totalAmount),
                                 },
-                            }}    
+                            }}
                         />
                     </AcceptDiscountCard>
                 </Grid>
