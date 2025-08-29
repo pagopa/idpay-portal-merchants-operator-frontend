@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 
 const viteConfig = defineConfig({
   plugins: [react()],
+  define: {
+    'process.env': process.env,
+  },
   base: '/esercente/',
   build: {
     outDir: 'dist',
@@ -29,7 +32,7 @@ const vitestConfig = defineVitestConfig({
         statements: 80
       },
       exclude: ['**/openApi/**', '**/src/config/**', '**/src/utils/constants.ts',
-        ...coverageConfigDefaults.exclude]
+        '**/src/api/generated/**', ...coverageConfigDefaults.exclude]
     }
   },
 });
