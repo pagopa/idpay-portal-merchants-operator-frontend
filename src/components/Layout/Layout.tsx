@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { Footer } from '@pagopa/selfcare-common-frontend/lib';
-import { useLocation } from 'react-router-dom';
+import { matchPath, useLocation } from 'react-router-dom';
 
 import ROUTES from '../../routes';
 type Props = {
@@ -13,8 +13,13 @@ import SideMenu from '../SideMenu/SideMenu';
 const Layout = ({ children }: Props) => {
   const location = useLocation();
 
-  // const match = matchPath({ path: ROUTES.HOME, end: true }, location.pathname);
-  const match = null;
+  const match =
+    matchPath({ path: ROUTES.HOME, end: true }, location.pathname) ||
+    matchPath({ path: ROUTES.PRODUCTS, end: true }, location.pathname) ||
+    matchPath({ path: ROUTES.PROFILE, end: true }, location.pathname) ||
+    matchPath({ path: ROUTES.BUY_MANAGEMENT, end: true }, location.pathname) ||
+    matchPath({ path: ROUTES.REFUNDS_MANAGEMENT, end: true }, location.pathname);
+
   return (
     <Box
       display="grid"
@@ -71,7 +76,7 @@ const Layout = ({ children }: Props) => {
         </Box>
       )}
       <Box gridArea="footer">
-        <Footer onExit={() =>{}} loggedUser={true} />
+        <Footer onExit={() => { }} loggedUser={true} />
       </Box>
     </Box>
   );

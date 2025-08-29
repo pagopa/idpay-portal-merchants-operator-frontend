@@ -23,7 +23,6 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
 
 
   useEffect(() => {
-    console.log("QUII", columns);
     if (columns && columns.length > 0) {
       const processedColumns = columns.map((col: any) => ({
         ...col,

@@ -1,9 +1,12 @@
-import { List, Box } from '@mui/material';
+import { List, Box, Divider } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import ROUTES from '../../routes';
 import SideNavItem from './SideNavItem';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import PersonIcon from '@mui/icons-material/Person';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
 /** The side menu of the application */
 export default function SideMenu() {
@@ -16,10 +19,35 @@ export default function SideMenu() {
       <Box gridColumn="auto">
         <List data-testid="list-test">
           <SideNavItem
-            title={t('pages.overview.overviewTitle')}
-            handleClick={() => navigate(ROUTES.HOME, { replace: true })}
-            isSelected={location.pathname === ROUTES.HOME}
-            icon={ListAltIcon}
+            title={t('pages.buyManagement.title')}
+            handleClick={() => navigate(ROUTES.BUY_MANAGEMENT, { replace: true })}
+            isSelected={location.pathname === ROUTES.HOME|| location.pathname === ROUTES.BUY_MANAGEMENT}
+            icon={ConfirmationNumberIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+          />
+           <SideNavItem
+            title={t('pages.refundManagement.title')}
+            handleClick={() => navigate(ROUTES.REFUNDS_MANAGEMENT, { replace: true })}
+            isSelected={location.pathname === ROUTES.REFUNDS_MANAGEMENT}
+            icon={PaymentsIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+          />
+           <SideNavItem
+            title={t('pages.products.title')}
+            handleClick={() => navigate(ROUTES.PRODUCTS, { replace: true })}
+            isSelected={location.pathname === ROUTES.PRODUCTS}
+            icon={InventoryIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+          />
+          <Divider />
+          <SideNavItem
+            title={t('pages.profile.title')}
+            handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
+            isSelected={location.pathname === ROUTES.PROFILE}
+            icon={PersonIcon}
             level={0}
             data-testid="initiativeList-click-test"
           />

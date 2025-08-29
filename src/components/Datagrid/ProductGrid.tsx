@@ -60,7 +60,6 @@ export default function ProductGrid() {
     }
 ));
 setRowGrid(rw);
-      console.log("rws", rowsGrid);
     }, []);
 
   const cols: Array<GridColDef> = [
@@ -109,28 +108,28 @@ setRowGrid(rw);
       //   <StatusChip status={params.value} />
       // ),
     },
-    {
-      field: 'linkEprel',
-      headerName:  t('pages.products.linkEprel'),
-      flex: 1,
-      editable: false,
-      disableColumnMenu: true,
-      // sortable: false,
-      // renderCell: (params: any) => (
-      //   <StatusChip status={params.value} />
-      // ),
-    },
-     {
-      field: 'productName',
-      headerName:  t('pages.products.productName'),
-      flex: 1,
-      editable: false,
-      disableColumnMenu: true,
-      // sortable: false,
-      // renderCell: (params: any) => (
-      //   <StatusChip status={params.value} />
-      // ),
-    },
+    // {
+    //   field: 'linkEprel',
+    //   headerName:  t('pages.products.linkEprel'),
+    //   flex: 1,
+    //   editable: false,
+    //   disableColumnMenu: true,
+    //   // sortable: false,
+    //   // renderCell: (params: any) => (
+    //   //   <StatusChip status={params.value} />
+    //   // ),
+    // },
+    //  {
+    //   field: 'productName',
+    //   headerName:  t('pages.products.productName'),
+    //   flex: 1,
+    //   editable: false,
+    //   disableColumnMenu: true,
+    //   // sortable: false,
+    //   // renderCell: (params: any) => (
+    //   //   <StatusChip status={params.value} />
+    //   // ),
+    // },
   ];
 
   //   const columns: Array<GridColDef> = [

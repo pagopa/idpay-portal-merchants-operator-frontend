@@ -70,11 +70,21 @@
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
     "products": {
-      "category": "categoria",
-      "brand": "marca",
-      "model": "modello",
-      "gtin":"codice gtin/ean",
-      "eprelCode":"eprel"
+      "title": "Prodotti",
+      "category": "Categoria",
+      "brand": "Marca",
+      "model": "Modello",
+      "gtin":"Codice GTIN/EAN",
+      "eprelCode":"Codice EPREL"
+    },
+    "profile": {
+      "title": "Profilo"
+    },
+    "buyManagement": {
+      "title": "Gestione acquisti"
+    },
+    "refundManagement": {
+      "title": "Gestione rimborsi"
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
