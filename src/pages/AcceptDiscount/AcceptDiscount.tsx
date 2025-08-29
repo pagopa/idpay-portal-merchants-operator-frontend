@@ -1,11 +1,14 @@
-import { Box, Button, Grid, TextField } from '@mui/material';
+import { Box, Button, Grid, InputAdornment, TextField } from '@mui/material';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { getProductsList } from '../../services/merchantService';
+import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
+import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
 
 interface FormData {
     product: string | null;
@@ -29,6 +32,22 @@ const AcceptDiscount = () => {
         totalAmount: '',
         discountCode: ''
     });
+    const [productsList, setProductsList] = useState<ProductDTO[]>([]);
+    const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
+
+
+    useEffect(() => {
+        fetchProductsList();
+    }, []);
+
+    const fetchProductsList = async (productName?: string) => {
+        try {
+            const {content} = await getProductsList({productName});
+            setProductsList([...content]);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const handleValidateData = () => {
         const errors: Record<string, boolean> = {};
@@ -50,6 +69,7 @@ const AcceptDiscount = () => {
         setFieldErrors(errors);
         if (isValid) {
             console.log("VALID");
+
         }
     };
 
@@ -59,6 +79,20 @@ const AcceptDiscount = () => {
             [field]: value
         }));
     };
+
+    const handleChangeAutocomplete = (value: string) => {
+        handleFieldChange('product', value);
+        fetchProductsList(value);
+    }
+
+    const handleExpenditureFocus = () => {
+       setIsExpenditureFocused(true);
+    }
+
+    const handleExpenditureBlur = () => {
+        setIsExpenditureFocused(false);
+      };
+
     return (
         <Box>
             <Box mt={2} mb={4}>
@@ -78,15 +112,14 @@ const AcceptDiscount = () => {
                         titleBox={t('pages.acceptDiscount.selectProduct')}
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
-                        <Box mt={2}>
-                            <TextField
-                                variant="outlined"
-                                label={t('pages.acceptDiscount.search')}
-                                size='small'
-                                error={!!fieldErrors.product} helperText={fieldErrors.product ? REQUIRED_FIELD_ERROR : ""}
-                                onChange={(e) => handleFieldChange('product', e.target.value)}
-                            />
-                        </Box>
+                       <Autocomplete
+                        options={productsList}
+                        onChangeDebounce={(value) => handleChangeAutocomplete(value)}
+                        onChange={(value) => handleFieldChange('product', value)}
+                        inputError={!!fieldErrors.product}
+                       />
+
+
                     </AcceptDiscountCard>
                 </Grid>
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
@@ -98,8 +131,20 @@ const AcceptDiscount = () => {
                             variant="outlined"
                             label={t('pages.acceptDiscount.expenditureAmount')}
                             size='small'
+                            onFocus={handleExpenditureFocus}
+                            onBlur={handleExpenditureBlur}
                             error={!!fieldErrors.totalAmount} helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ""}
                             onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
+                            slotProps={{
+                                input: {
+                                  startAdornment: isExpenditureFocused || formData.totalAmount ? (
+                                    <InputAdornment position="start">€</InputAdornment>
+                                  ) : null,
+                                },
+                                inputLabel: {
+                                  shrink: Boolean(isExpenditureFocused || formData.totalAmount),
+                                },
+                            }}    
                         />
                     </AcceptDiscountCard>
                 </Grid>
@@ -109,15 +154,16 @@ const AcceptDiscount = () => {
                         subTitleBox={t('pages.acceptDiscount.insertDiscountCode')}
                         inputTitle={"Inserisci codice sconto"}
                     >
-                        <Box mt={2}>
-                            <TextField
-                                variant="outlined"
-                                label={t('pages.acceptDiscount.discountCode')}
-                                size='small'
-                                error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
-                                onChange={(e) => handleFieldChange('discountCode', e.target.value)}
-                            />
-                        </Box>
+                        <TextField
+                            variant="outlined"
+                            label={t('pages.acceptDiscount.discountCode')}
+                            size='small'
+                            sx={{
+                                mt: 2
+                            }}
+                            error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
+                            onChange={(e) => handleFieldChange('discountCode', e.target.value)}
+                        />
                     </AcceptDiscountCard>
                 </Grid>
             </Grid>

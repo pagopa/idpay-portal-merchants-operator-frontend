@@ -1,0 +1,739 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "contact": {
+      "email": "cstar@pagopa.it",
+      "name": "PagoPA S.p.A."
+    },
+    "description": "IDPAY ITN Merchant Operator Portal API",
+    "title": "IDPAY ITN Merchant Operator Portal API",
+    "version": "1.0"
+  },
+  "host": "api-io.dev.cstar.pagopa.it",
+  "basePath": "/idpay-itn/merchant-op",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "format": "int32",
+            "in": "query",
+            "maximum": 10000,
+            "minimum": 0,
+            "name": "page",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "int32",
+            "in": "query",
+            "maximum": 1000,
+            "minimum": 1,
+            "name": "size",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "enum": [
+              "category, desc",
+              "batchName, desc",
+              "energyClass, desc",
+              "gtinCode, desc",
+              "eprelCode, desc",
+              "status, desc",
+              "category, asc",
+              "batchName, asc",
+              "energyClass, asc",
+              "gtinCode, asc",
+              "eprelCode, asc",
+              "status, asc"
+            ],
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "enum": [
+              "WASHINGMACHINES",
+              "WASHERDRIERS",
+              "OVENS",
+              "RANGEHOODS",
+              "DISHWASHERS",
+              "TUMBLEDRYERS",
+              "REFRIGERATINGAPPL",
+              "COOKINGHOBS"
+            ],
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 50,
+            "name": "eprelCode",
+            "pattern": "^\\d+$",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 14,
+            "name": "gtinCode",
+            "pattern": "^[a-zA-Z0-9]{1,14}$",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 24,
+            "minLength": 24,
+            "name": "productFileId",
+            "pattern": "^[a-fA-F0-9]{24}$",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 255,
+            "name": "productName",
+            "pattern": ".*",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "enum": [
+              "APPROVED",
+              "REJECTED",
+              "SUPERVISIONED"
+            ],
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 36,
+            "name": "organizationId",
+            "pattern": "^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ProductListDTO"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "429": {
+            "description": "Too many Request",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "500": {
+            "description": "Server ERROR",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "tags": [
+          "products"
+        ],
+        "description": "ENG: Returns product list <br> IT: Lista prodotti",
+        "operationId": "getProducts",
+        "summary": "Returns the products list"
+      }
+    }
+  },
+  "definitions" : {"STRINGWrapper":{"type": "string"},"STRINGArray":{"type": "array", "items": {"type": "string"}},
+    "ErrorDTO": {
+      "properties": {
+        "code": {
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object"
+    },
+    "ProductDTO": {
+      "properties": {
+        "batchName": {
+          "description": "ENG: The batch name the product <br> IT: il nomelotto del prodotto",
+          "maxLength": 255,
+          "pattern": "^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\\\.csv$",
+          "type": "string"
+        },
+        "brand": {
+          "description": "ENG: The brand of the product <br> IT: brand del prodotto",
+          "maxLength": 100,
+          "pattern": "^.{1,100}$",
+          "type": "string"
+        },
+        "capacity": {
+          "description": "ENG: The capacity of the product <br> IT: Capacità del  prodotto",
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string",
+          "x-nullable": true
+        },
+        "category": {
+          "description": "ENG: The category of the product <br> IT: categoria del prodotto",
+          "enum": [
+            "Lavatrice",
+            "Lavasciuga",
+            "Piano cottura",
+            "Frigorifero",
+            "Asciugatrice",
+            "Lavastoviglie",
+            "Cappa da cucina",
+            "Forno"
+          ],
+          "type": "string"
+        },
+        "countryOfProduction": {
+          "description": "ENG: The production country of the product <br> IT: il paese di produzione del prodotto",
+          "maxLength": 2,
+          "pattern": "^[A-Z]{2}$",
+          "type": "string"
+        },
+        "energyClass": {
+          "description": "ENG: The product energy class <br> IT: La classe energetica del prodotto",
+          "maxLength": 4,
+          "pattern": "^(A\\\\+\\\\+\\\\+|A\\\\+\\\\+|A\\\\+|A|B|C|D|E|F|G)$",
+          "type": "string",
+          "x-nullable": true
+        },
+        "eprelCode": {
+          "description": "ENG: The EPREL code of the product <br> IT: Il code EPREL del prodotto",
+          "maxLength": 50,
+          "pattern": "^\\\\d+$",
+          "type": "string"
+        },
+        "gtinCode": {
+          "description": "ENG: The GTIN code of the product <br> IT: Il code GTIN del prodotto",
+          "maxLength": 14,
+          "pattern": "^[a-zA-Z0-9]{1,14}$",
+          "type": "string"
+        },
+        "linkEprel": {
+          "description": "ENG: The EPREL product link <br> IT: Il link EPREL del prodotto",
+          "format": "uri",
+          "maxLength": 255,
+          "type": "string",
+          "x-nullable": true
+        },
+        "model": {
+          "description": "ENG: The mode of the product <br> IT: il modello del prodotto",
+          "maxLength": 100,
+          "pattern": "^.{1,100}$",
+          "type": "string"
+        },
+        "motivation": {
+          "maxLength": 200,
+          "pattern": ".*",
+          "type": "string"
+        },
+        "organizationId": {
+          "description": "ENG: The name of organization <br> IT: Id del produttore",
+          "maxLength": 36,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
+          "type": "string"
+        },
+        "productCode": {
+          "description": "ENG: The product code <br> IT: Il codice prodotto",
+          "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9 ]{0,100}$",
+          "type": "string",
+          "x-nullable": true
+        },
+        "productGroup": {
+          "description": "ENG: The EPREL category <br> IT: categoria EPREL",
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string"
+        },
+        "productName": {
+          "description": "ENG: The name of the product  <br> IT: Nome del prodotto",
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string"
+        },
+        "registrationDate": {
+          "description": "ENG: Timestamps of insert (after EPREL checks) <br> IT: Data caricamento prodotto (dopo la verifica EPREL)",
+          "format": "date-time",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "status": {
+          "description": "ENG: The status of the product <br> IT: Lo stato del prodotto",
+          "enum": [
+            "APPROVED",
+            "REJECTED",
+            "SUPERVISIONED"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ProductListDTO": {
+      "properties": {
+        "content": {
+          "items": {
+            "$ref": "#/definitions/ProductDTO"
+          },
+          "maxItems": 1000,
+          "type": "array"
+        },
+        "pageNo": {
+          "description": "ENG: The number of the page <br> IT: Il numero della pagina",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pageSize": {
+          "description": "ENG: The element size for page <br> IT: Il numero di elementi per pagina",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "totalElements": {
+          "description": "ENG: The total number of the elements <br> IT: Il numero totale degli elementi",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "totalPages": {
+          "description": "ENG: The total number of the pages <br> IT: Il numero totale delle pagine",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "description": "Operations related to product listing and filtering",
+      "name": "products"
+    }
+  ],
+  "x-components": {
+    "parameters": {
+      "category_query": {
+        "enum": [
+          "WASHINGMACHINES",
+          "WASHERDRIERS",
+          "OVENS",
+          "RANGEHOODS",
+          "DISHWASHERS",
+          "TUMBLEDRYERS",
+          "REFRIGERATINGAPPL",
+          "COOKINGHOBS"
+        ],
+        "in": "query",
+        "name": "category",
+        "required": false,
+        "type": "string"
+      },
+      "eprelCode_query": {
+        "in": "query",
+        "maxLength": 50,
+        "name": "eprelCode",
+        "pattern": "^\\d+$",
+        "required": false,
+        "type": "string"
+      },
+      "gtinCode_query": {
+        "in": "query",
+        "maxLength": 14,
+        "name": "gtinCode",
+        "pattern": "^[a-zA-Z0-9]{1,14}$",
+        "required": false,
+        "type": "string"
+      },
+      "organizationId_query": {
+        "in": "query",
+        "maxLength": 36,
+        "name": "organizationId",
+        "pattern": "^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
+        "required": false,
+        "type": "string"
+      },
+      "page_query": {
+        "format": "int32",
+        "in": "query",
+        "maximum": 10000,
+        "minimum": 0,
+        "name": "page",
+        "required": false,
+        "type": "integer"
+      },
+      "productFileId_query": {
+        "in": "query",
+        "maxLength": 24,
+        "minLength": 24,
+        "name": "productFileId",
+        "pattern": "^[a-fA-F0-9]{24}$",
+        "required": false,
+        "type": "string"
+      },
+      "productName_query": {
+        "in": "query",
+        "maxLength": 255,
+        "name": "productName",
+        "pattern": ".*",
+        "required": false,
+        "type": "string"
+      },
+      "size_query": {
+        "format": "int32",
+        "in": "query",
+        "maximum": 1000,
+        "minimum": 1,
+        "name": "size",
+        "required": false,
+        "type": "integer"
+      },
+      "sort_query": {
+        "enum": [
+          "category, desc",
+          "batchName, desc",
+          "energyClass, desc",
+          "gtinCode, desc",
+          "eprelCode, desc",
+          "status, desc",
+          "category, asc",
+          "batchName, asc",
+          "energyClass, asc",
+          "gtinCode, asc",
+          "eprelCode, asc",
+          "status, asc"
+        ],
+        "in": "query",
+        "name": "sort",
+        "required": false,
+        "type": "string"
+      },
+      "status_query": {
+        "enum": [
+          "APPROVED",
+          "REJECTED",
+          "SUPERVISIONED"
+        ],
+        "in": "query",
+        "name": "status",
+        "required": false,
+        "type": "string"
+      }
+    },
+    "responses": {
+      "GET_products_200_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ProductListDTO"
+            }
+          }
+        },
+        "description": "Ok",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_products_400_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Bad request",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_products_401_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Authentication failed",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_products_429_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Too many Request",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "Retry-After": {
+            "$ref": "#/x-components/headers/Retry-After"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_products_500_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Server ERROR",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          }
+        }
+      }
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": {
+        "description": "CORS header to allow cross-origin requests",
+        "schema": {
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string"
+        }
+      },
+      "Retry-After": {
+        "description": "Indicates how long the user agent should wait before making a follow-up request",
+        "schema": {
+          "format": "int64",
+          "maximum": 86400,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "X-RateLimit-Limit": {
+        "description": "The maximum number of requests allowed in the current period",
+        "schema": {
+          "format": "int64",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "X-RateLimit-Remaining": {
+        "description": "The number of requests remaining in the current period",
+        "schema": {
+          "format": "int64",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "X-RateLimit-Reset": {
+        "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+        "schema": {
+          "format": "int64",
+          "maximum": 9999999999,
+          "minimum": 0,
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
