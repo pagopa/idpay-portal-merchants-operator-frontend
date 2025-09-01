@@ -1,11 +1,26 @@
 import type { ProductEntity } from '@pagopa/mui-italia';
-import { useAuth } from '../../contexts/AuthContext';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import type { LoggedUser } from '../../utils/types';
+import {useAuth} from "../../contexts/AuthContext";
 
 const Header = () => {
 
   const { user } = useAuth();
+  // const user: JwtUser = {
+  //   id: "12345",
+  //   username: "mattia.rossi",
+  //   firstName: "Mattia",
+  //   lastName: "Rossi",
+  //   email: "mattia.rossi@example.com",
+  //   emailVerified: true,
+  //   userProfileMetadata: {
+  //     role: "admin",
+  //     permissions: ["READ", "WRITE", "DELETE"],
+  //     lastLogin: "2025-08-29T14:35:00Z",
+  //     language: "it"
+  //   }
+  // };
+
   const loggedUser: LoggedUser = {
     id: user.id,
     name: user.firstName,

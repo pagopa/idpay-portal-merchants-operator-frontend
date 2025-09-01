@@ -157,7 +157,9 @@
       "expenditureAmount": "Importo della spesa",
       "whatDiscountCode": "Qual'è il codice sconto?",
       "discountCode": "Codice sconto",
-      "insertDiscountCode": "Inserisci il codice sconto generato dal cliente."
+      "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
+      "noOptionsText": "Nessun risultato",
+      "loadingText": "Caricamento..."
     }
   },
   "roles": {

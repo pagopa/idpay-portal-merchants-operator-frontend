@@ -1,4 +1,4 @@
-import { Box, Button, Grid, TextField } from '@mui/material';
+import { Box, Button, Grid, InputAdornment, TextField } from '@mui/material';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
@@ -6,6 +6,9 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { getProductsList } from '../../services/merchantService';
+import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
+import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
 
 interface FormData {
     product: string | null;
@@ -29,36 +32,63 @@ const AcceptDiscount = () => {
         totalAmount: '',
         discountCode: ''
     });
+    const [productsList, setProductsList] = useState<ProductDTO[]>([]);
+    const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
+
+    const fetchProductsList = async (productName?: string) => {
+        try {
+            const {content} = await getProductsList({productName});
+            setProductsList([...content]);
+        } catch (error) {
+            console.log(error);
+            setProductsList([]);
+        }
+    }
 
     const handleValidateData = () => {
         const errors: Record<string, boolean> = {};
         let isValid = true;
-      
+
         if (!formData.product) {
-          errors.product = true;
-          isValid = false;
+            errors.product = true;
+            isValid = false;
         }
         if (!formData.totalAmount) {
-          errors.totalAmount = true;
-          isValid = false;
+            errors.totalAmount = true;
+            isValid = false;
         }
         if (!formData.discountCode) {
-          errors.discountCode = true;
-          isValid = false;
+            errors.discountCode = true;
+            isValid = false;
         }
-      
-        setFieldErrors(errors);
-        if(isValid){
-            console.log("VALID");
-        }
-      };
 
-      const handleFieldChange = (field: keyof FormData, value: any) => {
+        setFieldErrors(errors);
+        if (isValid) {
+            console.log("VALID");
+
+        }
+    };
+
+    const handleFieldChange = (field: keyof FormData, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
         }));
     };
+
+    const handleChangeAutocomplete = (value: string) => {
+        handleFieldChange('product', value);
+        fetchProductsList(value);
+    }
+
+    const handleExpenditureFocus = () => {
+       setIsExpenditureFocused(true);
+    }
+
+    const handleExpenditureBlur = () => {
+        setIsExpenditureFocused(false);
+      };
+
     return (
         <Box>
             <Box mt={2} mb={4}>
@@ -78,18 +108,14 @@ const AcceptDiscount = () => {
                         titleBox={t('pages.acceptDiscount.selectProduct')}
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
-                        <TextField
-                            variant="outlined"
-                            label={t('pages.acceptDiscount.search')}
-                            size='small'
-                            sx={{
-                                mt: 2, '& .MuiFormLabel-root.Mui-error': {
-                                    color: '#5C6E82 !important',
-                                },
-                            }}
-                            error={!!fieldErrors.product} helperText={fieldErrors.product ? REQUIRED_FIELD_ERROR : ""} 
-                            onChange={(e) => handleFieldChange('product', e.target.value)}
-                        />
+                       <Autocomplete
+                        options={productsList}
+                        onChangeDebounce={(value) => handleChangeAutocomplete(value)}
+                        onChange={(value) => handleFieldChange('product', value)}
+                        inputError={!!fieldErrors.product}
+                       />
+
+
                     </AcceptDiscountCard>
                 </Grid>
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
@@ -101,6 +127,8 @@ const AcceptDiscount = () => {
                             variant="outlined"
                             label={t('pages.acceptDiscount.expenditureAmount')}
                             size='small'
+                            onFocus={handleExpenditureFocus}
+                            onBlur={handleExpenditureBlur}
                             sx={{
                                 '& .MuiFormLabel-root.Mui-error': {
                                     color: '#5C6E82 !important',
@@ -108,6 +136,16 @@ const AcceptDiscount = () => {
                             }}
                             error={!!fieldErrors.totalAmount} helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ""}
                             onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
+                            slotProps={{
+                                input: {
+                                  startAdornment: isExpenditureFocused || formData.totalAmount ? (
+                                    <InputAdornment position="start">€</InputAdornment>
+                                  ) : null,
+                                },
+                                inputLabel: {
+                                  shrink: Boolean(isExpenditureFocused || formData.totalAmount),
+                                },
+                            }}    
                         />
                     </AcceptDiscountCard>
                 </Grid>
@@ -125,7 +163,7 @@ const AcceptDiscount = () => {
                                 mt: 2, '& .MuiFormLabel-root.Mui-error': {
                                     color: '#5C6E82 !important',
                                 },
-                            }} 
+                            }}
                             error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
                             onChange={(e) => handleFieldChange('discountCode', e.target.value)}
                         />

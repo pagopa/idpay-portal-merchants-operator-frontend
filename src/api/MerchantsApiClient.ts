@@ -1,0 +1,90 @@
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import type { ProductListDTO } from './generated/merchants/ProductListDTO';
+//store
+import { authStore } from '../store/authStore';
+
+//axios instance 
+const createAxiosInstance = (): AxiosInstance => {
+  const instance = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS) || 10000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // Request Interceptor 
+  instance.interceptors.request.use((config) => {
+    const { token } = authStore.getState();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // Response Interceptor 
+  instance.interceptors.response.use(
+    (response: AxiosResponse) => {
+      return response;
+    },
+    (error: AxiosError) => {
+      console.log(error);
+      if (error.response?.status === 401) {
+        onRedirectToLogin();
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
+};
+
+const axiosInstance = createAxiosInstance();
+
+const onRedirectToLogin = () => {
+  console.log("ERROR 401");
+};
+
+const handleAxiosResponse = <T>(response: AxiosResponse<T>): T => {
+  return response.data;
+};
+
+export const MerchantApi = {
+  getProducts: async (
+   params: {
+    status?: string, 
+    page?: number, 
+    size?: number, 
+    sort?: string, 
+    category?: string, 
+    eprelCode?: string, 
+    gtinCode?: string, 
+    productFileId?: string, 
+    productName?: string, 
+    organizationId?: string
+   }
+  ): Promise<ProductListDTO> => {
+    try {
+
+      // Remove undefined params
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== undefined)
+      );
+
+      const response = await axiosInstance.get('/products', {
+        params: cleanParams
+      });
+      
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in getProducts:', error);
+      throw error;
+    }
+  },
+};
+
+
+
+
+

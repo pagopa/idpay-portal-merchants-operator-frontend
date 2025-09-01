@@ -1,0 +1,424 @@
+openapi: 3.0.1
+info:
+  title: IDPAY ITN Merchant Operator Portal API
+  description: IDPAY ITN Merchant Operator Portal API
+  version: '1.0'
+  contact:
+    name: PagoPA S.p.A.
+    email: cstar@pagopa.it
+servers:
+  - description: Development Test
+    url: https://api-io.dev.cstar.pagopa.it/idpay-itn/merchant-op
+    x-internal: true
+  - description: User Acceptance Test
+    url: https://api-io.uat.cstar.pagopa.it/idpay-itn/merchant-op
+    x-internal: true
+tags:
+  - name: products
+    description: Operations related to product listing and filtering
+paths:
+  /products:
+    get:
+      tags:
+        - products
+      summary: Returns the products list
+      description: 'ENG: Returns product list <br> IT: Lista prodotti'
+      operationId: getProducts
+      parameters:
+        - $ref: '#/components/parameters/page_query'
+        - $ref: '#/components/parameters/size_query'
+        - $ref: '#/components/parameters/sort_query'
+        - $ref: '#/components/parameters/category_query'
+        - $ref: '#/components/parameters/eprelCode_query'
+        - $ref: '#/components/parameters/gtinCode_query'
+        - $ref: '#/components/parameters/productFileId_query'
+        - $ref: '#/components/parameters/productName_query'
+        - $ref: '#/components/parameters/status_query'
+        - $ref: '#/components/parameters/organizationId_query'
+      responses:
+        '200':
+          $ref: '#/components/responses/GET_products_200_Response'
+        '400':
+          $ref: '#/components/responses/GET_products_400_Response'
+        '401':
+          $ref: '#/components/responses/GET_products_401_Response'
+        '429':
+          $ref: '#/components/responses/GET_products_429_Response'
+        '500':
+          $ref: '#/components/responses/GET_products_500_Response'
+components:
+  headers:
+    X-RateLimit-Limit:
+      description: The maximum number of requests allowed in the current period
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 1000000
+    X-RateLimit-Remaining:
+      description: The number of requests remaining in the current period
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 1000000
+    X-RateLimit-Reset:
+      description: The time at which the rate limit resets (in UTC epoch seconds)
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 9999999999
+    Access-Control-Allow-Origin:
+      description: CORS header to allow cross-origin requests
+      schema:
+        type: string
+        maxLength: 255
+        pattern: .*
+    Retry-After:
+      description: Indicates how long the user agent should wait before making a follow-up
+        request
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        maximum: 86400
+  schemas:
+    ProductListDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDTO'
+          maxItems: 1000
+        pageNo:
+          type: integer
+          format: int32
+          description: 'ENG: The number of the page <br> IT: Il numero della pagina'
+          minimum: 0
+          maximum: 1000000
+        pageSize:
+          type: integer
+          format: int32
+          description: 'ENG: The element size for page <br> IT: Il numero di elementi
+            per pagina'
+          minimum: 0
+          maximum: 1000000
+        totalElements:
+          type: integer
+          format: int32
+          description: 'ENG: The total number of the elements <br> IT: Il numero totale
+            degli elementi'
+          minimum: 0
+          maximum: 1000000
+        totalPages:
+          type: integer
+          format: int32
+          description: 'ENG: The total number of the pages <br> IT: Il numero totale
+            delle pagine'
+          minimum: 0
+          maximum: 1000000
+    ProductDTO:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          description: 'ENG: The name of organization <br> IT: Id del produttore'
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+        registrationDate:
+          type: string
+          format: date-time
+          description: 'ENG: Timestamps of insert (after EPREL checks) <br> IT: Data
+            caricamento prodotto (dopo la verifica EPREL)'
+          maxLength: 255
+        status:
+          type: string
+          description: 'ENG: The status of the product <br> IT: Lo stato del prodotto'
+          enum:
+            - APPROVED
+            - REJECTED
+            - SUPERVISIONED
+        model:
+          type: string
+          description: 'ENG: The mode of the product <br> IT: il modello del prodotto'
+          maxLength: 100
+          pattern: ^.{1,100}$
+        productGroup:
+          type: string
+          description: 'ENG: The EPREL category <br> IT: categoria EPREL'
+          maxLength: 255
+          pattern: .*
+        category:
+          type: string
+          description: 'ENG: The category of the product <br> IT: categoria del prodotto'
+          enum:
+            - Lavatrice
+            - Lavasciuga
+            - Piano cottura
+            - Frigorifero
+            - Asciugatrice
+            - Lavastoviglie
+            - Cappa da cucina
+            - Forno
+        brand:
+          type: string
+          description: 'ENG: The brand of the product <br> IT: brand del prodotto'
+          maxLength: 100
+          pattern: ^.{1,100}$
+        eprelCode:
+          type: string
+          description: 'ENG: The EPREL code of the product <br> IT: Il code EPREL
+            del prodotto'
+          maxLength: 50
+          pattern: ^\\d+$
+        gtinCode:
+          type: string
+          description: 'ENG: The GTIN code of the product <br> IT: Il code GTIN del
+            prodotto'
+          maxLength: 14
+          pattern: ^[a-zA-Z0-9]{1,14}$
+        productCode:
+          type: string
+          description: 'ENG: The product code <br> IT: Il codice prodotto'
+          maxLength: 100
+          pattern: ^[a-zA-Z0-9 ]{0,100}$
+          nullable: true
+        energyClass:
+          type: string
+          description: 'ENG: The product energy class <br> IT: La classe energetica
+            del prodotto'
+          maxLength: 4
+          pattern: ^(A\\+\\+\\+|A\\+\\+|A\\+|A|B|C|D|E|F|G)$
+          nullable: true
+        countryOfProduction:
+          type: string
+          description: 'ENG: The production country of the product <br> IT: il paese
+            di produzione del prodotto'
+          maxLength: 2
+          pattern: ^[A-Z]{2}$
+        batchName:
+          type: string
+          description: 'ENG: The batch name the product <br> IT: il nomelotto del
+            prodotto'
+          pattern: ^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$
+          maxLength: 255
+        linkEprel:
+          type: string
+          description: 'ENG: The EPREL product link <br> IT: Il link EPREL del prodotto'
+          maxLength: 255
+          format: uri
+          nullable: true
+        capacity:
+          type: string
+          description: 'ENG: The capacity of the product <br> IT: Capacità del  prodotto'
+          maxLength: 255
+          pattern: .*
+          nullable: true
+        productName:
+          type: string
+          description: 'ENG: The name of the product  <br> IT: Nome del prodotto'
+          maxLength: 255
+          pattern: .*
+        motivation:
+          type: string
+          maxLength: 200
+          pattern: .*
+    ErrorDTO:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          pattern: .*
+        message:
+          type: string
+          maxLength: 255
+          pattern: .*
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      name: Authorization
+      in: header
+  responses:
+    GET_products_200_Response:
+      description: Ok
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProductListDTO'
+    GET_products_400_Response:
+      description: Bad request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_products_401_Response:
+      description: Authentication failed
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_products_429_Response:
+      description: Too many Request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_products_500_Response:
+      description: Server ERROR
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+  parameters:
+    category_query:
+      name: category
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - WASHINGMACHINES
+          - WASHERDRIERS
+          - OVENS
+          - RANGEHOODS
+          - DISHWASHERS
+          - TUMBLEDRYERS
+          - REFRIGERATINGAPPL
+          - COOKINGHOBS
+    page_query:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 10000
+    size_query:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+    organizationId_query:
+      name: organizationId
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 36
+        pattern: ^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
+    sort_query:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - category, desc
+          - batchName, desc
+          - energyClass, desc
+          - gtinCode, desc
+          - eprelCode, desc
+          - status, desc
+          - category, asc
+          - batchName, asc
+          - energyClass, asc
+          - gtinCode, asc
+          - eprelCode, asc
+          - status, asc
+    eprelCode_query:
+      name: eprelCode
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\d+$
+    gtinCode_query:
+      name: gtinCode
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 14
+        pattern: ^[a-zA-Z0-9]{1,14}$
+    productFileId_query:
+      name: productFileId
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 24
+        maxLength: 24
+        pattern: ^[a-fA-F0-9]{24}$
+    status_query:
+      name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - APPROVED
+          - REJECTED
+          - SUPERVISIONED
+    productName_query:
+      name: productName
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 255
+        pattern: .*
+security:
+  - Bearer: []
