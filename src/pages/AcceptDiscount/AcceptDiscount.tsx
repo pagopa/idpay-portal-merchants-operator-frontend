@@ -3,7 +3,7 @@ import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { getProductsList } from '../../services/merchantService';
@@ -35,17 +35,13 @@ const AcceptDiscount = () => {
     const [productsList, setProductsList] = useState<ProductDTO[]>([]);
     const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
 
-
-    useEffect(() => {
-        fetchProductsList();
-    }, []);
-
     const fetchProductsList = async (productName?: string) => {
         try {
             const {content} = await getProductsList({productName});
             setProductsList([...content]);
         } catch (error) {
             console.log(error);
+            setProductsList([]);
         }
     }
 
