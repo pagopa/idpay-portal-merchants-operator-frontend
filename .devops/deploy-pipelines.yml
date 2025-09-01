@@ -7,6 +7,8 @@ variables:
   vmImageNameDefault: 'ubuntu-latest'
 
   basePath: esercente
+  VITE_API_TIMEOUT_MS: 10000
+  VITE_PAGINATION_SIZE: 10
 
 
   # global variables
@@ -38,6 +40,9 @@ variables:
     vite_keycloak_client_id: '$(UAT_VITE_KEYCLOAK_CLIENT_ID)'
     vite_keycloak_redirect_uri: '$(UAT_VITE_KEYCLOAK_REDIRECT_URI)'
 
+    #API ENV
+    vite_api_url: '$(UAT_VITE_API_URL)'
+
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -62,6 +67,9 @@ variables:
     vite_keycloak_realm: '$(PROD_VITE_KEYCLOAK_REALM)'
     vite_keycloak_client_id: '$(PROD_VITE_KEYCLOAK_CLIENT_ID)'
     vite_keycloak_redirect_uri: '$(PROD_VITE_KEYCLOAK_REDIRECT_URI)'
+
+    #API ENV
+    vite_api_url: '$(PROD_VITE_API_URL)'
 
 
   # every branch different from past will be considered as DEV
@@ -89,6 +97,9 @@ variables:
     vite_keycloak_realm: '$(DEV_VITE_KEYCLOAK_REALM)'
     vite_keycloak_client_id: '$(DEV_VITE_KEYCLOAK_CLIENT_ID)'
     vite_keycloak_redirect_uri: '$(DEV_VITE_KEYCLOAK_REDIRECT_URI)'
+
+    #API ENV
+    vite_api_url: '$(DEV_VITE_API_URL)'
     
     
 # Automatically triggered on PR
