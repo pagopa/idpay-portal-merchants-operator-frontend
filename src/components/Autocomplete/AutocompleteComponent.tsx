@@ -11,11 +11,12 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [optionValue, setOptionValue] = useState('');
   const { t } = useTranslation();
 
   useEffect(() => {
-    // If input is less than 3 characters, clear options and do nothing.
-    if (inputValue.length < 3) {
+    // If input is less than 5 characters, clear options and do nothing.
+    if (inputValue.length < 5 || inputValue.trim().length === 0 || optionValue === inputValue) {
       setLoading(false);
       return;
     }
@@ -57,7 +58,7 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
       // Determine if two options are equal
       isOptionEqualToValue={(option, value) => option?.productName === value?.productName}
       // Extract the label from the option
-      getOptionLabel={(option) => option?.productName}
+      getOptionLabel={(option) => {setOptionValue(option?.productName); return option?.productName}}
       options={options}
       loading={loading}
       noOptionsText={t('pages.acceptDiscount.noOptionsText')}
