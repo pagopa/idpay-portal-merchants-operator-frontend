@@ -1,5 +1,6 @@
 {
   "commons": {
+    "headerTitle": "Portale Esercenti",
     "backBtn": "Indietro",
     "cancelBtn": "Torna indietro",
     "closeBtn": "Chiudi",
@@ -151,11 +152,11 @@
       "subtitle": "Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa",
       "selectProduct": "Seleziona il prodotto soggetto all'iniziativa",
       "selectProductTitle": "Seleziona il prodotto",
-      "expenseAmount": "Qual'è l'importo totale della spesa?",
-      "insertAmount": "Inserisci l'importo totale della spesa,ci servirà per calcolare lo sconto massimo applicabile.",
+      "expenseAmount": "Qual è l'importo totale della spesa?",
+      "insertAmount": "Inserisci l'importo totale della spesa, ci servirà per calcolare lo sconto massimo applicabile.",
       "search": "Cerca",
       "expenditureAmount": "Importo della spesa",
-      "whatDiscountCode": "Qual'è il codice sconto?",
+      "whatDiscountCode": "Qual è il codice sconto?",
       "discountCode": "Codice sconto",
       "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
       "noOptionsText": "Nessun risultato",

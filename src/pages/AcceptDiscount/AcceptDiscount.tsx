@@ -37,7 +37,7 @@ const AcceptDiscount = () => {
 
     const fetchProductsList = async (productName?: string) => {
         try {
-            const {content} = await getProductsList({productName});
+            const {content} = await getProductsList({productName, size: 50});
             setProductsList([...content]);
         } catch (error) {
             console.log(error);
@@ -90,7 +90,7 @@ const AcceptDiscount = () => {
       };
 
     return (
-        <Box>
+        <Box sx={{margin:'20px'}}>
             <Box mt={2} mb={4}>
                 <BreadcrumbsBox
                     backLabel={t('commons.exitBtn')} items={[]} active={false} />
