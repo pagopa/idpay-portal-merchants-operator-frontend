@@ -1,26 +1,21 @@
 import './App.css'
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-// import {Switch} from "@mui/material";
-// import {Route} from "react-router-dom";
-import AcceptDiscount from "./pages/AcceptDiscount/AcceptDiscount.tsx";
+import { Route, Routes } from "react-router-dom";
+import AcceptDiscount from "./pages/acceptDiscount/AcceptDiscount.tsx";
+import SummaryAcceptDiscount from "./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx";
 
 function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
       <ProtectedRoute>
-            <Layout>
-                {/*<Switch>*/}
-                {/*    <Route path={"/accetta-buono-sconto"}>*/}
-                {/*        <AcceptDiscount />*/}
-                {/*        </Route>*/}
-                {/*    <Route path={"/accetta-buono"}>*/}
-                {/*        <AcceptDiscount />*/}
-                {/*    </Route>*/}
-                {/*</Switch>*/}
-                <AcceptDiscount />
-            </Layout>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<AcceptDiscount />} />
+            <Route path="/riepilogo-accetta-buono-sconto" element={<SummaryAcceptDiscount />} />
+          </Routes>
+        </Layout>
       </ProtectedRoute>
     </div>
 

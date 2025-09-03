@@ -7,7 +7,8 @@ import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { useTranslation } from "react-i18next";
 
 
-export default function AutocompleteComponent({ options, onChangeDebounce, inputError, onChange }: { options: ProductDTO[], onChangeDebounce?: (value: string) => void, inputError?: boolean, onChange?: (value: string) => void }) {
+export default function AutocompleteComponent({ options, onChangeDebounce, inputError, onChange, value }: { options: ProductDTO[], onChangeDebounce?: (value: string) => void, inputError?: boolean, onChange?: (value: ProductDTO) => void, value?: ProductDTO }) {
+  // const [currentValue, setCurrentValue] = useState(value);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -39,6 +40,11 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
     setLoading(false);
   }, [options]);
 
+
+  useEffect(() => {
+    console.log("CURRENT", value);
+  }, [value]);
+
   return (
     <Autocomplete
       id="server-side-autocomplete"
@@ -63,11 +69,14 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
       loading={loading}
       noOptionsText={t('pages.acceptDiscount.noOptionsText')}
       loadingText={t('pages.acceptDiscount.loadingText')}
-      onInputChange={(_, newInputValue) => {
-        setInputValue(newInputValue);
+      value={value}
+      onChange={(_, value) => {
         if (onChange) {
-          onChange(newInputValue);
+          onChange(value);
         }
+      }}
+      onInputChange={(_, newInputValue) => {
+        setInputValue(newInputValue); 
       }}
       filterOptions={(x) => x}
       renderInput={(params) => (

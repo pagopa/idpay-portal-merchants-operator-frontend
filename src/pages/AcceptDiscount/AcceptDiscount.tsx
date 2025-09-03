@@ -3,12 +3,13 @@ import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { getProductsList } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
+import { useNavigate } from 'react-router-dom';
 
 interface FormData {
     product: string | null;
@@ -34,6 +35,19 @@ const AcceptDiscount = () => {
     });
     const [productsList, setProductsList] = useState<ProductDTO[]>([]);
     const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const discountCouponData = sessionStorage.getItem('discountCoupon');
+        if (discountCouponData) {
+            const parsedDiscountCouponData = JSON.parse(discountCouponData);
+            setFormData(parsedDiscountCouponData);
+        }
+
+    }, []);
+
+
 
     const fetchProductsList = async (productName?: string) => {
         try {
@@ -64,9 +78,10 @@ const AcceptDiscount = () => {
 
         setFieldErrors(errors);
         if (isValid) {
-            console.log("VALID");
-
+            sessionStorage.setItem('discountCoupon', JSON.stringify(formData));
+            navigate('/riepilogo-accetta-buono-sconto');
         }
+        return isValid;
     };
 
     const handleFieldChange = (field: keyof FormData, value: any) => {
@@ -77,7 +92,6 @@ const AcceptDiscount = () => {
     };
 
     const handleChangeAutocomplete = (value: string) => {
-        handleFieldChange('product', value);
         fetchProductsList(value);
     }
 
@@ -111,8 +125,9 @@ const AcceptDiscount = () => {
                        <Autocomplete
                         options={productsList}
                         onChangeDebounce={(value) => handleChangeAutocomplete(value)}
-                        onChange={(value) => handleFieldChange('product', value)}
+                        onChange={(productObj) => handleFieldChange('product', productObj)}
                         inputError={!!fieldErrors.product}
+                        value={formData.product}
                        />
 
 
@@ -127,6 +142,7 @@ const AcceptDiscount = () => {
                             variant="outlined"
                             label={t('pages.acceptDiscount.expenditureAmount')}
                             size='small'
+                            value={formData.totalAmount}
                             onFocus={handleExpenditureFocus}
                             onBlur={handleExpenditureBlur}
                             sx={{
@@ -159,6 +175,7 @@ const AcceptDiscount = () => {
                             variant="outlined"
                             label={t('pages.acceptDiscount.discountCode')}
                             size='small'
+                            value={formData.discountCode}
                             sx={{
                                 mt: 2, '& .MuiFormLabel-root.Mui-error': {
                                     color: '#5C6E82 !important',
