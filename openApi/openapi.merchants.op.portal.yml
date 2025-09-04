@@ -16,7 +16,43 @@ servers:
 tags:
   - name: products
     description: Operations related to product listing and filtering
+  - name: payment
+    description: Operations related to payment
 paths:
+  /payment/bar-code/preview/{trxCode}:
+    put:
+      tags:
+        - payment
+      summary: 'ENG: Preview Payment - IT: Anteprima pagamento'
+      description: Preview payment
+      operationId: previewPayment
+      parameters:
+        - name: trxCode
+          in: path
+          description: 'ENG: The transaction''s code - IT: Codice della transazione'
+          required: true
+          schema:
+            type: string
+            maxLength: 24
+            pattern: '^[a-zA-Z0-9]+$'
+      requestBody:
+        description: 'ENG: trxCode - IT: Identificativo della transizione'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewPaymentRequestDTO'
+      responses:
+        '200':
+          $ref: '#/components/responses/PUT_preview_payment_200_Response'
+        '400':
+          $ref: '#/components/responses/PUT_preview_payment_400_Response'
+        '401':
+          $ref: '#/components/responses/PUT_preview_payment_401_Response'
+        '429':
+          $ref: '#/components/responses/PUT_preview_payment_429_Response'
+        '500':
+          $ref: '#/components/responses/PUT_preview_payment_500_Response'
   /products:
     get:
       tags:
@@ -84,6 +120,65 @@ components:
         minimum: 0
         maximum: 86400
   schemas:
+    PreviewPaymentRequestDTO:
+      type: object
+      properties:
+        product:
+          type: string
+          description: 'ENG: prodcut name - IT: il nome del prodotto'
+          maxLength: 255
+          pattern: .*
+        amount:
+          type: number
+          description: 'ENG: amount - IT: importo totale della spesa'
+    PreviewPaymentDTO:
+      type: object
+      properties:
+        trxCode:
+          type: string
+          description: 'ENG: Transaction code - IT: Codice della transazione'
+          maxLength: 24
+          pattern: '^[a-zA-Z0-9]+$'
+        trxDate:
+          type: string
+          format: date-time
+          description: 'ENG: Transaction date - IT: Data della transazione'
+          maxLength: 255
+        status:
+          type: string
+          enum:
+            - CREATED
+            - IDENTIFIED
+            - AUTHORIZATION_REQUESTED
+            - AUTHORIZED
+          description: >-
+            ENG: Status of the payment [CREATED: Created, IDENTIFIED: User
+            related, AUTHORIZATION_REQUESTED: Authorization Requested,
+            AUTHORIZED: authorized] - IT: Stato del pagamento [CREATED: Creato,
+            IDENTIFIED: Utente associato, AUTHORIZATION_REQUESTED:
+            autorizzazione richiesta, AUTHORIZED: autorizzato]
+        rewardCents:
+          type: integer
+          format: int64
+          description: 'ENG: Reward - IT: Premio generato'
+          minimum: 0
+          maximum: 1000000000
+        amountCents:
+          type: integer
+          format: int64
+          description: 'ENG: Amount cents - IT: Importo in centesimi'
+          minimum: 0
+          maximum: 1000000000
+        userId:
+          type: string
+          description: 'ENG: user id - IT: id user'
+          maxLength: 255
+          pattern: .*
+        product:
+          type: string
+          description: 'ENG: prodcut name - IT: il nome del prodotto'
+          maxLength: 255
+          pattern: .*
     ProductListDTO:
       type: object
       properties:
@@ -245,6 +340,77 @@ components:
       name: Authorization
       in: header
   responses:
+    PUT_preview_payment_200_Response:
+      description: Ok
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PreviewPaymentDTO'
+    PUT_preview_payment_400_Response:
+      description: Bad request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    PUT_preview_payment_401_Response:
+      description: Authentication failed
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    PUT_preview_payment_429_Response:
+      description: Too many Request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    PUT_preview_payment_500_Response:
+      description: Server ERROR
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
     GET_products_200_Response:
       description: Ok
       headers:

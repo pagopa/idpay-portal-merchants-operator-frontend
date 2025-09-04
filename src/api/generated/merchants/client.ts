@@ -14,7 +14,12 @@ import {
 } from "@pagopa/ts-commons/lib/requests";
 import { identity } from "fp-ts/lib/function";
 
-import { GetProductsT, getProductsDefaultDecoder } from "./requestTypes";
+import {
+  PreviewPaymentT,
+  previewPaymentDefaultDecoder,
+  GetProductsT,
+  getProductsDefaultDecoder
+} from "./requestTypes";
 
 // This is a placeholder for undefined when dealing with object keys
 // Typescript doesn't perform well when narrowing a union type which includes string and undefined
@@ -22,9 +27,11 @@ import { GetProductsT, getProductsDefaultDecoder } from "./requestTypes";
 // We use this as a placeholder for type parameters indicating "no key"
 type __UNDEFINED_KEY = "_____";
 
-export type ApiOperation = TypeofApiCall<GetProductsT>;
+export type ApiOperation = TypeofApiCall<PreviewPaymentT> &
+  TypeofApiCall<GetProductsT>;
 
-export type ParamKeys = keyof TypeofApiParams<GetProductsT>;
+export type ParamKeys = keyof (TypeofApiParams<PreviewPaymentT> &
+  TypeofApiParams<GetProductsT>);
 
 /**
  * Defines an adapter for TypeofApiCall which omit one or more parameters in the signature
@@ -47,7 +54,7 @@ export type OmitApiCallParams<
  */
 export type WithDefaultsT<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
-> = OmitApiCallParams<GetProductsT, K>;
+> = OmitApiCallParams<PreviewPaymentT | GetProductsT, K>;
 
 /**
  * Defines a collection of api operations
@@ -57,9 +64,18 @@ export type Client<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
 > = K extends __UNDEFINED_KEY
   ? {
+      readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
+
       readonly getProducts: TypeofApiCall<GetProductsT>;
     }
   : {
+      readonly previewPayment: TypeofApiCall<
+        ReplaceRequestParams<
+          PreviewPaymentT,
+          Omit<RequestParams<PreviewPaymentT>, K>
+        >
+      >;
+
       readonly getProducts: TypeofApiCall<
         ReplaceRequestParams<GetProductsT, Omit<RequestParams<GetProductsT>, K>>
       >;
@@ -106,6 +122,36 @@ export function createClient<K extends ParamKeys>({
     fetchApi
   };
 
+  const previewPaymentT: ReplaceRequestParams<
+    PreviewPaymentT,
+    RequestParams<PreviewPaymentT>
+  > = {
+    method: "put",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer,
+
+      "Content-Type": "application/json"
+    }),
+    response_decoder: previewPaymentDefaultDecoder(),
+    url: ({ ["trxCode"]: trxCode }) =>
+      `${basePath}/payment/bar-code/preview/${trxCode}`,
+
+    body: ({ ["body"]: body }) =>
+      body?.constructor?.name === "Readable" ||
+      body?.constructor?.name === "ReadableStream"
+        ? (body as ReadableStream)
+        : body?.constructor?.name === "Buffer"
+        ? (body as Buffer)
+        : JSON.stringify(body),
+
+    query: () => withoutUndefinedValues({})
+  };
+  const previewPayment: TypeofApiCall<PreviewPaymentT> = createFetchRequestForApi(
+    previewPaymentT,
+    options
+  );
+
   const getProductsT: ReplaceRequestParams<
     GetProductsT,
     RequestParams<GetProductsT>
@@ -149,6 +195,7 @@ export function createClient<K extends ParamKeys>({
   );
 
   return {
+    previewPayment: (withDefaults || identity)(previewPayment),
     getProducts: (withDefaults || identity)(getProducts)
   };
 }

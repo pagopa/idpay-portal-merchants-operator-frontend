@@ -160,7 +160,8 @@
       "discountCode": "Codice sconto",
       "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
       "noOptionsText": "Nessun risultato",
-      "loadingText": "Caricamento..."
+      "loadingText": "Caricamento...",
+      "errorAlert": "Non è stato possibile finalizzare l' operazione. Riprova."
     }
   },
   "roles": {

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, InputAdornment, TextField } from '@mui/material';
+import { Box, Button, Grid, InputAdornment, TextField, Slide, Alert } from '@mui/material';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AcceptDiscountCard from './AcceptDiscountCard';
@@ -6,13 +6,14 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
-import { getProductsList } from '../../services/merchantService';
+import { getProductsList, previewPayment } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
-import { useNavigate } from 'react-router-dom';
+import ErrorAlert from '../../components/errorAlert/ErrorAlert';
+// import { useNavigate } from 'react-router-dom';
 
 interface FormData {
-    product: string | null;
+    product: ProductDTO | null;
     totalAmount: string;
     discountCode: string;
 }
@@ -35,8 +36,9 @@ const AcceptDiscount = () => {
     });
     const [productsList, setProductsList] = useState<ProductDTO[]>([]);
     const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
+    const [errorAlert, setErrorAlert] = useState(false);
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
         const discountCouponData = sessionStorage.getItem('discountCoupon');
@@ -47,11 +49,22 @@ const AcceptDiscount = () => {
 
     }, []);
 
+    useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert]);
+
+
+
 
 
     const fetchProductsList = async (productName?: string) => {
         try {
-            const {content} = await getProductsList({productName, size: 50});
+            const { content } = await getProductsList({ productName, size: 50 });
             setProductsList([...content]);
         } catch (error) {
             console.log(error);
@@ -59,7 +72,7 @@ const AcceptDiscount = () => {
         }
     }
 
-    const handleValidateData = () => {
+    const handleValidateData = async () => {
         const errors: Record<string, boolean> = {};
         let isValid = true;
 
@@ -78,16 +91,28 @@ const AcceptDiscount = () => {
 
         setFieldErrors(errors);
         if (isValid) {
-            sessionStorage.setItem('discountCoupon', JSON.stringify(formData));
-            navigate('/riepilogo-accetta-buono-sconto');
+            try {
+                const response = await previewPayment({ product: formData.product!.productName!, amount: Number(formData.totalAmount), discountCode: formData.discountCode! });
+                console.log("previewPayment response", response);
+
+            } catch (error) {
+                console.error('Error in previewPayment:', error);
+                setErrorAlert(true);
+            }
+            // sessionStorage.setItem('discountCoupon', JSON.stringify(formData));
+            // navigate('/riepilogo-accetta-buono-sconto');
         }
         return isValid;
     };
 
     const handleFieldChange = (field: keyof FormData, value: any) => {
+        let newValue = value;
+        if (field === 'totalAmount') {
+            newValue = Number(value);
+        }
         setFormData(prev => ({
             ...prev,
-            [field]: value
+            [field]: newValue
         }));
     };
 
@@ -96,15 +121,15 @@ const AcceptDiscount = () => {
     }
 
     const handleExpenditureFocus = () => {
-       setIsExpenditureFocused(true);
+        setIsExpenditureFocused(true);
     }
 
     const handleExpenditureBlur = () => {
         setIsExpenditureFocused(false);
-      };
+    };
 
     return (
-        <Box sx={{margin:'20px'}}>
+        <Box sx={{ margin: '20px' }}>
             <Box mt={2} mb={4}>
                 <BreadcrumbsBox
                     backLabel={t('commons.exitBtn')} items={[]} active={false} />
@@ -122,13 +147,13 @@ const AcceptDiscount = () => {
                         titleBox={t('pages.acceptDiscount.selectProduct')}
                         inputTitle={t('pages.acceptDiscount.selectProductTitle')}
                     >
-                       <Autocomplete
-                        options={productsList}
-                        onChangeDebounce={(value) => handleChangeAutocomplete(value)}
-                        onChange={(productObj) => handleFieldChange('product', productObj)}
-                        inputError={!!fieldErrors.product}
-                        value={formData.product}
-                       />
+                        <Autocomplete
+                            options={productsList}
+                            onChangeDebounce={(value) => handleChangeAutocomplete(value)}
+                            onChange={(productObj) => handleFieldChange('product', productObj)}
+                            inputError={!!fieldErrors.product}
+                            value={formData.product}
+                        />
 
 
                     </AcceptDiscountCard>
@@ -154,14 +179,14 @@ const AcceptDiscount = () => {
                             onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
                             slotProps={{
                                 input: {
-                                  startAdornment: isExpenditureFocused || formData.totalAmount ? (
-                                    <InputAdornment position="start">€</InputAdornment>
-                                  ) : null,
+                                    startAdornment: isExpenditureFocused || formData.totalAmount ? (
+                                        <InputAdornment position="start">€</InputAdornment>
+                                    ) : null,
                                 },
                                 inputLabel: {
-                                  shrink: Boolean(isExpenditureFocused || formData.totalAmount),
+                                    shrink: Boolean(isExpenditureFocused || formData.totalAmount),
                                 },
-                            }}    
+                            }}
                         />
                     </AcceptDiscountCard>
                 </Grid>
@@ -225,8 +250,12 @@ const AcceptDiscount = () => {
                     </Button>
                 </Box>
             </ModalComponent>
+            {
+                errorAlert && <ErrorAlert message={t('pages.acceptDiscount.errorAlert')} />
+            }
         </Box>
     );
 };
 
 export default AcceptDiscount;
+

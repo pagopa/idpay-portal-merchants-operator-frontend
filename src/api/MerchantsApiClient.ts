@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import type { ProductListDTO } from './generated/merchants/ProductListDTO';
+import type { PreviewPaymentDTO } from './generated/merchants/PreviewPaymentDTO';
 //store
 import { authStore } from '../store/authStore';
 
@@ -79,6 +80,22 @@ export const MerchantApi = {
       return result;
     } catch (error) {
       console.error('Error in getProducts:', error);
+      throw error;
+    }
+  },
+  previewPayment: async (
+    params: {
+      product: string,
+      amount: number,
+      discountCode: string
+    }
+  ): Promise<PreviewPaymentDTO> => {
+    try {
+      const response = await axiosInstance.put(`/payment/bar-code/previews/${params.discountCode}`, params);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in previewPayment:', error);
       throw error;
     }
   },
