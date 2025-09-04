@@ -10,7 +10,7 @@ import { getProductsList, previewPayment } from '../../services/merchantService'
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
 import ErrorAlert from '../../components/errorAlert/ErrorAlert';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface FormData {
     product: ProductDTO | null;
@@ -38,7 +38,7 @@ const AcceptDiscount = () => {
     const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
     const [errorAlert, setErrorAlert] = useState(false);
 
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const discountCouponData = sessionStorage.getItem('discountCoupon');
@@ -94,26 +94,33 @@ const AcceptDiscount = () => {
             try {
                 const response = await previewPayment({ product: formData.product!.productName!, amount: Number(formData.totalAmount), discountCode: formData.discountCode! });
                 console.log("previewPayment response", response);
+                sessionStorage.setItem('discountCoupon', JSON.stringify(formData));
+                navigate('/accetta-buono-sconto/riepilogo');
 
             } catch (error) {
                 console.error('Error in previewPayment:', error);
                 setErrorAlert(true);
             }
-            // sessionStorage.setItem('discountCoupon', JSON.stringify(formData));
-            // navigate('/riepilogo-accetta-buono-sconto');
         }
         return isValid;
     };
 
     const handleFieldChange = (field: keyof FormData, value: any) => {
-        let newValue = value;
+        const newValue = value;
         if (field === 'totalAmount') {
-            newValue = Number(value);
+            if (/^\d*\.?\d{0,2}$/.test(newValue) || newValue === '') {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: newValue
+                }));
+            }
+        }else{
+            setFormData(prev => ({
+                ...prev,
+                [field]: newValue
+            }));
         }
-        setFormData(prev => ({
-            ...prev,
-            [field]: newValue
-        }));
+
     };
 
     const handleChangeAutocomplete = (value: string) => {
@@ -217,7 +224,7 @@ const AcceptDiscount = () => {
                 display={'flex'}
                 justifyContent={'space-between'}
                 gap={2}
-                mt={1}
+                mt={4}
             >
                 <Button variant="outlined" onClick={() => setModalIsOpen(true)} disabled>
                     {'Indietro'}

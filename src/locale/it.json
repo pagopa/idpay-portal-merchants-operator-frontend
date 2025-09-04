@@ -148,7 +148,7 @@
       "title": "Crea un nuovo buono sconto"
     },
     "acceptDiscount": {
-      "title": "Accetta Buono Sconto",
+      "title": "Accetta buono sconto",
       "subtitle": "Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa",
       "selectProduct": "Seleziona il prodotto soggetto all'iniziativa",
       "selectProductTitle": "Seleziona il prodotto",
@@ -161,7 +161,19 @@
       "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
       "noOptionsText": "Nessun risultato",
       "loadingText": "Caricamento...",
-      "errorAlert": "Non è stato possibile finalizzare l' operazione. Riprova."
+      "errorAlert": "Non è stato possibile finalizzare l' operazione. Riprova.",
+      "summary": "Riepilogo",
+      "reviewTransactionInfo": "Rivedi qui le informazioni di questa transazione",
+      "beneficiaryData": "Dati beneficiario",
+      "fiscalCode": "Codice fiscale",
+      "discountCodeSummary": "Riepilogo buono",
+      "product": "Prodotto",
+      "emissionDate": "Data di emissione",
+      "amountToDiscount": "Importo da scontare",
+      "discount": "Sconto",
+      "totalAmount": "Importo totale",
+      "status": "Stato",
+      "toBeAuthorized": "Da autorizzare"
     }
   },
   "roles": {

@@ -13,7 +13,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<AcceptDiscount />} />
-            <Route path="/riepilogo-accetta-buono-sconto" element={<SummaryAcceptDiscount />} />
+            <Route path="/accetta-buono-sconto/riepilogo" element={<SummaryAcceptDiscount />} />
           </Routes>
         </Layout>
       </ProtectedRoute>

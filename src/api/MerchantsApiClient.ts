@@ -91,7 +91,7 @@ export const MerchantApi = {
     }
   ): Promise<PreviewPaymentDTO> => {
     try {
-      const response = await axiosInstance.put(`/payment/bar-code/previews/${params.discountCode}`, params);
+      const response = await axiosInstance.put(`/payment/bar-code/preview/${params.discountCode}`, params);
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
