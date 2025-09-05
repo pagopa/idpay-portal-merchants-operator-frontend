@@ -139,7 +139,7 @@ const AcceptDiscount = () => {
         <Box sx={{ margin: '20px' }}>
             <Box mt={2} mb={4}>
                 <BreadcrumbsBox
-                    backLabel={t('commons.exitBtn')} items={[]} active={false} />
+                    backLabel={t('commons.exitBtn')} items={[]} active={true} />
                 <TitleBox
                     title={t('pages.acceptDiscount.title')}
                     mtTitle={2}

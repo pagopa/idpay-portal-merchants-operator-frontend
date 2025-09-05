@@ -31,6 +31,10 @@
     "sendBtn": "Invia",
     "title": "Portale Esercenti"
   },
+  "sideMenu": {
+    "buyManagement": "Gestione acquisti",
+    "profile": "Profilo"
+  },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",
     "genericDescription": "Riprovare",
@@ -174,6 +178,10 @@
       "totalAmount": "Importo totale",
       "status": "Stato",
       "toBeAuthorized": "Da autorizzare"
+    },
+    "purchasingManagement": {
+      "title": "Gestione acquisti",
+      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici"
     }
   },
   "roles": {

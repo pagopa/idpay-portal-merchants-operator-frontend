@@ -4,6 +4,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { Route, Routes } from "react-router-dom";
 import AcceptDiscount from "./pages/acceptDiscount/AcceptDiscount.tsx";
 import SummaryAcceptDiscount from "./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx";
+import ROUTES from './routes.ts';
+import PurchasingManagement from "./pages/purchasingManagement/PurchasingManagement.tsx";
 
 function App() {
 
@@ -12,8 +14,10 @@ function App() {
       <ProtectedRoute>
         <Layout>
           <Routes>
-            <Route path="/" element={<AcceptDiscount />} />
-            <Route path="/accetta-buono-sconto/riepilogo" element={<SummaryAcceptDiscount />} />
+            <Route path={ROUTES.HOME} element={<PurchasingManagement />} />
+            <Route path={ROUTES.ACCEPT_DISCOUNT} element={<AcceptDiscount />} />
+            <Route path={ROUTES.ACCEPT_DISCOUNT_SUMMARY} element={<SummaryAcceptDiscount />} />
+            <Route path={ROUTES.BUY_MANAGEMENT} element={<PurchasingManagement />} />
           </Routes>
         </Layout>
       </ProtectedRoute>
