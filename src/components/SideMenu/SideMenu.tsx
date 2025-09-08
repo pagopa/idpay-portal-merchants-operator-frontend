@@ -2,6 +2,7 @@ import { List, Box } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import ROUTES from '../../routes';
 import SideNavItem from './SideNavItem';
 
@@ -15,11 +16,19 @@ export default function SideMenu() {
     <Box display="grid" mt={1}>
       <Box gridColumn="auto">
         <List data-testid="list-test">
+        <SideNavItem
+            title={t('sideMenu.purchaseManagement')}
+            handleClick={() => navigate(ROUTES.BUY_MANAGEMENT, { replace: true })}
+            isSelected={location.pathname === ROUTES.BUY_MANAGEMENT}
+            icon={ConfirmationNumberIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+          />
           <SideNavItem
-            title={t('sideMenu.buyManagement')}
+            title={t('sideMenu.refundManagement')}
             handleClick={() => navigate(ROUTES.HOME, { replace: true })}
             isSelected={location.pathname === ROUTES.HOME}
-            icon={ConfirmationNumberIcon}
+            icon={PaymentsIcon}
             level={0}
             data-testid="initiativeList-click-test"
           />

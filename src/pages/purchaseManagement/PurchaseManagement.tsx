@@ -8,7 +8,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
 
-const PurchasingManagement = () => {
+const PurchaseManagement = () => {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
@@ -35,7 +35,7 @@ const PurchasingManagement = () => {
         { field: 'dataEOra', headerName: 'Data e ora', flex: 1, disableColumnMenu: true },
         { field: 'beneficiario', headerName: 'Beneficiario', flex: 1.5, disableColumnMenu: true },
         { field: 'totaleDellaSpesa', headerName: 'Totale della spesa', flex: 1, disableColumnMenu: true },
-        { field: 'importoAutorizzato', headerName: 'Importo autorizzato', flex: 1, disableColumnMenu: true },
+        { field: 'importoAutorizzato', hìgeaderName: 'Importo autorizzato', flex: 1, disableColumnMenu: true },
         { field: 'stato', headerName: 'Stato', flex: 1, disableColumnMenu: true, renderCell: (params) => <Chip label={params.value} size="small" sx={{ backgroundColor: '#FFF5DA !important', color: '#614C15 !important' }} /> },
     ];
 
@@ -76,9 +76,9 @@ const PurchasingManagement = () => {
         <Box>
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox
-                    title={t('pages.purchasingManagement.title')}
+                    title={t('pages.purchaseManagement.title')}
                     variantTitle="h4"
-                    subTitle={t('pages.purchasingManagement.subtitle')}
+                    subTitle={t('pages.purchaseManagement.subtitle')}
                     variantSubTitle='body2'
                     mbTitle={2}
                     mtTitle={0}
@@ -111,4 +111,4 @@ const PurchasingManagement = () => {
     );
 };
 
-export default PurchasingManagement;
+export default  PurchaseManagement;

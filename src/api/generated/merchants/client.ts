@@ -18,7 +18,9 @@ import {
   PreviewPaymentT,
   previewPaymentDefaultDecoder,
   GetProductsT,
-  getProductsDefaultDecoder
+  getProductsDefaultDecoder,
+  AuthPaymentBarCodeT,
+  authPaymentBarCodeDefaultDecoder
 } from "./requestTypes";
 
 // This is a placeholder for undefined when dealing with object keys
@@ -28,10 +30,12 @@ import {
 type __UNDEFINED_KEY = "_____";
 
 export type ApiOperation = TypeofApiCall<PreviewPaymentT> &
-  TypeofApiCall<GetProductsT>;
+  TypeofApiCall<GetProductsT> &
+  TypeofApiCall<AuthPaymentBarCodeT>;
 
 export type ParamKeys = keyof (TypeofApiParams<PreviewPaymentT> &
-  TypeofApiParams<GetProductsT>);
+  TypeofApiParams<GetProductsT> &
+  TypeofApiParams<AuthPaymentBarCodeT>);
 
 /**
  * Defines an adapter for TypeofApiCall which omit one or more parameters in the signature
@@ -54,7 +58,7 @@ export type OmitApiCallParams<
  */
 export type WithDefaultsT<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
-> = OmitApiCallParams<PreviewPaymentT | GetProductsT, K>;
+> = OmitApiCallParams<PreviewPaymentT | GetProductsT | AuthPaymentBarCodeT, K>;
 
 /**
  * Defines a collection of api operations
@@ -67,6 +71,8 @@ export type Client<
       readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
 
       readonly getProducts: TypeofApiCall<GetProductsT>;
+
+      readonly authPaymentBarCode: TypeofApiCall<AuthPaymentBarCodeT>;
     }
   : {
       readonly previewPayment: TypeofApiCall<
@@ -78,6 +84,13 @@ export type Client<
 
       readonly getProducts: TypeofApiCall<
         ReplaceRequestParams<GetProductsT, Omit<RequestParams<GetProductsT>, K>>
+      >;
+
+      readonly authPaymentBarCode: TypeofApiCall<
+        ReplaceRequestParams<
+          AuthPaymentBarCodeT,
+          Omit<RequestParams<AuthPaymentBarCodeT>, K>
+        >
       >;
     };
 
@@ -194,8 +207,39 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const authPaymentBarCodeT: ReplaceRequestParams<
+    AuthPaymentBarCodeT,
+    RequestParams<AuthPaymentBarCodeT>
+  > = {
+    method: "put",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer,
+
+      "Content-Type": "application/json"
+    }),
+    response_decoder: authPaymentBarCodeDefaultDecoder(),
+    url: ({ ["trxCode"]: trxCode }) =>
+      `${basePath}/transactions/bar-code/${trxCode}/authorize`,
+
+    body: ({ ["body"]: body }) =>
+      body?.constructor?.name === "Readable" ||
+      body?.constructor?.name === "ReadableStream"
+        ? (body as ReadableStream)
+        : body?.constructor?.name === "Buffer"
+        ? (body as Buffer)
+        : JSON.stringify(body),
+
+    query: () => withoutUndefinedValues({})
+  };
+  const authPaymentBarCode: TypeofApiCall<AuthPaymentBarCodeT> = createFetchRequestForApi(
+    authPaymentBarCodeT,
+    options
+  );
+
   return {
     previewPayment: (withDefaults || identity)(previewPayment),
-    getProducts: (withDefaults || identity)(getProducts)
+    getProducts: (withDefaults || identity)(getProducts),
+    authPaymentBarCode: (withDefaults || identity)(authPaymentBarCode)
   };
 }

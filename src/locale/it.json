@@ -32,8 +32,9 @@
     "title": "Portale Esercenti"
   },
   "sideMenu": {
-    "buyManagement": "Gestione acquisti",
-    "profile": "Profilo"
+    "purchaseManagement": "Gestione acquisti",
+    "profile": "Profilo",
+    "refundManagement": "Gestione rimborsi"
   },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",
@@ -179,9 +180,13 @@
       "status": "Stato",
       "toBeAuthorized": "Da autorizzare"
     },
-    "purchasingManagement": {
+    "purchaseManagement": {
       "title": "Gestione acquisti",
       "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici"
+    },
+    "refundManagement": {
+      "title": "Gestione rimborsi",
+      "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici"
     }
   },
   "roles": {

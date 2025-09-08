@@ -5,7 +5,9 @@ import { Route, Routes } from "react-router-dom";
 import AcceptDiscount from "./pages/acceptDiscount/AcceptDiscount.tsx";
 import SummaryAcceptDiscount from "./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx";
 import ROUTES from './routes.ts';
-import PurchasingManagement from "./pages/purchasingManagement/PurchasingManagement.tsx";
+import RefundManagement from "./pages/refundManagement/RefundManagement.tsx";
+import PurchaseManagement from "./pages/purchaseManagement/PurchaseManagement.tsx";
+
 
 function App() {
 
@@ -14,10 +16,11 @@ function App() {
       <ProtectedRoute>
         <Layout>
           <Routes>
-            <Route path={ROUTES.HOME} element={<PurchasingManagement />} />
+            <Route path={ROUTES.HOME} element={<RefundManagement />} />
             <Route path={ROUTES.ACCEPT_DISCOUNT} element={<AcceptDiscount />} />
             <Route path={ROUTES.ACCEPT_DISCOUNT_SUMMARY} element={<SummaryAcceptDiscount />} />
-            <Route path={ROUTES.BUY_MANAGEMENT} element={<PurchasingManagement />} />
+            <Route path={ROUTES.REFUNDS_MANAGEMENT} element={<RefundManagement />} />
+            <Route path={ROUTES.BUY_MANAGEMENT} element={<PurchaseManagement />} />
           </Routes>
         </Layout>
       </ProtectedRoute>
