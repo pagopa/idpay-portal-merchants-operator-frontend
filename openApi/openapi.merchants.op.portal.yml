@@ -257,20 +257,32 @@ components:
     PreviewPaymentRequestDTO:
       type: object
       properties:
-        product:
+        productName:
           type: string
           description: 'ENG: prodcut name - IT: il nome del prodotto'
           maxLength: 255
           pattern: .*
-        amount:
-          type: number
-          description: 'ENG: amount - IT: importo totale della spesa'
+        productGtin:
+          type: string
+          description: 'ENG: prodcut GTIN - IT: il codice GTIN del prodotto'
+          maxLength: 14
+          pattern: ^[a-zA-Z0-9]{1,14}$
+        amountCents:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 1000000000
+          description: 'ENG: amount in cents - IT: importo totale della spesa in centesimi'
+      required:
+        - productName
+        - productGtin
+        - amountCents
     PreviewPaymentDTO:
       type: object
       properties:
         trxCode:
           type: string
-          description: 'ENG: Transaction code - IT: Codice della transazione'
+          description: 'ENG: Transaction code - IT: Codice della transazione (codice sconto)'
           maxLength: 24
           pattern: '^[a-zA-Z0-9]+$'
         trxDate:
@@ -291,24 +303,30 @@ components:
             AUTHORIZED: authorized] - IT: Stato del pagamento [CREATED: Creato,
             IDENTIFIED: Utente associato, AUTHORIZATION_REQUESTED:
             autorizzazione richiesta, AUTHORIZED: autorizzato]
+        originalAmountCents:
+          type: integer
+          format: int64
+          description: 'ENG: Original amount cents - IT: Importo originale da pagare in centesimi'
+          minimum: 0
+          maximum: 1000000000
         rewardCents:
           type: integer
           format: int64
-          description: 'ENG: Reward - IT: Premio generato'
+          description: 'ENG: Reward - IT: sconto generato'
           minimum: 0
           maximum: 1000000000
-        amountCents:
+        residualAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Amount cents - IT: Importo in centesimi'
+          description: 'ENG: Residual amount to pay - IT: Importo residuo da pagare dopo lo sconto'
           minimum: 0
           maximum: 1000000000
         userId:
           type: string
-          description: 'ENG: user id - IT: id user'
-          maxLength: 255
+          description: 'ENG: user fiscal code - IT: codice fiscale utente'
+          maxLength: 16
           pattern: .*
-        product:
+        productName:
           type: string
           description: 'ENG: prodcut name - IT: il nome del prodotto'
           maxLength: 255

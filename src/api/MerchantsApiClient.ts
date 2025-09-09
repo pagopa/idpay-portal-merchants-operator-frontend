@@ -3,6 +3,7 @@ import type { ProductListDTO } from './generated/merchants/ProductListDTO';
 import type { PreviewPaymentDTO } from './generated/merchants/PreviewPaymentDTO';
 //store
 import { authStore } from '../store/authStore';
+import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
 
 //axios instance 
 const createAxiosInstance = (): AxiosInstance => {
@@ -83,6 +84,8 @@ export const MerchantApi = {
       throw error;
     }
   },
+
+
   previewPayment: async (
     params: {
       product: string,
@@ -99,6 +102,24 @@ export const MerchantApi = {
       throw error;
     }
   },
+
+  authPaymentBarCode: async (
+    params: {
+      trxCode: string,
+      amountCents: number,
+      
+    }
+  ): Promise<AuthPaymentResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/authorize`, params);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in authPaymentBarCode:', error);
+      throw error;
+    }
+  },
+
 };
 
 

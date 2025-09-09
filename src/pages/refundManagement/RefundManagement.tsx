@@ -38,12 +38,26 @@ const RefundManagement = () => {
 
     const columns = [
         {
-            field: 'elettrodomestico', headerName: 'Elettrodomestico', flex: 1.5, disableColumnMenu: true, renderCell: (params) => (
-                <Tooltip title={params.value}>
-                    <Typography sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {params.value}
-                    </Typography>
-                </Tooltip>
+            field: 'elettrodomestico', headerName: 'Elettrodomestico', flex: 1.5, disableColumnMenu: true, align: 'center', renderCell: (params: any) => (
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center', 
+                        height: '100%',       
+                        width: '100%'          
+                    }}
+                >
+                    <Tooltip title={params.value}>
+                        <Typography
+                            sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                            {params.value}
+                        </Typography>
+                    </Tooltip>
+                </div>
             ),
         },
         { field: 'dataEOra', headerName: 'Data e ora', flex: 1, disableColumnMenu: true },
@@ -116,25 +130,25 @@ const RefundManagement = () => {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                         <FormControl fullWidth size="small">
-                        <InputLabel id="pos-type-label">Stato</InputLabel>
-                        <Select
-                            labelId="pos-type-label"
-                            id="pos-type-select"
-                            label="Stato"
-                            name="status"
-                            value={formik.values.status}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        >
-                            <MenuItem value=""><em>Tutti gli stati</em></MenuItem>
-                            <MenuItem value="PHYSICAL">
-                                <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
-                            </MenuItem>
-                            <MenuItem value="ONLINE">
-                                <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
+                            <InputLabel id="pos-type-label">Stato</InputLabel>
+                            <Select
+                                labelId="pos-type-label"
+                                id="pos-type-select"
+                                label="Stato"
+                                name="status"
+                                value={formik.values.status}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            >
+                                <MenuItem value=""><em>Tutti gli stati</em></MenuItem>
+                                <MenuItem value="PHYSICAL">
+                                    <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
+                                </MenuItem>
+                                <MenuItem value="ONLINE">
+                                    <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
                     </Grid>
                 </FiltersForm>
             </Box>

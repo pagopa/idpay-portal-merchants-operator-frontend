@@ -2,6 +2,7 @@ import { MerchantApi } from '../api/MerchantsApiClient';
 import { ProductListDTO } from '../api/generated/merchants/ProductListDTO';
 import { GetProductsParams } from '../utils/types';
 import { PreviewPaymentDTO } from '../api/generated/merchants/PreviewPaymentDTO';
+import { AuthPaymentResponseDTO } from '../api/generated/merchants/AuthPaymentResponseDTO';
 
 
   export const getProductsList = async (params: GetProductsParams): Promise<ProductListDTO> => {
@@ -10,4 +11,8 @@ import { PreviewPaymentDTO } from '../api/generated/merchants/PreviewPaymentDTO'
 
   export const previewPayment = async (params: { product: string, amount: number, discountCode: string }): Promise<PreviewPaymentDTO> => {
     return MerchantApi.previewPayment(params);
+  };
+
+  export const authPaymentBarCode = async (params: { trxCode: string, amountCents: number }): Promise<AuthPaymentResponseDTO> => {
+    return MerchantApi.authPaymentBarCode(params);
   };

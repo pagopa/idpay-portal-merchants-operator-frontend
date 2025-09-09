@@ -178,7 +178,9 @@
       "discount": "Sconto",
       "totalAmount": "Importo totale",
       "status": "Stato",
-      "toBeAuthorized": "Da autorizzare"
+      "toBeAuthorized": "Da autorizzare",
+      "modalTitle": "Vuoi uscire?",
+      "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
     },
     "purchaseManagement": {
       "title": "Gestione acquisti",

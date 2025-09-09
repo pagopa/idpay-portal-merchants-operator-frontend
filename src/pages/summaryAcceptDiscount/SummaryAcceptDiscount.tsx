@@ -4,11 +4,21 @@ import { useTranslation } from 'react-i18next';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { useNavigate } from 'react-router-dom';
+import { authPaymentBarCode } from '../../services/merchantService';
+import ROUTES from '../../routes';
 
 const SummaryAcceptDiscount = () => {
 
     const { t } = useTranslation();
     const navigate = useNavigate();
+
+    const handleAuthorizeDiscount = async () => {
+        try{
+            await authPaymentBarCode({ trxCode: '123', amountCents: 100 });
+        }catch(error){
+            console.log(error);
+        }
+    };
 
     return (
         <Box sx={{ margin: '20px' }} >
@@ -85,12 +95,12 @@ const SummaryAcceptDiscount = () => {
                 gap={2}
                 mt={4}
             >
-                <Button variant="outlined" onClick={() => navigate('/')} >
+                <Button variant="outlined" onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)} >
                     {'Indietro'}
                 </Button>
                 <Button
                     variant="contained"
-                    onClick={() => console.log('Avanti')}
+                    onClick={handleAuthorizeDiscount}
 
                 >
                     {t('pages.acceptDiscount.title')}
