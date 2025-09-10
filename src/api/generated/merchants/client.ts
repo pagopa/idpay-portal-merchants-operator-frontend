@@ -15,12 +15,14 @@ import {
 import { identity } from "fp-ts/lib/function";
 
 import {
-  PreviewPaymentT,
-  previewPaymentDefaultDecoder,
+  GetPointOfSaleTransactionsProcessedT,
+  getPointOfSaleTransactionsProcessedDefaultDecoder,
   GetProductsT,
   getProductsDefaultDecoder,
   AuthPaymentBarCodeT,
-  authPaymentBarCodeDefaultDecoder
+  authPaymentBarCodeDefaultDecoder,
+  PreviewPaymentT,
+  previewPaymentDefaultDecoder
 } from "./requestTypes";
 
 // This is a placeholder for undefined when dealing with object keys
@@ -29,13 +31,17 @@ import {
 // We use this as a placeholder for type parameters indicating "no key"
 type __UNDEFINED_KEY = "_____";
 
-export type ApiOperation = TypeofApiCall<PreviewPaymentT> &
+export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsProcessedT> &
   TypeofApiCall<GetProductsT> &
-  TypeofApiCall<AuthPaymentBarCodeT>;
+  TypeofApiCall<AuthPaymentBarCodeT> &
+  TypeofApiCall<PreviewPaymentT>;
 
-export type ParamKeys = keyof (TypeofApiParams<PreviewPaymentT> &
+export type ParamKeys = keyof (TypeofApiParams<
+  GetPointOfSaleTransactionsProcessedT
+> &
   TypeofApiParams<GetProductsT> &
-  TypeofApiParams<AuthPaymentBarCodeT>);
+  TypeofApiParams<AuthPaymentBarCodeT> &
+  TypeofApiParams<PreviewPaymentT>);
 
 /**
  * Defines an adapter for TypeofApiCall which omit one or more parameters in the signature
@@ -58,7 +64,13 @@ export type OmitApiCallParams<
  */
 export type WithDefaultsT<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
-> = OmitApiCallParams<PreviewPaymentT | GetProductsT | AuthPaymentBarCodeT, K>;
+> = OmitApiCallParams<
+  | GetPointOfSaleTransactionsProcessedT
+  | GetProductsT
+  | AuthPaymentBarCodeT
+  | PreviewPaymentT,
+  K
+>;
 
 /**
  * Defines a collection of api operations
@@ -68,17 +80,21 @@ export type Client<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
 > = K extends __UNDEFINED_KEY
   ? {
-      readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
+      readonly getPointOfSaleTransactionsProcessed: TypeofApiCall<
+        GetPointOfSaleTransactionsProcessedT
+      >;
 
       readonly getProducts: TypeofApiCall<GetProductsT>;
 
       readonly authPaymentBarCode: TypeofApiCall<AuthPaymentBarCodeT>;
+
+      readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
     }
   : {
-      readonly previewPayment: TypeofApiCall<
+      readonly getPointOfSaleTransactionsProcessed: TypeofApiCall<
         ReplaceRequestParams<
-          PreviewPaymentT,
-          Omit<RequestParams<PreviewPaymentT>, K>
+          GetPointOfSaleTransactionsProcessedT,
+          Omit<RequestParams<GetPointOfSaleTransactionsProcessedT>, K>
         >
       >;
 
@@ -90,6 +106,13 @@ export type Client<
         ReplaceRequestParams<
           AuthPaymentBarCodeT,
           Omit<RequestParams<AuthPaymentBarCodeT>, K>
+        >
+      >;
+
+      readonly previewPayment: TypeofApiCall<
+        ReplaceRequestParams<
+          PreviewPaymentT,
+          Omit<RequestParams<PreviewPaymentT>, K>
         >
       >;
     };
@@ -135,33 +158,39 @@ export function createClient<K extends ParamKeys>({
     fetchApi
   };
 
-  const previewPaymentT: ReplaceRequestParams<
-    PreviewPaymentT,
-    RequestParams<PreviewPaymentT>
+  const getPointOfSaleTransactionsProcessedT: ReplaceRequestParams<
+    GetPointOfSaleTransactionsProcessedT,
+    RequestParams<GetPointOfSaleTransactionsProcessedT>
   > = {
-    method: "put",
+    method: "get",
 
     headers: ({ ["Bearer"]: Bearer }) => ({
-      Authorization: Bearer,
-
-      "Content-Type": "application/json"
+      Authorization: Bearer
     }),
-    response_decoder: previewPaymentDefaultDecoder(),
-    url: ({ ["trxCode"]: trxCode }) =>
-      `${basePath}/payment/bar-code/preview/${trxCode}`,
+    response_decoder: getPointOfSaleTransactionsProcessedDefaultDecoder(),
+    url: ({
+      ["initiativeId"]: initiativeId,
+      ["pointOfSaleId"]: pointOfSaleId
+    }) =>
+      `${basePath}/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/processed`,
 
-    body: ({ ["body"]: body }) =>
-      body?.constructor?.name === "Readable" ||
-      body?.constructor?.name === "ReadableStream"
-        ? (body as ReadableStream)
-        : body?.constructor?.name === "Buffer"
-        ? (body as Buffer)
-        : JSON.stringify(body),
-
-    query: () => withoutUndefinedValues({})
+    query: ({
+      ["page"]: page,
+      ["size"]: size,
+      ["sort"]: sort,
+      ["fiscalCode"]: fiscalCode,
+      ["status"]: status
+    }) =>
+      withoutUndefinedValues({
+        ["page"]: page,
+        ["size"]: size,
+        ["sort"]: sort,
+        ["fiscalCode"]: fiscalCode,
+        ["status"]: status
+      })
   };
-  const previewPayment: TypeofApiCall<PreviewPaymentT> = createFetchRequestForApi(
-    previewPaymentT,
+  const getPointOfSaleTransactionsProcessed: TypeofApiCall<GetPointOfSaleTransactionsProcessedT> = createFetchRequestForApi(
+    getPointOfSaleTransactionsProcessedT,
     options
   );
 
@@ -237,9 +266,42 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const previewPaymentT: ReplaceRequestParams<
+    PreviewPaymentT,
+    RequestParams<PreviewPaymentT>
+  > = {
+    method: "put",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer,
+
+      "Content-Type": "application/json"
+    }),
+    response_decoder: previewPaymentDefaultDecoder(),
+    url: ({ ["trxCode"]: trxCode }) =>
+      `${basePath}/transactions/bar-code/${trxCode}/preview`,
+
+    body: ({ ["body"]: body }) =>
+      body?.constructor?.name === "Readable" ||
+      body?.constructor?.name === "ReadableStream"
+        ? (body as ReadableStream)
+        : body?.constructor?.name === "Buffer"
+        ? (body as Buffer)
+        : JSON.stringify(body),
+
+    query: () => withoutUndefinedValues({})
+  };
+  const previewPayment: TypeofApiCall<PreviewPaymentT> = createFetchRequestForApi(
+    previewPaymentT,
+    options
+  );
+
   return {
-    previewPayment: (withDefaults || identity)(previewPayment),
+    getPointOfSaleTransactionsProcessed: (withDefaults || identity)(
+      getPointOfSaleTransactionsProcessed
+    ),
     getProducts: (withDefaults || identity)(getProducts),
-    authPaymentBarCode: (withDefaults || identity)(authPaymentBarCode)
+    authPaymentBarCode: (withDefaults || identity)(authPaymentBarCode),
+    previewPayment: (withDefaults || identity)(previewPayment)
   };
 }

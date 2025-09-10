@@ -16,15 +16,13 @@ servers:
 tags:
   - name: products
     description: Operations related to product listing and filtering
-  - name: payment
-    description: Operations related to payment
   - name: transaction
     description: Operations related to transaction
 paths:
-  /payment/bar-code/preview/{trxCode}:
+  /transactions/bar-code/{trxCode}/preview:
     put:
       tags:
-        - payment
+        - transaction
       summary: 'ENG: Preview Payment - IT: Anteprima pagamento'
       description: Preview payment
       operationId: previewPayment
@@ -215,6 +213,34 @@ paths:
               example:
                 code: PAYMENT_GENERIC_ERROR
                 message: A generic error occured
+  /initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions/processed:
+    get:
+      tags:
+        - transaction
+      summary: "ENG: Returns the list of processed transactions associated to a point of sale - IT: Ritorna la lista delle transazioni processate associate ad un punto vendita"
+      description: "ENG: Returns the list of processed transactions associated to a point of sale - IT: Ritorna la lista delle transazioni processate associate ad un punto vendita"
+      operationId: getPointOfSaleTransactionsProcessed
+      parameters:
+        - $ref: '#/components/parameters/page_query'
+        - $ref: '#/components/parameters/size_query'
+        - $ref: '#/components/parameters/sort_trx_processed_query'
+        - $ref: '#/components/parameters/fiscalCode_query'
+        - $ref: '#/components/parameters/status_trx_processed_query'
+        - $ref: '#/components/parameters/initiativeId_path'
+        - $ref: '#/components/parameters/pointOfSaleId_path'
+      responses:
+        '200':
+          $ref: '#/components/responses/GET_transactions_processed_200_Response'
+        '400':
+          $ref: '#/components/responses/GET_transactions_processed_400_Response'
+        '401':
+          $ref: '#/components/responses/GET_transactions_processed_401_Response'
+        '404':
+          $ref: '#/components/responses/GET_transactions_processed_404_Response'
+        '429':
+          $ref: '#/components/responses/GET_transactions_processed_429_Response'
+        '500':
+          $ref: '#/components/responses/GET_transactions_processed_500_Response'
 
 components:
   headers:
@@ -331,6 +357,11 @@ components:
           description: 'ENG: prodcut name - IT: il nome del prodotto'
           maxLength: 255
           pattern: .*
+        productGtin:
+          type: string
+          description: 'ENG: prodcut GTIN - IT: il codice GTIN del prodotto'
+          maxLength: 14
+          pattern: ^[a-zA-Z0-9]{1,14}$
     ProductListDTO:
       type: object
       properties:
@@ -472,6 +503,83 @@ components:
           type: string
           maxLength: 200
           pattern: .*
+    PointOfSaleTransactionsProcessedListDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointOfSaleTransactionProcessedDTO'
+          maxItems: 1000
+        pageNo:
+          type: integer
+          format: int32
+          description: 'ENG: The number of the page <br> IT: Il numero della pagina'
+          minimum: 0
+          maximum: 1000000
+        pageSize:
+          type: integer
+          format: int32
+          description: 'ENG: The element size for page <br> IT: Il numero di elementi per pagina'
+          minimum: 0
+          maximum: 1000000
+        totalElements:
+          type: integer
+          format: int32
+          description: 'ENG: The total number of the elements <br> IT: Il numero totale degli elementi'
+          minimum: 0
+          maximum: 1000000
+        totalPages:
+          type: integer
+          format: int32
+          description: 'ENG: The total number of the pages <br> IT: Il numero totale delle pagine'
+          minimum: 0
+          maximum: 1000000
+    PointOfSaleTransactionProcessedDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'ENG: Transaction ID <br> IT: ID della transazione'
+          maxLength: 64
+          pattern: .*
+        fiscalCode:
+          type: string
+          description: 'ENG: Citizen fiscal code - IT: Codice fiscale del cittadino'
+          maxLength: 16
+          pattern: .*
+        effectiveAmountCents:
+          type: integer
+          format: int64
+          description: 'ENG: Transaction amount in cents - IT: Importo della transazione in centesimi'
+          minimum: 0
+          maximum: 1000000000
+        rewardAmountCents:
+          type: integer
+          format: int64
+          description: 'ENG: Reward amount in cents - IT: Premio generato in centesimi'
+          minimum: 0
+          maximum: 1000000000
+        trxDate:
+          type: string
+          format: date-time
+          description: 'ENG: The date of the transaction - IT: La data della transazione'
+          maxLength: 255
+        updateDate:
+          type: string
+          format: date-time
+          description: 'ENG: The date of the transaction update - IT: La data di aggiornamento della transazione'
+          maxLength: 255
+        status:
+          type: string
+          description: 'ENG: The status of the transaction - IT: Lo stato della transazione'
+          enum:
+            - REWARDED
+            - CANCELLED
+        channel:
+          type: string
+          description: 'ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione'
+          maxLength: 24
     ErrorDTO:
       type: object
       required:
@@ -502,6 +610,10 @@ components:
           type: string
           description: "ENG: Transaction acquirer ID- IT: Identificativo della transazione rispetto all'acquirer"
           maxLength: 100
+        additionalProperties:
+          type: object
+          additionalProperties:
+            type: string
     AuthPaymentResponseDTO:
       type: object
       required:
@@ -759,6 +871,92 @@ components:
       headers:
         Access-Control-Allow-Origin:
           $ref: '#/components/headers/Access-Control-Allow-Origin'
+    GET_transactions_processed_200_Response:
+      description: Ok
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PointOfSaleTransactionsProcessedListDTO'
+    GET_transactions_processed_400_Response:
+      description: Bad request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_processed_401_Response:
+      description: Authentication failed
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_processed_404_Response:
+      description: The requested resource was not found
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_processed_429_Response:
+      description: Too many Request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_processed_500_Response:
+      description: Generic error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
   parameters:
     category_query:
       name: category
@@ -862,6 +1060,51 @@ components:
       schema:
         type: string
         maxLength: 255
+        pattern: .*
+    fiscalCode_query:
+      name: fiscalCode
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 16
+        pattern: .*
+    status_trx_processed_query:
+      name: status
+      in: query
+      description: Transaction processed status
+      required: false
+      schema:
+        type: string
+        enum:
+          - REWARDED
+          - CANCELLED
+    sort_trx_processed_query:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - elaborationDateTime, desc
+          - elaborationDateTime, asc
+    initiativeId_path:
+      name: initiativeId
+      in: path
+      description: The initiative ID
+      required: true
+      schema:
+        type: string
+        maxLength: 36
+        pattern: .*
+    pointOfSaleId_path:
+      name: pointOfSaleId
+      in: path
+      description: The point of sale ID
+      required: true
+      schema:
+        type: string
+        maxLength: 36
         pattern: .*
 security:
   - Bearer: []

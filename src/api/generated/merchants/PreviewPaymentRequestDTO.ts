@@ -5,17 +5,29 @@
 /* eslint-disable  */
 
 import * as t from "io-ts";
+import {
+  IWithinRangeIntegerTag,
+  WithinRangeInteger
+} from "@pagopa/ts-commons/lib/numbers";
 import { PatternString } from "@pagopa/ts-commons/lib/strings";
 
 // required attributes
-const PreviewPaymentRequestDTOR = t.interface({});
+const PreviewPaymentRequestDTOR = t.interface({
+  amountCents: t.union([
+    WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
+      0,
+      1000000000
+    ),
+    t.literal(1000000000)
+  ]),
+
+  productGtin: PatternString("^[a-zA-Z0-9]{1,14}$"),
+
+  productName: PatternString(".*")
+});
 
 // optional attributes
-const PreviewPaymentRequestDTOO = t.partial({
-  amount: t.number,
-
-  product: PatternString(".*")
-});
+const PreviewPaymentRequestDTOO = t.partial({});
 
 export const PreviewPaymentRequestDTO = t.intersection(
   [PreviewPaymentRequestDTOR, PreviewPaymentRequestDTOO],

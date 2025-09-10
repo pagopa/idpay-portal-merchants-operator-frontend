@@ -9,10 +9,10 @@ import { AuthPaymentResponseDTO } from '../api/generated/merchants/AuthPaymentRe
     return MerchantApi.getProducts(params);
   };
 
-  export const previewPayment = async (params: { product: string, amount: number, discountCode: string }): Promise<PreviewPaymentDTO> => {
+  export const previewPayment = async (params: { productGtin: string, productName: string, amountCents: number, discountCode: string }): Promise<PreviewPaymentDTO> => {
     return MerchantApi.previewPayment(params);
   };
 
-  export const authPaymentBarCode = async (params: { trxCode: string, amountCents: number }): Promise<AuthPaymentResponseDTO> => {
+  export const authPaymentBarCode = async (params: { trxCode: string, amountCents: number, additionalProperties?: {} }): Promise<AuthPaymentResponseDTO> => {
     return MerchantApi.authPaymentBarCode(params);
   };

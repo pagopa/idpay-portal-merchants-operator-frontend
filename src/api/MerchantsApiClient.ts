@@ -88,13 +88,14 @@ export const MerchantApi = {
 
   previewPayment: async (
     params: {
-      product: string,
-      amount: number,
+      productGtin: string,
+      productName: string,
+      amountCents: number,
       discountCode: string
     }
   ): Promise<PreviewPaymentDTO> => {
     try {
-      const response = await axiosInstance.put(`/payment/bar-code/preview/${params.discountCode}`, params);
+      const response = await axiosInstance.put(`/transactions/bar-code/${params.discountCode}/preview`, params);
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
@@ -107,6 +108,7 @@ export const MerchantApi = {
     params: {
       trxCode: string,
       amountCents: number,
+      additionalProperties?: {}
       
     }
   ): Promise<AuthPaymentResponseDTO> => {

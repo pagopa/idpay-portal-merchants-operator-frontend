@@ -6,16 +6,29 @@ import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { useNavigate } from 'react-router-dom';
 import { authPaymentBarCode } from '../../services/merchantService';
 import ROUTES from '../../routes';
+import { useEffect, useState } from 'react';
+import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
 
 const SummaryAcceptDiscount = () => {
 
+    const [summaryDataObj, setSummaryDataObj] = useState<any>(null);
     const { t } = useTranslation();
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const discountCoupon = sessionStorage.getItem('discountCoupon');
+        if (discountCoupon) {
+            const formData = JSON.parse(discountCoupon);
+            setSummaryDataObj(formData);
+        }
+    }, []);
+
     const handleAuthorizeDiscount = async () => {
-        try{
-            await authPaymentBarCode({ trxCode: '123', amountCents: 100 });
-        }catch(error){
+        try {
+            await authPaymentBarCode({ trxCode: summaryDataObj?.trxCode, amountCents: summaryDataObj?.originalAmountCents, additionalProperties: {
+                gtin: summaryDataObj?.productGtin,
+            } });
+        } catch (error) {
             console.log(error);
         }
     };
@@ -28,7 +41,7 @@ const SummaryAcceptDiscount = () => {
                     backLabel={t('commons.exitBtn')} items={[
                         t('pages.acceptDiscount.title'),
                         t('pages.acceptDiscount.summary'),
-                      ]} />
+                    ]} />
                 <TitleBox
                     title={t('pages.acceptDiscount.summary')}
                     mtTitle={2}
@@ -46,7 +59,7 @@ const SummaryAcceptDiscount = () => {
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.fiscalCode')}</Typography>
-                                <Typography variant="body1" sx={{ fontWeight: theme.typography.fontWeightMedium, textTransform: 'uppercase' }}>LNFN76458VBNRGIRFN</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: theme.typography.fontWeightMedium, textTransform: 'uppercase' }}>{summaryDataObj?.userId}</Typography>
                             </Grid>
                         </Grid>
                     </Box>
@@ -59,27 +72,36 @@ const SummaryAcceptDiscount = () => {
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.product')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>Asciugatrice bosch 34</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.productName ?? MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.discountCode')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium, textTransform: 'uppercase' }}>ASDASDASDASD</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium, textTransform: 'uppercase' }}>{summaryDataObj?.trxCode ?? MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.emissionDate')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>27/07/2025</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.trxDate.split('T')[0] ?? MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.amountToDiscount')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>200,00 €</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.originalAmountCents ? (Number(summaryDataObj?.originalAmountCents) / 100).toLocaleString('it-IT', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) + ' €' : MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.discount')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>100,00 €</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.rewardCents ? (Number(summaryDataObj?.rewardCents) / 100).toLocaleString('it-IT', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) + ' €' : MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.totalAmount')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>100,00 €</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{(summaryDataObj?.residualAmountCents || summaryDataObj?.residualAmountCents === 0) ? (Number(summaryDataObj?.residualAmountCents) / 100).toLocaleString('it-IT', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) + ' €' : MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.status')}</Typography>

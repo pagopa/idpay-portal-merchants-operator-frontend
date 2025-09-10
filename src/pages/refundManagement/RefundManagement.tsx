@@ -61,10 +61,10 @@ const RefundManagement = () => {
             ),
         },
         { field: 'dataEOra', headerName: 'Data e ora', flex: 1, disableColumnMenu: true },
-        { field: 'beneficiario', headerName: 'Beneficiario', flex: 1.5, disableColumnMenu: true },
-        { field: 'totaleDellaSpesa', headerName: 'Totale della spesa', flex: 1, disableColumnMenu: true },
-        { field: 'importoAutorizzato', headerName: 'Importo autorizzato', flex: 1, disableColumnMenu: true },
-        { field: 'stato', headerName: 'Stato', flex: 1, disableColumnMenu: true, renderCell: (params) => <Chip label={params.value} size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} /> },
+        { field: 'beneficiario', headerName: 'Beneficiario', flex: 1.5, disableColumnMenu: true, sortable: false },
+        { field: 'totaleDellaSpesa', headerName: 'Totale della spesa', flex: 1, disableColumnMenu: true, sortable: false },
+        { field: 'importoAutorizzato', headerName: 'Importo autorizzato', flex: 1, disableColumnMenu: true, sortable: false },
+        { field: 'stato', headerName: 'Stato', flex: 1, disableColumnMenu: true, sortable: false, renderCell: (params) => <Chip label={params.value} size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} /> },
     ];
 
 

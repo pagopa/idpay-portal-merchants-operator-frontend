@@ -10,6 +10,20 @@ import {
   WithinRangeInteger
 } from "@pagopa/ts-commons/lib/numbers";
 
+// additional attributes
+
+export const AuthBarCodePaymentDTOAdditionalProperties = t.record(
+  t.string,
+
+  t.string,
+
+  "AuthBarCodePaymentDTOAdditionalProperties"
+);
+
+export type AuthBarCodePaymentDTOAdditionalProperties = t.TypeOf<
+  typeof AuthBarCodePaymentDTOAdditionalProperties
+>;
+
 // required attributes
 const AuthBarCodePaymentDTOR = t.interface({
   amountCents: t.union([
@@ -24,7 +38,9 @@ const AuthBarCodePaymentDTOR = t.interface({
 });
 
 // optional attributes
-const AuthBarCodePaymentDTOO = t.partial({});
+const AuthBarCodePaymentDTOO = t.partial({
+  additionalProperties: AuthBarCodePaymentDTOAdditionalProperties
+});
 
 export const AuthBarCodePaymentDTO = t.intersection(
   [AuthBarCodePaymentDTOR, AuthBarCodePaymentDTOO],

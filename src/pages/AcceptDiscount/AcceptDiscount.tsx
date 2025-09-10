@@ -94,9 +94,9 @@ const AcceptDiscount = () => {
         if (isValid) {
             setPreviewIsLoading(true);
             try {
-                const response = await previewPayment({ product: formData.product!.productName!, amount: Number(formData.totalAmount), discountCode: formData.discountCode! });
+                const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Number(formData.totalAmount) * 100, discountCode: formData.discountCode.trim()! });
                 console.log("previewPayment response", response);
-                sessionStorage.setItem('discountCoupon', JSON.stringify(formData));
+                sessionStorage.setItem('discountCoupon', JSON.stringify(response));
                 setPreviewIsLoading(false);
                 navigate('/accetta-buono-sconto/riepilogo');
             } catch (error) {

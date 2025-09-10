@@ -14,21 +14,19 @@ import { enumType } from "@pagopa/ts-commons/lib/types";
 import { UTCISODateFromString } from "@pagopa/ts-commons/lib/dates";
 
 export enum StatusEnum {
-  "CREATED" = "CREATED",
+  "REWARDED" = "REWARDED",
 
-  "IDENTIFIED" = "IDENTIFIED",
-
-  "AUTHORIZATION_REQUESTED" = "AUTHORIZATION_REQUESTED",
-
-  "AUTHORIZED" = "AUTHORIZED"
+  "CANCELLED" = "CANCELLED"
 }
 
 // required attributes
-const PreviewPaymentDTOR = t.interface({});
+const PointOfSaleTransactionProcessedDTOR = t.interface({});
 
 // optional attributes
-const PreviewPaymentDTOO = t.partial({
-  originalAmountCents: t.union([
+const PointOfSaleTransactionProcessedDTOO = t.partial({
+  channel: t.string,
+
+  effectiveAmountCents: t.union([
     WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
       0,
       1000000000
@@ -36,19 +34,11 @@ const PreviewPaymentDTOO = t.partial({
     t.literal(1000000000)
   ]),
 
-  productGtin: PatternString("^[a-zA-Z0-9]{1,14}$"),
+  fiscalCode: PatternString(".*"),
 
-  productName: PatternString(".*"),
+  id: PatternString(".*"),
 
-  residualAmountCents: t.union([
-    WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
-      0,
-      1000000000
-    ),
-    t.literal(1000000000)
-  ]),
-
-  rewardCents: t.union([
+  rewardAmountCents: t.union([
     WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
       0,
       1000000000
@@ -58,16 +48,16 @@ const PreviewPaymentDTOO = t.partial({
 
   status: enumType<StatusEnum>(StatusEnum, "status"),
 
-  trxCode: PatternString("^[a-zA-Z0-9]+$"),
-
   trxDate: UTCISODateFromString,
 
-  userId: PatternString(".*")
+  updateDate: UTCISODateFromString
 });
 
-export const PreviewPaymentDTO = t.intersection(
-  [PreviewPaymentDTOR, PreviewPaymentDTOO],
-  "PreviewPaymentDTO"
+export const PointOfSaleTransactionProcessedDTO = t.intersection(
+  [PointOfSaleTransactionProcessedDTOR, PointOfSaleTransactionProcessedDTOO],
+  "PointOfSaleTransactionProcessedDTO"
 );
 
-export type PreviewPaymentDTO = t.TypeOf<typeof PreviewPaymentDTO>;
+export type PointOfSaleTransactionProcessedDTO = t.TypeOf<
+  typeof PointOfSaleTransactionProcessedDTO
+>;
