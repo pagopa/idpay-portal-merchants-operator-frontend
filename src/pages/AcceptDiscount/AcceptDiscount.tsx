@@ -11,6 +11,7 @@ import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
 import ErrorAlert from '../../components/errorAlert/ErrorAlert';
 import { useNavigate } from 'react-router-dom';
+import EuroIcon from '@mui/icons-material/Euro';
 
 interface FormData {
     product: ProductDTO | null;
@@ -198,7 +199,7 @@ const AcceptDiscount = () => {
                                 slotProps={{
                                     input: {
                                         startAdornment: isExpenditureFocused || formData.totalAmount ? (
-                                            <InputAdornment position="start">€</InputAdornment>
+                                            <InputAdornment position="start" ><EuroIcon fontSize='small'/></InputAdornment>
                                         ) : null,
                                     },
                                     inputLabel: {
