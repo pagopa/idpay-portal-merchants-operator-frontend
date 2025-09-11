@@ -106,7 +106,7 @@ const AcceptDiscount = () => {
     const handleFieldChange = (field: keyof FormData, value: any) => {
         const newValue = value;
         if (field === 'totalAmount') {
-            if (/^\d*\.?\d{0,2}$/.test(newValue) || newValue === '') {
+            if (!isNaN(parseFloat(newValue)) || newValue === '') {
                 setFormData(prev => ({
                     ...prev,
                     [field]: newValue
