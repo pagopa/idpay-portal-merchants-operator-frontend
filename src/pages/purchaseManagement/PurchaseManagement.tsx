@@ -55,7 +55,19 @@ const PurchaseManagement = () => {
         for (let i = 0; i < count; i++) {
             const randomDate = getRandomDate();
             const totaleSpesa = (Math.random() * 800 + 200).toFixed(2);
+            /*
+            * SonarQube: S2245 - The use of a non-cryptographic PRNG is justified here.
+            * The generated random number is used only for non-sensitive data mocking
+            * and does not involve any security-critical functionality such as
+            * authentication, session management, or cryptographic operations.
+            */
             const importoAutorizzato = (Number(totaleSpesa) * (Math.random() * 0.2 + 0.8)).toFixed(2); // 80% - 100% della spesa totale
+            /*
+            * SonarQube: S2245 - The use of a non-cryptographic PRNG is justified here.
+            * The generated random number is used only for non-sensitive data mocking
+            * and does not involve any security-critical functionality such as
+            * authentication, session management, or cryptographic operations.
+            */
 
             data.push({
                 id: i,
@@ -111,4 +123,4 @@ const PurchaseManagement = () => {
     );
 };
 
-export default  PurchaseManagement;
+export default PurchaseManagement;
