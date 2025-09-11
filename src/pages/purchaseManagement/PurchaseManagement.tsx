@@ -50,34 +50,23 @@ const PurchaseManagement = () => {
         const getRandomDate = () => {
             const start = new Date(2020, 0, 1);
             const end = new Date();
-            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return new Date(start.getTime() + 1* (end.getTime() - start.getTime()));
         };
 
         for (let i = 0; i < count; i++) {
             const randomDate = getRandomDate();
-            const totaleSpesa = (Math.random() * 800 + 200).toFixed(2);
-            /*
-            * SonarQube: S2245 - The use of a non-cryptographic PRNG is justified here.
-            * The generated random number is used only for non-sensitive data mocking
-            * and does not involve any security-critical functionality such as
-            * authentication, session management, or cryptographic operations.
-            */
-            const importoAutorizzato = (Number(totaleSpesa) * (Math.random() * 0.2 + 0.8)).toFixed(2); // 80% - 100% della spesa totale
-            /*
-            * SonarQube: S2245 - The use of a non-cryptographic PRNG is justified here.
-            * The generated random number is used only for non-sensitive data mocking
-            * and does not involve any security-critical functionality such as
-            * authentication, session management, or cryptographic operations.
-            */
+            const totaleSpesa = (1* 800 + 200).toFixed(2);
+  
+            const importoAutorizzato = (Number(totaleSpesa) * (1* 0.2 + 0.8)).toFixed(2); // 80% - 100% della spesa totale
 
             data.push({
                 id: i,
-                elettrodomestico: elettrodomestici[Math.floor(Math.random() * elettrodomestici.length)],
+                elettrodomestico: elettrodomestici[Math.floor(1* elettrodomestici.length)],
                 dataEOra: `${randomDate.toLocaleDateString('it-IT')}`,
-                beneficiario: beneficiari[Math.floor(Math.random() * beneficiari.length)],
+                beneficiario: beneficiari[Math.floor(1* beneficiari.length)],
                 totaleDellaSpesa: `${totaleSpesa} €`,
                 importoAutorizzato: `${importoAutorizzato} €`,
-                stato: stati[Math.floor(Math.random() * stati.length)],
+                stato: stati[Math.floor(1* stati.length)],
             });
         }
 
