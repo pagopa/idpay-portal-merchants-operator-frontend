@@ -8,10 +8,12 @@ import { authPaymentBarCode } from '../../services/merchantService';
 import ROUTES from '../../routes';
 import { useEffect, useState } from 'react';
 import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
+import ErrorAlert from '../../components/errorAlert/ErrorAlert';
 
 const SummaryAcceptDiscount = () => {
 
     const [summaryDataObj, setSummaryDataObj] = useState<any>(null);
+    const [errorAlert, setErrorAlert] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -23,12 +25,25 @@ const SummaryAcceptDiscount = () => {
         }
     }, []);
 
+     useEffect(() => {
+            if (errorAlert) {
+                const timer = setTimeout(() => {
+                    setErrorAlert(false);
+                }, 5000);
+                return () => clearTimeout(timer);
+            }
+        }, [errorAlert]);
+    
+
     const handleAuthorizeDiscount = async () => {
         try {
-            await authPaymentBarCode({ trxCode: summaryDataObj?.trxCode, amountCents: summaryDataObj?.originalAmountCents, additionalProperties: {
-                gtin: summaryDataObj?.productGtin,
-            } });
+            await authPaymentBarCode({
+                trxCode: summaryDataObj?.trxCode, amountCents: summaryDataObj?.originalAmountCents, additionalProperties: {
+                    productGtin: summaryDataObj?.productGtin,
+                }
+            });
         } catch (error) {
+            setErrorAlert(true);
             console.log(error);
         }
     };
@@ -84,14 +99,14 @@ const SummaryAcceptDiscount = () => {
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.amountToDiscount')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.originalAmountCents ? (Number(summaryDataObj?.originalAmountCents) / 100).toLocaleString('it-IT', {
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.originalAmountCents || summaryDataObj?.originalAmountCents === 0 ? (Number(summaryDataObj?.originalAmountCents) / 100).toLocaleString('it-IT', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 }) + ' €' : MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.discount')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.rewardCents ? (Number(summaryDataObj?.rewardCents) / 100).toLocaleString('it-IT', {
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.rewardCents || summaryDataObj?.rewardCents === 0 ? (Number(summaryDataObj?.rewardCents) / 100).toLocaleString('it-IT', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 }) + ' €' : MISSING_DATA_PLACEHOLDER}</Typography>
@@ -128,6 +143,9 @@ const SummaryAcceptDiscount = () => {
                     {t('pages.acceptDiscount.title')}
                 </Button>
             </Box>
+            {
+                errorAlert && <ErrorAlert message={t('pages.acceptDiscount.errorAlert')} />
+            }
 
         </Box>
     );

@@ -263,12 +263,12 @@ const AcceptDiscount = () => {
                         gap={2}
                         mt={1}
                     >
-                        <Button variant="outlined" onClick={() => setModalIsOpen(false)}>
+                        <Button variant="outlined" onClick={() => navigate(-1)}>
                             {'Torna indietro'}
                         </Button>
                         <Button
                             variant="contained"
-                            onClick={() => navigate(-1)}
+                            onClick={() => setModalIsOpen(false)}
                         >
                             {'Esci'}
                         </Button>

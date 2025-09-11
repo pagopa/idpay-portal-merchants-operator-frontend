@@ -49,7 +49,7 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
     <Autocomplete
       id="server-side-autocomplete"
       sx={{
-        width: 300,
+        width: '50%',
         '& .MuiFormLabel-root.Mui-error': {
           color: '#5C6E82 !important',
         }
