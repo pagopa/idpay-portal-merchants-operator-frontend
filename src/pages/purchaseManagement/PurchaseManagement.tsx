@@ -19,6 +19,7 @@ const PurchaseManagement = () => {
         const fakeData = createFakeData(15); // Genera 50 righe di dati
         setRows(fakeData);
         setLoading(false);
+        console.log(loading);
     }, []);
 
 
@@ -107,8 +108,8 @@ const PurchaseManagement = () => {
                         <DataTable
                             rows={rows}
                             columns={columns}
-                            pageSize={10}
-                            rowsPerPage={10}
+                            // pageSize={10}
+                            // rowsPerPage={10}
                             paginationModel={{
                                 pageSize: 10,
                                 pageNo: 0,

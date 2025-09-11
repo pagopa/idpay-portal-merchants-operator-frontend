@@ -1,4 +1,3 @@
-import React from 'react';
 import { DataGrid, type GridSortModel } from '@mui/x-data-grid';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
