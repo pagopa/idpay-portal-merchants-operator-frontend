@@ -24,7 +24,7 @@ const RefundManagement = () => {
     const [errorAlert, setErrorAlert] = useState(false);
     const { t } = useTranslation();
     const token = authStore.getState().token;
-    
+
     const isLoadingRef = useRef(false);
 
     const initialValues = {
@@ -47,32 +47,32 @@ const RefundManagement = () => {
     useEffect(() => {
         console.log('formik.values', formik.values);
     }, [formik.values]);
-    
+
     const fetchTransactions = useCallback(async (params: any) => {
         if (isLoadingRef.current) {
             return;
         }
 
         const decodeToken: any = jwtDecode(token);
-        
+
         isLoadingRef.current = true;
         setLoading(true);
-        
+
         try {
             const response = await getProcessedTransactions(
-                "688a12d87415622f166697a0", 
-                decodeToken?.point_of_sale_id, 
+                "688a12d87415622f166697a0",
+                decodeToken?.point_of_sale_id,
                 params
             );
-            
+
             setPaginationModel({
                 pageNo: response.pageNo || 0,
                 pageSize: response.pageSize || 10,
                 totalElements: response.totalElements || 0
             });
-            
+
             setRows([...response.content]);
-            setErrorAlert(false); 
+            setErrorAlert(false);
         } catch (error) {
             console.error('RefundManagement: Errore fetch:', error);
             setErrorAlert(true);
@@ -85,14 +85,14 @@ const RefundManagement = () => {
 
     const columns = [
         {
-            field: 'elettrodomestico', 
-            headerName: 'Elettrodomestico', 
-            flex: 1.5, 
-            disableColumnMenu: true, 
-            align: 'center', 
-            sortable: false, 
+            field: 'elettrodomestico',
+            headerName: 'Elettrodomestico',
+            flex: 1.5,
+            disableColumnMenu: true,
+            align: 'center',
+            sortable: false,
             renderCell: (params: any) => {
-                if(params.value){
+                if (params.value) {
                     return (
                         <div style={{
                             display: 'flex',
@@ -115,34 +115,34 @@ const RefundManagement = () => {
                 return MISSING_DATA_PLACEHOLDER;
             },
         },
-        { 
-            field: 'trxDate', 
-            headerName: 'Data e ora', 
-            flex: 1, 
-            disableColumnMenu: true, 
+        {
+            field: 'trxDate',
+            headerName: 'Data e ora',
+            flex: 1,
+            disableColumnMenu: true,
             renderCell: (params: any) => {
-                if(params.value){
+                if (params.value) {
                     return new Date(params.value).toLocaleDateString('it-IT');
                 }
                 return MISSING_DATA_PLACEHOLDER;
-            } 
+            }
         },
-        { 
-            field: 'fiscalCode', 
-            headerName: 'Beneficiario', 
-            flex: 1.5, 
-            disableColumnMenu: true, 
-            sortable: false 
+        {
+            field: 'fiscalCode',
+            headerName: 'Beneficiario',
+            flex: 1.5,
+            disableColumnMenu: true,
+            sortable: false
         },
-        { 
-            field: 'effectiveAmountCents', 
-            headerName: 'Totale della spesa', 
-            flex: 1, 
-            type: 'number', 
-            disableColumnMenu: true, 
-            sortable: false, 
+        {
+            field: 'effectiveAmountCents',
+            headerName: 'Totale della spesa',
+            flex: 1,
+            type: 'number',
+            disableColumnMenu: true,
+            sortable: false,
             renderCell: (params: any) => {
-                if(params.value || params.value === 0){
+                if (params.value || params.value === 0) {
                     return (params.value / 100).toLocaleString('it-IT', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
@@ -151,15 +151,15 @@ const RefundManagement = () => {
                 return MISSING_DATA_PLACEHOLDER;
             }
         },
-        { 
-            field: 'rewardAmountCents', 
-            headerName: 'Importo autorizzato', 
-            flex: 1, 
-            type: 'number', 
-            disableColumnMenu: true, 
-            sortable: false, 
+        {
+            field: 'rewardAmountCents',
+            headerName: 'Importo autorizzato',
+            flex: 1,
+            type: 'number',
+            disableColumnMenu: true,
+            sortable: false,
             renderCell: (params: any) => {
-                if(params.value || params.value === 0){
+                if (params.value || params.value === 0) {
                     return (params.value / 100).toLocaleString('it-IT', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
@@ -168,31 +168,31 @@ const RefundManagement = () => {
                 return MISSING_DATA_PLACEHOLDER;
             }
         },
-        { 
-            field: 'status', 
-            headerName: 'Stato', 
-            flex: 1, 
-            disableColumnMenu: true, 
-            sortable: false, 
+        {
+            field: 'status',
+            headerName: 'Stato',
+            flex: 1,
+            disableColumnMenu: true,
+            sortable: false,
             renderCell: (params: any) => {
-                if(params.value === "CANCELLED"){
+                if (params.value === "CANCELLED") {
                     return (
-                        <Chip 
-                            label={t('pages.refundManagement.chipCancelled')} 
-                            size="small" 
-                            sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} 
+                        <Chip
+                            label={t('pages.refundManagement.chipCancelled')}
+                            size="small"
+                            sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
                         />
                     )
-                }else{
+                } else {
                     return (
-                        <Chip 
-                            label={t('pages.refundManagement.chipRefunded')} 
-                            size="small" 
-                            sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }} 
+                        <Chip
+                            label={t('pages.refundManagement.chipRefunded')}
+                            size="small"
+                            sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
                         />
                     )
                 }
-               
+
             }
         },
     ];
@@ -200,15 +200,15 @@ const RefundManagement = () => {
     const setApiFilters = useCallback((filtersObj: any) => {
         fetchTransactions({
             ...filtersObj,
-            page: 0, 
+            page: 0,
             size: paginationModel.pageSize || 10,
             sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
         });
     }, [fetchTransactions, paginationModel.pageSize, sortModel]);
 
     const handlePaginationChange = useCallback((newPaginationModel: any) => {
-        
-        if (newPaginationModel.pageNo === paginationModel.pageNo && 
+
+        if (newPaginationModel.pageNo === paginationModel.pageNo &&
             newPaginationModel.pageSize === paginationModel.pageSize) {
             return;
         }
@@ -216,12 +216,12 @@ const RefundManagement = () => {
         fetchTransactions({
             page: newPaginationModel.pageNo,
             size: newPaginationModel.pageSize,
-            sort: sortModel[0].field + ',' + sortModel[0].sort,
+            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
         });
     }, [fetchTransactions, paginationModel.pageNo, paginationModel.pageSize, sortModel]);
 
     const handleSortModelChange = (model: any) => {
-        if(model.length > 0){
+        if (model.length > 0) {
             setSortModel(model);
             fetchTransactions({
                 sort: model[0].field + ',' + model[0].sort,
@@ -245,83 +245,84 @@ const RefundManagement = () => {
                     mbSubTitle={2}
                 />
             </Box>
-            
+
             <Typography variant="h6">
                 Transazioni
             </Typography>
-            
+            <Box>
+               {
+                (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null)) )&& (
+                    <FiltersForm
+                    formik={formik}
+                    onFiltersApplied={setApiFilters}
+                    onFiltersReset={() => setApiFilters({})}
+                >
+                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                        <TextField
+                            name="fiscalCode"
+                            label="Cerca per codice fiscale"
+                            size="small"
+                            value={formik.values.fiscalCode}
+                            onChange={formik.handleChange}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                        <TextField
+                            name="gtiIn"
+                            label="Cerca per GTI In"
+                            size="small"
+                            value={formik.values.gtiIn}
+                            onChange={formik.handleChange}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel id="pos-type-label">Stato</InputLabel>
+                            <Select
+                                labelId="pos-type-label"
+                                id="pos-type-select"
+                                label="Stato"
+                                name="status"
+                                value={formik.values.status}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            >
+                                <MenuItem value=""><em>Tutti gli stati</em></MenuItem>
+                                <MenuItem value="CANCELLED">
+                                    <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
+                                </MenuItem>
+                                <MenuItem value="REWARDED">
+                                    <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                </FiltersForm>
+                )
+               }
+            </Box>
+
             {(rows.length > 0 || loading) ? (
-                <>
-                    <Box>
-                        <FiltersForm
-                            formik={formik}
-                            onFiltersApplied={setApiFilters}
-                            onFiltersReset={() => setApiFilters({})}
-                        >
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                                <TextField 
-                                    name="fiscalCode" 
-                                    label="Cerca per codice fiscale" 
-                                    size="small" 
-                                    value={formik.values.fiscalCode} 
-                                    onChange={formik.handleChange}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                                <TextField 
-                                    name="gtiIn" 
-                                    label="Cerca per GTI In" 
-                                    size="small" 
-                                    value={formik.values.gtiIn} 
-                                    onChange={formik.handleChange}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                                <FormControl fullWidth size="small">
-                                    <InputLabel id="pos-type-label">Stato</InputLabel>
-                                    <Select
-                                        labelId="pos-type-label"
-                                        id="pos-type-select"
-                                        label="Stato"
-                                        name="status"
-                                        value={formik.values.status}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                    >
-                                        <MenuItem value=""><em>Tutti gli stati</em></MenuItem>
-                                        <MenuItem value="CANCELLED">
-                                            <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
-                                        </MenuItem>
-                                        <MenuItem value="REWARDED">
-                                            <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
-                                        </MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                        </FiltersForm>
-                    </Box>
-                    
                     <Grid container mt={2}>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Box sx={{ height: 600, width: '100%' }}>
                                 <DataTable
                                     rows={rows}
                                     columns={columns}
-                                    loading={loading} 
-                                    onPaginationPageChange={handlePaginationChange}  
+                                    loading={loading}
+                                    onPaginationPageChange={handlePaginationChange}
                                     paginationModel={paginationModel}
                                     onSortModelChange={handleSortModelChange}
                                 />
                             </Box>
                         </Grid>
                     </Grid>
-                </>
             ) : (
-                <Paper sx={{my: 4, p: 3, textAlign: 'center', display: 'flex',alignItems: 'center', justifyContent: 'center'}}>
+                <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
                 </Paper>
             )}
-            
+
             {errorAlert && <ErrorAlert message={t('pages.refundManagement.errorAlert')} />}
         </Box>
     );
