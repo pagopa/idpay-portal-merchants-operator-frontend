@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataGrid, type GridSortModel } from '@mui/x-data-grid';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {MISSING_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -8,20 +8,44 @@ import {MISSING_DATA_PLACEHOLDER} from '../../utils/constants';
 export interface DataTableProps {
   rows: any;
   columns: any;
-  pageSize: number;
-  rowsPerPage: number;
   handleRowAction?: (row: any) => void; 
   onSortModelChange?: (model: any) => void;
   sortModel?: GridSortModel;
-  onPaginationPageChange?: (page: number) => void;
+  onPaginationPageChange?: (obj: any) => void;
   paginationModel?: any;
+  loading?: boolean;
 }
 
-
-const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelChange, onPaginationPageChange, paginationModel }: DataTableProps) => {
+const DataTable = ({ 
+  rows, 
+  columns, 
+  handleRowAction, 
+  onSortModelChange, 
+  onPaginationPageChange, 
+  paginationModel,
+  loading = false 
+}: DataTableProps) => {
   const [finalColumns, setFinalColumns] = useState(Array<any>);
   const [sortModelState, setSortModelState] = useState<any>([]);
+  
+  const isExternalUpdate = useRef(false);
+  const [internalPaginationModel, setInternalPaginationModel] = useState(
+    paginationModel || { pageNo: 0, pageSize: 10, totalElements: 0 }
+  );
 
+  useEffect(() => {
+    if (paginationModel) {
+      isExternalUpdate.current = true;
+      setInternalPaginationModel({
+        page: paginationModel.pageNo || 0,
+        pageSize: paginationModel.pageSize || 10
+      });
+
+      setTimeout(() => {
+        isExternalUpdate.current = false;
+      }, 100);
+    }
+  }, [paginationModel]);
 
   useEffect(() => {
     if (columns && columns.length > 0) {
@@ -43,7 +67,7 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
             renderCell: (params: any) => (
               <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%' }}>
                 <IconButton
-                  onClick={() => handleRowAction(params.row)}
+                  onClick={() => handleRowAction && handleRowAction(params.row)}
                   size="small"
                 >
                   <ArrowForwardIosIcon color='primary' fontSize='small' />
@@ -54,8 +78,7 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
         ]
       );
     }
-  }, [columns]);
-
+  }, [columns, handleRowAction]);
 
   const renderEmptyCell = (params: any) => {
     if (params.value === null || params.value === undefined || params.value === '') {
@@ -64,33 +87,46 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
     return params.value;
   };
 
-//   const handlePageChange = (page: number) => {
-//     onPaginationPageChange?.(page);
-//   };
+  const handlePaginationModelChange = useCallback((model: any) => {
+    
+    if (isExternalUpdate.current) {
+      return;
+    }
 
-  const handlePaginationModelChange = (model: any) => {
-    console.log("MODEL", model);
-    onPaginationPageChange?.(model);
-  };    
+    if (loading) {
+      return;
+    }
+
+    const currentPage = internalPaginationModel.page || 0;
+    const currentPageSize = internalPaginationModel.pageSize || 10;
+    
+    if (model.page === currentPage && model.pageSize === currentPageSize) {
+      return;
+    }
+
+    setInternalPaginationModel(model);
+    
+    onPaginationPageChange?.({
+      pageNo: model.page,
+      pageSize: model.pageSize
+    });
+  }, [onPaginationPageChange, loading, internalPaginationModel]);
 
   const handleSortModelChange = useCallback((model: any) => {
-    console.log("MODEL", model);
     if(model.length > 0){
       setSortModelState(model);
       onSortModelChange?.(model);
     }else{
       setSortModelState((prevState: any) => {
-        const newSortModel = prevState?.[0].sort === 'asc'
+        const newSortModel = prevState?.[0]?.sort === 'asc'
           ? [{field: prevState?.[0].field, sort: 'desc'}]
           : [{field: prevState?.[0].field, sort: 'asc'}];
         
         onSortModelChange?.(newSortModel);
-        console.log("NEW MODEL", newSortModel);
         
         return newSortModel;
       });
     }
-    
   }, [onSortModelChange]);
 
   return (
@@ -103,17 +139,21 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
             disableRowSelectionOnClick
             sortingMode='server'
             paginationMode='server'
+            loading={loading}
             onSortModelChange={handleSortModelChange}
             sortModel={sortModelState}
-            paginationModel={paginationModel}
-            onPaginationMetaChange={handlePaginationModelChange}
-            rowCount={paginationModel?.totalElements}
+            paginationModel={{
+              page: internalPaginationModel.page || 0,
+              pageSize: internalPaginationModel.pageSize || 10
+            }}
+            onPaginationModelChange={handlePaginationModelChange}
+            rowCount={paginationModel?.totalElements || 0}
             localeText={{
                 noRowsLabel: 'Nessun punto vendita da visualizzare.',
                 footerTotalRows: 'Totale righe:',
                 paginationRowsPerPage: 'Righe per pagina:',
-                paginationDisplayedRows: ({ from, to}) => {
-                  return `${from}–${to} di ${rows.length }`;
+                paginationDisplayedRows: ({ from, to, count}) => {
+                  return `${from}–${to} di ${count}`;
                 },
               }}
             sx={{
@@ -127,16 +167,13 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
               '& .MuiDataGrid-columnSeparator': {
                 display: 'none'
               },
-              // '& .MuiDataGrid-footerContainer': {
-              //   border: 'none'
-              // }, 
-               '& .MuiDataGrid-cell:focus': {
+              '& .MuiDataGrid-cell:focus': {
                 outline: 'none'
               }, 
-               '& .MuiDataGrid-columnHeader:focus': {
+              '& .MuiDataGrid-columnHeader:focus': {
                 outline: 'none'
               },
-               '& .MuiDataGrid-cell:focus-within': {
+              '& .MuiDataGrid-cell:focus-within': {
                 outline: 'none'
               },
               '& .MuiDataGrid-iconButtonContainer button': {
@@ -144,7 +181,6 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
               },
               '& .MuiTablePagination-root': {
                 overflowY: 'hidden',
-
                 '& button': {
                   backgroundColor: 'transparent !important'
                 }
@@ -154,7 +190,6 @@ const DataTable = ({ rows, columns, rowsPerPage, handleRowAction, onSortModelCha
         )
       }
     </>
-
   );
 };
 

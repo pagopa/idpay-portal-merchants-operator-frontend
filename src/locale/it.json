@@ -188,7 +188,11 @@
     },
     "refundManagement": {
       "title": "Gestione rimborsi",
-      "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici"
+      "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa",
+      "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
+      "chipCancelled": "Annullato",
+      "chipRefunded": "Stornato"
     }
   },
   "roles": {

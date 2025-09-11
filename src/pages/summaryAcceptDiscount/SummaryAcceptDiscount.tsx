@@ -21,6 +21,7 @@ const SummaryAcceptDiscount = () => {
         const discountCoupon = sessionStorage.getItem('discountCoupon');
         if (discountCoupon) {
             const formData = JSON.parse(discountCoupon);
+            console.log(formData)
             setSummaryDataObj(formData);
         }
     }, []);
@@ -78,7 +79,7 @@ const SummaryAcceptDiscount = () => {
                             </Grid>
                         </Grid>
                     </Box>
-                </Grid>
+                </Grid> 
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                     <Box sx={{ backgroundColor: theme.palette.background.paper }} py={3} px={3}>
                         <Grid container spacing={2}>
@@ -95,7 +96,7 @@ const SummaryAcceptDiscount = () => {
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.emissionDate')}</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{summaryDataObj?.trxDate.split('T')[0] ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{new Date(summaryDataObj?.trxDate).toLocaleDateString('it-IT') ?? MISSING_DATA_PLACEHOLDER}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.amountToDiscount')}</Typography>
