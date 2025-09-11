@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography, Tooltip, TextField, FormControl, InputLabel, Select, MenuItem, Paper } from "@mui/material";
+import { Box, Grid, Typography, Tooltip, TextField, FormControl, InputLabel, Select, MenuItem, Paper } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
@@ -42,6 +42,7 @@ const RefundManagement = () => {
 
     useEffect(() => {
         fetchTransactions({});
+        console.log(loading)
     }, []);
 
     useEffect(() => {
