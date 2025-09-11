@@ -75,6 +75,7 @@ const RefundManagement = () => {
             setErrorAlert(false);
         } catch (error) {
             console.error('RefundManagement: Errore fetch:', error);
+            setLoading(false);
             setErrorAlert(true);
         } finally {
             setLoading(false);

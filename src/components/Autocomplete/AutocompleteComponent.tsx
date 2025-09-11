@@ -40,11 +40,6 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
     setLoading(false);
   }, [options]);
 
-
-  useEffect(() => {
-    console.log("CURRENT", value);
-  }, [value]);
-
   return (
     <Autocomplete
       id="server-side-autocomplete"

@@ -23,6 +23,7 @@ interface FormErrors {
     product?: boolean;
     totalAmount?: boolean;
     discountCode?: boolean;
+    discountCodeWrong?: boolean;
 }
 
 
@@ -42,15 +43,6 @@ const AcceptDiscount = () => {
 
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     const discountCouponData = sessionStorage.getItem('discountCoupon');
-    //     if (discountCouponData) {
-    //         const parsedDiscountCouponData = JSON.parse(discountCouponData);
-    //         setFormData(parsedDiscountCouponData);
-    //     }
-
-    // }, []);
-
     useEffect(() => {
         if (errorAlert) {
             const timer = setTimeout(() => {
@@ -59,10 +51,6 @@ const AcceptDiscount = () => {
             return () => clearTimeout(timer);
         }
     }, [errorAlert]);
-
-
-
-
 
     const fetchProductsList = async (productName?: string) => {
         try {
@@ -96,14 +84,20 @@ const AcceptDiscount = () => {
             setPreviewIsLoading(true);
             try {
                 const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Number(formData.totalAmount) * 100, discountCode: formData.discountCode.trim()! });
-                console.log("previewPayment response", response);
-                sessionStorage.setItem('discountCoupon', JSON.stringify(response));
-                setPreviewIsLoading(false);
-                navigate('/accetta-buono-sconto/riepilogo');
+                    sessionStorage.setItem('discountCoupon', JSON.stringify(response));
+                    setPreviewIsLoading(false);
+                    navigate('/accetta-buono-sconto/riepilogo');
             } catch (error) {
                 console.error('Error in previewPayment:', error);
-                setErrorAlert(true);
-                setPreviewIsLoading(false);
+                if(error.response.data.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' || error.response.data.code === 'PAYMENT_ALREADY_AUTHORIZED') {
+                    const errors: Record<string, boolean> = {};
+                    errors.discountCodeWrong = true;
+                    setFieldErrors(errors);
+                    setPreviewIsLoading(false);
+                } else {
+                    setErrorAlert(true);
+                    setPreviewIsLoading(false);
+                }
             }
         }
         return isValid;
@@ -148,7 +142,7 @@ const AcceptDiscount = () => {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <Box sx={{ margin: '20px' }}>
+            <Box sx={{ margin: '20px'}}>
                 <Box mt={2} mb={4}>
                     <BreadcrumbsBox
                         backLabel={t('commons.exitBtn')} items={[]} active={true} />
@@ -225,7 +219,7 @@ const AcceptDiscount = () => {
                                         color: '#5C6E82 !important',
                                     },
                                 }}
-                                error={!!fieldErrors.discountCode} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR : ""}
+                                error={!!fieldErrors.discountCode || !!fieldErrors.discountCodeWrong} helperText={fieldErrors.discountCode ? REQUIRED_FIELD_ERROR :  fieldErrors.discountCodeWrong ? "Codice sconto non valido" : ""}
                                 onChange={(e) => handleFieldChange('discountCode', e.target.value)}
                             />
                         </AcceptDiscountCard>

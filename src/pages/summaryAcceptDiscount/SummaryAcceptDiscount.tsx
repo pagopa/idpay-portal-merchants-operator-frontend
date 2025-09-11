@@ -68,7 +68,7 @@ const SummaryAcceptDiscount = () => {
             </Box>
             <Grid container spacing={2} sx={{ maxWidth: '920px' }}>
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                    <Box sx={{ backgroundColor: theme.palette.background.paper }} py={3} px={3}>
+                    <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }} py={3} px={3}>
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body1" fontWeight={theme.typography.fontWeightBold} sx={{ textTransform: 'uppercase' }}>{t('pages.acceptDiscount.beneficiaryData')}</Typography>
@@ -81,7 +81,7 @@ const SummaryAcceptDiscount = () => {
                     </Box>
                 </Grid> 
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                    <Box sx={{ backgroundColor: theme.palette.background.paper }} py={3} px={3}>
+                    <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }} py={3} px={3}>
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                 <Typography variant="body1" fontWeight={theme.typography.fontWeightBold} sx={{ textTransform: 'uppercase' }}>{t('pages.acceptDiscount.discountCodeSummary')}</Typography>
