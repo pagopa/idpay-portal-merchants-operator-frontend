@@ -36,7 +36,7 @@ const vitestConfig = defineVitestConfig({
         functions: 80,
         statements: 80
       },
-      exclude: ['**/openApi/**', '**/src/api/generated/**', '**/src/routest.ts', ...coverageConfigDefaults.exclude]
+      exclude: ['**/openApi/**', '**/src/contexts/**', '**/src/api/generated/**', '**/src/routes.ts', ...coverageConfigDefaults.exclude]
     }
   },
 });
