@@ -26,11 +26,22 @@ const PurchaseManagement = () => {
     const columns = [
         {
             field: 'elettrodomestico', headerName: 'Elettrodomestico', flex: 1.5, disableColumnMenu: true, renderCell: (params) => (
-                <Tooltip title={params.value}>
-                    <Typography sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {params.value}
-                    </Typography>
-                </Tooltip>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: '100%'
+                }}>
+                    <Tooltip title={params.value}>
+                        <Typography sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            {params.value}
+                        </Typography>
+                    </Tooltip>
+                </div>
             ),
         },
         { field: 'dataEOra', headerName: 'Data e ora', flex: 1, disableColumnMenu: true },
@@ -61,12 +72,12 @@ const PurchaseManagement = () => {
 
             data.push({
                 id: i,
-                elettrodomestico: elettrodomestici[Math.floor(1* elettrodomestici.length)],
+                elettrodomestico: elettrodomestici[0],
                 dataEOra: `${randomDate.toLocaleDateString('it-IT')}`,
-                beneficiario: beneficiari[Math.floor(1* beneficiari.length)],
+                beneficiario: beneficiari[0],
                 totaleDellaSpesa: `${totaleSpesa} €`,
                 importoAutorizzato: `${importoAutorizzato} €`,
-                stato: stati[Math.floor(1* stati.length)],
+                stato: stati[0],
             });
         }
 
