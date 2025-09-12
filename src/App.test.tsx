@@ -23,7 +23,7 @@ vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({
   default: () => <div data-testid="purchase-management-page">Purchase Management</div>,
 }));
 
-describe('App Component', () => {
+describe('App', () => {
 
   it('renders the ProtectedRoute and Layout wrappers', () => {
     // Render the App component wrapped in MemoryRouter to simulate routing.
