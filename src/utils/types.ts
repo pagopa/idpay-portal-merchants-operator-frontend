@@ -27,3 +27,11 @@ export interface GetProductsParams {
     productFileId?: string;
     organizationId?: string;
 }
+
+export interface PaginationResponse {
+    pageNo: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+    content: any[];
+}
