@@ -12,7 +12,7 @@ interface Props {
 
 export default function AcceptDiscountCard({ titleBox, children , subTitleBox ,inputTitle }: Props) {
     return (
-        <Box py={3} px={4} sx={{ backgroundColor: theme.palette.background.paper }}>
+        <Box py={3} px={4} sx={{ backgroundColor: theme.palette.background.paper }} borderRadius={'4px'}>
             <Box mb={2}>
                 <TitleBox
                     title={titleBox}

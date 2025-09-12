@@ -31,6 +31,11 @@
     "sendBtn": "Invia",
     "title": "Portale Esercenti"
   },
+  "sideMenu": {
+    "purchaseManagement": "Gestione acquisti",
+    "profile": "Profilo",
+    "refundManagement": "Gestione rimborsi"
+  },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",
     "genericDescription": "Riprovare",
@@ -148,7 +153,7 @@
       "title": "Crea un nuovo buono sconto"
     },
     "acceptDiscount": {
-      "title": "Accetta Buono Sconto",
+      "title": "Accetta buono sconto",
       "subtitle": "Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa",
       "selectProduct": "Seleziona il prodotto soggetto all'iniziativa",
       "selectProductTitle": "Seleziona il prodotto",
@@ -160,7 +165,34 @@
       "discountCode": "Codice sconto",
       "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
       "noOptionsText": "Nessun risultato",
-      "loadingText": "Caricamento..."
+      "loadingText": "Caricamento...",
+      "errorAlert": "Non è stato possibile finalizzare l' operazione. Riprova.",
+      "summary": "Riepilogo",
+      "reviewTransactionInfo": "Rivedi qui le informazioni di questa transazione",
+      "beneficiaryData": "Dati beneficiario",
+      "fiscalCode": "Codice fiscale",
+      "discountCodeSummary": "Riepilogo buono",
+      "product": "Prodotto",
+      "emissionDate": "Data di emissione",
+      "amountToDiscount": "Importo da scontare",
+      "discount": "Sconto",
+      "totalAmount": "Importo totale",
+      "status": "Stato",
+      "toBeAuthorized": "Da autorizzare",
+      "modalTitle": "Vuoi uscire?",
+      "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
+    },
+    "purchaseManagement": {
+      "title": "Gestione acquisti",
+      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici"
+    },
+    "refundManagement": {
+      "title": "Gestione rimborsi",
+      "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa",
+      "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
+      "chipCancelled": "Annullato",
+      "chipRefunded": "Stornato"
     }
   },
   "roles": {

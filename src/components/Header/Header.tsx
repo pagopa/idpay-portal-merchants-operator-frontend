@@ -2,10 +2,15 @@ import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import type { LoggedUser } from '../../utils/types';
 import {useAuth} from "../../contexts/AuthContext";
+// import type { JwtUser } from '../../utils/types';
 
-const Header = () => {
+interface HeaderProps {
+  userProps?: any;
+}
 
-  const { user } = useAuth();
+const Header = ({userProps}: HeaderProps) => {
+
+  const { user } = userProps ? userProps : useAuth();
   // const user: JwtUser = {
   //   id: "12345",
   //   username: "mattia.rossi",
@@ -22,10 +27,10 @@ const Header = () => {
   // };
 
   const loggedUser: LoggedUser = {
-    id: user.id,
-    name: user.firstName,
-    email: user.email,
-    surname: user.lastName,
+    id: userProps ? userProps.id : user.id,
+    name: userProps ? userProps.firstName : user.firstName,
+    email: userProps ? userProps.email : user.email,
+    surname: userProps ? userProps.lastName : user.lastName,
   }
 
 
@@ -33,7 +38,7 @@ const Header = () => {
   const welfareProduct: ProductEntity = {
     // TODO check if correct
     id: 'prod-idpay-merchants',
-    title: "portale esercenti",
+    title: "Portale esercenti",
     productUrl: "test",
     linkType: 'internal',
   };

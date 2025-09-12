@@ -18,7 +18,12 @@ const vitestConfig = defineVitestConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/setupTests.ts'],
+    setupFiles: './src/setupTests.ts',
+    deps: {
+      inline: [
+        '@mui/x-data-grid'
+      ]
+    },
     coverage: {
       provider: 'v8',
       // you can include other reporters, but 'json-summary' is required, json is recommended
@@ -31,8 +36,7 @@ const vitestConfig = defineVitestConfig({
         functions: 80,
         statements: 80
       },
-      exclude: ['**/openApi/**', '**/src/config/**', '**/src/utils/constants.ts',
-        '**/src/api/generated/**', ...coverageConfigDefaults.exclude]
+      exclude: ['**/openApi/**', '**/src/contexts/**', '**/src/api/generated/**', '**/src/routes.ts', ...coverageConfigDefaults.exclude]
     }
   },
 });
