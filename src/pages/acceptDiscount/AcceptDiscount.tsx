@@ -83,7 +83,7 @@ const AcceptDiscount = () => {
         if (isValid) {
             setPreviewIsLoading(true);
             try {
-                const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Number(formData.totalAmount) * 100, discountCode: formData.discountCode.trim()! });
+                const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100), discountCode: formData.discountCode.trim()! });
                     sessionStorage.setItem('discountCoupon', JSON.stringify(response));
                     setPreviewIsLoading(false);
                     navigate('/accetta-buono-sconto/riepilogo');
@@ -106,12 +106,37 @@ const AcceptDiscount = () => {
     const handleFieldChange = (field: keyof FormData, value: any) => {
         const newValue = value;
         if (field === 'totalAmount') {
-            if (!isNaN(parseFloat(newValue)) || newValue === '') {
+            if (newValue === '') {
                 setFormData(prev => ({
                     ...prev,
                     [field]: newValue
                 }));
+                return;
             }
+        
+            const parts = newValue.split(',');
+            if (parts.length > 2) {
+                return;
+            }
+        
+            const integerPart = parts[0];
+            const decimalPart = parts[1] ?? '';
+        
+
+            if (integerPart && integerPart.split('').some(ch => ch < '0' || ch > '9')) {
+                return;
+            }
+        
+            if (decimalPart.length > 2 || decimalPart.split('').some(ch => ch < '0' || ch > '9')) {
+                return;
+            }
+
+            console.log("VAL", typeof(newValue))
+        
+            setFormData(prev => ({
+                ...prev,
+                [field]: newValue
+            }));
         } else {
             setFormData(prev => ({
                 ...prev,
