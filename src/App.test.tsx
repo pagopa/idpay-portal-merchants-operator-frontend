@@ -13,7 +13,7 @@ vi.mock('./components/ProtectedRoute', () => ({
 vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({
   default: () => <div data-testid="refund-management-page">Refund Management</div>,
 }));
-vi.mock('./pages/acceptDiscount/acceptDiscount.tsx', () => ({
+vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({
   default: () => <div data-testid="accept-discount-page">Accept Discount</div>,
 }));
 vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({
