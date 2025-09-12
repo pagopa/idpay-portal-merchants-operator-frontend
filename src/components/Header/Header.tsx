@@ -2,6 +2,7 @@ import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import type { LoggedUser } from '../../utils/types';
 import {useAuth} from "../../contexts/AuthContext";
+// import type { JwtUser } from '../../utils/types';
 
 const Header = () => {
 
@@ -33,7 +34,7 @@ const Header = () => {
   const welfareProduct: ProductEntity = {
     // TODO check if correct
     id: 'prod-idpay-merchants',
-    title: "portale esercenti",
+    title: "Portale esercenti",
     productUrl: "test",
     linkType: 'internal',
   };

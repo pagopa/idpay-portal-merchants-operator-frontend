@@ -1,7 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import type { ProductListDTO } from './generated/merchants/ProductListDTO';
+import type { PreviewPaymentDTO } from './generated/merchants/PreviewPaymentDTO';
 //store
 import { authStore } from '../store/authStore';
+import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
+import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
 
 //axios instance 
 const createAxiosInstance = (): AxiosInstance => {
@@ -82,6 +85,63 @@ export const MerchantApi = {
       throw error;
     }
   },
+
+
+  previewPayment: async (
+    params: {
+      productGtin: string,
+      productName: string,
+      amountCents: number,
+      discountCode: string
+    }
+  ): Promise<PreviewPaymentDTO> => {
+    try {
+      const response = await axiosInstance.put(`/transactions/bar-code/${params.discountCode}/preview`, params);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in previewPayment:', error);
+      throw error;
+    }
+  },
+
+  authPaymentBarCode: async (
+    params: {
+      trxCode: string,
+      amountCents: number,
+      additionalProperties?: {}
+      
+    }
+  ): Promise<AuthPaymentResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/authorize`, params);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in authPaymentBarCode:', error);
+      throw error;
+    }
+  },
+
+  getProcessedTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
+    page?: number,
+    size?: number,
+    sort?: string,
+    fiscalCode?: string,
+    status?: ["REWARDED","CANCELLED"],
+  }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
+    try {
+      const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/processed`, {
+        params: params
+      });
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in getProcessedTransactions:', error);
+      throw error;
+    }
+  },
+
 };
 
 
