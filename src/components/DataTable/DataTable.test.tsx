@@ -2,7 +2,6 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import DataTable from './DataTable';
-import React from 'react';
 
 vi.mock('../../utils/constants', () => ({
   MISSING_DATA_PLACEHOLDER: '--',
