@@ -50,7 +50,7 @@ describe('App', () => {
     expect(screen.getByTestId('refund-management-page')).toBeInTheDocument();
   });
 
-  it('renders the AcceptDiscount component on the correct route', () => {
+  it('renders the acceptDiscount component on the correct route', () => {
     // Render the component on the accept discount path.
     render(
       <MemoryRouter initialEntries={[ROUTES.ACCEPT_DISCOUNT]}>
@@ -58,7 +58,7 @@ describe('App', () => {
       </MemoryRouter>
     );
 
-    // Check if the mocked AcceptDiscount component is rendered.
+    // Check if the mocked acceptDiscount component is rendered.
     expect(screen.getByTestId('accept-discount-page')).toBeInTheDocument();
   });
 
