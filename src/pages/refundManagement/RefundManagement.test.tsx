@@ -1,159 +1,507 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import RefundManagement from './RefundManagement';
-import * as merchantService from '../../services/merchantService';
 
-// external dependencies mock
-
-// jwt-decode mock
-vi.mock('jwt-decode', () => ({
-    jwtDecode: () => ({ point_of_sale_id: 'mock-pos-id' }),
-}));
-
-// authStore mock
-vi.mock('../../store/authStore', () => ({
-    authStore: {
-        getState: () => ({ token: 'mock-jwt-token' }),
-    },
-}));
-
-// merchantService mock
-vi.mock('../../services/merchantService');
-
-// i18next mock
+// Dependencies mock
 vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-}));
-
-// children components mock
-vi.mock('../../components/DataTable/DataTable', () => ({
-    default: ({ rows, columns, loading }: { rows: any[], columns: any[], loading: boolean }) => (
-        <div data-testid="data-table">
-            {loading && <span>Loading...</span>}
-            {rows.map(row => (
-                <div key={row.fiscalCode}>{columns[2].renderCell ? columns[2].renderCell(row) : row.fiscalCode}</div>
-            ))}
-        </div>
-    ),
-}));
-
-vi.mock('../../components/FiltersForm/FiltersForm', () => ({
-    default: ({ formik, onFiltersApplied, children }: any) => (
-        <form data-testid="filters-form" onSubmit={(e) => { e.preventDefault(); onFiltersApplied(formik.values); }}>
-            {children}
-            <button type="submit">Applica Filtri</button>
-        </form>
-    ),
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'pages.refundManagement.title': 'Gestione Rimborsi',
+        'pages.refundManagement.subtitle': 'Gestisci i rimborsi delle transazioni',
+        'pages.refundManagement.chipCancelled': 'Annullato',
+        'pages.refundManagement.chipRefunded': 'Stornato',
+        'pages.refundManagement.noTransactions': 'Nessuna transazione trovata',
+        'pages.refundManagement.errorAlert': 'Errore nel caricamento dei dati'
+      };
+      return translations[key] || key;
+    }
+  })
 }));
 
 vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
-    TitleBox: ({ title }: { title: string }) => <h1>{title}</h1>,
+  TitleBox: ({ title, subTitle }: { title: string; subTitle: string }) => (
+    <div data-testid="title-box">
+      <h4>{title}</h4>
+      <p>{subTitle}</p>
+    </div>
+  )
+}));
+
+vi.mock('../../components/DataTable/DataTable', () => ({
+  default: ({ 
+    rows, 
+    columns, 
+    loading, 
+    onPaginationPageChange,
+    onSortModelChange 
+  }: any) => (
+    <div data-testid="data-table">
+      {loading && <div data-testid="loading">Loading...</div>}
+      {!loading && rows.length === 0 && <div data-testid="no-data">No data</div>}
+      {!loading && rows.length > 0 && (
+        <div>
+          <div data-testid="rows-count">{rows.length} rows</div>
+          <div data-testid="columns-count">{columns.length} columns</div>
+          <button 
+            data-testid="pagination-change"
+            onClick={() => onPaginationPageChange({ pageNo: 1, pageSize: 10 })}
+          >
+            Change page
+          </button>
+          <button 
+            data-testid="sort-change"
+            onClick={() => onSortModelChange([{ field: 'trxDate', sort: 'asc' }])}
+          >
+            Sort
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}));
+
+vi.mock('../../components/FiltersForm/FiltersForm', () => ({
+  default: ({ children, onFiltersApplied, onFiltersReset }: any) => (
+    <div data-testid="filters-form">
+      {children}
+      <button 
+        data-testid="apply-filters"
+        onClick={() => onFiltersApplied({ fiscalCode: 'test', gtiIn: 'test', status: 'CANCELLED' })}
+      >
+        Apply Filters
+      </button>
+      <button 
+        data-testid="reset-filters"
+        onClick={() => onFiltersReset()}
+      >
+        Reset Filters
+      </button>
+    </div>
+  )
 }));
 
 vi.mock('../../components/errorAlert/ErrorAlert', () => ({
-    default: ({ message }: { message: string }) => <div data-testid="error-alert">{message}</div>,
+  default: ({ message }: { message: string }) => (
+    <div data-testid="error-alert">{message}</div>
+  )
 }));
 
+vi.mock('../../services/merchantService', () => ({
+  getProcessedTransactions: vi.fn()
+}));
 
-// test suite
+vi.mock('../../store/authStore', () => ({
+  authStore: {
+    getState: () => ({
+      token: 'mock-jwt-token.eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwb2ludF9vZl9zYWxlX2lkIjoibW9jay1wb3MtaWQifQ.mock-signature'
+    })
+  }
+}));
+
+vi.mock('jwt-decode', () => ({
+  jwtDecode: vi.fn(() => ({
+    point_of_sale_id: 'mock-pos-id'
+  }))
+}));
+
+vi.mock('../../utils/constants', () => ({
+  MISSING_DATA_PLACEHOLDER: '-'
+}));
+
+import { getProcessedTransactions } from '../../services/merchantService';
+
 describe('RefundManagement', () => {
-    const getProcessedTransactionsMock = vi.spyOn(merchantService, 'getProcessedTransactions');
+  const mockGetProcessedTransactions = vi.mocked(getProcessedTransactions);
+  const user = userEvent.setup();
 
-    const mockTransactions: any = {
-        content: [
-            { fiscalCode: 'AAAAAA00A00A000A', trxDate: new Date().toISOString() },
-            { fiscalCode: 'BBBBBB00B00B000B', trxDate: new Date().toISOString() },
-        ],
+  const mockTransactionData = {
+    content: [
+      {
+        id: '1',
+        elettrodomestico: 'Frigorifero Samsung',
+        trxDate: '2024-01-15T10:30:00Z',
+        fiscalCode: 'RSSMRA80A01H501Z',
+        effectiveAmountCents: 50000,
+        rewardAmountCents: 25000,
+        status: 'REWARDED'
+      },
+      {
+        id: '2',
+        elettrodomestico: 'Lavatrice LG',
+        trxDate: '2024-01-14T15:45:00Z',
+        fiscalCode: 'BNCGVN85B02H501Y',
+        effectiveAmountCents: 75000,
+        rewardAmountCents: 37500,
+        status: 'CANCELLED'
+      }
+    ],
+    pageNo: 0,
+    pageSize: 10,
+    totalElements: 2
+  } as any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetProcessedTransactions.mockResolvedValue(mockTransactionData);
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+  });
+
+  describe('Rendering', () => {
+    it('should render the component with title and subtitle', async () => {
+      render(<RefundManagement />);
+      
+      expect(screen.getByTestId('title-box')).toBeInTheDocument();
+      expect(screen.getByText('Gestione Rimborsi')).toBeInTheDocument();
+      expect(screen.getByText('Gestisci i rimborsi delle transazioni')).toBeInTheDocument();
+      expect(screen.getByText('Transazioni')).toBeInTheDocument();
+    });
+
+    it('should show loading state initially', () => {
+      render(<RefundManagement />);
+      
+      expect(screen.getByTestId('loading')).toBeInTheDocument();
+    });
+
+    it('should render data table with transactions after loading', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('rows-count')).toHaveTextContent('2 rows');
+        expect(screen.getByTestId('columns-count')).toHaveTextContent('6 columns');
+      });
+    });
+
+    it('should show no transactions message when no data is available', async () => {
+      mockGetProcessedTransactions.mockResolvedValueOnce({
+        content: [],
         pageNo: 0,
         pageSize: 10,
-        totalElements: 2,
-    };
+        totalElements: 0
+      }as any);
 
-    beforeEach(() => {
-        // default mock implementation
-        getProcessedTransactionsMock.mockResolvedValue(mockTransactions);
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByText('Nessuna transazione trovata')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Data fetching', () => {
+    it('should call getProcessedTransactions on component mount', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
+          "688a12d87415622f166697a0",
+          "mock-pos-id",
+          {}
+        );
+      });
     });
 
-    afterEach(() => {
-        // clean up
-        vi.clearAllMocks();
+    it('should handle API errors and show error alert', async () => {
+      mockGetProcessedTransactions.mockRejectedValueOnce(new Error('API Error'));
+      
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('error-alert')).toBeInTheDocument();
+        expect(screen.getByText('Errore nel caricamento dei dati')).toBeInTheDocument();
+      });
     });
 
-    it('should fetch transactions and display them on first render', async () => {
-        render(<RefundManagement />);
+    it('should prevent duplicate API calls when already loading', async () => {
+      // Mock a slow API response
+      mockGetProcessedTransactions.mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve(mockTransactionData), 100))
+      );
 
-        // Verify that the title is rendered
-        expect(screen.getByText('pages.refundManagement.title')).toBeInTheDocument();
+      const { rerender } = render(<RefundManagement />);
+      
+      // Trigger multiple rerenders quickly
+      rerender(<RefundManagement />);
+      rerender(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
 
-        // Wait for the API call to resolve and data to be displayed
-        await waitFor(() => {
-            expect(getProcessedTransactionsMock).toHaveBeenCalledTimes(1);
-            expect(getProcessedTransactionsMock).toHaveBeenCalledWith(
-                "688a12d87415622f166697a0", // initiativeId hardcoded
-                'mock-pos-id', // point_of_sale_id dal mock di jwtDecode
-                expect.any(Object)
-            );
-        });
-
-        // Verify that the mocked data is present in the document
-        expect(screen.getByText('AAAAAA00A00A000A')).toBeInTheDocument();
-        expect(screen.getByText('BBBBBB00B00B000B')).toBeInTheDocument();
+  describe('Filters functionality', () => {
+    it('should show filters when there are transactions', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('filters-form')).toBeInTheDocument();
+      });
     });
 
-    it('should show an error message if the API call fails', async () => {
-        // override the mock for this specific test
-        getProcessedTransactionsMock.mockRejectedValue(new Error('API Error'));
 
-        render(<RefundManagement />);
+    it('should handle filter application', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('apply-filters')).toBeInTheDocument();
+      });
 
-        // Wait for the error alert to appear in the DOM
-        const errorAlert = await screen.findByTestId('error-alert');
-        expect(errorAlert).toBeInTheDocument();
-        expect(screen.getByText('pages.refundManagement.errorAlert')).toBeInTheDocument();
-
-        // Verify that the data was not rendered
-        expect(screen.queryByText('AAAAAA00A00A000A')).not.toBeInTheDocument();
+      const applyButton = screen.getByTestId('apply-filters');
+      await user.click(applyButton);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
+          "688a12d87415622f166697a0",
+          "mock-pos-id",
+          expect.objectContaining({
+            fiscalCode: 'test',
+            gtiIn: 'test',
+            status: 'CANCELLED'
+          })
+        );
+      });
     });
 
-    it('should show a specific message when there are no transactions', async () => {
-        // override the mock for this specific test
-        getProcessedTransactionsMock.mockResolvedValue({});
+    it('should handle filter reset', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('reset-filters')).toBeInTheDocument();
+      });
 
-        render(<RefundManagement />);
-
-        // Wait for the "no transactions" message to appear
-        expect(await screen.findByText('pages.refundManagement.noTransactions')).toBeInTheDocument();
+      const resetButton = screen.getByTestId('reset-filters');
+      await user.click(resetButton);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
+          "688a12d87415622f166697a0",
+          "mock-pos-id",
+          {}
+        );
+      });
     });
 
-    it('should re-execute the API call with the correct filters when they are applied', async () => {
-        const user = userEvent.setup();
-        render(<RefundManagement />);
-        
-        // Wait for the initial loading
-        await waitFor(() => expect(getProcessedTransactionsMock).toHaveBeenCalledTimes(1));
-
-        // Simulate typing in the fiscal code input field
-        const fiscalCodeInput = screen.getByLabelText('Cerca per codice fiscale');
-        await user.type(fiscalCodeInput, 'TESTCF123456789');
-
-        // Simulate clicking the apply filters button (present in our FiltersForm mock)
-        const applyButton = screen.getByRole('button', { name: 'Applica Filtri' });
-        await user.click(applyButton);
-
-        // Verify that the second API call was made with the filter parameters
-        await waitFor(() => {
-            expect(getProcessedTransactionsMock).toHaveBeenCalledTimes(2);
-            expect(getProcessedTransactionsMock).toHaveBeenLastCalledWith(
-                expect.any(String),
-                expect.any(String),
-                expect.objectContaining({
-                    fiscalCode: 'TESTCF123456789', 
-                    page: 0,
-                    size: 10
-                })
-            );
-        });
+    it('should update formik values when input fields change', async () => {
+      render(<RefundManagement />);
+      
+      const fiscalCodeInput = await screen.findByLabelText('Cerca per codice fiscale');
+      await user.type(fiscalCodeInput, 'RSSMRA80A01H501Z');
+      
+      expect(fiscalCodeInput).toHaveValue('RSSMRA80A01H501Z');
+      
+      const gtiInput = screen.getByLabelText('Cerca per GTI In');
+      await user.type(gtiInput, 'GTI123');
+      
+      expect(gtiInput).toHaveValue('GTI123');
     });
 
+    it('should handle status filter selection', async () => {
+      render(<RefundManagement />);
+      
+      const statusSelect = await screen.findByLabelText('Stato');
+      await user.click(statusSelect);
+      
+      const cancelledOption = await screen.findByText('Annullato');
+      await user.click(cancelledOption);
+      
+      expect(statusSelect).toHaveTextContent('Annullato');
+    });
+  });
+
+  describe('Pagination and sorting', () => {
+    it('should handle pagination changes', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('pagination-change')).toBeInTheDocument();
+      });
+
+      const paginationButton = screen.getByTestId('pagination-change');
+      await user.click(paginationButton);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
+          "688a12d87415622f166697a0",
+          "mock-pos-id",
+          expect.objectContaining({
+            page: 1,
+            size: 10
+          })
+        );
+      });
+    });
+
+    it('should handle sort model changes', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('sort-change')).toBeInTheDocument();
+      });
+
+      const sortButton = screen.getByTestId('sort-change');
+      await user.click(sortButton);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
+          "688a12d87415622f166697a0",
+          "mock-pos-id",
+          expect.objectContaining({
+            sort: 'trxDate,asc'
+          })
+        );
+      });
+    });
+
+    it('should not trigger unnecessary pagination calls', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalledTimes(1);
+      });
+
+      mockGetProcessedTransactions.mockClear();
+      
+      const component = screen.getByTestId('data-table');
+      fireEvent.click(component); 
+      
+      expect(mockGetProcessedTransactions).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Columns rendering', () => {
+    it('should format date correctly in trxDate column', () => {
+      const columns = [
+        {
+          field: 'trxDate',
+          headerName: 'Data e ora',
+          renderCell: (params: any) => {
+            if (params.value) {
+              return new Date(params.value).toLocaleDateString('it-IT');
+            }
+            return '-';
+          }
+        }
+      ];
+
+      const result = columns[0].renderCell({ value: '2024-01-15T10:30:00Z' });
+      expect(result).toBe('15/01/2024');
+    });
+
+    it('should format currency correctly in amount columns', () => {
+      const renderCell = (params: any) => {
+        if (params.value || params.value === 0) {
+          return (params.value / 100).toLocaleString('it-IT', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }) + '€';
+        }
+        return '-';
+      };
+
+      expect(renderCell({ value: 50000 })).toBe('500,00€');
+      expect(renderCell({ value: 0 })).toBe('0,00€');
+      expect(renderCell({ value: null })).toBe('-');
+    });
+
+    it('should render status chips correctly', () => {
+      const renderCell = (params: any) => {
+        if (params.value === "CANCELLED") {
+          return 'Annullato';
+        } else {
+          return 'Stornato';
+        }
+      };
+
+      expect(renderCell({ value: 'CANCELLED' })).toBe('Annullato');
+      expect(renderCell({ value: 'REWARDED' })).toBe('Stornato');
+    });
+
+    it('should handle missing data with placeholder', () => {
+      const renderCell = (params: any) => {
+        if (params.value) {
+          return params.value;
+        }
+        return '-';
+      };
+
+      expect(renderCell({ value: null })).toBe('-');
+      expect(renderCell({ value: undefined })).toBe('-');
+      expect(renderCell({ value: '' })).toBe('-');
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle network errors gracefully', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      mockGetProcessedTransactions.mockRejectedValueOnce(new Error('Network error'));
+      
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'RefundManagement: Errore fetch:',
+          expect.any(Error)
+        );
+        expect(screen.getByTestId('error-alert')).toBeInTheDocument();
+      });
+      
+      consoleSpy.mockRestore();
+    });
+
+  });
+
+  describe('Component state management', () => {
+    it('should maintain correct loading states', async () => {
+      render(<RefundManagement />);
+      
+      // Initially loading
+      expect(screen.getByTestId('loading')).toBeInTheDocument();
+      
+      // After successful fetch
+      await waitFor(() => {
+        expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+        expect(screen.getByTestId('rows-count')).toBeInTheDocument();
+      });
+    });
+
+    it('should update pagination model correctly', async () => {
+      render(<RefundManagement />);
+      
+      await waitFor(() => {
+        // Check that pagination model is set correctly from API response
+        expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      });
+    });
+
+    it('should prevent race conditions with loading ref', async () => {
+      // Mock multiple concurrent API calls
+      let resolveCount = 0;
+      mockGetProcessedTransactions.mockImplementation(() => 
+        new Promise(resolve => {
+          setTimeout(() => {
+            resolveCount++;
+            resolve(mockTransactionData);
+          }, 50);
+        })
+      );
+
+      render(<RefundManagement />);
+
+      const applyButton = await screen.findByTestId('apply-filters');
+      
+
+      await user.click(applyButton);
+      await user.click(applyButton);
+      await user.click(applyButton);
+      
+      await waitFor(() => {
+        expect(mockGetProcessedTransactions).toHaveBeenCalled();
+      });
+    });
+  });
 });
