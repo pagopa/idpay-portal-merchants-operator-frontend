@@ -7,16 +7,30 @@ interface Props {
   backLabel: string;
   items: Array<string | undefined>;
   active: boolean;
+  onClickBackButton?: () => void;
+  backButtonPath?: string;
 }
 
-const BreadcrumbsBox = ({ backLabel, items, active }: Props) => {
+const BreadcrumbsBox = ({ backLabel, items, active, onClickBackButton, backButtonPath }: Props) => {
   const navigate = useNavigate();
+
+  const handleBackButton = () => {
+    if(onClickBackButton) {
+      onClickBackButton();
+      return;
+    }
+    if(backButtonPath) {
+      navigate(backButtonPath);
+    } else {
+      navigate(-1);
+    }
+  }
   return (
     <Box sx={{ display: 'grid', gridColumn: 'span 12' }}>
       <Breadcrumbs aria-label="breadcrumb">
         <ButtonNaked
           component="button"
-          onClick={() => active && navigate(-1)}
+          onClick={() => active && handleBackButton()}
           startIcon={<ArrowBackIcon />}
           sx={{ color: 'primary.main', fontSize: '1rem', marginBottom: '3px' }}
           weight="default"

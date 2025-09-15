@@ -12,6 +12,7 @@ import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
 import ErrorAlert from '../../components/errorAlert/ErrorAlert';
 import { useNavigate } from 'react-router-dom';
 import EuroIcon from '@mui/icons-material/Euro';
+import ROUTES from '../../routes';
 
 interface FormData {
     product: ProductDTO | null;
@@ -34,7 +35,7 @@ const AcceptDiscount = () => {
     const [formData, setFormData] = useState<FormData>({
         product: null,
         totalAmount: '',
-        discountCode: ''
+        discountCode: '' 
     });
     const [productsList, setProductsList] = useState<ProductDTO[]>([]);
     const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
@@ -42,6 +43,20 @@ const AcceptDiscount = () => {
     const [previewIsLoading, setPreviewIsLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if(sessionStorage.getItem('discountCoupon')) {
+            const discountCoupon = JSON.parse(sessionStorage.getItem('discountCoupon')!);
+            setFormData({
+                product: discountCoupon.product,
+                totalAmount: (discountCoupon.originalAmountCents / 100).toLocaleString('it-IT', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }),
+                discountCode: discountCoupon.trxCode
+            });
+        }
+    }, []);
 
     useEffect(() => {
         if (errorAlert) {
@@ -84,7 +99,7 @@ const AcceptDiscount = () => {
             setPreviewIsLoading(true);
             try {
                 const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100), discountCode: formData.discountCode.trim()! });
-                    sessionStorage.setItem('discountCoupon', JSON.stringify(response));
+                    sessionStorage.setItem('discountCoupon', JSON.stringify({...response, product: formData.product}));
                     setPreviewIsLoading(false);
                     navigate('/accetta-buono-sconto/riepilogo');
             } catch (error) {
@@ -158,6 +173,11 @@ const AcceptDiscount = () => {
         setIsExpenditureFocused(false);
     };
 
+    const handleExitPage = () => {
+        sessionStorage.removeItem('discountCoupon');
+        navigate(ROUTES.BUY_MANAGEMENT);
+    }
+
     return (
         <>
             <Backdrop
@@ -170,7 +190,7 @@ const AcceptDiscount = () => {
             <Box sx={{ margin: '20px'}}>
                 <Box mt={2} mb={4}>
                     <BreadcrumbsBox
-                        backLabel={t('commons.exitBtn')} items={[]} active={true} />
+                        backLabel={t('commons.exitBtn')} items={[]} active={true} onClickBackButton={() => setModalIsOpen(true)} />
                     <TitleBox
                         title={t('pages.acceptDiscount.title')}
                         mtTitle={2}
@@ -282,12 +302,12 @@ const AcceptDiscount = () => {
                         gap={2}
                         mt={1}
                     >
-                        <Button variant="outlined" onClick={() => navigate(-1)}>
+                        <Button variant="outlined" onClick={() => setModalIsOpen(false)}>
                             {'Torna indietro'}
                         </Button>
                         <Button
                             variant="contained"
-                            onClick={() => setModalIsOpen(false)}
+                            onClick={handleExitPage}
                         >
                             {'Esci'}
                         </Button>
