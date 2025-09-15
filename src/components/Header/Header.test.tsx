@@ -62,7 +62,7 @@ describe('Header Component', () => {
     renderWithAuth();
 
     expect(screen.getByText('Portale esercenti')).toBeInTheDocument();
-    expect(screen.getByText('Euronics')).toBeInTheDocument();
+    expect(screen.getByText('Comet S.P.A.')).toBeInTheDocument();
   });
 
   it('should have both HeaderAccount and HeaderProduct components in the document', () => {
