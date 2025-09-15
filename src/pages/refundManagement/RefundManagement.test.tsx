@@ -198,7 +198,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "688a12d87415622f166697a0",
+          "68c7db19fed6831074cbc624",
           "mock-pos-id",
           {}
         );
@@ -256,7 +256,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "688a12d87415622f166697a0",
+          "68c7db19fed6831074cbc624",
           "mock-pos-id",
           expect.objectContaining({
             fiscalCode: 'test',
@@ -279,7 +279,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "688a12d87415622f166697a0",
+          "68c7db19fed6831074cbc624",
           "mock-pos-id",
           {}
         );
@@ -326,7 +326,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "688a12d87415622f166697a0",
+          "68c7db19fed6831074cbc624",
           "mock-pos-id",
           expect.objectContaining({
             page: 1,
@@ -348,7 +348,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "688a12d87415622f166697a0",
+          "68c7db19fed6831074cbc624",
           "mock-pos-id",
           expect.objectContaining({
             sort: 'trxDate,asc'

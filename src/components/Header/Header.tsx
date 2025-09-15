@@ -71,16 +71,11 @@ const Header = ({userProps}: HeaderProps) => {
         }))}
         partyList={[{
           id: 'party-idpay-merchants',
-          name: 'Euronics',
+          name: 'Comet S.P.A.',
           logoUrl: 'https://www.pagopa.it/it/img/logo-pagopa.svg',
           productRole: "Operatore",
-        },
-        {
-          id: 'party-mediaworld',
-          name: 'MediaWorld',
-          logoUrl: 'https://www.pagopa.it/it/img/logo-pagopa.svg',
-          productRole: "Operatore"
-        }]}
+        }
+      ]}
         partyId="party-idpay-merchants"
         onSelectedParty={e => console.log("Selected Item:", e.name)}
       />

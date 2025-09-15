@@ -49,6 +49,15 @@ const RefundManagement = () => {
         console.log('formik.values', formik.values);
     }, [formik.values]);
 
+    useEffect(() => {
+        if(errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert]);
+
     const fetchTransactions = useCallback(async (params: any) => {
         if (isLoadingRef.current) {
             return;
@@ -61,7 +70,7 @@ const RefundManagement = () => {
 
         try {
             const response = await getProcessedTransactions(
-                "688a12d87415622f166697a0",
+                "68c7db19fed6831074cbc624",
                 decodeToken?.point_of_sale_id,
                 params
             );
