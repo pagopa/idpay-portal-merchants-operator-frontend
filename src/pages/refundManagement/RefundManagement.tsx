@@ -280,7 +280,7 @@ const RefundManagement = () => {
                     <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                         <TextField
                             name="gtiIn"
-                            label="Cerca per GTI In"
+                            label="Cerca per GTIN"
                             size="small"
                             value={formik.values.gtiIn}
                             onChange={formik.handleChange}
