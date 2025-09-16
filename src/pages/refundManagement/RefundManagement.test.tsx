@@ -294,7 +294,7 @@ describe('RefundManagement', () => {
       
       expect(fiscalCodeInput).toHaveValue('RSSMRA80A01H501Z');
       
-      const gtiInput = screen.getByLabelText('Cerca per GTI In');
+      const gtiInput = screen.getByLabelText('Cerca per GTIN');
       await user.type(gtiInput, 'GTI123');
       
       expect(gtiInput).toHaveValue('GTI123');
