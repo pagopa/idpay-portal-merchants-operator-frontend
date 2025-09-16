@@ -104,7 +104,7 @@ const PurchaseManagement = () => {
             </Typography>
             <Grid container mt={2}>
                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                    <Box sx={{ height: 600, width: '100%' }}>
+                    <Box sx={{ height: 'auto', width: '100%' }}>
                         <DataTable
                             rows={rows}
                             columns={columns}

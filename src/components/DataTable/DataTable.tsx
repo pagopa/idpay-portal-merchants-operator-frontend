@@ -183,7 +183,13 @@ const DataTable = ({
                 '& button': {
                   backgroundColor: 'transparent !important'
                 }
-              }
+              },
+              '& .MuiDataGrid-columnHeader': {
+                backgroundColor: '#F5F5F5', 
+              },
+              '& .MuiDataGrid-footerContainer': {
+                backgroundColor: '#F5F5F5' 
+              }, 
             }}
           />
         )

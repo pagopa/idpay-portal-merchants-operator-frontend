@@ -30,7 +30,7 @@ const RefundManagement = () => {
     const initialValues = {
         fiscalCode: '',
         gtiIn: '',
-        status: null
+        status: ''
     };
 
     const formik = useFormik({
@@ -50,7 +50,7 @@ const RefundManagement = () => {
     }, [formik.values]);
 
     useEffect(() => {
-        if(errorAlert) {
+        if (errorAlert) {
             const timer = setTimeout(() => {
                 setErrorAlert(false);
             }, 5000);
@@ -70,9 +70,14 @@ const RefundManagement = () => {
 
         try {
             const response = await getProcessedTransactions(
-                "68c7db19fed6831074cbc624",
+                // "68c7db19fed6831074cbc624",
+                "688a12d87415622f166697a0",
                 decodeToken?.point_of_sale_id,
-                params
+                Object.keys(params).length > 0 ? params : {
+                    sort: 'trxDate,asc',
+                    page: paginationModel.pageNo,
+                    size: paginationModel.pageSize
+                }
             );
 
             setPaginationModel({
@@ -133,10 +138,41 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             renderCell: (params: any) => {
                 if (params.value) {
-                    return new Date(params.value).toLocaleDateString('it-IT');
+                    return (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            height: '100%',
+                            width: '100%'
+                        }}>
+                            <Tooltip title={params.value ? new Date(params.value).toLocaleDateString('it-IT', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }).replace(',', '') : MISSING_DATA_PLACEHOLDER}>
+                                <Typography sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {
+                                        params.value ? new Date(params.value).toLocaleDateString('it-IT', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        }).replace(',', '') : MISSING_DATA_PLACEHOLDER
+                                    }
+                                </Typography>
+                            </Tooltip>
+                        </div>
+                    )
                 }
                 return MISSING_DATA_PLACEHOLDER;
-            }
+            },
         },
         {
             field: 'fiscalCode',
@@ -150,6 +186,7 @@ const RefundManagement = () => {
             headerName: 'Totale della spesa',
             flex: 1,
             type: 'number',
+            align: 'left',
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: any) => {
@@ -167,6 +204,7 @@ const RefundManagement = () => {
             headerName: 'Importo autorizzato',
             flex: 1,
             type: 'number',
+            align: 'left',
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: any) => {
@@ -241,7 +279,7 @@ const RefundManagement = () => {
                 ...formik.values
             });
         }
-    }
+    };
 
     return (
         <Box>
@@ -261,73 +299,80 @@ const RefundManagement = () => {
                 Transazioni
             </Typography>
             <Box>
-               {
-                (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null)) )&& (
-                    <FiltersForm
-                    formik={formik}
-                    onFiltersApplied={setApiFilters}
-                    onFiltersReset={() => setApiFilters({})}
-                >
-                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                        <TextField
-                            name="fiscalCode"
-                            label="Cerca per codice fiscale"
-                            size="small"
-                            value={formik.values.fiscalCode}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                        <TextField
-                            name="gtiIn"
-                            label="Cerca per GTIN"
-                            size="small"
-                            value={formik.values.gtiIn}
-                            onChange={formik.handleChange}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                        <FormControl fullWidth size="small">
-                            <InputLabel id="pos-type-label">Stato</InputLabel>
-                            <Select
-                                labelId="pos-type-label"
-                                id="pos-type-select"
-                                label="Stato"
-                                name="status"
-                                value={formik.values.status}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                            >
-                                <MenuItem value=""><em>Tutti gli stati</em></MenuItem>
-                                <MenuItem value="CANCELLED">
-                                    <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
-                                </MenuItem>
-                                <MenuItem value="REWARDED">
-                                    <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                </FiltersForm>
-                )
-               }
+                {
+                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                        <FiltersForm
+                            formik={formik}
+                            onFiltersApplied={setApiFilters}
+                            onFiltersReset={() => {
+                                setApiFilters({
+                                    fiscalCode: '',
+                                    gtiIn: '',
+                                    status: '',
+                                });
+                                formik.resetForm();
+                            }}
+                        >
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                                <TextField
+                                    name="fiscalCode"
+                                    label="Cerca per codice fiscale"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.fiscalCode}
+                                    onChange={formik.handleChange}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                                <TextField
+                                    name="gtiIn"
+                                    label="Cerca per GTIN"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.gtiIn}
+                                    onChange={formik.handleChange}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                                <FormControl fullWidth size="small">
+                                    <InputLabel id="pos-type-label">Stato</InputLabel>
+                                    <Select
+                                        labelId="pos-type-label"
+                                        id="pos-type-select"
+                                        label='Stato'
+                                        name="status"
+                                        value={formik.values.status}
+                                        onChange={formik.handleChange}
+                                    >
+                                        <MenuItem value="CANCELLED">
+                                            <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
+                                        </MenuItem>
+                                        <MenuItem value="REWARDED">
+                                            <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
+                                        </MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        </FiltersForm>
+                    )
+                }
             </Box>
 
             {(rows.length > 0 || loading) ? (
-                    <Grid container mt={2}>
-                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                            <Box sx={{ height: 600, width: '100%' }}>
-                                <DataTable
-                                    rows={rows}
-                                    columns={columns}
-                                    loading={loading}
-                                    onPaginationPageChange={handlePaginationChange}
-                                    paginationModel={paginationModel}
-                                    onSortModelChange={handleSortModelChange}
-                                />
-                            </Box>
-                        </Grid>
+                <Grid container mt={2}>
+                    <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                        <Box sx={{ height: 'auto', width: '100%' }}>
+                            <DataTable
+                                rows={rows}
+                                columns={columns}
+                                loading={loading}
+                                onPaginationPageChange={handlePaginationChange}
+                                paginationModel={paginationModel}
+                                onSortModelChange={handleSortModelChange}
+                            />
+                        </Box>
                     </Grid>
+                </Grid>
             ) : (
                 <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
