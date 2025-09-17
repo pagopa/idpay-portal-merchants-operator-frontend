@@ -4,6 +4,9 @@ import { IconButton, Box } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {MISSING_DATA_PLACEHOLDER} from '../../utils/constants';
 
+//STYLE
+import './dataTable.module.css';
+
 export interface DataTableProps {
   rows: any;
   columns: any;
@@ -13,6 +16,7 @@ export interface DataTableProps {
   onPaginationPageChange?: (obj: any) => void;
   paginationModel?: any;
   loading?: boolean;
+  customUniqueField?: string;
 }
 
 const DataTable = ({ 
@@ -22,7 +26,8 @@ const DataTable = ({
   onSortModelChange, 
   onPaginationPageChange, 
   paginationModel,
-  loading = false 
+  loading = false,
+  customUniqueField 
 }: DataTableProps) => {
   const [finalColumns, setFinalColumns] = useState(Array<any>);
   const [sortModelState, setSortModelState] = useState<any>([]);
@@ -72,7 +77,12 @@ const DataTable = ({
                   <ArrowForwardIosIcon color='primary' fontSize='small' />
                 </IconButton>
               </Box>
-            )
+            ),
+            sx: {
+              display: 'flex !important',
+              justifyContent: 'end !important',
+              alignItems: 'center !important',
+            },
           }
         ]
       );
@@ -135,6 +145,7 @@ const DataTable = ({
           <DataGrid
             rows={rows}
             columns={finalColumns}
+            getRowId={(row: any) => customUniqueField ? row[customUniqueField] : row.id}
             disableRowSelectionOnClick
             sortingMode='server'
             paginationMode='server'
@@ -159,6 +170,7 @@ const DataTable = ({
               border: 'none',
               '& .MuiDataGrid-row': {
                 backgroundColor: '#FFFFFF',
+                borderBottom: '1px solid #E3E7EB', 
                 '&:hover': {
                   backgroundColor: '#FFFFFF',
                 },

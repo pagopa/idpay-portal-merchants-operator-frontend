@@ -34,7 +34,8 @@
   "sideMenu": {
     "purchaseManagement": "Gestione acquisti",
     "profile": "Profilo",
-    "refundManagement": "Gestione rimborsi"
+    "refundManagement": "Gestione rimborsi",
+    "products": "Prodotti"
   },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",
@@ -193,6 +194,10 @@
       "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
       "chipCancelled": "Annullato",
       "chipRefunded": "Stornato"
+    },
+    "products": {
+      "title": "Prodotti",
+      "subtitle": "Visualizza tutti i prodotti caricati e i dettagli."
     }
   },
   "roles": {
