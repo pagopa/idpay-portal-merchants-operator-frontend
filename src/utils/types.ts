@@ -17,11 +17,11 @@ export interface LoggedUser {
 
 export interface GetProductsParams {
     productName?: string;
-    status?: string;
+    status?: string,
     page?: number;
     size?: number;
     sort?: string;
-    category?: string;
+    category?: string, 
     eprelCode?: string;
     gtinCode?: string;
     productFileId?: string;
@@ -33,5 +33,22 @@ export interface PaginationResponse {
     pageSize: number;
     totalElements: number;
     totalPages: number;
-    content: any[];
+    content: unknown[];
 }
+export interface SortModelItem {
+    field: string;
+    sort: 'asc' | 'desc';
+}
+
+export type SortModel = SortModelItem[];
+
+export interface PaginationModel {
+    pageNo: number;
+    pageSize: number;
+}
+
+export interface PaginationDataTableModel {
+    page: number;
+    pageSize: number;
+}
+    

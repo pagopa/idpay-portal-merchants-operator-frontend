@@ -55,11 +55,11 @@ const handleAxiosResponse = <T>(response: AxiosResponse<T>): T => {
 export const MerchantApi = {
   getProducts: async (
    params: {
-    status?: string, 
+    status?: ["APPROVED", "REJECTED", "SUPERVISIONED"], 
     page?: number, 
     size?: number, 
     sort?: string, 
-    category?: string, 
+    category?: ["WASHINGMACHINES", "WASHERDRIERS", "OVENS", "RANGEHOODS", "DISHWASHERS", "TUMBLEDRYERS", "REFRIGERATINGAPPL", "COOKINGHOBS"], 
     eprelCode?: string, 
     gtinCode?: string, 
     productFileId?: string, 

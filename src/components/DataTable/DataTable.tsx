@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {MISSING_DATA_PLACEHOLDER} from '../../utils/constants';
+import { SortModel } from '../../utils/types';
+import { PaginationDataTableModel } from '../../utils/types';
 
 //STYLE
 import './dataTable.module.css';
@@ -71,7 +73,7 @@ const DataTable = ({
             renderCell: (params: any) => (
               <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%' }}>
                 <IconButton
-                  onClick={() => handleRowAction && handleRowAction(params.row)}
+                  onClick={() => handleRowAction && handleRowAction(params?.row)}
                   size="small"
                 >
                   <ArrowForwardIosIcon color='primary' fontSize='small' />
@@ -96,7 +98,7 @@ const DataTable = ({
     return params.value;
   };
 
-  const handlePaginationModelChange = useCallback((model: any) => {
+  const handlePaginationModelChange = useCallback((model: PaginationDataTableModel) => {
     
     if (isExternalUpdate.current) {
       return;
@@ -121,12 +123,12 @@ const DataTable = ({
     });
   }, [onPaginationPageChange, loading, internalPaginationModel]);
 
-  const handleSortModelChange = useCallback((model: any) => {
+  const handleSortModelChange = useCallback((model: SortModel) => {
     if(model.length > 0){
       setSortModelState(model);
       onSortModelChange?.(model);
     }else{
-      setSortModelState((prevState: any) => {
+      setSortModelState((prevState: SortModel) => {
         const newSortModel = prevState?.[0]?.sort === 'asc'
           ? [{field: prevState?.[0].field, sort: 'desc'}]
           : [{field: prevState?.[0].field, sort: 'asc'}];
@@ -145,7 +147,7 @@ const DataTable = ({
           <DataGrid
             rows={rows}
             columns={finalColumns}
-            getRowId={(row: any) => customUniqueField ? row[customUniqueField] : row.id}
+            getRowId={(row: unknown) => customUniqueField ? row[customUniqueField] : row.id}
             disableRowSelectionOnClick
             sortingMode='server'
             paginationMode='server'
