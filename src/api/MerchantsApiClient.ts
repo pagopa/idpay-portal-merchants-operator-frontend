@@ -71,7 +71,7 @@ export const MerchantApi = {
 
       // Remove undefined params
       const cleanParams = Object.fromEntries(
-        Object.entries(params).filter(([_, value]) => value !== undefined)
+        Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined)
       );
 
       const response = await axiosInstance.get('/products', {
@@ -109,8 +109,7 @@ export const MerchantApi = {
     params: {
       trxCode: string,
       amountCents: number,
-      additionalProperties?: {}
-      
+      additionalProperties?: object
     }
   ): Promise<AuthPaymentResponseDTO> => {
     try {

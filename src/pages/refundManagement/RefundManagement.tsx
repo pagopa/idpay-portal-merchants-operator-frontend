@@ -46,10 +46,6 @@ const RefundManagement = () => {
     }, []);
 
     useEffect(() => {
-        console.log('formik.values', formik.values);
-    }, [formik.values]);
-
-    useEffect(() => {
         if (errorAlert) {
             const timer = setTimeout(() => {
                 setErrorAlert(false);
@@ -222,7 +218,7 @@ const RefundManagement = () => {
             headerName: 'Stato',
             flex: 1,
             disableColumnMenu: true,
-            sortable: false,
+            sortable: true,
             renderCell: (params: any) => {
                 if (params.value === "CANCELLED") {
                     return (

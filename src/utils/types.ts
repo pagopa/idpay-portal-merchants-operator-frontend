@@ -33,5 +33,5 @@ export interface PaginationResponse {
     pageSize: number;
     totalElements: number;
     totalPages: number;
-    content: any[];
+    content: unknown[];
 }
