@@ -22,10 +22,11 @@ const DataTable = ({
   onSortModelChange, 
   onPaginationPageChange, 
   paginationModel,
-  loading = false 
+  loading = false,
+  sortModel
 }: DataTableProps) => {
   const [finalColumns, setFinalColumns] = useState(Array<any>);
-  const [sortModelState, setSortModelState] = useState<any>([]);
+  const [sortModelState, setSortModelState] = useState<GridSortModel>([]);
   
   const isExternalUpdate = useRef(false);
   const [internalPaginationModel, setInternalPaginationModel] = useState(
@@ -79,6 +80,12 @@ const DataTable = ({
     }
   }, [columns, handleRowAction]);
 
+  useEffect(() => {
+    if(sortModel){
+      setSortModelState(sortModel);
+    }
+  }, [sortModel]);
+
   const renderEmptyCell = (params: any) => {
     if (params.value === null || params.value === undefined || params.value === '') {
       return MISSING_DATA_PLACEHOLDER;
@@ -116,8 +123,8 @@ const DataTable = ({
       setSortModelState(model);
       onSortModelChange?.(model);
     }else{
-      setSortModelState((prevState: any) => {
-        const newSortModel = prevState?.[0]?.sort === 'asc'
+      setSortModelState((prevState: GridSortModel) => {
+        const newSortModel: GridSortModel = prevState?.[0]?.sort === 'asc'
           ? [{field: prevState?.[0].field, sort: 'desc'}]
           : [{field: prevState?.[0].field, sort: 'asc'}];
         

@@ -4,6 +4,7 @@ import { GetProductsParams } from '../utils/types';
 import { PreviewPaymentDTO } from '../api/generated/merchants/PreviewPaymentDTO';
 import { AuthPaymentResponseDTO } from '../api/generated/merchants/AuthPaymentResponseDTO';
 import { PointOfSaleTransactionsProcessedListDTO } from '../api/generated/merchants/PointOfSaleTransactionsProcessedListDTO';
+import { PointOfSaleTransactionsListDTO } from '../api/generated/merchants/PointOfSaleTransactionsListDTO';
 
 
   export const getProductsList = async (params: GetProductsParams): Promise<ProductListDTO> => {
@@ -20,4 +21,8 @@ import { PointOfSaleTransactionsProcessedListDTO } from '../api/generated/mercha
 
   export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: ["REWARDED","CANCELLED"], }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     return MerchantApi.getProcessedTransactions(initiativeId, pointOfSaleId, params);
+  };
+
+  export const getInProgressTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, }): Promise<PointOfSaleTransactionsListDTO> => {
+    return MerchantApi.getInProgressTransactions(initiativeId, pointOfSaleId, params);
   };

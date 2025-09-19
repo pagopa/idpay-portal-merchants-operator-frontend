@@ -115,6 +115,7 @@ import { getProcessedTransactions } from '../../services/merchantService';
 describe('RefundManagement', () => {
   const mockGetProcessedTransactions = vi.mocked(getProcessedTransactions);
   const user = userEvent.setup();
+  let RefundManagement: any;
 
   const mockTransactionData = {
     content: [
@@ -142,8 +143,13 @@ describe('RefundManagement', () => {
     totalElements: 2
   } as any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    mockGetProcessedTransactions.mockResolvedValue(mockTransactionData);
+    vi.stubEnv("VITE_PAGINATION_SIZE", "10");
+    vi.stubEnv("VITE_INITIATIVE_ID", "mock-initiative-id-from-env");
+    const module = await import('./RefundManagement');
+    RefundManagement = module.default;
     mockGetProcessedTransactions.mockResolvedValue(mockTransactionData);
   });
 
@@ -198,9 +204,13 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "68c7db19fed6831074cbc624",
+          'mock-initiative-id-from-env',
           "mock-pos-id",
-          {}
+          {
+            page: 0,
+            size: "10",
+            sort: 'trxDate,asc'
+          }
         );
       });
     });
@@ -256,7 +266,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "68c7db19fed6831074cbc624",
+          'mock-initiative-id-from-env',
           "mock-pos-id",
           expect.objectContaining({
             fiscalCode: 'test',
@@ -279,9 +289,13 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "68c7db19fed6831074cbc624",
+          'mock-initiative-id-from-env',
           "mock-pos-id",
-          {}
+          {
+            page: 0,
+            size: "10",
+            sort: 'trxDate,asc',
+          }
         );
       });
     });
@@ -326,7 +340,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "68c7db19fed6831074cbc624",
+          'mock-initiative-id-from-env',
           "mock-pos-id",
           expect.objectContaining({
             page: 1,
@@ -348,7 +362,7 @@ describe('RefundManagement', () => {
       
       await waitFor(() => {
         expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-          "68c7db19fed6831074cbc624",
+          'mock-initiative-id-from-env',
           "mock-pos-id",
           expect.objectContaining({
             sort: 'trxDate,asc'

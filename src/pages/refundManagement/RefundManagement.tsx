@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Tooltip, TextField, FormControl, InputLabel, Select, MenuItem, Paper } from "@mui/material";
+import { Box, Grid, Typography, Tooltip, TextField, FormControl, InputLabel, Select, MenuItem, Paper, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
@@ -17,7 +17,7 @@ const RefundManagement = () => {
     const [loading, setLoading] = useState(true);
     const [paginationModel, setPaginationModel] = useState<any>({
         pageNo: 0,
-        pageSize: 10,
+        pageSize: import.meta.env.VITE_PAGINATION_SIZE,
         totalElements: 0
     });
     const [sortModel, setSortModel] = useState<any>([]);
@@ -41,8 +41,13 @@ const RefundManagement = () => {
     });
 
     useEffect(() => {
+        setSortModel([
+            {
+                field: 'trxDate',
+                sort: 'asc'
+            }
+        ]);
         fetchTransactions({});
-        console.log(loading)
     }, []);
 
     useEffect(() => {
@@ -66,8 +71,7 @@ const RefundManagement = () => {
 
         try {
             const response = await getProcessedTransactions(
-                // "68c7db19fed6831074cbc624",
-                "688a12d87415622f166697a0",
+                import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
                     sort: 'trxDate,asc',
@@ -92,7 +96,7 @@ const RefundManagement = () => {
             setLoading(false);
             isLoadingRef.current = false;
         }
-    }, [token]);
+    }, [token, paginationModel.pageNo, paginationModel.pageSize]);
 
 
     const columns = [
@@ -216,24 +220,32 @@ const RefundManagement = () => {
         {
             field: 'status',
             headerName: 'Stato',
-            flex: 1,
+            flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
             renderCell: (params: any) => {
                 if (params.value === "CANCELLED") {
                     return (
                         <Chip
-                            label={t('pages.refundManagement.chipCancelled')}
+                            label={t('pages.refundManagement.cancelled')}
                             size="small"
                             sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
+                        />
+                    )
+                } else if (params.value === "REFUNDED") {
+                    return (
+                        <Chip
+                            label={t('pages.refundManagement.refunded')}
+                            size="small"
+                            sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
                         />
                     )
                 } else {
                     return (
                         <Chip
-                            label={t('pages.refundManagement.chipRefunded')}
+                            label={t('pages.refundManagement.rewarded')}
                             size="small"
-                            sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
+                            sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
                         />
                     )
                 }
@@ -309,7 +321,7 @@ const RefundManagement = () => {
                                 formik.resetForm();
                             }}
                         >
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField
                                     name="fiscalCode"
                                     label="Cerca per codice fiscale"
@@ -329,7 +341,7 @@ const RefundManagement = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel id="pos-type-label">Stato</InputLabel>
                                     <Select
@@ -340,10 +352,13 @@ const RefundManagement = () => {
                                         value={formik.values.status}
                                         onChange={formik.handleChange}
                                     >
+                                        <MenuItem value="REWARDED">
+                                            <Chip label="Rimborso richiesto" size="small" sx={{ backgroundColor: '#E1F4E1 !important', color: '##17324D !important' }} />
+                                        </MenuItem>
                                         <MenuItem value="CANCELLED">
                                             <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
                                         </MenuItem>
-                                        <MenuItem value="REWARDED">
+                                        <MenuItem value="REFUNDED">
                                             <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
                                         </MenuItem>
                                     </Select>
@@ -354,7 +369,15 @@ const RefundManagement = () => {
                 }
             </Box>
 
-            {(rows.length > 0 || loading) ? (
+            {
+                loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
+                        <CircularProgress />
+                    </Box>
+                )
+            }
+
+            {(rows.length > 0) && (
                 <Grid container mt={2}>
                     <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                         <Box sx={{ height: 'auto', width: '100%' }}>
@@ -365,11 +388,13 @@ const RefundManagement = () => {
                                 onPaginationPageChange={handlePaginationChange}
                                 paginationModel={paginationModel}
                                 onSortModelChange={handleSortModelChange}
+                                sortModel={sortModel}
                             />
                         </Box>
                     </Grid>
                 </Grid>
-            ) : (
+            )}
+            {rows.length === 0 && !loading && (
                 <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
                 </Paper>
