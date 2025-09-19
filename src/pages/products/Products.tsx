@@ -384,7 +384,7 @@ const Products = () => {
                     {
                         !productsListIsLoading && productsList?.length === 0 && (
                             <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
+                                <Typography variant="body2">{t('pages.products.noProducts')}</Typography>
                             </Paper>
                         )
                     }

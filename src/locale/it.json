@@ -197,7 +197,9 @@
     },
     "products": {
       "title": "Prodotti",
-      "subtitle": "Visualizza tutti i prodotti caricati e i dettagli."
+      "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
+      "noProducts": "Non ci sono prodotti per questa iniziativa"
+      
     }
   },
   "roles": {
