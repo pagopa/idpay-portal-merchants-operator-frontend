@@ -196,6 +196,7 @@ const RefundManagement = () => {
             flex: 1,
             type: 'number',
             align: 'left',
+            headerAlign: 'left',
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
@@ -214,6 +215,7 @@ const RefundManagement = () => {
             flex: 1,
             type: 'number',
             align: 'left',
+            headerAlign: 'left',
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
