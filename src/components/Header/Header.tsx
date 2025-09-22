@@ -1,8 +1,8 @@
 import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import type { LoggedUser } from '../../utils/types';
-// import {useAuth} from "../../contexts/AuthContext";
-import type { JwtUser } from '../../utils/types';
+import {useAuth} from "../../contexts/AuthContext";
+// import type { JwtUser } from '../../utils/types';
 import keycloak from '../../config/keycloak';
 
 interface HeaderProps {
@@ -11,21 +11,21 @@ interface HeaderProps {
 
 const Header = ({userProps}: HeaderProps) => {
 
-  // const { user } = userProps ? userProps : useAuth();
-  const user: JwtUser = {
-    id: "12345",
-    username: "mattia.rossi",
-    firstName: "Mattia",
-    lastName: "Rossi",
-    email: "mattia.rossi@example.com",
-    emailVerified: true,
-    userProfileMetadata: {
-      role: "admin",
-      permissions: ["READ", "WRITE", "DELETE"],
-      lastLogin: "2025-08-29T14:35:00Z",
-      language: "it"
-    }
-  };
+  const { user } = userProps ? userProps : useAuth();
+  // const user: JwtUser = {
+  //   id: "12345",
+  //   username: "mattia.rossi",
+  //   firstName: "Mattia",
+  //   lastName: "Rossi",
+  //   email: "mattia.rossi@example.com",
+  //   emailVerified: true,
+  //   userProfileMetadata: {
+  //     role: "admin",
+  //     permissions: ["READ", "WRITE", "DELETE"],
+  //     lastLogin: "2025-08-29T14:35:00Z",
+  //     language: "it"
+  //   }
+  // };
 
   const loggedUser: LoggedUser = {
     id: userProps ? userProps.id : user.id,
