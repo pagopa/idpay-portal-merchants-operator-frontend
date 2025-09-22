@@ -59,7 +59,7 @@ describe('DataTable', () => {
       <DataTable
         rows={mockRows}
         columns={mockColumns}
-        paginationModel={{ pageNo: 0, pageSize: 10, totalElements: 1 }}
+        paginationModel={{ page: 0, pageSize: 10, totalElements: 1 }}
       />
     );
 
@@ -78,7 +78,7 @@ describe('DataTable', () => {
       <DataTable
         rows={rows}
         columns={mockColumns}
-        paginationModel={{ pageNo: 0, pageSize: 10, totalElements: 1 }}
+        paginationModel={{ page: 0, pageSize: 10, totalElements: 1 }}
       />
     );
 
@@ -93,7 +93,7 @@ describe('DataTable', () => {
         rows={mockRows}
         columns={mockColumns}
         handleRowAction={handleRowAction}
-        paginationModel={{ pageNo: 0, pageSize: 10, totalElements: 1 }}
+        paginationModel={{ page: 0, pageSize: 10, totalElements: 1 }}
       />
     );
 

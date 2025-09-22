@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography, Tooltip } from "@mui/material";
+import { Box, Button, Grid, Typography, Tooltip, CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, Paper} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
@@ -7,82 +7,257 @@ import Chip from "@mui/material/Chip";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
+import { getInProgressTransactions } from "../../services/merchantService";
+import { jwtDecode } from 'jwt-decode';
+import { authStore } from "../../store/authStore";
+import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import { DecodedJwtToken, PaginationExtendedModel, GetProcessedTransactionsFilters } from "../../utils/types";
+import { GridPaginationModel, GridRenderCellParams, GridSortModel } from "@mui/x-data-grid";
+import FiltersForm from "../../components/FiltersForm/FiltersForm";
+import { useFormik } from "formik";
 
 const PurchaseManagement = () => {
-    const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sortModel, setSortModel] = useState<GridSortModel>([]);
+    const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
+        page: 0,
+        pageSize: import.meta.env.VITE_PAGINATION_SIZE,
+        totalElements: 0
+    });
+    const [transactions, setTransactions] = useState([]);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const token = authStore.getState().token;
+
+    const initialValues: GetProcessedTransactionsFilters = {
+        fiscalCode: '',
+        gtiIn: '',
+        status: ''
+    };
+
+    const formik = useFormik<GetProcessedTransactionsFilters>({
+        initialValues,
+        onSubmit: (values) => {
+            console.log('Eseguo ricerca con filtri:', values);
+        }
+    });
 
     useEffect(() => {
-        setLoading(true);
-        const fakeData = createFakeData(15); // Genera 50 righe di dati
-        setRows(fakeData);
-        setLoading(false);
-        console.log(loading);
+        fetchTransactions({});
     }, []);
 
 
     const columns = [
         {
-            field: 'elettrodomestico', headerName: 'Elettrodomestico', flex: 1.5, disableColumnMenu: true, renderCell: (params) => (
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    height: '100%',
-                    width: '100%'
-                }}>
-                    <Tooltip title={params.value}>
-                        <Typography sx={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
+            field: "additionalProperties",
+            headerName: 'Elettrodomestico',
+            flex: 1.5,
+            disableColumnMenu: true,
+            align: 'center',
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value) {
+                    return (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            height: '100%',
+                            width: '100%'
                         }}>
-                            {params.value}
-                        </Typography>
-                    </Tooltip>
-                </div>
-            ),
+                            <Tooltip title={params.value?.productName}>
+                                <Typography sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {params.value?.productName}
+                                </Typography>
+                            </Tooltip>
+                        </div>
+                    )
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            },
         },
-        { field: 'dataEOra', headerName: 'Data e ora', flex: 1, disableColumnMenu: true },
-        { field: 'beneficiario', headerName: 'Beneficiario', flex: 1.5, disableColumnMenu: true },
-        { field: 'totaleDellaSpesa', headerName: 'Totale della spesa', flex: 1, disableColumnMenu: true },
-        { field: 'importoAutorizzato', hìgeaderName: 'Importo autorizzato', flex: 1, disableColumnMenu: true },
-        { field: 'stato', headerName: 'Stato', flex: 1, disableColumnMenu: true, renderCell: (params) => <Chip label={params.value} size="small" sx={{ backgroundColor: '#FFF5DA !important', color: '#614C15 !important' }} /> },
+        {
+            field: 'trxDate',
+            headerName: 'Data e ora',
+            flex: 1,
+            disableColumnMenu: true,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value) {
+                    return (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            height: '100%',
+                            width: '100%'
+                        }}>
+                            <Tooltip title={params.value ? new Date(params.value).toLocaleDateString('it-IT', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }).replace(',', '') : MISSING_DATA_PLACEHOLDER}>
+                                <Typography sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {
+                                        params.value ? new Date(params.value).toLocaleDateString('it-IT', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        }).replace(',', '') : MISSING_DATA_PLACEHOLDER
+                                    }
+                                </Typography>
+                            </Tooltip>
+                        </div>
+                    )
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            },
+        },
+        {
+            field: 'fiscalCode',
+            headerName: 'Beneficiario',
+            flex: 1.5,
+            disableColumnMenu: true,
+            sortable: false
+        },
+        {
+            field: 'effectiveAmountCents',
+            headerName: 'Totale della spesa',
+            flex: 1,
+            type: 'number',
+            headerAlign: 'left',
+            align: 'left',
+            disableColumnMenu: true,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value || params.value === 0) {
+                    return (params.value / 100).toLocaleString('it-IT', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + '€';
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            }
+        },
+        {
+            field: 'rewardAmountCents',
+            headerName: 'Importo autorizzato',
+            flex: 1,
+            type: 'number',
+            headerAlign: 'left',
+            align: 'left',
+            disableColumnMenu: true,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value || params.value === 0) {
+                    return (params.value / 100).toLocaleString('it-IT', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + '€';
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            }
+        },
+        {
+            field: 'status',
+            headerName: 'Stato',
+            flex: 1.5,
+            disableColumnMenu: true,
+            sortable: true,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value === "AUTHORIZED") {
+                    return (
+                        <Chip
+                            label={t('pages.refundManagement.authorized')}
+                            size="small"
+                            sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }}
+                        />
+                    )
+                } else {
+                    return (
+                        <Chip
+                            label={t('pages.refundManagement.captured')}
+                            size="small"
+                            sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }}
+                        />
+                    )
+                }
+            }
+        },
     ];
 
+    const fetchTransactions = async (params: {
+        fiscalCode?: string;
+        gtiIn?: string;
+        status?: string;
+        page?: number;
+        size?: number;
+        sort?: string;
+    }) => {
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
+        try {
+            setLoading(true);
+            const response = await getInProgressTransactions(
+                import.meta.env.VITE_INITIATIVE_ID,
+                decodeToken?.point_of_sale_id,
+                Object.keys(params).length > 0 ? params : {
+                    sort: 'trxDate,asc',
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize
+                }
+            );
+            setTransactions([...response.content]);
+            setPaginationModel({
+                page: response.pageNo,
+                pageSize: response.pageSize || import.meta.env.VITE_PAGINATION_SIZE,
+                totalElements: response.totalElements
+            });
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            setLoading(false);
+        }
+    };
 
-    const createFakeData = (count) => {
-        const data = [];
-        const elettrodomestici = ['Lavatrice Electrolux EW7F', 'Frigorifero Samsung RB34T', 'Asciugatrice Bosch WTH85200IT', 'Forno Microonde Candy CMW2070DW', 'Aspirapolvere Dyson V11'];
-        const beneficiari = ['ASDFG643RTGFDSA', 'RTG456YUHJ5678I', 'JKLO987UIO2345P', 'ZXCVB123NM654QW', 'QAZXSWE789PLMKO'];
-        const stati = ['Chiedi rimborso'];
-
-        const getRandomDate = () => {
-            const start = new Date(2020, 0, 1);
-            const end = new Date();
-            return new Date(start.getTime() + 1* (end.getTime() - start.getTime()));
-        };
-
-        for (let i = 0; i < count; i++) {
-            const randomDate = getRandomDate();
-            const totaleSpesa = (1* 800 + 200).toFixed(2);
-  
-            const importoAutorizzato = (Number(totaleSpesa) * (1* 0.2 + 0.8)).toFixed(2); // 80% - 100% della spesa totale
-
-            data.push({
-                id: i,
-                elettrodomestico: elettrodomestici[0],
-                dataEOra: `${randomDate.toLocaleDateString('it-IT')}`,
-                beneficiario: beneficiari[0],
-                totaleDellaSpesa: `${totaleSpesa} €`,
-                importoAutorizzato: `${importoAutorizzato} €`,
-                stato: stati[0],
+    const handleSortModelChange = (model: GridSortModel) => {
+        if (model.length > 0) {
+            setSortModel(model);
+            fetchTransactions({
+                sort: model[0].field + ',' + model[0].sort,
+                page: paginationModel.page,
+                size: paginationModel.pageSize,
+                ...formik.values
             });
         }
-
-        return data;
     };
+
+    const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
+        fetchTransactions({
+            page: paginationModel.page,
+            size: paginationModel.pageSize,
+            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...filtersObj
+        });
+    };
+
+    const handlePaginationChange = (model: GridPaginationModel) => {
+        fetchTransactions({
+            page: model.page,
+            size: model.pageSize,
+            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...formik.values
+        });
+    };
+
 
 
     return (
@@ -100,26 +275,93 @@ const PurchaseManagement = () => {
                 <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{ display: 'flex', textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
             </Box>
             <Typography variant="h6" >
-                Transazioni
+                Buoni sconto
             </Typography>
-            <Grid container mt={2}>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                    <Box sx={{ height: 600, width: '100%' }}>
-                        <DataTable
-                            rows={rows}
-                            columns={columns}
-                            // pageSize={10}
-                            // rowsPerPage={10}
-                            paginationModel={{
-                                pageSize: 10,
-                                pageNo: 0,
-                                totalElements: rows.length
-                            }}
-                        />
+            {
+                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                    <FiltersForm
+                        formik={formik}
+                        onFiltersApplied={handleApplyFilters}
+                        onFiltersReset={() => {
+                            formik.resetForm();
+                            fetchTransactions({});
+                        }}
+                    >
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                            <TextField
+                                name="fiscalCode"
+                                label="Cerca per codice fiscale"
+                                size="small"
+                                fullWidth
+                                value={formik.values.fiscalCode}
+                                onChange={formik.handleChange}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <TextField
+                                name="gtiIn"
+                                label="Cerca per GTIN"
+                                size="small"
+                                fullWidth
+                                value={formik.values.gtiIn}
+                                onChange={formik.handleChange}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel id="pos-type-label">Stato</InputLabel>
+                                <Select
+                                    labelId="pos-type-label"
+                                    id="pos-type-select"
+                                    label='Stato'
+                                    name="status"
+                                    value={formik.values.status}
+                                    onChange={formik.handleChange}
+                                >
+                                    <MenuItem value="AUTHORIZED">
+                                        <Chip label={t('pages.refundManagement.authorized')} size="small" sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }} />
+                                    </MenuItem>
+                                    <MenuItem value="CAPTURED">
+                                        <Chip label={t('pages.refundManagement.captured')} size="small" sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }} />
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </FiltersForm>
+                )
+            }
+            {
+                loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
+                        <CircularProgress />
                     </Box>
-                </Grid>
+                )
+            }
+            {
+                !loading && transactions?.length > 0 && (
+                    <Grid container mt={2}>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Box sx={{ height: 'auto', width: '100%' }}>
+                                <DataTable
+                                    rows={transactions}
+                                    columns={columns}
+                                    paginationModel={paginationModel}
+                                    onPaginationPageChange={handlePaginationChange}
+                                    onSortModelChange={handleSortModelChange}
+                                    sortModel={sortModel}
+                                />
+                            </Box>
+                        </Grid>
 
-            </Grid>
+                    </Grid>
+                )
+            }
+            {transactions.length === 0 && !loading && (
+                <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
+                </Paper>
+            )}
+
         </Box>
     );
 };

@@ -5,6 +5,7 @@
 /* eslint-disable  */
 
 import * as t from "io-ts";
+import { PatternString } from "@pagopa/ts-commons/lib/strings";
 import {
   IWithinRangeIntegerTag,
   WithinRangeInteger
@@ -15,7 +16,7 @@ import {
 export const AuthBarCodePaymentDTOAdditionalProperties = t.record(
   t.string,
 
-  t.string,
+  PatternString(".*"),
 
   "AuthBarCodePaymentDTOAdditionalProperties"
 );

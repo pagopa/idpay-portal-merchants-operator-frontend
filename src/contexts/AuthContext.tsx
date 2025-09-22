@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(response.data);
           } catch (error) {
             console.error('Errore inizializzazione Keycloak:', error);
-            keycloak.logout(); 
+            // keycloak.logout(); 
           }
         }
       } catch (error) {

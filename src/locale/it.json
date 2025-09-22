@@ -34,7 +34,8 @@
   "sideMenu": {
     "purchaseManagement": "Gestione acquisti",
     "profile": "Profilo",
-    "refundManagement": "Gestione rimborsi"
+    "refundManagement": "Gestione rimborsi",
+    "products": "Prodotti"
   },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",
@@ -184,15 +185,25 @@
     },
     "purchaseManagement": {
       "title": "Gestione acquisti",
-      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici"
+      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa"
     },
     "refundManagement": {
       "title": "Gestione rimborsi",
       "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici",
       "noTransactions": "Non ci sono transazioni per questa iniziativa",
       "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
-      "chipCancelled": "Annullato",
-      "chipRefunded": "Stornato"
+      "cancelled": "Annullato",
+      "refunded": "Stornato",
+      "rewarded": "Rimborso richiesto",
+      "authorized": "Da autorizzare",
+      "captured": "Da rimborsare"
+    },
+    "products": {
+      "title": "Prodotti",
+      "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
+      "noProducts": "Non ci sono prodotti per questa iniziativa"
+      
     }
   },
   "roles": {

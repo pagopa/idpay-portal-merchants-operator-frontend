@@ -9,6 +9,7 @@ import {
   IWithinRangeIntegerTag,
   WithinRangeInteger
 } from "@pagopa/ts-commons/lib/numbers";
+import { PatternString } from "@pagopa/ts-commons/lib/strings";
 import { enumType } from "@pagopa/ts-commons/lib/types";
 import { UTCISODateFromString } from "@pagopa/ts-commons/lib/dates";
 
@@ -34,18 +35,18 @@ const AuthPaymentResponseDTOR = t.interface({
 
   id: t.string,
 
-  initiativeId: t.string,
+  initiativeId: PatternString("^[A-Za-z0-9_-]+$"),
 
   status: enumType<StatusEnum>(StatusEnum, "status"),
 
-  trxCode: t.string
+  trxCode: PatternString("^[a-zA-Z0-9]+$")
 });
 
 // optional attributes
 const AuthPaymentResponseDTOO = t.partial({
-  businessName: t.string,
+  businessName: PatternString(".*"),
 
-  initiativeName: t.string,
+  initiativeName: PatternString(".*"),
 
   residualAmountCents: t.union([
     WithinRangeInteger<0, 1000000, IWithinRangeIntegerTag<0, 1000000>>(

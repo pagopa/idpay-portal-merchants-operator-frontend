@@ -61,8 +61,9 @@ const FiltersForm = <T extends Record<string, any>>({
       {enhancedChildren}
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
       <Button
-        sx={{ height: '44.5px', gridColumn: 'span 1' }}
+        sx={{ height: '44.5px', gridColumn: 'span 1' }} 
         variant="outlined"
+        fullWidth
         size="small"
         onClick={handleApplyFilters}
         disabled={formik.isSubmitting}

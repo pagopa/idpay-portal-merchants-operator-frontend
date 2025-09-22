@@ -42,6 +42,7 @@ variables:
 
     #API ENV
     vite_api_url: '$(UAT_VITE_API_URL)'
+    vite_initiative_id: '$(UAT_VITE_INITIATIVE_ID)'
 
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
@@ -100,6 +101,7 @@ variables:
 
     #API ENV
     vite_api_url: '$(DEV_VITE_API_URL)'
+    vite_initiative_id: '$(DEV_VITE_INITIATIVE_ID)'
     
     
 # Automatically triggered on PR

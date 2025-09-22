@@ -5,18 +5,28 @@
 /* eslint-disable  */
 
 import * as t from "io-ts";
+import { enumType } from "@pagopa/ts-commons/lib/types";
 import {
   IWithinRangeIntegerTag,
   WithinRangeInteger
 } from "@pagopa/ts-commons/lib/numbers";
 import { PatternString } from "@pagopa/ts-commons/lib/strings";
-import { enumType } from "@pagopa/ts-commons/lib/types";
 import { UTCISODateFromString } from "@pagopa/ts-commons/lib/dates";
+
+export enum ChannelEnum {
+  "BARCODE" = "BARCODE",
+
+  "QRCODE" = "QRCODE",
+
+  "IDPAYCODE" = "IDPAYCODE"
+}
 
 export enum StatusEnum {
   "REWARDED" = "REWARDED",
 
-  "CANCELLED" = "CANCELLED"
+  "CANCELLED" = "CANCELLED",
+
+  "REFUNDED" = "REFUNDED"
 }
 
 // required attributes
@@ -24,7 +34,7 @@ const PointOfSaleTransactionProcessedDTOR = t.interface({});
 
 // optional attributes
 const PointOfSaleTransactionProcessedDTOO = t.partial({
-  channel: t.string,
+  channel: enumType<ChannelEnum>(ChannelEnum, "channel"),
 
   effectiveAmountCents: t.union([
     WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
@@ -34,7 +44,7 @@ const PointOfSaleTransactionProcessedDTOO = t.partial({
     t.literal(1000000000)
   ]),
 
-  fiscalCode: PatternString(".*"),
+  fiscalCode: PatternString("^[A-Z0-9]+$"),
 
   id: PatternString(".*"),
 
