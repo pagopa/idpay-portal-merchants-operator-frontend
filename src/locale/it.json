@@ -185,7 +185,8 @@
     },
     "purchaseManagement": {
       "title": "Gestione acquisti",
-      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici"
+      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa"
     },
     "refundManagement": {
       "title": "Gestione rimborsi",

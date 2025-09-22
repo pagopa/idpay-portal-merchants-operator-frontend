@@ -19,7 +19,7 @@ import { PointOfSaleTransactionsListDTO } from '../api/generated/merchants/Point
     return MerchantApi.authPaymentBarCode(params);
   };
 
-  export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: ["REWARDED","CANCELLED"], }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
+  export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     return MerchantApi.getProcessedTransactions(initiativeId, pointOfSaleId, params);
   };
 

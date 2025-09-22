@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography, Tooltip, CircularProgress } from "@mui/material";
+import { Box, Button, Grid, Typography, Tooltip, CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, Paper} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
@@ -11,12 +11,16 @@ import { getInProgressTransactions } from "../../services/merchantService";
 import { jwtDecode } from 'jwt-decode';
 import { authStore } from "../../store/authStore";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import { DecodedJwtToken, PaginationExtendedModel, GetProcessedTransactionsFilters } from "../../utils/types";
+import { GridPaginationModel, GridRenderCellParams, GridSortModel } from "@mui/x-data-grid";
+import FiltersForm from "../../components/FiltersForm/FiltersForm";
+import { useFormik } from "formik";
 
 const PurchaseManagement = () => {
     const [loading, setLoading] = useState(true);
-    const [sortModel, setSortModel] = useState<any>([]);
-    const [paginationModel, setPaginationModel] = useState<any>({
-        pageNo: 0,
+    const [sortModel, setSortModel] = useState<GridSortModel>([]);
+    const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
+        page: 0,
         pageSize: import.meta.env.VITE_PAGINATION_SIZE,
         totalElements: 0
     });
@@ -24,6 +28,19 @@ const PurchaseManagement = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const token = authStore.getState().token;
+
+    const initialValues: GetProcessedTransactionsFilters = {
+        fiscalCode: '',
+        gtiIn: '',
+        status: ''
+    };
+
+    const formik = useFormik<GetProcessedTransactionsFilters>({
+        initialValues,
+        onSubmit: (values) => {
+            console.log('Eseguo ricerca con filtri:', values);
+        }
+    });
 
     useEffect(() => {
         fetchTransactions({});
@@ -38,7 +55,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             align: 'center',
             sortable: false,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -67,7 +84,7 @@ const PurchaseManagement = () => {
             headerName: 'Data e ora',
             flex: 1,
             disableColumnMenu: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -121,7 +138,7 @@ const PurchaseManagement = () => {
             align: 'left',
             disableColumnMenu: true,
             sortable: false,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
                     return (params.value / 100).toLocaleString('it-IT', {
                         minimumFractionDigits: 2,
@@ -140,7 +157,7 @@ const PurchaseManagement = () => {
             align: 'left',
             disableColumnMenu: true,
             sortable: false,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
                     return (params.value / 100).toLocaleString('it-IT', {
                         minimumFractionDigits: 2,
@@ -156,7 +173,7 @@ const PurchaseManagement = () => {
             flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value === "AUTHORIZED") {
                     return (
                         <Chip
@@ -178,8 +195,15 @@ const PurchaseManagement = () => {
         },
     ];
 
-    const fetchTransactions = async (params: any) => {
-        const decodeToken: any = jwtDecode(token);
+    const fetchTransactions = async (params: {
+        fiscalCode?: string;
+        gtiIn?: string;
+        status?: string;
+        page?: number;
+        size?: number;
+        sort?: string;
+    }) => {
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
         try {
             setLoading(true);
             const response = await getInProgressTransactions(
@@ -187,11 +211,16 @@ const PurchaseManagement = () => {
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
                     sort: 'trxDate,asc',
-                    page: paginationModel.pageNo,
+                    page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
             );
             setTransactions([...response.content]);
+            setPaginationModel({
+                page: response.pageNo,
+                pageSize: response.pageSize || import.meta.env.VITE_PAGINATION_SIZE,
+                totalElements: response.totalElements
+            });
             setLoading(false);
         } catch (error) {
             console.error('Error fetching transactions:', error);
@@ -199,17 +228,35 @@ const PurchaseManagement = () => {
         }
     };
 
-    const handleSortModelChange = (model: any) => {
+    const handleSortModelChange = (model: GridSortModel) => {
         if (model.length > 0) {
             setSortModel(model);
             fetchTransactions({
                 sort: model[0].field + ',' + model[0].sort,
-                page: paginationModel.pageNo,
+                page: paginationModel.page,
                 size: paginationModel.pageSize,
+                ...formik.values
             });
         }
     };
 
+    const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
+        fetchTransactions({
+            page: paginationModel.page,
+            size: paginationModel.pageSize,
+            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...filtersObj
+        });
+    };
+
+    const handlePaginationChange = (model: GridPaginationModel) => {
+        fetchTransactions({
+            page: model.page,
+            size: model.pageSize,
+            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...formik.values
+        });
+    };
 
 
 
@@ -228,8 +275,61 @@ const PurchaseManagement = () => {
                 <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{ display: 'flex', textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
             </Box>
             <Typography variant="h6" >
-                Transazioni
+                Buoni sconto
             </Typography>
+            {
+                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                    <FiltersForm
+                        formik={formik}
+                        onFiltersApplied={handleApplyFilters}
+                        onFiltersReset={() => {
+                            formik.resetForm();
+                            fetchTransactions({});
+                        }}
+                    >
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                            <TextField
+                                name="fiscalCode"
+                                label="Cerca per codice fiscale"
+                                size="small"
+                                fullWidth
+                                value={formik.values.fiscalCode}
+                                onChange={formik.handleChange}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <TextField
+                                name="gtiIn"
+                                label="Cerca per GTIN"
+                                size="small"
+                                fullWidth
+                                value={formik.values.gtiIn}
+                                onChange={formik.handleChange}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel id="pos-type-label">Stato</InputLabel>
+                                <Select
+                                    labelId="pos-type-label"
+                                    id="pos-type-select"
+                                    label='Stato'
+                                    name="status"
+                                    value={formik.values.status}
+                                    onChange={formik.handleChange}
+                                >
+                                    <MenuItem value="AUTHORIZED">
+                                        <Chip label={t('pages.refundManagement.authorized')} size="small" sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }} />
+                                    </MenuItem>
+                                    <MenuItem value="CAPTURED">
+                                        <Chip label={t('pages.refundManagement.captured')} size="small" sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }} />
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </FiltersForm>
+                )
+            }
             {
                 loading && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
@@ -245,13 +345,8 @@ const PurchaseManagement = () => {
                                 <DataTable
                                     rows={transactions}
                                     columns={columns}
-                                    // pageSize={10}
-                                    // rowsPerPage={10}
-                                    paginationModel={{
-                                        pageSize: import.meta.env.VITE_PAGINATION_SIZE,
-                                        pageNo: 0,
-                                        totalElements: transactions.length
-                                    }}
+                                    paginationModel={paginationModel}
+                                    onPaginationPageChange={handlePaginationChange}
                                     onSortModelChange={handleSortModelChange}
                                     sortModel={sortModel}
                                 />
@@ -261,6 +356,11 @@ const PurchaseManagement = () => {
                     </Grid>
                 )
             }
+            {transactions.length === 0 && !loading && (
+                <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
+                </Paper>
+            )}
 
         </Box>
     );

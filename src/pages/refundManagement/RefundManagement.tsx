@@ -11,29 +11,31 @@ import { authStore } from "../../store/authStore";
 import { jwtDecode } from 'jwt-decode';
 import ErrorAlert from "../../components/errorAlert/ErrorAlert";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import {GridRenderCellParams, GridSortModel, GridPaginationModel} from '@mui/x-data-grid';
+import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 
 const RefundManagement = () => {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [paginationModel, setPaginationModel] = useState<any>({
-        pageNo: 0,
+    const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
+        page: 0,
         pageSize: import.meta.env.VITE_PAGINATION_SIZE,
         totalElements: 0
     });
-    const [sortModel, setSortModel] = useState<any>([]);
+    const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const [errorAlert, setErrorAlert] = useState(false);
     const { t } = useTranslation();
     const token = authStore.getState().token;
 
     const isLoadingRef = useRef(false);
 
-    const initialValues = {
+    const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
         gtiIn: '',
         status: ''
     };
 
-    const formik = useFormik({
+    const formik = useFormik<GetProcessedTransactionsFilters>({
         initialValues,
         onSubmit: (values) => {
             console.log('Eseguo ricerca con filtri:', values);
@@ -57,14 +59,21 @@ const RefundManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert]);
+    }, [errorAlert]);   
 
-    const fetchTransactions = useCallback(async (params: any) => {
+    const fetchTransactions = useCallback(async (params: {
+        fiscalCode?: string;
+        gtiIn?: string;
+        status?: string;
+        page?: number;
+        size?: number;
+        sort?: string;
+    }) => {
         if (isLoadingRef.current) {
             return;
         }
 
-        const decodeToken: any = jwtDecode(token);
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
 
         isLoadingRef.current = true;
         setLoading(true);
@@ -75,14 +84,14 @@ const RefundManagement = () => {
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
                     sort: 'trxDate,asc',
-                    page: paginationModel.pageNo,
+                    page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
             );
 
             setPaginationModel({
-                pageNo: response.pageNo || 0,
-                pageSize: response.pageSize || 10,
+                page: response.pageNo || 0,
+                pageSize: response.pageSize || import.meta.env.VITE_PAGINATION_SIZE,
                 totalElements: response.totalElements || 0
             });
 
@@ -96,18 +105,18 @@ const RefundManagement = () => {
             setLoading(false);
             isLoadingRef.current = false;
         }
-    }, [token, paginationModel.pageNo, paginationModel.pageSize]);
+    }, [token, paginationModel.page, paginationModel.pageSize]);
 
 
     const columns = [
         {
-            field: 'elettrodomestico',
+            field: 'eletronicDevice',
             headerName: 'Elettrodomestico',
             flex: 1.5,
             disableColumnMenu: true,
             align: 'center',
             sortable: false,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -136,7 +145,7 @@ const RefundManagement = () => {
             headerName: 'Data e ora',
             flex: 1,
             disableColumnMenu: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -189,7 +198,7 @@ const RefundManagement = () => {
             align: 'left',
             disableColumnMenu: true,
             sortable: false,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
                     return (params.value / 100).toLocaleString('it-IT', {
                         minimumFractionDigits: 2,
@@ -207,7 +216,7 @@ const RefundManagement = () => {
             align: 'left',
             disableColumnMenu: true,
             sortable: false,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
                     return (params.value / 100).toLocaleString('it-IT', {
                         minimumFractionDigits: 2,
@@ -223,7 +232,7 @@ const RefundManagement = () => {
             flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value === "CANCELLED") {
                     return (
                         <Chip
@@ -254,7 +263,7 @@ const RefundManagement = () => {
         },
     ];
 
-    const setApiFilters = useCallback((filtersObj: any) => {
+    const setApiFilters = useCallback((filtersObj: GetProcessedTransactionsFilters) => {
         fetchTransactions({
             ...filtersObj,
             page: 0,
@@ -263,26 +272,27 @@ const RefundManagement = () => {
         });
     }, [fetchTransactions, paginationModel.pageSize, sortModel]);
 
-    const handlePaginationChange = useCallback((newPaginationModel: any) => {
+    const handlePaginationChange = useCallback((newPaginationModel: GridPaginationModel) => {
 
-        if (newPaginationModel.pageNo === paginationModel.pageNo &&
+        if (newPaginationModel.page === paginationModel.page &&
             newPaginationModel.pageSize === paginationModel.pageSize) {
             return;
         }
 
         fetchTransactions({
-            page: newPaginationModel.pageNo,
+            page: newPaginationModel.page,
             size: newPaginationModel.pageSize,
             sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...formik.values
         });
-    }, [fetchTransactions, paginationModel.pageNo, paginationModel.pageSize, sortModel]);
+    }, [fetchTransactions, paginationModel.page, paginationModel.pageSize, sortModel, formik.values]);
 
-    const handleSortModelChange = (model: any) => {
+    const handleSortModelChange = (model: GridSortModel) => {
         if (model.length > 0) {
             setSortModel(model);
             fetchTransactions({
                 sort: model[0].field + ',' + model[0].sort,
-                page: paginationModel.pageNo,
+                page: paginationModel.page,
                 size: paginationModel.pageSize,
                 ...formik.values
             });
@@ -377,7 +387,7 @@ const RefundManagement = () => {
                 )
             }
 
-            {(rows.length > 0) && (
+            {(rows && rows?.length > 0) && (
                 <Grid container mt={2}>
                     <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                         <Box sx={{ height: 'auto', width: '100%' }}>

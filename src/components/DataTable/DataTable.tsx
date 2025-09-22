@@ -1,17 +1,18 @@
-import { DataGrid, type GridSortModel } from '@mui/x-data-grid';
+import { DataGrid, GridSortModel, GridPaginationModel, GridRenderCellParams, GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {MISSING_DATA_PLACEHOLDER} from '../../utils/constants';
+import { PaginationExtendedModel } from '../../utils/types';
 
 export interface DataTableProps {
-  rows: any;
-  columns: any;
-  handleRowAction?: (row: any) => void; 
-  onSortModelChange?: (model: any) => void;
+  rows: GridRowsProp;
+  columns: any[];
+  handleRowAction?: (row: unknown) => void; 
+  onSortModelChange?: (model: GridSortModel) => void;
   sortModel?: GridSortModel;
-  onPaginationPageChange?: (obj: any) => void;
-  paginationModel?: any;
+  onPaginationPageChange?: (obj: GridPaginationModel) => void;
+  paginationModel?: PaginationExtendedModel;
   loading?: boolean;
 }
 
@@ -25,20 +26,21 @@ const DataTable = ({
   loading = false,
   sortModel
 }: DataTableProps) => {
-  const [finalColumns, setFinalColumns] = useState(Array<any>);
+  const [finalColumns, setFinalColumns] = useState<Array<GridColDef>>();
   const [sortModelState, setSortModelState] = useState<GridSortModel>([]);
   
   const isExternalUpdate = useRef(false);
   const [internalPaginationModel, setInternalPaginationModel] = useState(
-    paginationModel || { pageNo: 0, pageSize: 10, totalElements: 0 }
+    paginationModel || { page: 0, pageSize: 10, totalElements: 0 }
   );
 
   useEffect(() => {
     if (paginationModel) {
       isExternalUpdate.current = true;
       setInternalPaginationModel({
-        page: paginationModel.pageNo || 0,
-        pageSize: paginationModel.pageSize || 10
+        page: paginationModel.page || 0,
+        pageSize: paginationModel.pageSize || 10,
+        totalElements: paginationModel.totalElements || 0
       });
 
       setTimeout(() => {
@@ -49,7 +51,7 @@ const DataTable = ({
 
   useEffect(() => {
     if (columns && columns.length > 0) {
-      const processedColumns = columns.map((col: any) => ({
+      const processedColumns = columns.map((col: GridColDef) => ({
         ...col,
         renderCell: col.renderCell ? col.renderCell : renderEmptyCell
       }));
@@ -64,7 +66,7 @@ const DataTable = ({
             filterable: false,
             disableColumnMenu: true,
             flex: 1,
-            renderCell: (params: any) => (
+            renderCell: (params: GridRenderCellParams) => (
               <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%' }}>
                 <IconButton
                   onClick={() => handleRowAction && handleRowAction(params.row)}
@@ -86,14 +88,14 @@ const DataTable = ({
     }
   }, [sortModel]);
 
-  const renderEmptyCell = (params: any) => {
+  const renderEmptyCell = (params: GridRenderCellParams) => {
     if (params.value === null || params.value === undefined || params.value === '') {
       return MISSING_DATA_PLACEHOLDER;
     }
     return params.value;
   };
 
-  const handlePaginationModelChange = useCallback((model: any) => {
+  const handlePaginationModelChange = useCallback((model: GridPaginationModel) => {
     
     if (isExternalUpdate.current) {
       return;
@@ -110,15 +112,15 @@ const DataTable = ({
       return;
     }
 
-    setInternalPaginationModel(model);
+    setInternalPaginationModel({...model, totalElements: 0});
     
     onPaginationPageChange?.({
-      pageNo: model.page,
+      page: model.page,
       pageSize: model.pageSize
     });
   }, [onPaginationPageChange, loading, internalPaginationModel]);
 
-  const handleSortModelChange = useCallback((model: any) => {
+  const handleSortModelChange = useCallback((model: GridSortModel) => {
     if(model.length > 0){
       setSortModelState(model);
       onSortModelChange?.(model);
@@ -138,7 +140,7 @@ const DataTable = ({
   return (
     <>
       {
-        rows?.length > 0 && columns?.length > 0 && (
+        rows?.length > 0 && finalColumns?.length > 0 && (
           <DataGrid
             rows={rows}
             columns={finalColumns}
