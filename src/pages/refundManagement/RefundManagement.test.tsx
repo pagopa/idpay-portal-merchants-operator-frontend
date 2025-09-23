@@ -14,6 +14,9 @@ vi.mock('react-i18next', () => ({
         'pages.refundManagement.noTransactions': 'Nessuna transazione trovata.',
         'pages.refundManagement.errorAlert': 'Si è verificato un errore.',
         'pages.refundManagement.refunded': 'STORNATO',
+        'commons.fiscalCodeFilterPlaceholer': 'Cerca per codice fiscale',
+        'commons.gtiInFilterPlaceholer': 'Cerca per GTIN',
+        'commons.statusFilterPlaceholer': 'Cerca per stato',
       };
       return translations[key] || key;
     },
@@ -173,7 +176,7 @@ describe('RefundManagement', () => {
       'pos-456',
       expect.objectContaining({
         fiscalCode: 'TESTCF123',
-        gtiIn: '',
+        productGtin: '',
         status: '',
         page: 0,
       })

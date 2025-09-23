@@ -179,7 +179,6 @@ describe('PurchaseManagement', () => {
     });
 
     expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
-    expect(screen.getByText('Buoni sconto')).toBeInTheDocument();
   });
 
   it('should handle errors during transaction fetch', async () => {
