@@ -11,7 +11,7 @@ import { authStore } from "../../store/authStore";
 import { jwtDecode } from 'jwt-decode';
 import ErrorAlert from "../../components/errorAlert/ErrorAlert";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import {GridRenderCellParams, GridSortModel, GridPaginationModel} from '@mui/x-data-grid';
+import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 
 const RefundManagement = () => {
@@ -59,7 +59,7 @@ const RefundManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert]);   
+    }, [errorAlert]);
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
@@ -234,30 +234,37 @@ const RefundManagement = () => {
             flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
+            alignVertical: 'center',
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value === "CANCELLED") {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.cancelled')}
-                            size="small"
-                            sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.cancelled')}
+                                size="small"
+                                sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
+                            />
+                        </Box>
                     )
                 } else if (params.value === "REFUNDED") {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.refunded')}
-                            size="small"
-                            sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.refunded')}
+                                size="small"
+                                sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
+                            />
+                        </Box>
                     )
                 } else {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.rewarded')}
-                            size="small"
-                            sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.rewarded')}
+                                size="small"
+                                sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
+                            />
+                        </Box>
                     )
                 }
 

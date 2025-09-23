@@ -176,19 +176,23 @@ const PurchaseManagement = () => {
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value === "AUTHORIZED") {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.authorized')}
-                            size="small"
-                            sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.authorized')}
+                                size="small"
+                                sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }}
+                            />
+                        </Box>
                     )
                 } else {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.captured')}
-                            size="small"
-                            sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.captured')}
+                                size="small"
+                                sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }}
+                            />
+                        </Box>
                     )
                 }
             }
