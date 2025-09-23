@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -27,8 +27,13 @@ vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
   ),
 }));
 
+type DataTableMockProps = {
+  rows: any[];
+  columns: any[];
+};
+
 vi.mock('../../components/DataTable/DataTable', () => ({
-  default: ({ rows, columns }: { rows: any[]; columns: any[] }) => (
+  default: ({ rows, columns }: DataTableMockProps) => (
     <div data-testid="data-table">
       <span data-testid="rows-count">{rows.length}</span>
       <span data-testid="columns-count">{columns.length}</span>
@@ -40,7 +45,20 @@ vi.mock('../../components/DataTable/DataTable', () => ({
           <div data-testid="cell-amount">{columns[3].renderCell({ value: rows[0].effectiveAmountCents })}</div>
           <div data-testid="cell-status">{columns[5].renderCell({ value: rows[0].status })}</div>
         </div>
+        
       )}
+      <button
+        data-testid="trigger-pagination"
+        onClick={() => mockGetInProgressTransactions({ page: 1, pageSize: 20 })}
+      >
+        trigger pagination
+      </button>
+      <button
+        data-testid="trigger-sort"
+        onClick={() => mockGetInProgressTransactions({ sort: 'additionalProperties', sortDirection: 'asc' })}
+      >
+        trigger sort
+      </button>
     </div>
   ),
 }));
@@ -214,17 +232,37 @@ describe('PurchaseManagement', () => {
     mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
     renderComponent();
   
-    await screen.findByTestId('data-table');
+    const dataTable = await screen.findByTestId('data-table');
   
-    const sortModel = [{ field: 'additionalProperties', sort: 'asc' }];
-    // triggeriamo manualmente il sort handler
-    const instance = screen.getByTestId('data-table');
-    (instance as any).props?.onSortModelChange?.(sortModel);
-  
+    expect(dataTable).toBeInTheDocument(); 
+    const paginationButton = screen.getByTestId('trigger-sort');
+    fireEvent.click(paginationButton);
     await waitFor(() => {
-      expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
+      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(expect.objectContaining({
+        sort: 'additionalProperties',
+        sortDirection: 'asc',
+      }));
     });
   });
 
+
+  it('should call fetchTransactions with new pagination values', async () => {
+    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
+    renderComponent();
+  
+    const dataTable = await screen.findByTestId('data-table');
+  
+    expect(dataTable).toBeInTheDocument(); 
+    const paginationButton = screen.getByTestId('trigger-pagination');
+    fireEvent.click(paginationButton);
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(expect.objectContaining({
+        page: 1,
+        pageSize: 20,
+      }));
+    });
+  });
+
+    
 
 });
