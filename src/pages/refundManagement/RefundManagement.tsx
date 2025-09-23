@@ -31,7 +31,7 @@ const RefundManagement = () => {
 
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
-        gtiIn: '',
+        productGtin: '',
         status: ''
     };
 
@@ -323,18 +323,18 @@ const RefundManagement = () => {
             </Box>
 
             <Typography variant="h6">
-                Transazioni
+                {t('pages.refundManagement.tableTitle')}
             </Typography>
             <Box>
                 {
-                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={setApiFilters}
                             onFiltersReset={() => {
                                 setApiFilters({
                                     fiscalCode: '',
-                                    gtiIn: '',
+                                    productGtin: '',
                                     status: '',
                                 });
                                 formik.resetForm();
@@ -343,7 +343,7 @@ const RefundManagement = () => {
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField
                                     name="fiscalCode"
-                                    label="Cerca per codice fiscale"
+                                    label={t('commons.fiscalCodeFilterPlaceholer')}
                                     size="small"
                                     fullWidth
                                     value={formik.values.fiscalCode}
@@ -352,21 +352,21 @@ const RefundManagement = () => {
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <TextField
-                                    name="gtiIn"
-                                    label="Cerca per GTIN"
+                                    name="productGtin"
+                                    label={t('commons.gtiInFilterPlaceholer')}
                                     size="small"
                                     fullWidth
-                                    value={formik.values.gtiIn}
+                                    value={formik.values.productGtin}
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <FormControl fullWidth size="small">
-                                    <InputLabel id="pos-type-label">Stato</InputLabel>
+                                    <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                     <Select
                                         labelId="pos-type-label"
                                         id="pos-type-select"
-                                        label='Stato'
+                                        label={t('commons.statusFilterPlaceholer')}
                                         name="status"
                                         value={formik.values.status}
                                         onChange={formik.handleChange}
@@ -390,7 +390,7 @@ const RefundManagement = () => {
 
             {
                 loading && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }} data-testid="loading">
                         <CircularProgress />
                     </Box>
                 )

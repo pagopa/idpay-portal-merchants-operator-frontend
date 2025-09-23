@@ -31,7 +31,7 @@ const PurchaseManagement = () => {
 
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
-        gtiIn: '',
+        productGtin: '',
         status: ''
     };
 
@@ -54,7 +54,7 @@ const PurchaseManagement = () => {
             flex: 1.5,
             disableColumnMenu: true,
             align: 'center',
-            sortable: false,
+            sortable: true,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
@@ -235,12 +235,21 @@ const PurchaseManagement = () => {
     const handleSortModelChange = (model: GridSortModel) => {
         if (model.length > 0) {
             setSortModel(model);
-            fetchTransactions({
-                sort: model[0].field + ',' + model[0].sort,
-                page: paginationModel.page,
-                size: paginationModel.pageSize,
-                ...formik.values
-            });
+            if(model[0].field === 'additionalProperties'){
+                fetchTransactions({
+                    sort: 'productCategory,' + model[0].sort,
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize,
+                    ...formik.values
+                });
+            } else {
+                fetchTransactions({
+                    sort: model[0].field + ',' + model[0].sort,
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize,
+                    ...formik.values
+                });
+            }
         }
     };
 
@@ -279,10 +288,10 @@ const PurchaseManagement = () => {
                 <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{ display: 'flex', textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
             </Box>
             <Typography variant="h6" >
-                Buoni sconto
+                {t('pages.purchaseManagement.tableTitle')}
             </Typography>
             {
-                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
                     <FiltersForm
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
@@ -294,7 +303,7 @@ const PurchaseManagement = () => {
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField
                                 name="fiscalCode"
-                                label="Cerca per codice fiscale"
+                                label={t('commons.fiscalCodeFilterPlaceholer')}
                                 size="small"
                                 fullWidth
                                 value={formik.values.fiscalCode}
@@ -303,21 +312,21 @@ const PurchaseManagement = () => {
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                             <TextField
-                                name="gtiIn"
-                                label="Cerca per GTIN"
+                                name="productGtin"
+                                label={t('commons.gtiInFilterPlaceholer')}
                                 size="small"
                                 fullWidth
-                                value={formik.values.gtiIn}
+                                value={formik.values.productGtin}
                                 onChange={formik.handleChange}
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <FormControl fullWidth size="small">
-                                <InputLabel id="pos-type-label">Stato</InputLabel>
+                                <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                 <Select
                                     labelId="pos-type-label"
                                     id="pos-type-select"
-                                    label='Stato'
+                                    label={t('commons.statusFilterPlaceholer')}
                                     name="status"
                                     value={formik.values.status}
                                     onChange={formik.handleChange}
@@ -336,7 +345,7 @@ const PurchaseManagement = () => {
             }
             {
                 loading && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }} data-testid="loading">
                         <CircularProgress />
                     </Box>
                 )
