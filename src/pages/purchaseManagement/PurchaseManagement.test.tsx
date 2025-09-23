@@ -1,203 +1,199 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import userEvent from '@testing-library/user-event';
 import PurchaseManagement from './PurchaseManagement';
 
-// Dependencies mock
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'pages.purchaseManagement.title': 'Gestione Acquisti',
-        'pages.purchaseManagement.subtitle': 'Gestisci i tuoi acquisti e transazioni'
+        'pages.purchaseManagement.subtitle': 'Gestisci i tuoi acquisti e transazioni',
+        'pages.refundManagement.authorized': 'AUTORIZZATO',
       };
       return translations[key] || key;
-    }
-  })
+    },
+  }),
 }));
 
 vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
   TitleBox: ({ title, subTitle }: { title: string; subTitle: string }) => (
     <div data-testid="title-box">
-      <h4>{title}</h4>
+      <h1>{title}</h1>
       <p>{subTitle}</p>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../../components/DataTable/DataTable', () => ({
-  default: ({ rows, columns, paginationModel }: any) => (
+  default: ({ rows, columns }: { rows: any[]; columns: any[] }) => (
     <div data-testid="data-table">
-      <div data-testid="table-rows-count">{rows.length}</div>
-      <div data-testid="table-columns-count">{columns.length}</div>
-      <div data-testid="pagination-page-size">{paginationModel.pageSize}</div>
-      <div data-testid="pagination-total">{paginationModel.totalElements}</div>
-      {/* Simulate table rows */}
-      {rows.slice(0, 3).map((row: any) => (
-        <div key={row.id} data-testid={`table-row-${row.id}`}>
-          <span data-testid="elettrodomestico">{row.elettrodomestico}</span>
-          <span data-testid="beneficiario">{row.beneficiario}</span>
-          <span data-testid="stato">{row.stato}</span>
+      <span data-testid="rows-count">{rows.length}</span>
+      <span data-testid="columns-count">{columns.length}</span>
+      {rows.length > 0 && (
+        <div data-testid="first-row">
+          <div data-testid="cell-product">{columns[0].renderCell({ value: rows[0].additionalProperties })}</div>
+          <div data-testid="cell-date">{columns[1].renderCell({ value: rows[0].trxDate })}</div>
+          <div data-testid="cell-fiscal-code">{rows[0].fiscalCode}</div>
+          <div data-testid="cell-amount">{columns[3].renderCell({ value: rows[0].effectiveAmountCents })}</div>
+          <div data-testid="cell-status">{columns[5].renderCell({ value: rows[0].status })}</div>
         </div>
-      ))}
+      )}
     </div>
-  )
+  ),
 }));
 
-vi.mock('../../routes', () => ({
-  default: {
-    ACCEPT_DISCOUNT: '/accept-discount'
-  }
-}));
-
-// useNavigate mock
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
   };
 });
+vi.mock('../../routes', () => ({
+  default: {
+    ACCEPT_DISCOUNT: '/accetta-sconto',
+  },
+}));
 
-const theme = createTheme();
+const mockGetInProgressTransactions = vi.fn();
+vi.mock('../../services/merchantService', () => ({
+  getInProgressTransactions: () => mockGetInProgressTransactions(),
+}));
+vi.mock('jwt-decode', () => ({
+  jwtDecode: () => ({ point_of_sale_id: 'pos-123' }),
+}));
+vi.mock('../../store/authStore', () => ({
+  authStore: {
+    getState: () => ({ token: 'fake-jwt-token' }),
+  },
+}));
 
-const renderWithProviders = (component: React.ReactElement) => {
+//mock data
+const mockTransactions = [
+  {
+    trxId: '1',
+    trxDate: '2025-09-22T10:30:00Z',
+    fiscalCode: 'AAAAAA11B22C333D',
+    effectiveAmountCents: 5000,
+    rewardAmountCents: 500,
+    status: 'AUTHORIZED',
+    additionalProperties: { productName: 'Lavatrice SuperClean' },
+  },
+];
+
+const mockApiResponse = {
+  content: mockTransactions,
+  pageNo: 0,
+  pageSize: 10,
+  totalElements: 1,
+  totalPages: 1,
+  last: true,
+};
+
+//render helper function
+const renderComponent = () => {
+  const theme = createTheme();
   return render(
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        {component}
+        <PurchaseManagement />
       </ThemeProvider>
     </BrowserRouter>
   );
 };
 
 describe('PurchaseManagement', () => {
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
+  it('should show loading spinner', () => {
+    mockGetInProgressTransactions.mockReturnValue(new Promise(() => {}));
+    
+    renderComponent();
+    
+    expect(screen.getByTestId('loading')).toBeInTheDocument();
   });
 
-  it('should render the component with title and subtitle', () => {
-    renderWithProviders(<PurchaseManagement />);
+  it('should render title, subtitle and action button', async () => {
+    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [], totalElements: 0 });
+    
+    renderComponent();
+    
+    await waitFor(() => {
+        expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+    });
 
-    expect(screen.getByTestId('title-box')).toBeInTheDocument();
     expect(screen.getByText('Gestione Acquisti')).toBeInTheDocument();
     expect(screen.getByText('Gestisci i tuoi acquisti e transazioni')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /accetta buono sconto/i })).toBeInTheDocument();
   });
 
-  it('should render the "Accetta buono sconto" button', () => {
-    renderWithProviders(<PurchaseManagement />);
-
-    const button = screen.getByRole('button', { name: /accetta buono sconto/i });
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveTextContent('Accetta buono sconto');
-  });
-
-  it('should navigate to accept discount route when button is clicked', async () => {
+  it('should navigate to the correct page when clicking the "Accept Discount" button', async () => {
+    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [] });
     const user = userEvent.setup();
-    renderWithProviders(<PurchaseManagement />);
 
-    const button = screen.getByRole('button', { name: /accetta buono sconto/i });
-    await user.click(button);
-
-    expect(mockNavigate).toHaveBeenCalledWith('/accept-discount');
-  });
-
-  it('should render the "Transazioni" subtitle', () => {
-    renderWithProviders(<PurchaseManagement />);
-
-    expect(screen.getByText('Transazioni')).toBeInTheDocument();
-  });
-
-  it('should render DataTable component', async () => {
-    renderWithProviders(<PurchaseManagement />);
+    renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
     });
-  });
-
-  it('should generate and display fake data in the table', async () => {
-    renderWithProviders(<PurchaseManagement />);
-
-    await waitFor(() => {
-      // Verify that 15 rows have been generated
-      expect(screen.getByTestId('table-rows-count')).toHaveTextContent('15');
-      
-      // Verify that there are 6 columns
-      expect(screen.getByTestId('table-columns-count')).toHaveTextContent('6');
-      
-      // Verify pagination
-      expect(screen.getByTestId('pagination-page-size')).toHaveTextContent('10');
-      expect(screen.getByTestId('pagination-total')).toHaveTextContent('15');
-    });
-  });
-
-
-  it('should have correct column configuration', async () => {
-    renderWithProviders(<PurchaseManagement />);
-
-    await waitFor(() => {
-      // Verify that the number of columns is correct
-      expect(screen.getByTestId('table-columns-count')).toHaveTextContent('6');
-    });
-  });
-
-  it('should handle loading state correctly', async () => {
-    renderWithProviders(<PurchaseManagement />);
-
-    // Initially should be in loading state
-    // The component sets loading=true at the start and then sets it to false
-    await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
-    });
-  });
-
-  describe('fake data generation', () => {
-    it('should generate data with correct structure', async () => {
-      renderWithProviders(<PurchaseManagement />);
-
-      await waitFor(() => {
-        // Verify that the generated data contains realistic values
-        const elettrodomestico0 = screen.queryByTestId('elettrodomestico-0');
-        const beneficiario0 = screen.queryByTestId('beneficiario-0');
-
-        if (elettrodomestico0) {
-          expect(elettrodomestico0.textContent).toMatch(/Lavatrice|Frigorifero|Asciugatrice|Forno|Aspirapolvere/);
-        }
-
-        if (beneficiario0) {
-          expect(beneficiario0.textContent).toMatch(/^[A-Z0-9]{15}$/);
-        }
-      });
-    });
-  });
-
-  it('should render QrCode icon in button', () => {
-    renderWithProviders(<PurchaseManagement />);
-
-    const button = screen.getByRole('button', { name: /accetta buono sconto/i });
-    // Verify that the button contains the icon (MUI renders startIcon)
-    expect(button).toBeInTheDocument();
-  });
-
-  it('should have correct button styling and behavior', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<PurchaseManagement />);
-
-    const button = screen.getByRole('button', { name: /accetta buono sconto/i });
     
-    // Verify that the button is clickable
-    expect(button).not.toBeDisabled();
+    const acceptButton = screen.getByRole('button', { name: /accetta buono sconto/i });
+    await user.click(acceptButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/accetta-sconto');
+  });
+
+  it('should fetch and display transactions correctly', async () => {
+    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
+
+    renderComponent();
+
+    await screen.findByTestId('data-table');
+
+    expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
+
+    expect(screen.getByTestId('rows-count')).toHaveTextContent('1');
+    expect(screen.getByTestId('columns-count')).toHaveTextContent('6');
+    const firstRow = screen.getByTestId('first-row');
+    expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('Lavatrice SuperClean');
+    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); // Nota: l'ora è +2 per via del fuso orario italiano
+    expect(firstRow.querySelector('[data-testid="cell-fiscal-code"]')).toHaveTextContent('AAAAAA11B22C333D');
+    expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('50,00€');
+    expect(firstRow.querySelector('[data-testid="cell-status"]')).toHaveTextContent('AUTORIZZATO');
+  });
+  
+  it('should not render the table if there are no transactions', async () => {
+    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [], totalElements: 0 });
+
+    renderComponent();
     
-    // Test the click
-    await user.click(button);
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
+    expect(screen.getByText('Buoni sconto')).toBeInTheDocument();
+  });
+
+  it('should handle errors during transaction fetch', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockGetInProgressTransactions.mockRejectedValue(new Error('API Error'));
+
+    renderComponent();
+    
+    await waitFor(() => {
+      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+    });
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching transactions:', expect.any(Error));
+    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
+
+    consoleErrorSpy.mockRestore();
   });
 });

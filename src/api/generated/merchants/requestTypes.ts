@@ -7,9 +7,11 @@ import * as t from "io-ts";
 
 import * as r from "@pagopa/ts-commons/lib/requests";
 
-import { PointOfSaleTransactionsProcessedListDTO } from "./PointOfSaleTransactionsProcessedListDTO";
+import { PointOfSaleTransactionsListDTO } from "./PointOfSaleTransactionsListDTO";
 
 import { ErrorDTO } from "./ErrorDTO";
+
+import { PointOfSaleTransactionsProcessedListDTO } from "./PointOfSaleTransactionsProcessedListDTO";
 
 import { ProductListDTO } from "./ProductListDTO";
 
@@ -22,6 +24,370 @@ import { TransactionErrorDTO } from "./TransactionErrorDTO";
 import { PreviewPaymentRequestDTO } from "./PreviewPaymentRequestDTO";
 
 import { PreviewPaymentDTO } from "./PreviewPaymentDTO";
+
+/****************************************************************
+ * getPointOfSaleTransactions
+ */
+
+// Request type definition
+export type GetPointOfSaleTransactionsT = r.IGetApiRequestType<
+  {
+    readonly Bearer: string;
+    readonly page?: number;
+    readonly size?: number;
+    readonly sort?: string;
+    readonly fiscalCode?: string;
+    readonly status?: string;
+    readonly initiativeId: string;
+    readonly pointOfSaleId: string;
+  },
+  "Authorization",
+  never,
+  | r.IResponseType<
+      200,
+      PointOfSaleTransactionsListDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      ErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      ErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      ErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      ErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, ErrorDTO, "Access-Control-Allow-Origin">
+>;
+
+export const getPointOfSaleTransactionsDefaultResponses = {
+  200: PointOfSaleTransactionsListDTO,
+  400: ErrorDTO,
+  401: ErrorDTO,
+  404: ErrorDTO,
+  429: ErrorDTO,
+  500: ErrorDTO
+};
+
+export type GetPointOfSaleTransactionsResponsesT<
+  A0 = PointOfSaleTransactionsListDTO,
+  C0 = PointOfSaleTransactionsListDTO,
+  A1 = ErrorDTO,
+  C1 = ErrorDTO,
+  A2 = ErrorDTO,
+  C2 = ErrorDTO,
+  A3 = ErrorDTO,
+  C3 = ErrorDTO,
+  A4 = ErrorDTO,
+  C4 = ErrorDTO,
+  A5 = ErrorDTO,
+  C5 = ErrorDTO
+> = {
+  200: t.Type<A0, C0>;
+  400: t.Type<A1, C1>;
+  401: t.Type<A2, C2>;
+  404: t.Type<A3, C3>;
+  429: t.Type<A4, C4>;
+  500: t.Type<A5, C5>;
+};
+
+export function getPointOfSaleTransactionsDecoder<
+  A0 = PointOfSaleTransactionsListDTO,
+  C0 = PointOfSaleTransactionsListDTO,
+  A1 = ErrorDTO,
+  C1 = ErrorDTO,
+  A2 = ErrorDTO,
+  C2 = ErrorDTO,
+  A3 = ErrorDTO,
+  C3 = ErrorDTO,
+  A4 = ErrorDTO,
+  C4 = ErrorDTO,
+  A5 = ErrorDTO,
+  C5 = ErrorDTO
+>(
+  overrideTypes:
+    | Partial<
+        GetPointOfSaleTransactionsResponsesT<
+          A0,
+          C0,
+          A1,
+          C1,
+          A2,
+          C2,
+          A3,
+          C3,
+          A4,
+          C4,
+          A5,
+          C5
+        >
+      >
+    | t.Type<A0, C0>
+    | undefined = {}
+): r.ResponseDecoder<
+  | r.IResponseType<
+      200,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, A5, "Access-Control-Allow-Origin">
+> {
+  const isDecoder = (d: any): d is t.Type<A0, C0> =>
+    typeof d["_A"] !== "undefined";
+
+  const type = {
+    ...((getPointOfSaleTransactionsDefaultResponses as unknown) as GetPointOfSaleTransactionsResponsesT<
+      A0,
+      C0,
+      A1,
+      C1,
+      A2,
+      C2,
+      A3,
+      C3,
+      A4,
+      C4,
+      A5,
+      C5
+    >),
+    ...(isDecoder(overrideTypes) ? { 200: overrideTypes } : overrideTypes)
+  };
+
+  const d200 = (type[200].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        200,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(200, undefined)
+    : r.ioResponseDecoder<
+        200,
+        typeof type[200]["_A"],
+        typeof type[200]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(200, type[200])) as r.ResponseDecoder<
+    r.IResponseType<
+      200,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d400 = (type[400].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        400,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, undefined)
+    : r.ioResponseDecoder<
+        400,
+        typeof type[400]["_A"],
+        typeof type[400]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, type[400])) as r.ResponseDecoder<
+    r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d401 = (type[401].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        401,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, undefined)
+    : r.ioResponseDecoder<
+        401,
+        typeof type[401]["_A"],
+        typeof type[401]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, type[401])) as r.ResponseDecoder<
+    r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d404 = (type[404].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        404,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, undefined)
+    : r.ioResponseDecoder<
+        404,
+        typeof type[404]["_A"],
+        typeof type[404]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, type[404])) as r.ResponseDecoder<
+    r.IResponseType<
+      404,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d429 = (type[429].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        429,
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, undefined)
+    : r.ioResponseDecoder<
+        429,
+        typeof type[429]["_A"],
+        typeof type[429]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, type[429])) as r.ResponseDecoder<
+    r.IResponseType<
+      429,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d500 = (type[500].name === "undefined"
+    ? r.constantResponseDecoder<undefined, 500, "Access-Control-Allow-Origin">(
+        500,
+        undefined
+      )
+    : r.ioResponseDecoder<
+        500,
+        typeof type[500]["_A"],
+        typeof type[500]["_O"],
+        "Access-Control-Allow-Origin"
+      >(500, type[500])) as r.ResponseDecoder<
+    r.IResponseType<500, A5, "Access-Control-Allow-Origin">
+  >;
+
+  return r.composeResponseDecoders(
+    r.composeResponseDecoders(
+      r.composeResponseDecoders(
+        r.composeResponseDecoders(r.composeResponseDecoders(d200, d400), d401),
+        d404
+      ),
+      d429
+    ),
+    d500
+  );
+}
+
+// Decodes the success response with the type defined in the specs
+export const getPointOfSaleTransactionsDefaultDecoder = () =>
+  getPointOfSaleTransactionsDecoder();
 
 /****************************************************************
  * getPointOfSaleTransactionsProcessed
@@ -714,7 +1080,7 @@ export type AuthPaymentBarCodeT = r.IPutApiRequestType<
     >
   | r.IResponseType<
       401,
-      undefined,
+      TransactionErrorDTO,
       | "Access-Control-Allow-Origin"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
@@ -751,7 +1117,7 @@ export type AuthPaymentBarCodeT = r.IPutApiRequestType<
 export const authPaymentBarCodeDefaultResponses = {
   200: AuthPaymentResponseDTO,
   400: TransactionErrorDTO,
-  401: t.undefined,
+  401: TransactionErrorDTO,
   403: TransactionErrorDTO,
   404: TransactionErrorDTO,
   429: TransactionErrorDTO,
@@ -763,8 +1129,8 @@ export type AuthPaymentBarCodeResponsesT<
   C0 = AuthPaymentResponseDTO,
   A1 = TransactionErrorDTO,
   C1 = TransactionErrorDTO,
-  A2 = undefined,
-  C2 = undefined,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
   A3 = TransactionErrorDTO,
   C3 = TransactionErrorDTO,
   A4 = TransactionErrorDTO,
@@ -788,8 +1154,8 @@ export function authPaymentBarCodeDecoder<
   C0 = AuthPaymentResponseDTO,
   A1 = TransactionErrorDTO,
   C1 = TransactionErrorDTO,
-  A2 = undefined,
-  C2 = undefined,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
   A3 = TransactionErrorDTO,
   C3 = TransactionErrorDTO,
   A4 = TransactionErrorDTO,

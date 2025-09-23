@@ -6,6 +6,7 @@
 
 import * as t from "io-ts";
 import { enumType } from "@pagopa/ts-commons/lib/types";
+import { PatternString } from "@pagopa/ts-commons/lib/strings";
 
 export enum CodeEnum {
   "PAYMENT_NOT_FOUND_EXPIRED" = "PAYMENT_NOT_FOUND_EXPIRED",
@@ -58,14 +59,16 @@ export enum CodeEnum {
 
   "PAYMENT_STATUS_NOT_VALID" = "PAYMENT_STATUS_NOT_VALID",
 
-  "PAYMENT_TRANSACTION_VERSION_PENDING" = "PAYMENT_TRANSACTION_VERSION_PENDING"
+  "PAYMENT_TRANSACTION_VERSION_PENDING" = "PAYMENT_TRANSACTION_VERSION_PENDING",
+
+  "PRODUCT_NOT_FOUND" = "PRODUCT_NOT_FOUND"
 }
 
 // required attributes
 const TransactionErrorDTOR = t.interface({
   code: enumType<CodeEnum>(CodeEnum, "code"),
 
-  message: t.string
+  message: PatternString(".*")
 });
 
 // optional attributes

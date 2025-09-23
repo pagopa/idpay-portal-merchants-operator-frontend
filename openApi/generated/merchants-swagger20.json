@@ -15,7 +15,7 @@
     "https"
   ],
   "paths": {
-    "/initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions/processed": {
+    "/initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions": {
       "get": {
         "produces": [
           "application/json"
@@ -52,8 +52,249 @@
           {
             "in": "query",
             "maxLength": 16,
+            "minLength": 16,
             "name": "fiscalCode",
+            "pattern": "^[A-Z0-9]+$",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Transaction in progress status",
+            "enum": [
+              "CREATED",
+              "IDENTIFIED",
+              "AUTHORIZATION_REQUESTED",
+              "AUTHORIZED",
+              "REJECTED"
+            ],
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "The initiative ID",
+            "in": "path",
+            "maxLength": 36,
+            "name": "initiativeId",
             "pattern": ".*",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The point of sale ID",
+            "in": "path",
+            "maxLength": 36,
+            "name": "pointOfSaleId",
+            "pattern": ".*",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleTransactionsListDTO"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "429": {
+            "description": "Too many Request",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "500": {
+            "description": "Generic error",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "tags": [
+          "transaction"
+        ],
+        "description": "ENG: Returns the list of in progress transactions associated to a point of sale - IT: Ritorna la lista delle transazioni in corso associate ad un punto vendita",
+        "operationId": "getPointOfSaleTransactions",
+        "summary": "ENG: Returns the list of in progress transactions associated to a point of sale - IT: Ritorna la lista delle transazioni in corso associate ad un punto vendita"
+      }
+    },
+    "/initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions/processed": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "format": "int32",
+            "in": "query",
+            "maximum": 10000,
+            "minimum": 0,
+            "name": "page",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "format": "int32",
+            "in": "query",
+            "maximum": 1000,
+            "minimum": 1,
+            "name": "size",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "enum": [
+              "elaborationDateTime, desc",
+              "status, desc",
+              "elaborationDateTime, asc",
+              "status, asc"
+            ],
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 16,
+            "minLength": 16,
+            "name": "fiscalCode",
+            "pattern": "^[A-Z0-9]+$",
             "required": false,
             "type": "string"
           },
@@ -61,7 +302,8 @@
             "description": "Transaction processed status",
             "enum": [
               "REWARDED",
-              "CANCELLED"
+              "CANCELLED",
+              "REFUNDED"
             ],
             "in": "query",
             "name": "status",
@@ -511,6 +753,7 @@
             "in": "path",
             "maxLength": 255,
             "name": "trxCode",
+            "pattern": "^[a-zA-Z0-9]+$",
             "required": true,
             "type": "string"
           },
@@ -606,6 +849,9 @@
                 "format": "int64",
                 "type": "integer"
               }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
             }
           },
           "403": {
@@ -643,12 +889,6 @@
           },
           "404": {
             "description": "The requested resource was not found",
-            "examples": {
-              "application/json": {
-                "code": "PAYMENT_NOT_FOUND_EXPIRED",
-                "message": "Cannot find transaction with trxCode [trxCode]"
-              }
-            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "CORS header to allow cross-origin requests",
@@ -899,9 +1139,12 @@
   },
   "definitions" : {"STRINGWrapper":{"type": "string"},"STRINGArray":{"type": "array", "items": {"type": "string"}},
     "AuthBarCodePaymentDTO": {
+      "additionalProperties": false,
       "properties": {
         "additionalProperties": {
           "additionalProperties": {
+            "maxLength": 255,
+            "pattern": ".*",
             "type": "string"
           },
           "type": "object"
@@ -915,6 +1158,7 @@
         },
         "idTrxAcquirer": {
           "description": "ENG: Transaction acquirer ID- IT: Identificativo della transazione rispetto all'acquirer",
+          "format": "uuid",
           "maxLength": 100,
           "type": "string"
         }
@@ -937,21 +1181,25 @@
         "businessName": {
           "description": "ENG: Business name - IT: Nome dell'esercente",
           "maxLength": 1000,
+          "pattern": ".*",
           "type": "string"
         },
         "id": {
           "description": "ENG: Id of the payment - IT: Identificativo del pagamento",
+          "format": "uuid",
           "maxLength": 100,
           "type": "string"
         },
         "initiativeId": {
           "description": "ENG: Id of the initiative - IT: Identificativo dell'iniziativa",
           "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_-]+$",
           "type": "string"
         },
         "initiativeName": {
           "description": "ENG: Name of the initiative - IT: Nome della iniziativa",
           "maxLength": 1000,
+          "pattern": ".*",
           "type": "string"
         },
         "residualAmountCents": {
@@ -992,6 +1240,7 @@
         "trxCode": {
           "description": "ENG: Transaction code - IT: Codice della transazione",
           "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9]+$",
           "type": "string"
         },
         "trxDate": {
@@ -1029,10 +1278,24 @@
       ],
       "type": "object"
     },
-    "PointOfSaleTransactionProcessedDTO": {
+    "PointOfSaleTransactionDTO": {
+      "additionalProperties": false,
       "properties": {
+        "additionalProperties": {
+          "additionalProperties": {
+            "maxLength": 255,
+            "pattern": ".*",
+            "type": "string"
+          },
+          "type": "object"
+        },
         "channel": {
           "description": "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione",
+          "enum": [
+            "BARCODE",
+            "QRCODE",
+            "IDPAYCODE"
+          ],
           "maxLength": 24,
           "type": "string"
         },
@@ -1046,7 +1309,107 @@
         "fiscalCode": {
           "description": "ENG: Citizen fiscal code - IT: Codice fiscale del cittadino",
           "maxLength": 16,
+          "minLength": 16,
+          "pattern": "^[A-Z0-9]+$",
+          "type": "string"
+        },
+        "id": {
+          "description": "ENG: Transaction ID <br> IT: ID della transazione",
+          "maxLength": 64,
           "pattern": ".*",
+          "type": "string"
+        },
+        "qrcodePngUrl": {
+          "description": "ENG: Url to the QR code image - IT: Url all'immagine del QR code",
+          "format": "uri",
+          "maxLength": 2048,
+          "type": "string"
+        },
+        "qrcodeTxtUrl": {
+          "description": "ENG: Url of the QR code link - IT: Url del QR code",
+          "format": "uri",
+          "maxLength": 2048,
+          "type": "string"
+        },
+        "residualAmountCents": {
+          "description": "ENG: Remaining amount to be paid if the authorized sum is less than the requested sum - IT: Importo restante da pagare nel caso in cui la somma autorizzata sia inferiore alla somma richiesta.",
+          "format": "int64",
+          "maximum": 1000000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "rewardAmountCents": {
+          "description": "ENG: Reward amount in cents - IT: Premio generato in centesimi",
+          "format": "int64",
+          "maximum": 1000000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "splitPayment": {
+          "description": "ENG: TRUE, if the authorized sum is less than the requested sum or FALSE, if the authorized sum is equal to the requested sum - IT: TRUE, se la somma autorizzata è inferiore alla somma richiesta o FALSE, se la somma autorizzata è uguale alla somma richiesta.",
+          "type": "boolean"
+        },
+        "status": {
+          "description": "ENG: The status of the transaction - IT: Lo stato della transazione",
+          "enum": [
+            "CREATED",
+            "IDENTIFIED",
+            "AUTHORIZATION_REQUESTED",
+            "AUTHORIZED",
+            "REJECTED"
+          ],
+          "type": "string"
+        },
+        "trxCode": {
+          "description": "ENG: Transaction code - IT: Il codice della transazione",
+          "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9]+$",
+          "type": "string"
+        },
+        "trxDate": {
+          "description": "ENG: The date of the transaction - IT: La data della transazione",
+          "format": "date-time",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "trxExpirationSeconds": {
+          "description": "ENG: Expiration time of the transaction, in seconds - IT: Scadenza della transazione, in secondi",
+          "minimum": 0,
+          "type": "number"
+        },
+        "updateDate": {
+          "description": "ENG: The date of the transaction update - IT: La data di aggiornamento della transazione",
+          "format": "date-time",
+          "maxLength": 255,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PointOfSaleTransactionProcessedDTO": {
+      "properties": {
+        "channel": {
+          "description": "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione",
+          "enum": [
+            "BARCODE",
+            "QRCODE",
+            "IDPAYCODE"
+          ],
+          "maxLength": 24,
+          "type": "string"
+        },
+        "effectiveAmountCents": {
+          "description": "ENG: Transaction amount in cents - IT: Importo della transazione in centesimi",
+          "format": "int64",
+          "maximum": 1000000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "fiscalCode": {
+          "description": "ENG: Citizen fiscal code - IT: Codice fiscale del cittadino",
+          "maxLength": 16,
+          "minLength": 16,
+          "pattern": "^[A-Z0-9]+$",
           "type": "string"
         },
         "id": {
@@ -1066,7 +1429,8 @@
           "description": "ENG: The status of the transaction - IT: Lo stato della transazione",
           "enum": [
             "REWARDED",
-            "CANCELLED"
+            "CANCELLED",
+            "REFUNDED"
           ],
           "type": "string"
         },
@@ -1081,6 +1445,46 @@
           "format": "date-time",
           "maxLength": 255,
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PointOfSaleTransactionsListDTO": {
+      "properties": {
+        "content": {
+          "items": {
+            "$ref": "#/definitions/PointOfSaleTransactionDTO"
+          },
+          "maxItems": 1000,
+          "type": "array"
+        },
+        "pageNo": {
+          "description": "ENG: The number of the page <br> IT: Il numero della pagina",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pageSize": {
+          "description": "ENG: The element size for page <br> IT: Il numero di elementi per pagina",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "totalElements": {
+          "description": "ENG: The total number of the elements <br> IT: Il numero totale degli elementi",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "totalPages": {
+          "description": "ENG: The total number of the pages <br> IT: Il numero totale delle pagine",
+          "format": "int32",
+          "maximum": 1000000,
+          "minimum": 0,
+          "type": "integer"
         }
       },
       "type": "object"
@@ -1384,7 +1788,7 @@
     "TransactionErrorDTO": {
       "properties": {
         "code": {
-          "description": "\"ENG: Error code:<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transaction not found or expired<br> PAYMENT_TRANSACTION_EXPIRED: transaction expired<br> PAYMENT_INITIATIVE_NOT_FOUND: initiative not found<br> PAYMENT_INITIATIVE_INVALID_DATE: initiative invalid date<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: initiative is not of discount type<br> PAYMENT_ALREADY_AUTHORIZED: transaction already authorized<br> PAYMENT_ALREADY_CANCELLED: transaction already cancelled<br> PAYMENT_BUDGET_EXHAUSTED: budget exhausted<br> PAYMENT_GENERIC_REJECTED: generic rejected error (transaction rejected)<br> PAYMENT_TOO_MANY_REQUESTS: too many request, retry<br> PAYMENT_GENERIC_ERROR: application error (connection microservice error)<br> PAYMENT_USER_SUSPENDED: the user has been suspended on the initiative<br> PAYMENT_USER_NOT_ONBOARDED: user not onboarded<br> PAYMENT_USER_UNSUBSCRIBED: user unsubscribed<br> PAYMENT_ALREADY_ASSIGNED:  transaction already assigned<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: operation on transaction not allowed due to status<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: operation on transaction not allowed due to merchant mismatched<br> PAYMENT_USER_NOT_ASSOCIATED: user not associated to the transaction<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: cancellation of transaction not allowed due to status<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: unrelate transaction not allowed due to status<br> PAYMENT_AMOUNT_NOT_VALID: amount of transaction not valid<br> PAYMENT_MERCHANT_NOT_ONBOARDED: the merchant is not onboarded<br> PAYMENT_INVALID_REQUEST: request validation error<br> PAYMENT_STATUS_NOT_VALID: transaction status not valid<br> PAYMENT_TRANSACTION_VERSION_PENDING: The transaction version is actually locked<br> IT: Codice di errore<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transazione non trovata oppure scaduta<br> PAYMENT_TRANSACTION_EXPIRED: transazione scaduta<br> PAYMENT_INITIATIVE_NOT_FOUND: iniziativa non trovata<br> PAYMENT_INITIATIVE_INVALID_DATE: iniziativa con data invalida<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: iniziativa non è di tipo a sconto<br> PAYMENT_ALREADY_AUTHORIZED: transazione già autorizzata<br> PAYMENT_ALREADY_CANCELLED: transazione già cancellata<br> PAYMENT_BUDGET_EXHAUSTED: budget esaurito<br> PAYMENT_GENERIC_REJECTED: errore generico, transazione rigettata<br> PAYMENT_TOO_MANY_REQUESTS: troppe richieste, riprovare<br> PAYMENT_GENERIC_ERROR: errore generico (errore nella connessione ad un microservizio)<br> PAYMENT_USER_SUSPENDED: l'utente è stato sospeso dall'iniziativa<br> PAYMENT_USER_NOT_ONBOARDED: utente non onboardato all'iniziativa<br> PAYMENT_USER_UNSUBSCRIBED: utente disiscritto dall'iniziativa<br> PAYMENT_ALREADY_ASSIGNED:  transazione già assegnata<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: transazione non consentita a causa dello stato della transazione<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: transazione non consentita a causa della mancata corrispondenza del merchant<br> PAYMENT_USER_NOT_ASSOCIATED: utente non associato alla transazione<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: annullamento della transazione non consentito a causa dello stato della transazione<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: disassociazione non consentita a causa dello stato della transazione<br> PAYMENT_AMOUNT_NOT_VALID: importo nella transazione non valido<br> PAYMENT_MERCHANT_NOT_ONBOARDED: il merchant non è onboardato<br> PAYMENT_INVALID_REQUEST: errore di validazione della richiesta<br> PAYMENT_STATUS_NOT_VALID: stato della transazione non valido\"<br> PAYMENT_TRANSACTION_VERSION_PENDING: La versione del contatore è attualmente bloccata",
+          "description": "\"ENG: Error code:<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transaction not found or expired<br> PAYMENT_TRANSACTION_EXPIRED: transaction expired<br> PAYMENT_INITIATIVE_NOT_FOUND: initiative not found<br> PAYMENT_INITIATIVE_INVALID_DATE: initiative invalid date<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: initiative is not of discount type<br> PAYMENT_ALREADY_AUTHORIZED: transaction already authorized<br> PAYMENT_ALREADY_CANCELLED: transaction already cancelled<br> PAYMENT_BUDGET_EXHAUSTED: budget exhausted<br> PAYMENT_GENERIC_REJECTED: generic rejected error (transaction rejected)<br> PAYMENT_TOO_MANY_REQUESTS: too many request, retry<br> PAYMENT_GENERIC_ERROR: application error (connection microservice error)<br> PAYMENT_USER_SUSPENDED: the user has been suspended on the initiative<br> PAYMENT_USER_NOT_ONBOARDED: user not onboarded<br> PAYMENT_USER_UNSUBSCRIBED: user unsubscribed<br> PAYMENT_ALREADY_ASSIGNED:  transaction already assigned<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: operation on transaction not allowed due to status<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: operation on transaction not allowed due to merchant mismatched<br> PAYMENT_USER_NOT_ASSOCIATED: user not associated to the transaction<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: cancellation of transaction not allowed due to status<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: unrelate transaction not allowed due to status<br> PAYMENT_AMOUNT_NOT_VALID: amount of transaction not valid<br> PAYMENT_MERCHANT_NOT_ONBOARDED: the merchant is not onboarded<br> PAYMENT_INVALID_REQUEST: request validation error<br> PAYMENT_STATUS_NOT_VALID: transaction status not valid<br> PAYMENT_TRANSACTION_VERSION_PENDING: The transaction version is actually locked<br> IT: Codice di errore<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transazione non trovata oppure scaduta<br> PAYMENT_TRANSACTION_EXPIRED: transazione scaduta<br> PAYMENT_INITIATIVE_NOT_FOUND: iniziativa non trovata<br> PAYMENT_INITIATIVE_INVALID_DATE: iniziativa con data invalida<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: iniziativa non è di tipo a sconto<br> PAYMENT_ALREADY_AUTHORIZED: transazione già autorizzata<br> PAYMENT_ALREADY_CANCELLED: transazione già cancellata<br> PAYMENT_BUDGET_EXHAUSTED: budget esaurito<br> PAYMENT_GENERIC_REJECTED: errore generico, transazione rigettata<br> PAYMENT_TOO_MANY_REQUESTS: troppe richieste, riprovare<br> PAYMENT_GENERIC_ERROR: errore generico (errore nella connessione ad un microservizio)<br> PAYMENT_USER_SUSPENDED: l'utente è stato sospeso dall'iniziativa<br> PAYMENT_USER_NOT_ONBOARDED: utente non onboardato all'iniziativa<br> PAYMENT_USER_UNSUBSCRIBED: utente disiscritto dall'iniziativa<br> PAYMENT_ALREADY_ASSIGNED:  transazione già assegnata<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: transazione non consentita a causa dello stato della transazione<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: transazione non consentita a causa della mancata corrispondenza del merchant<br> PAYMENT_USER_NOT_ASSOCIATED: utente non associato alla transazione<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: annullamento della transazione non consentito a causa dello stato della transazione<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: disassociazione non consentita a causa dello stato della transazione<br> PAYMENT_AMOUNT_NOT_VALID: importo nella transazione non valido<br> PAYMENT_MERCHANT_NOT_ONBOARDED: il merchant non è onboardato<br> PAYMENT_INVALID_REQUEST: errore di validazione della richiesta<br> PAYMENT_STATUS_NOT_VALID: stato della transazione non valido\"<br> PAYMENT_TRANSACTION_VERSION_PENDING: La versione del contatore è attualmente bloccata<br> PRODUCT_NOT_FOUND: Prodotto non trovato o non approvato ",
           "enum": [
             "PAYMENT_NOT_FOUND_EXPIRED",
             "PAYMENT_NOT_FOUND_OR_EXPIRED",
@@ -1411,13 +1815,15 @@
             "PAYMENT_MERCHANT_NOT_ONBOARDED",
             "PAYMENT_INVALID_REQUEST",
             "PAYMENT_STATUS_NOT_VALID",
-            "PAYMENT_TRANSACTION_VERSION_PENDING"
+            "PAYMENT_TRANSACTION_VERSION_PENDING",
+            "PRODUCT_NOT_FOUND"
           ],
           "type": "string"
         },
         "message": {
           "description": "ENG: Error message- IT: Messaggio di errore",
           "maxLength": 1000,
+          "pattern": ".*",
           "type": "string"
         }
       },
@@ -1479,8 +1885,9 @@
       "fiscalCode_query": {
         "in": "query",
         "maxLength": 16,
+        "minLength": 16,
         "name": "fiscalCode",
-        "pattern": ".*",
+        "pattern": "^[A-Z0-9]+$",
         "required": false,
         "type": "string"
       },
@@ -1573,10 +1980,22 @@
         "required": false,
         "type": "string"
       },
-      "sort_trx_processed_query": {
+      "sort_trx_in_progress_query": {
         "enum": [
           "elaborationDateTime, desc",
           "elaborationDateTime, asc"
+        ],
+        "in": "query",
+        "name": "sort",
+        "required": false,
+        "type": "string"
+      },
+      "sort_trx_processed_query": {
+        "enum": [
+          "elaborationDateTime, desc",
+          "status, desc",
+          "elaborationDateTime, asc",
+          "status, asc"
         ],
         "in": "query",
         "name": "sort",
@@ -1594,11 +2013,26 @@
         "required": false,
         "type": "string"
       },
+      "status_trx_in_progress_query": {
+        "description": "Transaction in progress status",
+        "enum": [
+          "CREATED",
+          "IDENTIFIED",
+          "AUTHORIZATION_REQUESTED",
+          "AUTHORIZED",
+          "REJECTED"
+        ],
+        "in": "query",
+        "name": "status",
+        "required": false,
+        "type": "string"
+      },
       "status_trx_processed_query": {
         "description": "Transaction processed status",
         "enum": [
           "REWARDED",
-          "CANCELLED"
+          "CANCELLED",
+          "REFUNDED"
         ],
         "in": "query",
         "name": "status",
@@ -1715,6 +2149,144 @@
           }
         },
         "description": "Server ERROR",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          }
+        }
+      },
+      "GET_transactions_in_progress_200_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleTransactionsListDTO"
+            }
+          }
+        },
+        "description": "Ok",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_transactions_in_progress_400_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Bad request",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_transactions_in_progress_401_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Authentication failed",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_transactions_in_progress_404_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "The requested resource was not found",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_transactions_in_progress_429_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Too many Request",
+        "headers": {
+          "Access-Control-Allow-Origin": {
+            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
+          },
+          "Retry-After": {
+            "$ref": "#/x-components/headers/Retry-After"
+          },
+          "X-RateLimit-Limit": {
+            "$ref": "#/x-components/headers/X-RateLimit-Limit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/x-components/headers/X-RateLimit-Reset"
+          }
+        }
+      },
+      "GET_transactions_in_progress_500_Response": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          }
+        },
+        "description": "Generic error",
         "headers": {
           "Access-Control-Allow-Origin": {
             "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
