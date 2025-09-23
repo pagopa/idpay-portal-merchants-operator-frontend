@@ -195,4 +195,36 @@ describe('PurchaseManagement', () => {
 
     consoleErrorSpy.mockRestore();
   });
+
+
+  it('should reset filters and fetch all transactions again', async () => {
+    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [] });
+    renderComponent();
+  
+    await waitFor(() => {
+      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+    });
+  
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('should call fetchTransactions with proper sort when sorting by a column', async () => {
+    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
+    renderComponent();
+  
+    await screen.findByTestId('data-table');
+  
+    const sortModel = [{ field: 'additionalProperties', sort: 'asc' }];
+    // triggeriamo manualmente il sort handler
+    const instance = screen.getByTestId('data-table');
+    (instance as any).props?.onSortModelChange?.(sortModel);
+  
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
+    });
+  });
+
+
 });

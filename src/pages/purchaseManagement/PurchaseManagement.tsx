@@ -308,6 +308,7 @@ const PurchaseManagement = () => {
                                 fullWidth
                                 value={formik.values.fiscalCode}
                                 onChange={formik.handleChange}
+                                data-testid="fiscal-code-filter"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
