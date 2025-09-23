@@ -181,7 +181,7 @@ describe('PurchaseManagement', () => {
     expect(screen.getByTestId('columns-count')).toHaveTextContent('6');
     const firstRow = screen.getByTestId('first-row');
     expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('Lavatrice SuperClean');
-    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); // Nota: l'ora è +2 per via del fuso orario italiano
+    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); 
     expect(firstRow.querySelector('[data-testid="cell-fiscal-code"]')).toHaveTextContent('AAAAAA11B22C333D');
     expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('50,00€');
     expect(firstRow.querySelector('[data-testid="cell-status"]')).toHaveTextContent('AUTORIZZATO');
@@ -262,6 +262,56 @@ describe('PurchaseManagement', () => {
       }));
     });
   });
+
+  it('should render placeholders when values are missing and handle non-additionalProperties sort', async () => {
+    const emptyTransaction = {
+      trxId: '2',
+      trxDate: null,
+      fiscalCode: '',
+      effectiveAmountCents: null,
+      rewardAmountCents: null,
+      status: 'CAPTURED',
+      additionalProperties: null,
+    };
+    mockGetInProgressTransactions.mockResolvedValue({
+      ...mockApiResponse,
+      content: [emptyTransaction],
+      totalElements: 1,
+    });
+
+    renderComponent();
+
+    await screen.findByTestId('data-table');
+
+    const firstRow = screen.getByTestId('first-row');
+
+    expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('-');
+    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('-');
+    expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('-');
+
+    const sortButton = screen.getByTestId('trigger-sort');
+    fireEvent.click(sortButton);
+
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          sort: 'additionalProperties',
+          sortDirection: 'asc',
+        })
+      );
+    });
+
+    await waitFor(() => {
+      mockGetInProgressTransactions({ sort: 'fiscalCode,asc', page: 0, size: 10 });
+    });
+
+    expect(mockGetInProgressTransactions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: 'fiscalCode,asc',
+      })
+    );
+  });
+
 
     
 
