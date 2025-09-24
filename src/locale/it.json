@@ -183,6 +183,10 @@
       "modalTitle": "Vuoi uscire?",
       "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
     },
+    "profile": {
+      "title": "Profilo",
+      "subtitle": "Consulta i dati identificativi dell’azienda."
+    },
     "purchaseManagement": {
       "title": "Gestione acquisti",
       "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
