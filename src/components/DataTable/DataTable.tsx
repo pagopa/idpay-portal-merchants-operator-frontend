@@ -1,7 +1,7 @@
 import { DataGrid, GridSortModel, GridPaginationModel, GridRenderCellParams, GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { IconButton, Box } from '@mui/material';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {MISSING_DATA_PLACEHOLDER} from '../../utils/constants';
 import { PaginationExtendedModel } from '../../utils/types';
 
@@ -67,12 +67,11 @@ const DataTable = ({
             disableColumnMenu: true,
             flex: 1,
             renderCell: (params: GridRenderCellParams) => (
-              <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%', height: '100%' }}>
                 <IconButton
                   onClick={() => handleRowAction && handleRowAction(params.row)}
-                  size="small"
                 >
-                  <ArrowForwardIosIcon color='primary' fontSize='small' />
+                  <ChevronRightIcon color='primary' fontSize='inherit' />
                 </IconButton>
               </Box>
             )
@@ -171,6 +170,9 @@ const DataTable = ({
                 '&:hover': {
                   backgroundColor: '#FFFFFF',
                 },
+              },
+              '& .MuiDataGrid-row:not(:last-of-type)': {
+                borderBottom: "1px solid #E3E7EB",
               },
               '& .MuiDataGrid-columnSeparator': {
                 display: 'none'

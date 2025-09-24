@@ -42,7 +42,11 @@
           {
             "enum": [
               "elaborationDateTime, desc",
-              "elaborationDateTime, asc"
+              "status, desc",
+              "productCategory, desc",
+              "elaborationDateTime, asc",
+              "status, asc",
+              "productCategory, asc"
             ],
             "in": "query",
             "name": "sort",
@@ -61,14 +65,20 @@
           {
             "description": "Transaction in progress status",
             "enum": [
-              "CREATED",
-              "IDENTIFIED",
-              "AUTHORIZATION_REQUESTED",
               "AUTHORIZED",
-              "REJECTED"
+              "CAPTURED"
             ],
             "in": "query",
             "name": "status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "Product GTIN",
+            "in": "query",
+            "maxLength": 14,
+            "name": "productGtin",
+            "pattern": "^[a-zA-Z0-9]{1,14}$",
             "required": false,
             "type": "string"
           },
@@ -1352,11 +1362,8 @@
         "status": {
           "description": "ENG: The status of the transaction - IT: Lo stato della transazione",
           "enum": [
-            "CREATED",
-            "IDENTIFIED",
-            "AUTHORIZATION_REQUESTED",
             "AUTHORIZED",
-            "REJECTED"
+            "CAPTURED"
           ],
           "type": "string"
         },
@@ -1943,6 +1950,15 @@
         "required": false,
         "type": "string"
       },
+      "productGtin_query": {
+        "description": "Product GTIN",
+        "in": "query",
+        "maxLength": 14,
+        "name": "productGtin",
+        "pattern": "^[a-zA-Z0-9]{1,14}$",
+        "required": false,
+        "type": "string"
+      },
       "productName_query": {
         "in": "query",
         "maxLength": 255,
@@ -1983,7 +1999,11 @@
       "sort_trx_in_progress_query": {
         "enum": [
           "elaborationDateTime, desc",
-          "elaborationDateTime, asc"
+          "status, desc",
+          "productCategory, desc",
+          "elaborationDateTime, asc",
+          "status, asc",
+          "productCategory, asc"
         ],
         "in": "query",
         "name": "sort",
@@ -2016,11 +2036,8 @@
       "status_trx_in_progress_query": {
         "description": "Transaction in progress status",
         "enum": [
-          "CREATED",
-          "IDENTIFIED",
-          "AUTHORIZATION_REQUESTED",
           "AUTHORIZED",
-          "REJECTED"
+          "CAPTURED"
         ],
         "in": "query",
         "name": "status",

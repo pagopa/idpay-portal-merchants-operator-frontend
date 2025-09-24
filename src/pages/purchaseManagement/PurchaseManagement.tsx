@@ -1,9 +1,8 @@
-import { Box, Button, Grid, Typography, Tooltip, CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, Paper} from "@mui/material";
+import { Box, Button, Grid, Tooltip, CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Drawer, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
 import { useEffect, useState } from "react";
-import Chip from "@mui/material/Chip";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
@@ -11,13 +10,23 @@ import { getInProgressTransactions } from "../../services/merchantService";
 import { jwtDecode } from 'jwt-decode';
 import { authStore } from "../../store/authStore";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import { DecodedJwtToken, PaginationExtendedModel, GetProcessedTransactionsFilters } from "../../utils/types";
+import { DecodedJwtToken, PaginationExtendedModel, GetProcessedTransactionsFilters, transactionInProgreessDTO } from "../../utils/types";
 import { GridPaginationModel, GridRenderCellParams, GridSortModel } from "@mui/x-data-grid";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
+import { theme } from '@pagopa/mui-italia';
+import CloseIcon from '@mui/icons-material/Close';
+import style from './purchaseManagement.module.css';
+import { getStatusChip } from "../../utils/helpers";
+import AlertComponent from "../../components/Alert/AlertComponent";
+import { utilsStore } from "../../store/utilsStore";
+
 
 const PurchaseManagement = () => {
     const [loading, setLoading] = useState(true);
+    const [openDrawer, setOpenDrawer] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState(null);
+    const [errorAlert, setErrorAlert] = useState(false);
     const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
         page: 0,
@@ -28,10 +37,11 @@ const PurchaseManagement = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const token = authStore.getState().token;
+    const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
 
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
-        gtiIn: '',
+        productGtin: '',
         status: ''
     };
 
@@ -46,6 +56,22 @@ const PurchaseManagement = () => {
         fetchTransactions({});
     }, []);
 
+    useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+
+        if(transactionAuthorized){
+            const timer = setTimeout(() => {
+                utilsStore.setState({ transactionAuthorized: false });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert, transactionAuthorized]);
+
 
     const columns = [
         {
@@ -54,7 +80,7 @@ const PurchaseManagement = () => {
             flex: 1.5,
             disableColumnMenu: true,
             align: 'center',
-            sortable: false,
+            sortable: true,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
@@ -174,23 +200,11 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value === "AUTHORIZED") {
-                    return (
-                        <Chip
-                            label={t('pages.refundManagement.authorized')}
-                            size="small"
-                            sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }}
-                        />
-                    )
-                } else {
-                    return (
-                        <Chip
-                            label={t('pages.refundManagement.captured')}
-                            size="small"
-                            sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }}
-                        />
-                    )
-                }
+                return (
+                    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                        {getStatusChip(t, params.value)}
+                    </Box>
+                )
             }
         },
     ];
@@ -225,37 +239,70 @@ const PurchaseManagement = () => {
         } catch (error) {
             console.error('Error fetching transactions:', error);
             setLoading(false);
+            setErrorAlert(true);
         }
     };
 
     const handleSortModelChange = (model: GridSortModel) => {
         if (model.length > 0) {
             setSortModel(model);
+            if (model[0].field === 'additionalProperties') {
+                fetchTransactions({
+                    sort: 'productCategory,' + model[0].sort,
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize,
+                    ...formik.values
+                });
+            } else {
+                fetchTransactions({
+                    sort: model[0].field + ',' + model[0].sort,
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize,
+                    ...formik.values
+                });
+            }
+        }
+    };
+
+    const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
+        if(sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: model[0].field + ',' + model[0].sort,
+                sort: 'productCategory,' + sortModel[0].sort,
                 page: paginationModel.page,
                 size: paginationModel.pageSize,
+                ...filtersObj
+            });
+        } else {
+            fetchTransactions({
+                sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+                page: paginationModel.page,
+                size: paginationModel.pageSize,
+                ...filtersObj
+            });
+        }
+    };
+
+    const handlePaginationChange = (model: GridPaginationModel) => {
+        if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+            fetchTransactions({
+                sort: 'productCategory,' + sortModel[0].sort,
+                page: model.page,
+                size: model.pageSize,
+                ...formik.values
+            });
+        } else {
+            fetchTransactions({
+                sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+                page: model.page,
+                size: model.pageSize,
                 ...formik.values
             });
         }
     };
 
-    const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
-        fetchTransactions({
-            page: paginationModel.page,
-            size: paginationModel.pageSize,
-            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-            ...filtersObj
-        });
-    };
-
-    const handlePaginationChange = (model: GridPaginationModel) => {
-        fetchTransactions({
-            page: model.page,
-            size: model.pageSize,
-            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-            ...formik.values
-        });
+    const handleRowAction = (row: transactionInProgreessDTO) => {
+        setOpenDrawer(true);
+        setSelectedTransaction(row);
     };
 
 
@@ -272,13 +319,13 @@ const PurchaseManagement = () => {
                     mtTitle={0}
                     mbSubTitle={2}
                 />
-                <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{ display: 'flex', textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
+                <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
             </Box>
             <Typography variant="h6" >
-                Buoni sconto
+                {t('pages.purchaseManagement.tableTitle')}
             </Typography>
             {
-                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
                     <FiltersForm
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
@@ -290,39 +337,40 @@ const PurchaseManagement = () => {
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField
                                 name="fiscalCode"
-                                label="Cerca per codice fiscale"
+                                label={t('commons.fiscalCodeFilterPlaceholer')}
                                 size="small"
                                 fullWidth
                                 value={formik.values.fiscalCode}
                                 onChange={formik.handleChange}
+                                data-testid="fiscal-code-filter"
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                             <TextField
-                                name="gtiIn"
-                                label="Cerca per GTIN"
+                                name="productGtin"
+                                label={t('commons.gtiInFilterPlaceholer')}
                                 size="small"
                                 fullWidth
-                                value={formik.values.gtiIn}
+                                value={formik.values.productGtin}
                                 onChange={formik.handleChange}
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <FormControl fullWidth size="small">
-                                <InputLabel id="pos-type-label">Stato</InputLabel>
+                                <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                 <Select
                                     labelId="pos-type-label"
                                     id="pos-type-select"
-                                    label='Stato'
+                                    label={t('commons.statusFilterPlaceholer')}
                                     name="status"
                                     value={formik.values.status}
                                     onChange={formik.handleChange}
                                 >
                                     <MenuItem value="AUTHORIZED">
-                                        <Chip label={t('pages.refundManagement.authorized')} size="small" sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }} />
+                                        {getStatusChip(t, "AUTHORIZED")}
                                     </MenuItem>
                                     <MenuItem value="CAPTURED">
-                                        <Chip label={t('pages.refundManagement.captured')} size="small" sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }} />
+                                        {getStatusChip(t, "CAPTURED")}
                                     </MenuItem>
                                 </Select>
                             </FormControl>
@@ -332,7 +380,7 @@ const PurchaseManagement = () => {
             }
             {
                 loading && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }} data-testid="loading">
                         <CircularProgress />
                     </Box>
                 )
@@ -349,6 +397,7 @@ const PurchaseManagement = () => {
                                     onPaginationPageChange={handlePaginationChange}
                                     onSortModelChange={handleSortModelChange}
                                     sortModel={sortModel}
+                                    handleRowAction={handleRowAction}
                                 />
                             </Box>
                         </Grid>
@@ -361,6 +410,75 @@ const PurchaseManagement = () => {
                     <Typography variant="body2">{t('pages.refundManagement.noTransactions')}</Typography>
                 </Paper>
             )}
+
+            <Drawer
+                anchor="right"
+                open={openDrawer}
+                onClose={() => setOpenDrawer(false)}
+                sx={{
+                    '& .MuiDrawer-paper': {
+                        width: 375,
+                        boxSizing: 'border-box',
+                        p: 2
+                    },
+                }}
+            >
+                <Box p={1} sx={{position: 'relative', height: '100%'}}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mb={4} className={style.cursorPointer}>
+                        <CloseIcon sx={{color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
+                    </Box>
+                    <Typography variant="h6" mb={4}>{t('pages.purchaseManagement.drawer.title')}</Typography>
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.trxDate')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{new Date(selectedTransaction?.trxDate).toLocaleDateString('it-IT', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        }).replace(',', '') ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.category')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.additionalProperties?.productCategory ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.brand')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.additionalProperties?.productName ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.fiscalCode')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.fiscalCode ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.totalAmount')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? (selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? (selectedTransaction?.rewardAmountCents / 100).toLocaleString('it-IT', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.status')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.status ? getStatusChip(t, selectedTransaction?.status) : MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+
+                    </Grid>
+                    <Box sx={{position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1}}>
+                        <Button variant="contained" fullWidth onClick={() => setOpenDrawer(false)}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
+                        <Button fullWidth onClick={() => setOpenDrawer(false)} sx={{color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#'}}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
+                    </Box>
+                </Box>
+            </Drawer>
+            {errorAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorAlert')} />}
+            {transactionAuthorized && <AlertComponent error={false} message={t('pages.purchaseManagement.alertSuccess')} />}
 
         </Box>
     );

@@ -93,7 +93,7 @@ describe('SummaryAcceptDiscount', () => {
     });
     fireEvent.click(button);
 
-    expect(await screen.findByTestId('error-alert')).toBeInTheDocument();
+    expect(await screen.findByTestId('alert')).toBeInTheDocument();
   });
 
 });

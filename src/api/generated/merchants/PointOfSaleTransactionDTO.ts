@@ -23,15 +23,9 @@ export enum ChannelEnum {
 }
 
 export enum StatusEnum {
-  "CREATED" = "CREATED",
-
-  "IDENTIFIED" = "IDENTIFIED",
-
-  "AUTHORIZATION_REQUESTED" = "AUTHORIZATION_REQUESTED",
-
   "AUTHORIZED" = "AUTHORIZED",
 
-  "REJECTED" = "REJECTED"
+  "CAPTURED" = "CAPTURED"
 }
 
 // additional attributes
