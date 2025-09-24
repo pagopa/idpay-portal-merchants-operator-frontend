@@ -94,7 +94,7 @@ vi.mock('../../store/authStore', () => ({
 const mockTransactions = [
   {
     trxId: '1',
-    trxDate: '2025-09-22T10:30:00Z',
+    trxDate: '2025-09-22 12:30:00 ',
     fiscalCode: 'AAAAAA11B22C333D',
     effectiveAmountCents: 5000,
     rewardAmountCents: 500,
