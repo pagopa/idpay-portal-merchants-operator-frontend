@@ -170,6 +170,17 @@ export const MerchantApi = {
     }
   },
 
+  getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string) => {
+    try {
+      const response = await axiosInstance.get(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
+      const result = handleAxiosResponse(response)
+      return result
+    } catch (error) {
+      console.error('Error in getInProgressTransactions:', error);
+      throw error;
+    }
+  }
+
 };
 
 

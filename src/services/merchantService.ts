@@ -26,3 +26,7 @@ import { PointOfSaleTransactionsListDTO } from '../api/generated/merchants/Point
   export const getInProgressTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, }): Promise<PointOfSaleTransactionsListDTO> => {
     return MerchantApi.getInProgressTransactions(initiativeId, pointOfSaleId, params);
   };
+
+  export const getPointOfSaleDetails = async (merchantId: string, pointOfSaleId: string) => {
+    return MerchantApi.getPointOfSaleDetails(merchantId, pointOfSaleId);
+  };
