@@ -10,7 +10,7 @@ import { getInProgressTransactions } from "../../services/merchantService";
 import { jwtDecode } from 'jwt-decode';
 import { authStore } from "../../store/authStore";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import { DecodedJwtToken, PaginationExtendedModel, GetProcessedTransactionsFilters } from "../../utils/types";
+import { DecodedJwtToken, PaginationExtendedModel, GetProcessedTransactionsFilters, transactionInProgreessDTO } from "../../utils/types";
 import { GridPaginationModel, GridRenderCellParams, GridSortModel } from "@mui/x-data-grid";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
@@ -63,7 +63,14 @@ const PurchaseManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert]);
+
+        if(transactionAuthorized){
+            const timer = setTimeout(() => {
+                utilsStore.setState({ transactionAuthorized: false });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert, transactionAuthorized]);
 
 
     const columns = [
@@ -293,7 +300,7 @@ const PurchaseManagement = () => {
         }
     };
 
-    const handleRowAction = (row: any) => {
+    const handleRowAction = (row: transactionInProgreessDTO) => {
         setOpenDrawer(true);
         setSelectedTransaction(row);
     };
