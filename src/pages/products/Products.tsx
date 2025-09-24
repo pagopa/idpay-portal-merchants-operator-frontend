@@ -252,6 +252,27 @@ const Products = () => {
         return filteredValues;
     };
 
+    const handleFiltersApplied = (filtersObj: any) => {
+        const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
+            const value = filtersObj[key];
+            if (value !== '' && value !== null && value !== undefined) {
+              acc[key] = value;
+            }
+            return acc;
+          }, {});
+        fetchProducts({
+            ...queryParams,
+            page: 0,
+            size: paginationModel.pageSize || 10,
+            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+        });
+    };
+
+    const handleFiltersReset = () => {
+        formik.resetForm();
+        fetchProducts({});
+    };
+
     return (
         <Box>
             <TitleBox
@@ -269,8 +290,8 @@ const Products = () => {
                     productsList && productsList?.length > 0 && (
                         <FiltersForm
                             formik={formik}
-                            onFiltersApplied={() => { }}
-                            onFiltersReset={() => { }}
+                            onFiltersApplied={handleFiltersApplied}
+                            onFiltersReset={handleFiltersReset}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">
