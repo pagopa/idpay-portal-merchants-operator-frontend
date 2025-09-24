@@ -11,7 +11,7 @@ import { authStore } from "../../store/authStore";
 import { jwtDecode } from 'jwt-decode';
 import ErrorAlert from "../../components/errorAlert/ErrorAlert";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import {GridRenderCellParams, GridSortModel, GridPaginationModel} from '@mui/x-data-grid';
+import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 
 const RefundManagement = () => {
@@ -31,7 +31,7 @@ const RefundManagement = () => {
 
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
-        gtiIn: '',
+        productGtin: '',
         status: ''
     };
 
@@ -59,7 +59,7 @@ const RefundManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert]);   
+    }, [errorAlert]);
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
@@ -234,30 +234,37 @@ const RefundManagement = () => {
             flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
+            alignVertical: 'center',
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value === "CANCELLED") {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.cancelled')}
-                            size="small"
-                            sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.cancelled')}
+                                size="small"
+                                sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
+                            />
+                        </Box>
                     )
                 } else if (params.value === "REFUNDED") {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.refunded')}
-                            size="small"
-                            sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.refunded')}
+                                size="small"
+                                sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
+                            />
+                        </Box>
                     )
                 } else {
                     return (
-                        <Chip
-                            label={t('pages.refundManagement.rewarded')}
-                            size="small"
-                            sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
+                            <Chip
+                                label={t('pages.refundManagement.rewarded')}
+                                size="small"
+                                sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
+                            />
+                        </Box>
                     )
                 }
 
@@ -316,18 +323,18 @@ const RefundManagement = () => {
             </Box>
 
             <Typography variant="h6">
-                Transazioni
+                {t('pages.refundManagement.tableTitle')}
             </Typography>
             <Box>
                 {
-                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.gtiIn.length > 0 || formik.values.status !== null))) && (
+                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={setApiFilters}
                             onFiltersReset={() => {
                                 setApiFilters({
                                     fiscalCode: '',
-                                    gtiIn: '',
+                                    productGtin: '',
                                     status: '',
                                 });
                                 formik.resetForm();
@@ -336,7 +343,7 @@ const RefundManagement = () => {
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField
                                     name="fiscalCode"
-                                    label="Cerca per codice fiscale"
+                                    label={t('commons.fiscalCodeFilterPlaceholer')}
                                     size="small"
                                     fullWidth
                                     value={formik.values.fiscalCode}
@@ -345,21 +352,21 @@ const RefundManagement = () => {
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <TextField
-                                    name="gtiIn"
-                                    label="Cerca per GTIN"
+                                    name="productGtin"
+                                    label={t('commons.gtiInFilterPlaceholer')}
                                     size="small"
                                     fullWidth
-                                    value={formik.values.gtiIn}
+                                    value={formik.values.productGtin}
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <FormControl fullWidth size="small">
-                                    <InputLabel id="pos-type-label">Stato</InputLabel>
+                                    <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                     <Select
                                         labelId="pos-type-label"
                                         id="pos-type-select"
-                                        label='Stato'
+                                        label={t('commons.statusFilterPlaceholer')}
                                         name="status"
                                         value={formik.values.status}
                                         onChange={formik.handleChange}
@@ -383,7 +390,7 @@ const RefundManagement = () => {
 
             {
                 loading && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }} data-testid="loading">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'auto' }} data-testid="loading">
                         <CircularProgress />
                     </Box>
                 )

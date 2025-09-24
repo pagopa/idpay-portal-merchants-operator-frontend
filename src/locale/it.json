@@ -11,6 +11,9 @@
     "cancel": "Annulla",
     "copyCodeBtn": "Copia codice",
     "copyLinkBtn": "Copia link",
+    "gtiInFilterPlaceholer": "Cerca per GTIN",
+    "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
+    "statusFilterPlaceholer": "Stato",
     "discountStatusEnum": {
       "authorized": "Autorizzato",
       "authorizationRequested": "Autorizzazione in corso",
@@ -186,7 +189,8 @@
     "purchaseManagement": {
       "title": "Gestione acquisti",
       "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
-      "noTransactions": "Non ci sono transazioni per questa iniziativa"
+      "noTransactions": "Non ci sono transazioni per questa iniziativa",
+      "tableTitle": "Buoni sconto"
     },
     "refundManagement": {
       "title": "Gestione rimborsi",
@@ -197,7 +201,8 @@
       "refunded": "Stornato",
       "rewarded": "Rimborso richiesto",
       "authorized": "Da autorizzare",
-      "captured": "Da rimborsare"
+      "captured": "Da rimborsare",
+      "tableTitle": "Transazioni"
     },
     "products": {
       "title": "Prodotti",

@@ -267,6 +267,7 @@ paths:
         - $ref: '#/components/parameters/sort_trx_in_progress_query'
         - $ref: '#/components/parameters/fiscalCode_query'
         - $ref: '#/components/parameters/status_trx_in_progress_query'
+        - $ref: '#/components/parameters/productGtin_query'
         - $ref: '#/components/parameters/initiativeId_path'
         - $ref: '#/components/parameters/pointOfSaleId_path'
       responses:
@@ -709,11 +710,8 @@ components:
           type: string
           description: 'ENG: The status of the transaction - IT: Lo stato della transazione'
           enum:
-            - CREATED
-            - IDENTIFIED
-            - AUTHORIZATION_REQUESTED
             - AUTHORIZED
-            - REJECTED
+            - CAPTURED
         splitPayment:
           type: boolean
           description: "ENG: TRUE, if the authorized sum is less than the requested sum or FALSE, if the authorized sum is equal to the requested sum - IT: TRUE, se la somma autorizzata è inferiore alla somma richiesta o FALSE, se la somma autorizzata è uguale alla somma richiesta."
@@ -1364,11 +1362,17 @@ components:
       schema:
         type: string
         enum:
-          - CREATED
-          - IDENTIFIED
-          - AUTHORIZATION_REQUESTED
           - AUTHORIZED
-          - REJECTED
+          - CAPTURED
+    productGtin_query:
+      name: productGtin
+      in: query
+      description: Product GTIN
+      required: false
+      schema:
+        type: string
+        maxLength: 14
+        pattern: ^[a-zA-Z0-9]{1,14}$
     sort_trx_in_progress_query:
       name: sort
       in: query
@@ -1377,7 +1381,11 @@ components:
         type: string
         enum:
           - elaborationDateTime, desc
+          - status, desc
+          - productCategory, desc
           - elaborationDateTime, asc
+          - status, asc
+          - productCategory, asc
     initiativeId_path:
       name: initiativeId
       in: path

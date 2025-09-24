@@ -193,14 +193,16 @@ export function createClient<K extends ParamKeys>({
       ["size"]: size,
       ["sort"]: sort,
       ["fiscalCode"]: fiscalCode,
-      ["status"]: status
+      ["status"]: status,
+      ["productGtin"]: productGtin
     }) =>
       withoutUndefinedValues({
         ["page"]: page,
         ["size"]: size,
         ["sort"]: sort,
         ["fiscalCode"]: fiscalCode,
-        ["status"]: status
+        ["status"]: status,
+        ["productGtin"]: productGtin
       })
   };
   const getPointOfSaleTransactions: TypeofApiCall<GetPointOfSaleTransactionsT> = createFetchRequestForApi(
