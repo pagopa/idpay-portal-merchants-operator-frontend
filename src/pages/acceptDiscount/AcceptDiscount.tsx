@@ -9,7 +9,7 @@ import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { getProductsList, previewPayment } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
-import ErrorAlert from '../../components/Alert/AlertComponent';
+import AlertComponent from '../../components/Alert/AlertComponent';
 import { useNavigate } from 'react-router-dom';
 import EuroIcon from '@mui/icons-material/Euro';
 import ROUTES from '../../routes';
@@ -314,7 +314,7 @@ const AcceptDiscount = () => {
                     </Box>
                 </ModalComponent>
                 {
-                    errorAlert && <ErrorAlert message={t('pages.acceptDiscount.errorAlert')} />
+                    errorAlert && <AlertComponent error={true} message={t('pages.acceptDiscount.errorAlert')} />
                 }
             </Box>
         </>
