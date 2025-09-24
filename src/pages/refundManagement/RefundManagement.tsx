@@ -11,6 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 import AlertComponent from "../../components/Alert/AlertComponent";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
+import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 import { getStatusChip } from "../../utils/helpers";
 
