@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography, Paper, Grid, TextField, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { Box, CircularProgress, Typography, Paper, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Drawer, Divider } from "@mui/material";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useTranslation } from "react-i18next";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
@@ -9,8 +9,13 @@ import { useEffect, useState, useCallback } from "react";
 import DataTable from "../../components/DataTable/DataTable";
 import { getProductsList } from "../../services/merchantService";
 import { GetProductsParams } from "../../utils/types";
-import {GridPaginationModel, GridSortModel, GridRenderCellParams} from "@mui/x-data-grid";
-import {PaginationExtendedModel} from "../../utils/types";
+import { GridPaginationModel, GridSortModel, GridRenderCellParams } from "@mui/x-data-grid";
+import { PaginationExtendedModel } from "../../utils/types";
+import { theme } from '@pagopa/mui-italia';
+import CloseIcon from '@mui/icons-material/Close';
+import style from '../purchaseManagement/purchaseManagement.module.css';
+import AlertComponent from '../../components/Alert/AlertComponent';
+
 
 
 
@@ -18,6 +23,9 @@ import {PaginationExtendedModel} from "../../utils/types";
 const Products = () => {
     const [productsList, setProductsList] = useState([]);
     const [productsListIsLoading, setProductsListIsLoading] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [openDrawer, setOpenDrawer] = useState(false);
+    const [errorAlert, setErrorAlert] = useState(false);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
         page: 0,
         pageSize: import.meta.env.VITE_PAGINATION_SIZE,
@@ -200,6 +208,7 @@ const Products = () => {
     }, []);
 
     const fetchProducts = useCallback(async (params: GetProductsParams) => {
+        setProductsListIsLoading(true);
         try {
             const { content, pageNo, pageSize, totalElements } = await getProductsList({ size: import.meta.env.VITE_PAGINATION_SIZE, status: 'APPROVED', ...params });
             setProductsList([...content]);
@@ -212,6 +221,7 @@ const Products = () => {
         } catch (error) {
             console.error('Error fetching products:', error);
             setProductsListIsLoading(false);
+            setErrorAlert(true);
         }
     }, []);
 
@@ -246,10 +256,10 @@ const Products = () => {
         const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
             const value = filtersObj[key];
             if (value !== '' && value !== null && value !== undefined) {
-              acc[key] = value;
+                acc[key] = value;
             }
             return acc;
-          }, {});
+        }, {});
         fetchProducts({
             ...queryParams,
             page: 0,
@@ -262,6 +272,11 @@ const Products = () => {
         formik.resetForm();
         fetchProducts({});
     };
+    const handleRowAction = (row: any) => {
+        setOpenDrawer(true);
+        setSelectedProduct(row);
+    };
+
 
     return (
         <Box>
@@ -277,7 +292,7 @@ const Products = () => {
 
             <Box>
                 {
-                    productsList && productsList?.length > 0 && (
+                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0)) )&& (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={handleFiltersApplied}
@@ -307,7 +322,7 @@ const Products = () => {
                                         <MenuItem value="DISHWASHERS">
                                             Lavastoviglie
                                         </MenuItem>
-                                        <MenuItem value="WASHERDRYERS">
+                                        <MenuItem value="WASHERDRIERS">
                                             Lavasciuga
                                         </MenuItem>
                                         <MenuItem value="REFRIGERATINGAPPL">
@@ -388,6 +403,7 @@ const Products = () => {
                                 onPaginationPageChange={handlePaginationChange}
                                 sortModel={sortModel}
                                 onSortModelChange={handleSortModelChange}
+                                handleRowAction={handleRowAction}
                             />
                         )
                     }
@@ -397,6 +413,80 @@ const Products = () => {
                             <Paper sx={{ my: 4, p: 3, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Typography variant="body2">{t('pages.products.noProducts')}</Typography>
                             </Paper>
+                        )
+                    }
+
+                    <Drawer
+                        anchor="right"
+                        open={openDrawer}
+                        onClose={() => setOpenDrawer(false)}
+                        sx={{
+                            '& .MuiDrawer-paper': {
+                                width: 375,
+                                boxSizing: 'border-box',
+                                p: 2
+                            },
+                        }}
+                    >
+                        <Box p={1} sx={{ position: 'relative', height: '100%' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mb={2} className={style.cursorPointer}>
+                                <CloseIcon sx={{ color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
+                            </Box>
+                            <Typography variant="h6" mb={2}>{selectedProduct?.productName}</Typography>
+                            <Divider
+                                color="#E3E7EB"
+                                sx={{ mb: 2 }}
+                            />
+                            <Grid container spacing={2}>
+                                <Typography sx={{ fontWeight: theme.typography.fontWeightBold, fontSize: '14px' }}>
+                                    {t('pages.products.drawer.subTitle')}
+                                </Typography>
+
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.eprelCode')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.eprelCode ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.gtinCode')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.gtinCode ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.productCode')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.productCode ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.category')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.category ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.brand')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.brand ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.model')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.model ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.capacity')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.capacity ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.energyClass')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.energyClass ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }} pb={2}>
+                                    <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.productionCountry')}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.countryOfProduction ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                                </Grid>
+                                
+
+                            </Grid>
+                        </Box>
+                    </Drawer>
+
+                    {
+                        errorAlert && (
+                            <AlertComponent error={true} message={t('pages.products.errorAlert')} />
                         )
                     }
                 </>

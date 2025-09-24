@@ -369,14 +369,13 @@ const RefundManagement = () => {
                 )
             }
 
-            {(rows && rows?.length > 0) && (
+            {(rows && rows?.length > 0 && !loading) && (
                 <Grid container mt={2}>
                     <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                         <Box sx={{ height: 'auto', width: '100%' }}>
                             <DataTable
                                 rows={rows}
                                 columns={columns}
-                                loading={loading}
                                 onPaginationPageChange={handlePaginationChange}
                                 paginationModel={paginationModel}
                                 onSortModelChange={handleSortModelChange}

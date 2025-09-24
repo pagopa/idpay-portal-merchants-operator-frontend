@@ -226,7 +226,20 @@
     "products": {
       "title": "Prodotti",
       "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
-      "noProducts": "Non ci sono prodotti per questa iniziativa"
+      "noProducts": "Non ci sono prodotti per questa iniziativa",
+      "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+      "drawer": {
+        "subTitle": "SCHEDA PRODOTTO",
+        "eprelCode": "Codice EPREL",
+        "gtinCode": "Codice GTIN/EAN",
+        "productCode": "Codice prodotto",
+        "category": "Categoria",
+        "brand": "Marca",
+        "model": "Modello",
+        "capacity": "Capacità",
+        "energyClass": "Classe energetica",
+        "productionCountry": "Paese di produzione"
+      }
       
     }
 
