@@ -337,7 +337,7 @@ const Products = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
                                 <TextField
                                     name="brand"
                                     label="Marca"
@@ -347,7 +347,7 @@ const Products = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
                                 <TextField
                                     name="model"
                                     label="Modello"

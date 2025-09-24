@@ -77,11 +77,6 @@ const DataTable = ({
                 </IconButton>
               </Box>
             ),
-            sx: {
-              display: 'flex !important',
-              justifyContent: 'end !important',
-              alignItems: 'center !important',
-            },
           }
         ]
       );
@@ -150,7 +145,7 @@ const DataTable = ({
           <DataGrid
             rows={rows}
             columns={finalColumns}
-            getRowId={(row: unknown) => customUniqueField ? row[customUniqueField] : row.id}
+            getRowId={(row: any) => customUniqueField ? row[customUniqueField] : row?.id}
             disableRowSelectionOnClick
             sortingMode='server'
             paginationMode='server'
