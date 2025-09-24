@@ -15,6 +15,8 @@ import {
 import { identity } from "fp-ts/lib/function";
 
 import {
+  GetPointOfSaleTransactionsT,
+  getPointOfSaleTransactionsDefaultDecoder,
   GetPointOfSaleTransactionsProcessedT,
   getPointOfSaleTransactionsProcessedDefaultDecoder,
   GetProductsT,
@@ -31,14 +33,14 @@ import {
 // We use this as a placeholder for type parameters indicating "no key"
 type __UNDEFINED_KEY = "_____";
 
-export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsProcessedT> &
+export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsT> &
+  TypeofApiCall<GetPointOfSaleTransactionsProcessedT> &
   TypeofApiCall<GetProductsT> &
   TypeofApiCall<AuthPaymentBarCodeT> &
   TypeofApiCall<PreviewPaymentT>;
 
-export type ParamKeys = keyof (TypeofApiParams<
-  GetPointOfSaleTransactionsProcessedT
-> &
+export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
+  TypeofApiParams<GetPointOfSaleTransactionsProcessedT> &
   TypeofApiParams<GetProductsT> &
   TypeofApiParams<AuthPaymentBarCodeT> &
   TypeofApiParams<PreviewPaymentT>);
@@ -65,6 +67,7 @@ export type OmitApiCallParams<
 export type WithDefaultsT<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
 > = OmitApiCallParams<
+  | GetPointOfSaleTransactionsT
   | GetPointOfSaleTransactionsProcessedT
   | GetProductsT
   | AuthPaymentBarCodeT
@@ -80,6 +83,10 @@ export type Client<
   K extends ParamKeys | __UNDEFINED_KEY = __UNDEFINED_KEY
 > = K extends __UNDEFINED_KEY
   ? {
+      readonly getPointOfSaleTransactions: TypeofApiCall<
+        GetPointOfSaleTransactionsT
+      >;
+
       readonly getPointOfSaleTransactionsProcessed: TypeofApiCall<
         GetPointOfSaleTransactionsProcessedT
       >;
@@ -91,6 +98,13 @@ export type Client<
       readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
     }
   : {
+      readonly getPointOfSaleTransactions: TypeofApiCall<
+        ReplaceRequestParams<
+          GetPointOfSaleTransactionsT,
+          Omit<RequestParams<GetPointOfSaleTransactionsT>, K>
+        >
+      >;
+
       readonly getPointOfSaleTransactionsProcessed: TypeofApiCall<
         ReplaceRequestParams<
           GetPointOfSaleTransactionsProcessedT,
@@ -157,6 +171,44 @@ export function createClient<K extends ParamKeys>({
     baseUrl,
     fetchApi
   };
+
+  const getPointOfSaleTransactionsT: ReplaceRequestParams<
+    GetPointOfSaleTransactionsT,
+    RequestParams<GetPointOfSaleTransactionsT>
+  > = {
+    method: "get",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: getPointOfSaleTransactionsDefaultDecoder(),
+    url: ({
+      ["initiativeId"]: initiativeId,
+      ["pointOfSaleId"]: pointOfSaleId
+    }) =>
+      `${basePath}/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`,
+
+    query: ({
+      ["page"]: page,
+      ["size"]: size,
+      ["sort"]: sort,
+      ["fiscalCode"]: fiscalCode,
+      ["status"]: status,
+      ["productGtin"]: productGtin
+    }) =>
+      withoutUndefinedValues({
+        ["page"]: page,
+        ["size"]: size,
+        ["sort"]: sort,
+        ["fiscalCode"]: fiscalCode,
+        ["status"]: status,
+        ["productGtin"]: productGtin
+      })
+  };
+  const getPointOfSaleTransactions: TypeofApiCall<GetPointOfSaleTransactionsT> = createFetchRequestForApi(
+    getPointOfSaleTransactionsT,
+    options
+  );
 
   const getPointOfSaleTransactionsProcessedT: ReplaceRequestParams<
     GetPointOfSaleTransactionsProcessedT,
@@ -297,6 +349,9 @@ export function createClient<K extends ParamKeys>({
   );
 
   return {
+    getPointOfSaleTransactions: (withDefaults || identity)(
+      getPointOfSaleTransactions
+    ),
     getPointOfSaleTransactionsProcessed: (withDefaults || identity)(
       getPointOfSaleTransactionsProcessed
     ),

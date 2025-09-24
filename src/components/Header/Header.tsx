@@ -1,8 +1,9 @@
 import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import type { LoggedUser } from '../../utils/types';
-// import {useAuth} from "../../contexts/AuthContext";
-import type { JwtUser } from '../../utils/types';
+import {useAuth} from "../../contexts/AuthContext";
+// import type { JwtUser } from '../../utils/types';
+import keycloak from '../../config/keycloak';
 
 interface HeaderProps {
   userProps?: any;
@@ -59,7 +60,7 @@ const Header = ({userProps}: HeaderProps) => {
         label: "PagoPA S.p.A.",
         ariaLabel: "PagoPA S.p.A.",
         title: "PagoPA S.p.A.",
-      }} loggedUser={loggedUser} onAssistanceClick={() => { }} onLogin={() => { }} onLogout={() => { }}
+      }} loggedUser={loggedUser} onAssistanceClick={() => { }} onLogin={() => { }} onLogout={() => { keycloak.logout()}}
       />
 
       <HeaderProduct

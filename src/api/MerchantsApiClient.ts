@@ -5,6 +5,7 @@ import type { PreviewPaymentDTO } from './generated/merchants/PreviewPaymentDTO'
 import { authStore } from '../store/authStore';
 import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
 import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
+import type { PointOfSaleTransactionsListDTO } from './generated/merchants/PointOfSaleTransactionsListDTO';
 
 //axios instance 
 const createAxiosInstance = (): AxiosInstance => {
@@ -71,7 +72,7 @@ export const MerchantApi = {
 
       // Remove undefined params
       const cleanParams = Object.fromEntries(
-        Object.entries(params).filter(([_, value]) => value !== undefined)
+        Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
       );
 
       const response = await axiosInstance.get('/products', {
@@ -109,8 +110,7 @@ export const MerchantApi = {
     params: {
       trxCode: string,
       amountCents: number,
-      additionalProperties?: {}
-      
+      additionalProperties?: object
     }
   ): Promise<AuthPaymentResponseDTO> => {
     try {
@@ -128,16 +128,44 @@ export const MerchantApi = {
     size?: number,
     sort?: string,
     fiscalCode?: string,
-    status?: ["REWARDED","CANCELLED"],
+    status?: string,
+    gtiIn?: string
   }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     try {
+        // Remove undefined params
+        const cleanParams = Object.fromEntries(
+          Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
+        );
       const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/processed`, {
-        params: params
+        params: cleanParams
       });
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
       console.error('Error in getProcessedTransactions:', error);
+      throw error;
+    }
+  },
+
+  getInProgressTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
+    page?: number,
+    size?: number,
+    sort?: string,
+    fiscalCode?: string,
+    status?: string,
+  }): Promise<PointOfSaleTransactionsListDTO> => {
+    try {
+        // Remove undefined params
+        const cleanParams = Object.fromEntries(
+          Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
+        );
+      const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`, {
+        params: cleanParams
+      });
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in getInProgressTransactions:', error);
       throw error;
     }
   },

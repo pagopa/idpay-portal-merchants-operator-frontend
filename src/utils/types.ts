@@ -35,20 +35,68 @@ export interface PaginationResponse {
     totalPages: number;
     content: unknown[];
 }
-export interface SortModelItem {
-    field: string;
-    sort: 'asc' | 'desc';
+
+export interface GetProcessedTransactionsFilters {
+    fiscalCode?: string;
+    productGtin?: string;
+    status?: string;
 }
 
-export type SortModel = SortModelItem[];
-
-export interface PaginationModel {
-    pageNo: number;
-    pageSize: number;
-}
-
-export interface PaginationDataTableModel {
+export interface PaginationExtendedModel {
     page: number;
     pageSize: number;
+    totalElements: number;
 }
+
+export interface DecodedJwtToken {
+    exp: number;
+    iat: number;
+    auth_time: number;
+    jti: string;
+    iss: string;
+    aud: string;
+    sub: string;
+    typ: string;
+    azp: string;
+    sid: string;
+    acr: string;
+    'allowed-origins': string[];
+    realm_access: {
+        roles: string[];
+    };
+    resource_access: {
+        account: {
+            roles: string[];
+        };
+    };
+    scope: string;
+    email_verified: boolean;
+    name: string;
+    preferred_username: string;
+    merchant_id: string;
+    given_name: string;
+    family_name: string;
+    email: string;
+    point_of_sale_id: string;
+}
+
+export interface transactionInProgreessDTO {
+    additionalProperties: {
+        productCategory: string;
+        productGtin: string;
+        productName: string;
+    };
+    channel: string;
+    effectiveAmountCents: number;
+    fiscalCode: string;
+    id: string;
+    residualAmountCents: number;
+    rewardAmountCents: number;
+    splitPayment: boolean;
+    status: string;
+    trxCode: string;
+    trxDate: string;
+    trxExpirationSeconds: number;
+    updateDate: string;
     
+}

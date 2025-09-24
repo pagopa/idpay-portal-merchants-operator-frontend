@@ -11,6 +11,12 @@
     "cancel": "Annulla",
     "copyCodeBtn": "Copia codice",
     "copyLinkBtn": "Copia link",
+    "gtiInFilterPlaceholer": "Cerca per GTIN",
+    "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
+    "statusFilterPlaceholer": "Stato",
+    "gtiInFilterPlaceholer": "Cerca per GTIN",
+    "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
+    "statusFilterPlaceholer": "Stato",
     "discountStatusEnum": {
       "authorized": "Autorizzato",
       "authorizationRequested": "Autorizzazione in corso",
@@ -185,15 +191,37 @@
     },
     "purchaseManagement": {
       "title": "Gestione acquisti",
-      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici"
+      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa",
+      "tableTitle": "Buoni sconto",
+      "alertSuccess": "La transazione è andata a buon fine.",
+      "drawer": {
+        "title": "Dettaglio transazione",
+        "product": "Prodotto",
+        "totalAmount": "Totale della spesa",
+        "authorizedAmount": "Importo autorizzato",
+        "status": "Stato",
+        "fiscalCode": "Codice fiscale",
+        "trxDate": "Data e ora",
+        "brand": "Modello",
+        "category": "Categoria",
+        "confirmPayment": "Conferma pagamento",
+        "cancellPayment": "Annulla transazione",
+        "requestRefund": "Richiedi rimborso",
+        "refund": "Storna"
+      }
     },
     "refundManagement": {
       "title": "Gestione rimborsi",
       "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici",
       "noTransactions": "Non ci sono transazioni per questa iniziativa",
       "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
-      "chipCancelled": "Annullato",
-      "chipRefunded": "Stornato"
+      "cancelled": "Annullato",
+      "refunded": "Stornato",
+      "rewarded": "Rimborso richiesto",
+      "authorized": "Da autorizzare",
+      "captured": "Da rimborsare",
+      "tableTitle": "Transazioni"
     },
     "products": {
       "title": "Prodotti",
@@ -201,6 +229,7 @@
       "noProducts": "Non ci sono prodotti per questa iniziativa"
       
     }
+
   },
   "roles": {
     "admin": "Amministratore"

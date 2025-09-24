@@ -97,6 +97,7 @@ paths:
           schema:
             type: string
             maxLength: 255
+            pattern: '^[a-zA-Z0-9]+$'
       requestBody:
         description: Request about auth bar-code trx
         content:
@@ -148,6 +149,10 @@ paths:
               $ref: '#/components/headers/X-RateLimit-Remaining'
             X-RateLimit-Reset:
               $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
         "403":
           description: Forbidden
           headers:
@@ -181,9 +186,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransactionErrorDTO"
-              example:
-                code: PAYMENT_NOT_FOUND_EXPIRED
-                message: "Cannot find transaction with trxCode [trxCode]"
+              examples:
+                transactionNotFound:
+                  summary: Transaction not found
+                  value:
+                    code: PAYMENT_NOT_FOUND_EXPIRED
+                    message: "Cannot find transaction with trxCode [trxCode]"
+                productNotFound:
+                  summary: Product not found
+                  value:
+                    code: PRODUCT_NOT_FOUND
+                    message: "The product with gtin [gtin] is not found or not approved"
         "429":
           description: Too many requests
           headers:
@@ -241,6 +254,35 @@ paths:
           $ref: '#/components/responses/GET_transactions_processed_429_Response'
         '500':
           $ref: '#/components/responses/GET_transactions_processed_500_Response'
+  /initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions:
+    get:
+      tags:
+        - transaction
+      summary: "ENG: Returns the list of in progress transactions associated to a point of sale - IT: Ritorna la lista delle transazioni in corso associate ad un punto vendita"
+      description: "ENG: Returns the list of in progress transactions associated to a point of sale - IT: Ritorna la lista delle transazioni in corso associate ad un punto vendita"
+      operationId: getPointOfSaleTransactions
+      parameters:
+        - $ref: '#/components/parameters/page_query'
+        - $ref: '#/components/parameters/size_query'
+        - $ref: '#/components/parameters/sort_trx_in_progress_query'
+        - $ref: '#/components/parameters/fiscalCode_query'
+        - $ref: '#/components/parameters/status_trx_in_progress_query'
+        - $ref: '#/components/parameters/productGtin_query'
+        - $ref: '#/components/parameters/initiativeId_path'
+        - $ref: '#/components/parameters/pointOfSaleId_path'
+      responses:
+        '200':
+          $ref: '#/components/responses/GET_transactions_in_progress_200_Response'
+        '400':
+          $ref: '#/components/responses/GET_transactions_in_progress_400_Response'
+        '401':
+          $ref: '#/components/responses/GET_transactions_in_progress_401_Response'
+        '404':
+          $ref: '#/components/responses/GET_transactions_in_progress_404_Response'
+        '429':
+          $ref: '#/components/responses/GET_transactions_in_progress_429_Response'
+        '500':
+          $ref: '#/components/responses/GET_transactions_in_progress_500_Response'
 
 components:
   headers:
@@ -546,8 +588,9 @@ components:
         fiscalCode:
           type: string
           description: 'ENG: Citizen fiscal code - IT: Codice fiscale del cittadino'
+          minLength: 16
           maxLength: 16
-          pattern: .*
+          pattern: '^[A-Z0-9]+$'
         effectiveAmountCents:
           type: integer
           format: int64
@@ -576,10 +619,132 @@ components:
           enum:
             - REWARDED
             - CANCELLED
+            - REFUNDED
         channel:
           type: string
           description: 'ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione'
           maxLength: 24
+          enum:
+            - BARCODE
+            - QRCODE
+            - IDPAYCODE
+    PointOfSaleTransactionsListDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PointOfSaleTransactionDTO'
+          maxItems: 1000
+        pageNo:
+          type: integer
+          format: int32
+          description: 'ENG: The number of the page <br> IT: Il numero della pagina'
+          minimum: 0
+          maximum: 1000000
+        pageSize:
+          type: integer
+          format: int32
+          description: 'ENG: The element size for page <br> IT: Il numero di elementi per pagina'
+          minimum: 0
+          maximum: 1000000
+        totalElements:
+          type: integer
+          format: int32
+          description: 'ENG: The total number of the elements <br> IT: Il numero totale degli elementi'
+          minimum: 0
+          maximum: 1000000
+        totalPages:
+          type: integer
+          format: int32
+          description: 'ENG: The total number of the pages <br> IT: Il numero totale delle pagine'
+          minimum: 0
+          maximum: 1000000
+    PointOfSaleTransactionDTO:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: 'ENG: Transaction ID <br> IT: ID della transazione'
+          maxLength: 64
+          pattern: .*
+        trxCode:
+          type: string
+          description: 'ENG: Transaction code - IT: Il codice della transazione'
+          maxLength: 100
+          pattern: '^[a-zA-Z0-9]+$'
+        fiscalCode:
+          type: string
+          description: 'ENG: Citizen fiscal code - IT: Codice fiscale del cittadino'
+          minLength: 16
+          maxLength: 16
+          pattern: '^[A-Z0-9]+$'
+        effectiveAmountCents:
+          type: integer
+          format: int64
+          description: 'ENG: Transaction amount in cents - IT: Importo della transazione in centesimi'
+          minimum: 0
+          maximum: 1000000000
+        rewardAmountCents:
+          type: integer
+          format: int64
+          description: 'ENG: Reward amount in cents - IT: Premio generato in centesimi'
+          minimum: 0
+          maximum: 1000000000
+        trxDate:
+          type: string
+          format: date-time
+          description: 'ENG: The date of the transaction - IT: La data della transazione'
+          maxLength: 255
+        trxExpirationSeconds:
+          type: number
+          description: "ENG: Expiration time of the transaction, in seconds - IT: Scadenza della transazione, in secondi"
+          minimum: 0
+        updateDate:
+          type: string
+          format: date-time
+          description: 'ENG: The date of the transaction update - IT: La data di aggiornamento della transazione'
+          maxLength: 255
+        status:
+          type: string
+          description: 'ENG: The status of the transaction - IT: Lo stato della transazione'
+          enum:
+            - AUTHORIZED
+            - CAPTURED
+        splitPayment:
+          type: boolean
+          description: "ENG: TRUE, if the authorized sum is less than the requested sum or FALSE, if the authorized sum is equal to the requested sum - IT: TRUE, se la somma autorizzata è inferiore alla somma richiesta o FALSE, se la somma autorizzata è uguale alla somma richiesta."
+        residualAmountCents:
+          type: integer
+          format: int64
+          description: "ENG: Remaining amount to be paid if the authorized sum is less than the requested sum - IT: Importo restante da pagare nel caso in cui la somma autorizzata sia inferiore alla somma richiesta."
+          minimum: 0
+          maximum: 1000000000
+        channel:
+          type: string
+          description: 'ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione'
+          maxLength: 24
+          enum:
+            - BARCODE
+            - QRCODE
+            - IDPAYCODE
+        qrcodePngUrl:
+          type: string
+          format: uri
+          maxLength: 2048
+          description: "ENG: Url to the QR code image - IT: Url all'immagine del QR code"
+        qrcodeTxtUrl:
+          type: string
+          format: uri
+          maxLength: 2048
+          description: "ENG: Url of the QR code link - IT: Url del QR code"
+        "additionalProperties":
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 255
+            pattern: '.*'
     ErrorDTO:
       type: object
       required:
@@ -596,6 +761,7 @@ components:
           pattern: .*
     AuthBarCodePaymentDTO:
       type: object
+      additionalProperties: false
       required:
         - amountCents
         - idTrxAcquirer
@@ -610,10 +776,13 @@ components:
           type: string
           description: "ENG: Transaction acquirer ID- IT: Identificativo della transazione rispetto all'acquirer"
           maxLength: 100
-        additionalProperties:
-          type: object
-          additionalProperties:
-            type: string
+          format: uuid
+        "additionalProperties":
+         type: object
+         additionalProperties:
+          type: string
+          maxLength: 255
+          pattern: '.*'
     AuthPaymentResponseDTO:
       type: object
       required:
@@ -627,10 +796,12 @@ components:
           type: string
           description: "ENG: Id of the payment - IT: Identificativo del pagamento"
           maxLength: 100
+          format: uuid
         trxCode:
           type: string
           description: "ENG: Transaction code - IT: Codice della transazione"
           maxLength: 100
+          pattern: '^[a-zA-Z0-9]+$'
         trxDate:
           type: string
           format: date-time
@@ -640,14 +811,17 @@ components:
           type: string
           description: "ENG: Id of the initiative - IT: Identificativo dell'iniziativa"
           maxLength: 100
+          pattern: '^[A-Za-z0-9_-]+$'
         initiativeName:
           type: string
           description: "ENG: Name of the initiative - IT: Nome della iniziativa"
           maxLength: 1000
+          pattern: '.*'
         businessName:
           type: string
           description: "ENG: Business name - IT: Nome dell'esercente"
           maxLength: 1000
+          pattern: '.*'
         status:
           type: string
           enum:
@@ -718,11 +892,13 @@ components:
             - PAYMENT_INVALID_REQUEST
             - PAYMENT_STATUS_NOT_VALID
             - PAYMENT_TRANSACTION_VERSION_PENDING
-          description: '"ENG: Error code:<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transaction not found or expired<br> PAYMENT_TRANSACTION_EXPIRED: transaction expired<br> PAYMENT_INITIATIVE_NOT_FOUND: initiative not found<br> PAYMENT_INITIATIVE_INVALID_DATE: initiative invalid date<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: initiative is not of discount type<br> PAYMENT_ALREADY_AUTHORIZED: transaction already authorized<br> PAYMENT_ALREADY_CANCELLED: transaction already cancelled<br> PAYMENT_BUDGET_EXHAUSTED: budget exhausted<br> PAYMENT_GENERIC_REJECTED: generic rejected error (transaction rejected)<br> PAYMENT_TOO_MANY_REQUESTS: too many request, retry<br> PAYMENT_GENERIC_ERROR: application error (connection microservice error)<br> PAYMENT_USER_SUSPENDED: the user has been suspended on the initiative<br> PAYMENT_USER_NOT_ONBOARDED: user not onboarded<br> PAYMENT_USER_UNSUBSCRIBED: user unsubscribed<br> PAYMENT_ALREADY_ASSIGNED:  transaction already assigned<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: operation on transaction not allowed due to status<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: operation on transaction not allowed due to merchant mismatched<br> PAYMENT_USER_NOT_ASSOCIATED: user not associated to the transaction<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: cancellation of transaction not allowed due to status<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: unrelate transaction not allowed due to status<br> PAYMENT_AMOUNT_NOT_VALID: amount of transaction not valid<br> PAYMENT_MERCHANT_NOT_ONBOARDED: the merchant is not onboarded<br> PAYMENT_INVALID_REQUEST: request validation error<br> PAYMENT_STATUS_NOT_VALID: transaction status not valid<br> PAYMENT_TRANSACTION_VERSION_PENDING: The transaction version is actually locked<br> IT: Codice di errore<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transazione non trovata oppure scaduta<br> PAYMENT_TRANSACTION_EXPIRED: transazione scaduta<br> PAYMENT_INITIATIVE_NOT_FOUND: iniziativa non trovata<br> PAYMENT_INITIATIVE_INVALID_DATE: iniziativa con data invalida<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: iniziativa non è di tipo a sconto<br> PAYMENT_ALREADY_AUTHORIZED: transazione già autorizzata<br> PAYMENT_ALREADY_CANCELLED: transazione già cancellata<br> PAYMENT_BUDGET_EXHAUSTED: budget esaurito<br> PAYMENT_GENERIC_REJECTED: errore generico, transazione rigettata<br> PAYMENT_TOO_MANY_REQUESTS: troppe richieste, riprovare<br> PAYMENT_GENERIC_ERROR: errore generico (errore nella connessione ad un microservizio)<br> PAYMENT_USER_SUSPENDED: l''utente è stato sospeso dall''iniziativa<br> PAYMENT_USER_NOT_ONBOARDED: utente non onboardato all''iniziativa<br> PAYMENT_USER_UNSUBSCRIBED: utente disiscritto dall''iniziativa<br> PAYMENT_ALREADY_ASSIGNED:  transazione già assegnata<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: transazione non consentita a causa dello stato della transazione<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: transazione non consentita a causa della mancata corrispondenza del merchant<br> PAYMENT_USER_NOT_ASSOCIATED: utente non associato alla transazione<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: annullamento della transazione non consentito a causa dello stato della transazione<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: disassociazione non consentita a causa dello stato della transazione<br> PAYMENT_AMOUNT_NOT_VALID: importo nella transazione non valido<br> PAYMENT_MERCHANT_NOT_ONBOARDED: il merchant non è onboardato<br> PAYMENT_INVALID_REQUEST: errore di validazione della richiesta<br> PAYMENT_STATUS_NOT_VALID: stato della transazione non valido"<br> PAYMENT_TRANSACTION_VERSION_PENDING: La versione del contatore è attualmente bloccata'
+            - PRODUCT_NOT_FOUND
+          description: '"ENG: Error code:<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transaction not found or expired<br> PAYMENT_TRANSACTION_EXPIRED: transaction expired<br> PAYMENT_INITIATIVE_NOT_FOUND: initiative not found<br> PAYMENT_INITIATIVE_INVALID_DATE: initiative invalid date<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: initiative is not of discount type<br> PAYMENT_ALREADY_AUTHORIZED: transaction already authorized<br> PAYMENT_ALREADY_CANCELLED: transaction already cancelled<br> PAYMENT_BUDGET_EXHAUSTED: budget exhausted<br> PAYMENT_GENERIC_REJECTED: generic rejected error (transaction rejected)<br> PAYMENT_TOO_MANY_REQUESTS: too many request, retry<br> PAYMENT_GENERIC_ERROR: application error (connection microservice error)<br> PAYMENT_USER_SUSPENDED: the user has been suspended on the initiative<br> PAYMENT_USER_NOT_ONBOARDED: user not onboarded<br> PAYMENT_USER_UNSUBSCRIBED: user unsubscribed<br> PAYMENT_ALREADY_ASSIGNED:  transaction already assigned<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: operation on transaction not allowed due to status<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: operation on transaction not allowed due to merchant mismatched<br> PAYMENT_USER_NOT_ASSOCIATED: user not associated to the transaction<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: cancellation of transaction not allowed due to status<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: unrelate transaction not allowed due to status<br> PAYMENT_AMOUNT_NOT_VALID: amount of transaction not valid<br> PAYMENT_MERCHANT_NOT_ONBOARDED: the merchant is not onboarded<br> PAYMENT_INVALID_REQUEST: request validation error<br> PAYMENT_STATUS_NOT_VALID: transaction status not valid<br> PAYMENT_TRANSACTION_VERSION_PENDING: The transaction version is actually locked<br> IT: Codice di errore<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transazione non trovata oppure scaduta<br> PAYMENT_TRANSACTION_EXPIRED: transazione scaduta<br> PAYMENT_INITIATIVE_NOT_FOUND: iniziativa non trovata<br> PAYMENT_INITIATIVE_INVALID_DATE: iniziativa con data invalida<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: iniziativa non è di tipo a sconto<br> PAYMENT_ALREADY_AUTHORIZED: transazione già autorizzata<br> PAYMENT_ALREADY_CANCELLED: transazione già cancellata<br> PAYMENT_BUDGET_EXHAUSTED: budget esaurito<br> PAYMENT_GENERIC_REJECTED: errore generico, transazione rigettata<br> PAYMENT_TOO_MANY_REQUESTS: troppe richieste, riprovare<br> PAYMENT_GENERIC_ERROR: errore generico (errore nella connessione ad un microservizio)<br> PAYMENT_USER_SUSPENDED: l''utente è stato sospeso dall''iniziativa<br> PAYMENT_USER_NOT_ONBOARDED: utente non onboardato all''iniziativa<br> PAYMENT_USER_UNSUBSCRIBED: utente disiscritto dall''iniziativa<br> PAYMENT_ALREADY_ASSIGNED:  transazione già assegnata<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: transazione non consentita a causa dello stato della transazione<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: transazione non consentita a causa della mancata corrispondenza del merchant<br> PAYMENT_USER_NOT_ASSOCIATED: utente non associato alla transazione<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: annullamento della transazione non consentito a causa dello stato della transazione<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: disassociazione non consentita a causa dello stato della transazione<br> PAYMENT_AMOUNT_NOT_VALID: importo nella transazione non valido<br> PAYMENT_MERCHANT_NOT_ONBOARDED: il merchant non è onboardato<br> PAYMENT_INVALID_REQUEST: errore di validazione della richiesta<br> PAYMENT_STATUS_NOT_VALID: stato della transazione non valido"<br> PAYMENT_TRANSACTION_VERSION_PENDING: La versione del contatore è attualmente bloccata<br> PRODUCT_NOT_FOUND: Prodotto non trovato o non approvato '
         message:
           type: string
           description: "ENG: Error message- IT: Messaggio di errore"
           maxLength: 1000
+          pattern: '.*'
   securitySchemes:
     Bearer:
       type: apiKey
@@ -957,6 +1133,92 @@ components:
       headers:
         Access-Control-Allow-Origin:
           $ref: '#/components/headers/Access-Control-Allow-Origin'
+    GET_transactions_in_progress_200_Response:
+      description: Ok
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PointOfSaleTransactionsListDTO'
+    GET_transactions_in_progress_400_Response:
+      description: Bad request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_in_progress_401_Response:
+      description: Authentication failed
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_in_progress_404_Response:
+      description: The requested resource was not found
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_in_progress_429_Response:
+      description: Too many Request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+    GET_transactions_in_progress_500_Response:
+      description: Generic error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDTO'
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/Access-Control-Allow-Origin'
   parameters:
     category_query:
       name: category
@@ -1067,8 +1329,9 @@ components:
       required: false
       schema:
         type: string
+        minLength: 16
         maxLength: 16
-        pattern: .*
+        pattern: '^[A-Z0-9]+$'
     status_trx_processed_query:
       name: status
       in: query
@@ -1079,6 +1342,7 @@ components:
         enum:
           - REWARDED
           - CANCELLED
+          - REFUNDED
     sort_trx_processed_query:
       name: sort
       in: query
@@ -1087,7 +1351,41 @@ components:
         type: string
         enum:
           - elaborationDateTime, desc
+          - status, desc
           - elaborationDateTime, asc
+          - status, asc
+    status_trx_in_progress_query:
+      name: status
+      in: query
+      description: Transaction in progress status
+      required: false
+      schema:
+        type: string
+        enum:
+          - AUTHORIZED
+          - CAPTURED
+    productGtin_query:
+      name: productGtin
+      in: query
+      description: Product GTIN
+      required: false
+      schema:
+        type: string
+        maxLength: 14
+        pattern: ^[a-zA-Z0-9]{1,14}$
+    sort_trx_in_progress_query:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - elaborationDateTime, desc
+          - status, desc
+          - productCategory, desc
+          - elaborationDateTime, asc
+          - status, asc
+          - productCategory, asc
     initiativeId_path:
       name: initiativeId
       in: path
