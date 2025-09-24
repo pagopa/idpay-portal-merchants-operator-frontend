@@ -3,16 +3,16 @@ import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
 import { useEffect, useState, useCallback, useRef } from "react";
-import Chip from "@mui/material/Chip";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
 import { getProcessedTransactions } from "../../services/merchantService";
 import { authStore } from "../../store/authStore";
 import { jwtDecode } from 'jwt-decode';
-import ErrorAlert from "../../components/errorAlert/ErrorAlert";
+import AlertComponent from "../../components/Alert/AlertComponent";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
+import { getStatusChip } from "../../utils/helpers";
 
 const RefundManagement = () => {
     const [rows, setRows] = useState([]);
@@ -236,38 +236,11 @@ const RefundManagement = () => {
             sortable: true,
             alignVertical: 'center',
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value === "CANCELLED") {
-                    return (
-                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
-                            <Chip
-                                label={t('pages.refundManagement.cancelled')}
-                                size="small"
-                                sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
-                            />
-                        </Box>
-                    )
-                } else if (params.value === "REFUNDED") {
-                    return (
-                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
-                            <Chip
-                                label={t('pages.refundManagement.refunded')}
-                                size="small"
-                                sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
-                            />
-                        </Box>
-                    )
-                } else {
-                    return (
-                        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%'}}>
-                            <Chip
-                                label={t('pages.refundManagement.rewarded')}
-                                size="small"
-                                sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
-                            />
-                        </Box>
-                    )
-                }
-
+                return (
+                    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+                        {getStatusChip(t, params.value)}
+                    </Box>
+                )
             }
         },
     ];
@@ -372,13 +345,13 @@ const RefundManagement = () => {
                                         onChange={formik.handleChange}
                                     >
                                         <MenuItem value="REWARDED">
-                                            <Chip label="Rimborso richiesto" size="small" sx={{ backgroundColor: '#E1F4E1 !important', color: '##17324D !important' }} />
+                                            {getStatusChip(t, "REWARDED")}
                                         </MenuItem>
                                         <MenuItem value="CANCELLED">
-                                            <Chip label="Annullato" size="small" sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }} />
+                                            {getStatusChip(t, "CANCELLED")}
                                         </MenuItem>
                                         <MenuItem value="REFUNDED">
-                                            <Chip label="Stornato" size="small" sx={{ backgroundColor: '#C4DCF5 !important', color: '##17324D !important' }} />
+                                            {getStatusChip(t, "REFUNDED")}
                                         </MenuItem>
                                     </Select>
                                 </FormControl>
@@ -419,7 +392,7 @@ const RefundManagement = () => {
                 </Paper>
             )}
 
-            {errorAlert && <ErrorAlert message={t('pages.refundManagement.errorAlert')} />}
+            {errorAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorAlert')} />}
         </Box>
     );
 };

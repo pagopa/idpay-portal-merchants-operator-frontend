@@ -80,7 +80,7 @@ vi.mock('../../store/authStore', () => ({
 const mockTransactions = [
   {
     trxId: '1',
-    trxDate: '2025-09-22T14:00:00Z',
+    trxDate: '2025-09-22 14:00:00',
     fiscalCode: 'BBBBBB22C33D444E',
     effectiveAmountCents: 8000,
     rewardAmountCents: 800,
@@ -151,7 +151,7 @@ describe('RefundManagement', () => {
     
     renderComponent();
     
-    await screen.findByTestId('error-alert');
+    await screen.findByTestId('alert');
     
     expect(screen.getByText('Si è verificato un errore.')).toBeInTheDocument();
     expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();

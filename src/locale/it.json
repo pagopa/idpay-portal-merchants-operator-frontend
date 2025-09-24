@@ -190,7 +190,23 @@
       "title": "Gestione acquisti",
       "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
       "noTransactions": "Non ci sono transazioni per questa iniziativa",
-      "tableTitle": "Buoni sconto"
+      "tableTitle": "Buoni sconto",
+      "alertSuccess": "La transazione è andata a buon fine.",
+      "drawer": {
+        "title": "Dettaglio transazione",
+        "product": "Prodotto",
+        "totalAmount": "Totale della spesa",
+        "authorizedAmount": "Importo autorizzato",
+        "status": "Stato",
+        "fiscalCode": "Codice fiscale",
+        "trxDate": "Data e ora",
+        "brand": "Modello",
+        "category": "Categoria",
+        "confirmPayment": "Conferma pagamento",
+        "cancellPayment": "Annulla transazione",
+        "requestRefund": "Richiedi rimborso",
+        "refund": "Storna"
+      }
     },
     "refundManagement": {
       "title": "Gestione rimborsi",
