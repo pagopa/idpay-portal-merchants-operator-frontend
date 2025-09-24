@@ -9,20 +9,21 @@ import { useEffect, useState, useCallback } from "react";
 import DataTable from "../../components/DataTable/DataTable";
 import { getProductsList } from "../../services/merchantService";
 import { GetProductsParams } from "../../utils/types";
-import { SortModel } from "../../utils/types";
-import { PaginationModel } from "../../utils/types";
+import {GridPaginationModel, GridSortModel, GridRenderCellParams} from "@mui/x-data-grid";
+import {PaginationExtendedModel} from "../../utils/types";
+
 
 
 
 const Products = () => {
     const [productsList, setProductsList] = useState([]);
     const [productsListIsLoading, setProductsListIsLoading] = useState(false);
-    const [paginationModel, setPaginationModel] = useState({
-        pageNo: 0,
-        pageSize: 10,
+    const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
+        page: 0,
+        pageSize: import.meta.env.VITE_PAGINATION_SIZE,
         totalElements: 0
     });
-    const [sortModel, setSortModel] = useState<SortModel>([]);
+    const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const { t } = useTranslation();
 
     const initialValues = {
@@ -47,7 +48,7 @@ const Products = () => {
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -77,7 +78,7 @@ const Products = () => {
             flex: 1,
             disableColumnMenu: true,
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -107,7 +108,7 @@ const Products = () => {
             flex: 1,
             disableColumnMenu: true,
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -137,7 +138,7 @@ const Products = () => {
             flex: 1,
             disableColumnMenu: true,
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -167,7 +168,7 @@ const Products = () => {
             flex: 1,
             disableColumnMenu: true,
             sortable: true,
-            renderCell: (params: any) => {
+            renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
                     return (
                         <div style={{
@@ -200,10 +201,10 @@ const Products = () => {
 
     const fetchProducts = useCallback(async (params: GetProductsParams) => {
         try {
-            const { content, pageNo, pageSize, totalElements } = await getProductsList({ size: 10, status: 'APPROVED', ...params });
+            const { content, pageNo, pageSize, totalElements } = await getProductsList({ size: import.meta.env.VITE_PAGINATION_SIZE, status: 'APPROVED', ...params });
             setProductsList([...content]);
             setPaginationModel({
-                pageNo: pageNo || 0,
+                page: pageNo || 0,
                 pageSize: pageSize || 10,
                 totalElements: totalElements || 0
             });
@@ -214,43 +215,32 @@ const Products = () => {
         }
     }, []);
 
-    const handlePaginationChange = useCallback((newPaginationModel: PaginationModel) => {
+    const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
 
-        if (newPaginationModel.pageNo === paginationModel.pageNo &&
+        if (newPaginationModel.page === paginationModel.page &&
             newPaginationModel.pageSize === paginationModel.pageSize) {
             return;
         }
 
         fetchProducts({
-            page: newPaginationModel.pageNo,
+            page: newPaginationModel.page,
             size: newPaginationModel.pageSize,
             sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
         });
-    }, [fetchProducts, paginationModel.pageNo, paginationModel.pageSize, sortModel]);
+    };
 
-    const handleSortModelChange = (model: SortModel) => {
+    const handleSortModelChange = (model: GridSortModel) => {
         if (model.length > 0) {
             setSortModel(model);
-            const filteredValues = filterFormikValues(formik.values);
             fetchProducts({
                 sort: model[0].field + ',' + model[0].sort,
-                page: paginationModel.pageNo,
+                page: paginationModel.page,
                 size: paginationModel.pageSize,
-                ...filteredValues
+                ...formik.values
             });
         }
     }
 
-    const filterFormikValues = (values: GetProductsParams) => {
-        const filteredValues = {};
-        for (const key in values) {
-            const value = values[key];
-            if (value !== null && value !== undefined && value !== '') {
-                filteredValues[key] = value;
-            }
-        }
-        return filteredValues;
-    };
 
     const handleFiltersApplied = (filtersObj: any) => {
         const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
