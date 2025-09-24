@@ -132,8 +132,8 @@ describe('RefundManagement', () => {
     );
 
     expect(screen.getByTestId('rows-count')).toHaveTextContent('1');
-    expect(screen.getByTestId('first-row')).toHaveTextContent('STORNATO');
-    expect(screen.getByTestId('first-row')).toHaveTextContent('22/09/2025 16:00'); 
+    expect(screen.getByTestId('cell-status')).toHaveTextContent('STORNATO');
+    expect(screen.getByTestId('cell-date')).toHaveTextContent('22/09/2025 16:00'); 
   });
 
   it('should show no transactions message when there are no transactions', async () => {
