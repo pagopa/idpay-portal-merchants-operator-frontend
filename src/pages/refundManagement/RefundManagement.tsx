@@ -117,7 +117,7 @@ const RefundManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
+                if (params.value?.productName) {
                     return (
                         <div style={{
                             display: 'flex',
