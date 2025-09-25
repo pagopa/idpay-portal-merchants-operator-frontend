@@ -195,6 +195,7 @@
       "noTransactions": "Non ci sono transazioni per questa iniziativa",
       "tableTitle": "Buoni sconto",
       "alertSuccess": "La transazione è andata a buon fine.",
+      "paymentSuccess": "Il pagamento è stato confermato.",
       "drawer": {
         "title": "Dettaglio transazione",
         "product": "Prodotto",
@@ -214,6 +215,13 @@
         "title": "Vuoi annullare la transazione?",
         "description": "Sei sicuro di voler annullare questa transazione? <L’utente potrà continuare a usufruire del buono sconto>",
         "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
+      },
+      "captureTransactionModal": {
+        "title": "Hai ricevuto il pagamento del bene?",
+        "description1": "Hai ricevuto",
+        "description2":" dal cliente per il prodotto ",
+        "description3":"? Confermando, la transazione passerà nello stato ",
+        "errorCaptureTransaction" : "Non è stato possibile confermare la transazione. Riprova."
       }
     },
     "refundManagement": {

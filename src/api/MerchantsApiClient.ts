@@ -6,6 +6,7 @@ import { authStore } from '../store/authStore';
 import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
 import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
 import type { PointOfSaleTransactionsListDTO } from './generated/merchants/PointOfSaleTransactionsListDTO';
+import {TransactionBarCodeResponse} from "./generated/merchants/TransactionBarCodeResponse.ts";
 
 //axios instance 
 const createAxiosInstance = (): AxiosInstance => {
@@ -119,6 +120,21 @@ export const MerchantApi = {
       return result;
     } catch (error) {
       console.error('Error in authPaymentBarCode:', error);
+      throw error;
+    }
+  },
+
+  capturePayment: async (
+      params: {
+        trxCode: string,
+        additionalProperties?: object
+      }
+  ): Promise<TransactionBarCodeResponse> => {
+    try {
+      const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/capture`, params);
+     return handleAxiosResponse(response);
+    } catch (error) {
+      console.error('Error in capturePayment:', error);
       throw error;
     }
   },

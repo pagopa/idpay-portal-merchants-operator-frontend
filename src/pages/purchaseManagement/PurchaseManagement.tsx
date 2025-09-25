@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Tooltip, CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Drawer, Typography, Modal } from "@mui/material";
+import { Box, Button, Grid, Tooltip, CircularProgress, TextField, FormControl, InputLabel, Select, MenuItem, Paper, Drawer, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import DataTable from "../../components/DataTable/DataTable";
@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
-import { getInProgressTransactions, deleteTransactionInProgress } from "../../services/merchantService";
+import {getInProgressTransactions, deleteTransactionInProgress, capturePayment} from "../../services/merchantService";
 import { jwtDecode } from 'jwt-decode';
 import { authStore } from "../../store/authStore";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
@@ -29,6 +29,8 @@ const PurchaseManagement = () => {
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [errorAlert, setErrorAlert] = useState(false);
     const [errorDeleteTransaction, setErrorDeleteTransaction] = useState(false);
+    const [errorCaptureTransaction, setErrorCaptureTransaction] = useState(false);
+    const [transactionCaptured, setTransactionCaptured] = useState(false);
     const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
         page: 0,
@@ -39,6 +41,7 @@ const PurchaseManagement = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
+    const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const token = authStore.getState().token;
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
 
@@ -57,7 +60,7 @@ const PurchaseManagement = () => {
 
     useEffect(() => {
         fetchTransactions({});
-    }, []);
+    }, [transactionCaptured]);
 
     useEffect(() => {
         if (errorAlert) {
@@ -73,13 +76,25 @@ const PurchaseManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
+        if (transactionCaptured) {
+            const timer = setTimeout(() => {
+                setTransactionCaptured(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
         if(errorDeleteTransaction){
             const timer = setTimeout(() => {
                 setErrorDeleteTransaction(false);
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert, transactionAuthorized, errorDeleteTransaction]);
+        if(errorCaptureTransaction){
+            const timer = setTimeout(() => {
+                setErrorCaptureTransaction(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert, transactionAuthorized, errorDeleteTransaction,errorCaptureTransaction,transactionCaptured]);
 
 
     const columns = [
@@ -313,6 +328,10 @@ const PurchaseManagement = () => {
         setOpenDrawer(true);
         setSelectedTransaction(row);
     };
+    const handleCaptureTransaction = () => {
+        setOpenDrawer(false);
+        setCaptureTransactionModal(true);
+    };
 
     const handleCancelTransaction = () => {
         setOpenDrawer(false);
@@ -328,6 +347,21 @@ const PurchaseManagement = () => {
             console.error('Error deleting transaction:', error);
             setCancelTransactionModal(false);
             setErrorDeleteTransaction(true);
+            setOpenDrawer(true);
+        }
+    };
+
+    const captureTransaction = async () => {
+        try {
+            await capturePayment({trxCode:selectedTransaction?.trxCode});
+            setOpenDrawer(false);
+            setCaptureTransactionModal(false);
+            navigate(ROUTES.BUY_MANAGEMENT);
+            setTransactionCaptured(true);
+        } catch (error) {
+            console.error('Error capture transaction:', error);
+            setCaptureTransactionModal(false);
+            setErrorCaptureTransaction(true);
             setOpenDrawer(true);
         }
     };
@@ -500,20 +534,28 @@ const PurchaseManagement = () => {
 
                     </Grid>
                     <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Button variant="contained" fullWidth onClick={() => setOpenDrawer(false)}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
+                        <Button variant="contained" fullWidth onClick={handleCaptureTransaction}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
                         <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => {}} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
                     </Box>
                 </Box>
             </Drawer>
             {errorAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorAlert')} />}
             {transactionAuthorized && <AlertComponent error={false} message={t('pages.purchaseManagement.alertSuccess')} />}
+            {transactionCaptured && <AlertComponent error={false} message={t('pages.purchaseManagement.paymentSuccess')} />}
             {errorDeleteTransaction && <AlertComponent error={true} message={t('pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction')} />}
+            {errorCaptureTransaction && <AlertComponent error={true} message={t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')} />}
 
-            {cancelTransactionModal &&
-                <ModalComponent open={cancelTransactionModal} onClose={() => setCancelTransactionModal(false)}>
+                <ModalComponent open={cancelTransactionModal || captureTransactionModal} onClose={() => {
+                    setCancelTransactionModal(false);
+                    setCaptureTransactionModal(false);
+                }}>
                     <Box display={'flex'} flexDirection={'column'} gap={2}>
-                        <Typography variant="h6">{t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
-                        <Typography variant="body1">{t('pages.purchaseManagement.cancelTransactionModal.description')}</Typography>
+                        <Typography variant="h6">{captureTransactionModal ? t('pages.purchaseManagement.captureTransactionModal.title') : t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
+                        <Typography variant="body1">{captureTransactionModal ?
+                            `${t('pages.purchaseManagement.captureTransactionModal.description')}${selectedTransaction?.effectiveAmountCents}
+                            ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
+                            ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
+                            : t('pages.purchaseManagement.cancelTransactionModal.description')}</Typography>
                     </Box>
                     <Box
                         display={'flex'}
@@ -521,17 +563,17 @@ const PurchaseManagement = () => {
                         gap={2}
                         mt={1}
                     >
-                        <Button variant="outlined" onClick={() => { setCancelTransactionModal(false); setOpenDrawer(true) }}>
-                            {'Esci'}
+                        <Button variant="outlined" onClick={() => { setCaptureTransactionModal(false); setCancelTransactionModal(false); setOpenDrawer(true) }}>
+                            {captureTransactionModal ? 'Indietro' : 'Esci'}
                         </Button>
                         <Button
                             variant="contained"
-                            onClick={deleteTransaction}
+                            onClick={captureTransactionModal ? captureTransaction :deleteTransaction}
                         >
                             {'Conferma'}
                         </Button>
                     </Box>
-                </ModalComponent>}
+                </ModalComponent>
 
         </Box>
     );
