@@ -209,6 +209,11 @@
         "cancellPayment": "Annulla transazione",
         "requestRefund": "Richiedi rimborso",
         "refund": "Storna"
+      },
+      "cancelTransactionModal": {
+        "title": "Vuoi annullare la transazione?",
+        "description": "Sei sicuro di voler annullare questa transazione? <L’utente potrà continuare a usufruire del buono sconto>",
+        "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
       }
     },
     "refundManagement": {

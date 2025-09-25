@@ -171,6 +171,17 @@ export const MerchantApi = {
     }
   },
 
+  deleteTransactionInProgress: async (trxId: string): Promise<void> => {
+    try {
+      const response = await axiosInstance.delete(`/transactions/${trxId}`);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in deleteTransactionInProgress:', error);
+      throw error;
+    }
+  },
+
 };
 
 

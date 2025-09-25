@@ -269,8 +269,10 @@ const Products = () => {
     };
 
     const handleFiltersReset = () => {
-        formik.resetForm();
-        fetchProducts({});
+        if(formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0){
+            formik.resetForm();
+            fetchProducts({});
+        }
     };
     const handleRowAction = (row: any) => {
         setOpenDrawer(true);
