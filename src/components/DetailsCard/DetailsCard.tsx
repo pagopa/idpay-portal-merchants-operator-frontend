@@ -5,10 +5,10 @@ const DetailsCard = ({
   title,
   item,
 }: {
-  title: string;
+  title?: string;
   item: Record<string, string | number>;
 }) => {
-  const listItems = Object.entries(item);
+  const listItems = Object.entries(item).reduce((acc, [key, value]) => [ ...acc, [key, !value ? "-" : value]], [])
 
   return (
     <Card
@@ -22,10 +22,10 @@ const DetailsCard = ({
       <CardContent
         sx={{ display: "flex", flexDirection: "column", rowGap: "1rem" }}
       >
-        <Typography variant="h6" fontWeight="fontWeightBold">
+        {title && <Typography variant="h6" fontWeight="fontWeightBold">
           {title}
-        </Typography>
-        <List
+        </Typography>}
+        <List data-testid = "list-test"
           sx={{ display: "flex", flexDirection: "column", rowGap: "0.5rem" }}
           disablePadding
         >

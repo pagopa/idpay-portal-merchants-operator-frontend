@@ -27,19 +27,18 @@ const fetchDetails = async ({ setLoading, token, user }) => {
 
 const mapResponse = async ({ setLoading, setDetails, token, user }) => {
   const response = await fetchDetails({ setLoading, token, user });
-  const isEmpty = (key) => (!response?.[key] ? "-" : response[key]);
 
   const mappedResponse = [
     {
-      "ID univoco": isEmpty("id"),
-      "Indirizzo": isEmpty("address"),
-      "Telefono": isEmpty("channelPhone"),
-      "Email": isEmpty("channelEmail"),
+      "ID univoco": response.id,
+      "Indirizzo": response.address,
+      "Telefono": response.channelPhone,
+      "Email": response.channelEmail,
     },
     {
-      "Nome": isEmpty("contactName"),
-      "Cognome": isEmpty("contactSurname"),
-      "Email": isEmpty("contactEmail"),
+      "Nome": response.contactName,
+      "Cognome": response.contactSurname,
+      "Email": response.contactEmail,
     },
   ];
   setDetails(mappedResponse);
