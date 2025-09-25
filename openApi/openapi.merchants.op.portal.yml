@@ -1866,10 +1866,10 @@ components:
       schema:
         type: string
         enum:
-          - updateDate, desc
+          - elaborationDateTime, desc
           - status, desc
           - productCategory, desc
-          - updateDate, asc
+          - elaborationDateTime, asc
           - status, asc
           - productCategory, asc
     status_trx_in_progress_query:
@@ -1897,10 +1897,10 @@ components:
       schema:
         type: string
         enum:
-          - updateDate, desc
+          - elaborationDateTime, desc
           - status, desc
           - productCategory, desc
-          - updateDate, asc
+          - elaborationDateTime, asc
           - status, asc
           - productCategory, asc
     initiativeId_path:
