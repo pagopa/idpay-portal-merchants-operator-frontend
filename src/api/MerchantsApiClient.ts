@@ -6,6 +6,7 @@ import { authStore } from '../store/authStore';
 import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
 import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
 import type { PointOfSaleTransactionsListDTO } from './generated/merchants/PointOfSaleTransactionsListDTO';
+import { PointOfSaleDTO } from './generated/merchants/PointOfSaleDTO';
 
 //axios instance 
 const createAxiosInstance = (): AxiosInstance => {
@@ -170,7 +171,7 @@ export const MerchantApi = {
     }
   },
 
-  getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string) => {
+  getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string): Promise<PointOfSaleDTO> => {
     try {
       const response = await axiosInstance.get(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
       const result = handleAxiosResponse(response)
