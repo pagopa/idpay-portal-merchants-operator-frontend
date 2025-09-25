@@ -38,6 +38,7 @@ export type GetPointOfSaleTransactionsT = r.IGetApiRequestType<
     readonly sort?: string;
     readonly fiscalCode?: string;
     readonly status?: string;
+    readonly productGtin?: string;
     readonly initiativeId: string;
     readonly pointOfSaleId: string;
   },

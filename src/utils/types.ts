@@ -38,7 +38,7 @@ export interface PaginationResponse {
 
 export interface GetProcessedTransactionsFilters {
     fiscalCode?: string;
-    gtiIn?: string;
+    productGtin?: string;
     status?: string;
 }
 
@@ -78,4 +78,25 @@ export interface DecodedJwtToken {
     family_name: string;
     email: string;
     point_of_sale_id: string;
+}
+
+export interface transactionInProgreessDTO {
+    additionalProperties: {
+        productCategory: string;
+        productGtin: string;
+        productName: string;
+    };
+    channel: string;
+    effectiveAmountCents: number;
+    fiscalCode: string;
+    id: string;
+    residualAmountCents: number;
+    rewardAmountCents: number;
+    splitPayment: boolean;
+    status: string;
+    trxCode: string;
+    trxDate: string;
+    trxExpirationSeconds: number;
+    updateDate: string;
+    
 }

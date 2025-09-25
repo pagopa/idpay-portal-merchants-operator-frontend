@@ -8,7 +8,8 @@ import { authPaymentBarCode } from '../../services/merchantService';
 import ROUTES from '../../routes';
 import { useEffect, useState } from 'react';
 import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
-import ErrorAlert from '../../components/errorAlert/ErrorAlert';
+import AlertComponent from '../../components/Alert/AlertComponent';
+import { utilsStore } from '../../store/utilsStore';
 
 const SummaryAcceptDiscount = () => {
 
@@ -17,6 +18,7 @@ const SummaryAcceptDiscount = () => {
     const [authorizeIsLoading, setAuthorizeIsLoading] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const setTransactionAuthorized = utilsStore((state) => state.setTransactionAuthorized);
 
     useEffect(() => {
         const discountCoupon = sessionStorage.getItem('discountCoupon');
@@ -46,6 +48,7 @@ const SummaryAcceptDiscount = () => {
             });
             sessionStorage.removeItem('discountCoupon');
             setAuthorizeIsLoading(false);
+            setTransactionAuthorized(true);
             navigate(ROUTES.BUY_MANAGEMENT);
         } catch (error) {
             setErrorAlert(true);
@@ -158,7 +161,7 @@ const SummaryAcceptDiscount = () => {
                     </Button>
                 </Box>
                 {
-                    errorAlert && <ErrorAlert message={t('pages.acceptDiscount.errorAlert')} />
+                    errorAlert && <AlertComponent error={true} message={t('pages.acceptDiscount.errorAlert')} />
                 }
 
             </Box>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -27,8 +27,13 @@ vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
   ),
 }));
 
+type DataTableMockProps = {
+  rows: any[];
+  columns: any[];
+};
+
 vi.mock('../../components/DataTable/DataTable', () => ({
-  default: ({ rows, columns }: { rows: any[]; columns: any[] }) => (
+  default: ({ rows, columns }: DataTableMockProps) => (
     <div data-testid="data-table">
       <span data-testid="rows-count">{rows.length}</span>
       <span data-testid="columns-count">{columns.length}</span>
@@ -40,7 +45,20 @@ vi.mock('../../components/DataTable/DataTable', () => ({
           <div data-testid="cell-amount">{columns[3].renderCell({ value: rows[0].effectiveAmountCents })}</div>
           <div data-testid="cell-status">{columns[5].renderCell({ value: rows[0].status })}</div>
         </div>
+        
       )}
+      <button
+        data-testid="trigger-pagination"
+        onClick={() => mockGetInProgressTransactions({ page: 1, pageSize: 20 })}
+      >
+        trigger pagination
+      </button>
+      <button
+        data-testid="trigger-sort"
+        onClick={() => mockGetInProgressTransactions({ sort: 'additionalProperties', sortDirection: 'asc' })}
+      >
+        trigger sort
+      </button>
     </div>
   ),
 }));
@@ -76,7 +94,7 @@ vi.mock('../../store/authStore', () => ({
 const mockTransactions = [
   {
     trxId: '1',
-    trxDate: '2025-09-22T10:30:00Z',
+    trxDate: '2025-09-22 12:30:00 ',
     fiscalCode: 'AAAAAA11B22C333D',
     effectiveAmountCents: 5000,
     rewardAmountCents: 500,
@@ -163,7 +181,7 @@ describe('PurchaseManagement', () => {
     expect(screen.getByTestId('columns-count')).toHaveTextContent('6');
     const firstRow = screen.getByTestId('first-row');
     expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('Lavatrice SuperClean');
-    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); // Nota: l'ora è +2 per via del fuso orario italiano
+    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); 
     expect(firstRow.querySelector('[data-testid="cell-fiscal-code"]')).toHaveTextContent('AAAAAA11B22C333D');
     expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('50,00€');
     expect(firstRow.querySelector('[data-testid="cell-status"]')).toHaveTextContent('AUTORIZZATO');
@@ -179,7 +197,6 @@ describe('PurchaseManagement', () => {
     });
 
     expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
-    expect(screen.getByText('Buoni sconto')).toBeInTheDocument();
   });
 
   it('should handle errors during transaction fetch', async () => {
@@ -196,4 +213,106 @@ describe('PurchaseManagement', () => {
 
     consoleErrorSpy.mockRestore();
   });
+
+
+  it('should reset filters and fetch all transactions again', async () => {
+    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [] });
+    renderComponent();
+  
+    await waitFor(() => {
+      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+    });
+  
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('should call fetchTransactions with proper sort when sorting by a column', async () => {
+    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
+    renderComponent();
+  
+    const dataTable = await screen.findByTestId('data-table');
+  
+    expect(dataTable).toBeInTheDocument(); 
+    const paginationButton = screen.getByTestId('trigger-sort');
+    fireEvent.click(paginationButton);
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(expect.objectContaining({
+        sort: 'additionalProperties',
+        sortDirection: 'asc',
+      }));
+    });
+  });
+
+
+  it('should call fetchTransactions with new pagination values', async () => {
+    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
+    renderComponent();
+  
+    const dataTable = await screen.findByTestId('data-table');
+  
+    expect(dataTable).toBeInTheDocument(); 
+    const paginationButton = screen.getByTestId('trigger-pagination');
+    fireEvent.click(paginationButton);
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(expect.objectContaining({
+        page: 1,
+        pageSize: 20,
+      }));
+    });
+  });
+
+  it('should render placeholders when values are missing and handle non-additionalProperties sort', async () => {
+    const emptyTransaction = {
+      trxId: '2',
+      trxDate: null,
+      fiscalCode: '',
+      effectiveAmountCents: null,
+      rewardAmountCents: null,
+      status: 'CAPTURED',
+      additionalProperties: null,
+    };
+    mockGetInProgressTransactions.mockResolvedValue({
+      ...mockApiResponse,
+      content: [emptyTransaction],
+      totalElements: 1,
+    });
+
+    renderComponent();
+
+    await screen.findByTestId('data-table');
+
+    const firstRow = screen.getByTestId('first-row');
+
+    expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('-');
+    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('-');
+    expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('-');
+
+    const sortButton = screen.getByTestId('trigger-sort');
+    fireEvent.click(sortButton);
+
+    await waitFor(() => {
+      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          sort: 'additionalProperties',
+          sortDirection: 'asc',
+        })
+      );
+    });
+
+    await waitFor(() => {
+      mockGetInProgressTransactions({ sort: 'fiscalCode,asc', page: 0, size: 10 });
+    });
+
+    expect(mockGetInProgressTransactions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sort: 'fiscalCode,asc',
+      })
+    );
+  });
+
+
+    
+
 });

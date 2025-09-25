@@ -1,15 +1,18 @@
 import { Alert } from '@mui/material';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 
-interface ErrorAlertProps {
+interface AlertProps {
+        error: boolean;
         message: string;
 }
 
-const ErrorAlert = ({ message }: ErrorAlertProps) => {
+const AlertComponent = ({ error, message }: AlertProps) => {
     return (
         <Alert
-            severity="error"
-            icon={<ErrorOutline />}
+            data-testid="alert"
+            severity={error ? 'error' : 'success'}
+            icon={error ? <ErrorOutline /> : <CheckCircleOutline />}
             sx={{
                 position: 'fixed',
                 bottom: 40,
@@ -22,7 +25,7 @@ const ErrorAlert = ({ message }: ErrorAlertProps) => {
                 boxShadow: 3,
                 borderRadius: 1,
                 '& .MuiAlert-icon': {
-                    color: '#FF5C5C',
+                    color: error ? '#FF5C5C' : '#6CC66A',
                 },
             }}
         >
@@ -31,4 +34,4 @@ const ErrorAlert = ({ message }: ErrorAlertProps) => {
     );
 };
 
-export default ErrorAlert;
+export default AlertComponent;

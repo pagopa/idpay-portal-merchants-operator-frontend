@@ -14,6 +14,9 @@ vi.mock('react-i18next', () => ({
         'pages.refundManagement.noTransactions': 'Nessuna transazione trovata.',
         'pages.refundManagement.errorAlert': 'Si è verificato un errore.',
         'pages.refundManagement.refunded': 'STORNATO',
+        'commons.fiscalCodeFilterPlaceholer': 'Cerca per codice fiscale',
+        'commons.gtiInFilterPlaceholer': 'Cerca per GTIN',
+        'commons.statusFilterPlaceholer': 'Cerca per stato',
       };
       return translations[key] || key;
     },
@@ -77,7 +80,7 @@ vi.mock('../../store/authStore', () => ({
 const mockTransactions = [
   {
     trxId: '1',
-    trxDate: '2025-09-22T14:00:00Z',
+    trxDate: '2025-09-22 14:00:00',
     fiscalCode: 'BBBBBB22C33D444E',
     effectiveAmountCents: 8000,
     rewardAmountCents: 800,
@@ -129,8 +132,8 @@ describe('RefundManagement', () => {
     );
 
     expect(screen.getByTestId('rows-count')).toHaveTextContent('1');
-    expect(screen.getByTestId('first-row')).toHaveTextContent('STORNATO');
-    expect(screen.getByTestId('first-row')).toHaveTextContent('22/09/2025 16:00'); 
+    expect(screen.getByTestId('cell-status')).toHaveTextContent('STORNATO');
+    expect(screen.getByTestId('cell-date')).toHaveTextContent('22/09/2025 14:00'); 
   });
 
   it('should show no transactions message when there are no transactions', async () => {
@@ -148,7 +151,7 @@ describe('RefundManagement', () => {
     
     renderComponent();
     
-    await screen.findByTestId('error-alert');
+    await screen.findByTestId('alert');
     
     expect(screen.getByText('Si è verificato un errore.')).toBeInTheDocument();
     expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
@@ -173,7 +176,7 @@ describe('RefundManagement', () => {
       'pos-456',
       expect.objectContaining({
         fiscalCode: 'TESTCF123',
-        gtiIn: '',
+        productGtin: '',
         status: '',
         page: 0,
       })
