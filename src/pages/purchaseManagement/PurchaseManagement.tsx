@@ -330,8 +330,10 @@ const PurchaseManagement = () => {
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
                         onFiltersReset={() => {
-                            formik.resetForm();
-                            fetchTransactions({});
+                            if(formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== ""){
+                                formik.resetForm();
+                                fetchTransactions({});
+                            }
                         }}
                     >
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>

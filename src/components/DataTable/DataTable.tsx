@@ -84,7 +84,7 @@ const DataTable = ({
   }, [columns, handleRowAction]);
 
   useEffect(() => {
-    if(sortModel){
+    if(sortModel !== sortModelState){
       setSortModelState(sortModel);
     }
   }, [sortModel]);
@@ -125,7 +125,8 @@ const DataTable = ({
     if(model.length > 0){
       setSortModelState(model);
       onSortModelChange?.(model);
-    }else{
+    } 
+    else{
       setSortModelState((prevState: GridSortModel) => {
         const newSortModel: GridSortModel = prevState?.[0]?.sort === 'asc'
           ? [{field: prevState?.[0].field, sort: 'desc'}]
