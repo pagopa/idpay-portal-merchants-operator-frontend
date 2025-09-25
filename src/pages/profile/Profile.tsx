@@ -35,7 +35,6 @@ const mapResponse = async ({ setLoading, setDetails, token, user }) => {
       "Indirizzo": isEmpty("address"),
       "Telefono": isEmpty("channelPhone"),
       "Email": isEmpty("channelEmail"),
-      "Partita IVA": isEmpty("vat"),
     },
     {
       "Nome": isEmpty("contactName"),
