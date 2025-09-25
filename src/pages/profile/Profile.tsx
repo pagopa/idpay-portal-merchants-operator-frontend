@@ -88,15 +88,15 @@ const Profile = () => {
           mbSubTitle={2}
         />
       </Box>
-      {loading ? (
+      {loading && !details ? (
         <Box
+         data-testid="loading"
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             height: "100vh",
           }}
-         data-testid="loading"
         >
           <CircularProgress />
         </Box>
