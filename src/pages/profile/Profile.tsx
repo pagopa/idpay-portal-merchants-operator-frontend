@@ -8,37 +8,39 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { authStore } from "../../store/authStore";
 import { useAuth } from "../../contexts/AuthContext";
+import AlertComponent from "../../components/Alert/AlertComponent";
 
-const fetchDetails = async ({ setLoading, token, user }) => {
+const fetchDetails = async ({ setLoading, setErrorAlert, token, user }) => {
   const decodeToken: DecodedJwtToken = jwtDecode(token);
+  setLoading(true);
   try {
-    setLoading(true);
     const response = await getPointOfSaleDetails(
       user.merchant_id,
       decodeToken?.point_of_sale_id
     );
-    setLoading(false);
     return response;
   } catch (error) {
     console.error("Error fetching details:", error);
-    setLoading(false);
+    setErrorAlert(true)
+  } finally {
+    setLoading(false)
   }
 };
 
-const mapResponse = async ({ setLoading, setDetails, token, user }) => {
-  const response = await fetchDetails({ setLoading, token, user });
+const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user }) => {
+  const response = await fetchDetails({ setLoading, setErrorAlert, token, user });
 
   const mappedResponse = [
     {
-      "ID univoco": response.id,
-      "Indirizzo": response.address,
-      "Telefono": response.channelPhone,
-      "Email": response.channelEmail,
+      "ID univoco": response?.id ?? "",
+      "Indirizzo": response?.address ?? "",
+      "Telefono": response?.channelPhone ?? "",
+      "Email": response?.channelEmail ?? "",
     },
     {
-      "Nome": response.contactName,
-      "Cognome": response.contactSurname,
-      "Email": response.contactEmail,
+      "Nome": response?.contactName ?? "",
+      "Cognome": response?.contactSurname ?? "",
+      "Email": response?.contactEmail ?? "",
     },
   ];
   setDetails(mappedResponse);
@@ -48,14 +50,24 @@ const Profile = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState();
   const [details, setDetails] = useState();
+  const [errorAlert, setErrorAlert] = useState(false);
   const { t } = useTranslation();
   const token = authStore.getState().token;
 
   useEffect(() => {
     if (!details) {
-      mapResponse({ setLoading, setDetails, token, user });
+      mapResponse({ setLoading, setErrorAlert, setDetails, token, user });
     }
   }, [token, user, details]);
+
+  useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert]);
 
   return (
     <Box>
@@ -84,11 +96,11 @@ const Profile = () => {
             alignItems: "center",
             height: "100vh",
           }}
-          data-testid="loading"
+         data-testid="loading"
         >
           <CircularProgress />
         </Box>
-      ) : details ? (
+      ) : details && !errorAlert ? (
         <Grid container flexWrap="nowrap" flexDirection="row" spacing={2}>
           <DetailsCard title="Dati punto vendita" item={details[0]} />
           <DetailsCard title="Dati referente" item={details[1]} />
@@ -96,8 +108,9 @@ const Profile = () => {
       ) : (
         <Typography variant="body2">Nessun elemento trovato</Typography>
       )}
+      {errorAlert && <AlertComponent error={true} message={t('pages.profile.errorAlert')} />}
     </Box>
   );
 };
 
-export default Profile;
+export default Profile

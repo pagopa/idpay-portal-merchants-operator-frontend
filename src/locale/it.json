@@ -191,7 +191,8 @@
     },
     "profile": {
       "title": "Profilo",
-      "subtitle": "Consulta i dati identificativi dell’azienda."
+      "subtitle": "Consulta i dati identificativi dell’azienda.",
+      "errorAlert":"Non è stato possibile recuperare i dati. Riprova."
     },
     "purchaseManagement": {
       "title": "Gestione acquisti",
