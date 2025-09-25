@@ -18,7 +18,130 @@ tags:
     description: Operations related to product listing and filtering
   - name: transaction
     description: Operations related to transaction
+  - name: point-of-sales
+    description: Operations on merchant points of sale
 paths:
+  /transactions/bar-code/{trxCode}/capture:
+    put:
+      tags:
+        - transaction
+      summary: Capture the transaction
+      description: Capture the transaction
+      operationId: capturePayment
+      parameters:
+        - name: trxCode
+          in: path
+          description: 'ENG: The transaction''s code - IT: Codice della transazione'
+          required: true
+          schema:
+            type: string
+            maxLength: 24
+            pattern: '^[a-zA-Z0-9]+$'
+      responses:
+        '200':
+          description: Ok
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionBarCodeResponse'
+        '400':
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_INVALID_REQUEST"
+                message: "Something went wrong handling the request"
+        '401':
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                message: "Cannot find transaction with transactionCode [%s]"
+        '429':
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            Retry-After:
+              $ref: '#/components/headers/Retry-After'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_TOO_MANY_REQUESTS"
+                message: "Too many requests"
+        '500':
+          description: Generic error
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_GENERIC_ERROR"
+                message: "Application error"
   /transactions/bar-code/{trxCode}/preview:
     put:
       tags:
@@ -239,6 +362,7 @@ paths:
         - $ref: '#/components/parameters/sort_trx_processed_query'
         - $ref: '#/components/parameters/fiscalCode_query'
         - $ref: '#/components/parameters/status_trx_processed_query'
+        - $ref: '#/components/parameters/productGtin_query'
         - $ref: '#/components/parameters/initiativeId_path'
         - $ref: '#/components/parameters/pointOfSaleId_path'
       responses:
@@ -283,7 +407,245 @@ paths:
           $ref: '#/components/responses/GET_transactions_in_progress_429_Response'
         '500':
           $ref: '#/components/responses/GET_transactions_in_progress_500_Response'
+  /transactions/{transactionId}:
+    delete:
+      tags:
+        - transaction
+      summary: Point of sales delete transaction
+      operationId: deleteTransaction
+      description: "ENG: Delete a transaction associated to a point of sale - IT: Elimina una transazione associata ad un punto vendita"
+      parameters:
+        - name: transactionId
+          in: path
+          description: The transaction ID
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: '^[a-zA-Z0-9]+$'
+      responses:
+        '200':
+          description: Ok
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+        '400':
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_INVALID_REQUEST"
+                message: "Something went wrong handling the request"
+        '401':
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+        '403':
+          description: 'Forbidden'
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT"
+                message: "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+        '404':
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                message: "Cannot find transaction with transactionId [%s]"
+        '429':
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+            Retry-After:
+              $ref: '#/components/headers/Retry-After'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_TOO_MANY_REQUESTS"
+                message: "Too many requests"
+        '500':
+          description: Generic error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionErrorDTO'
+              example:
+                code: "PAYMENT_GENERIC_ERROR"
+                message: "Application error"
 
+  /{merchantId}/point-of-sales/{pointOfSaleId}:
+    get:
+      tags:
+        - point-of-sales
+      summary: Retrieve a point of sale
+      description: "Return a point of sale for the specified merchant."
+      operationId: getPointOfSale
+      parameters:
+        - name: merchantId
+          in: path
+          description: The merchant ID
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: '^[a-zA-Z0-9]+$'
+        - name: pointOfSaleId
+          in: path
+          description: The point of sale ID
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: '^[a-zA-Z0-9]+$'
+      responses:
+        "200":
+          description: Successful response with point of sale detail
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleDTO"
+        "400":
+          description: Bad request - Invalid query parameters
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_BAD_REQUEST
+                message: Something went wrong handling request
+        "401":
+          description: Unauthorized - Authentication Failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+        "404":
+          description: Not Found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_NOT_FOUND
+                message: Point of sale with id 123 not found.
+        "429":
+          description: Too many Request - Rate limit exceeded
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+            Retry-After:
+              $ref: '#/components/headers/Retry-After'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_TOO_MANY_REQUESTS
+                message: Too many requests
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_GENERIC_ERROR
+                message: An error occurred during file reading
 components:
   headers:
     X-RateLimit-Limit:
@@ -322,6 +684,60 @@ components:
         minimum: 0
         maximum: 86400
   schemas:
+    TransactionBarCodeResponse:
+      type: object
+      required:
+        - id
+        - trxCode
+        - initiativeId
+        - initiativeName
+        - trxDate
+        - status
+        - trxExpirationSeconds
+        - residualBudgetCents
+      properties:
+        id:
+          type: string
+          description: 'ENG: Transaction ID <br> IT: ID della transazione'
+          maxLength: 64
+          pattern: .*
+        trxCode:
+          type: string
+          description: 'ENG: Transaction code - IT: Codice della transazione (codice sconto)'
+          maxLength: 24
+          pattern: '^[a-zA-Z0-9]+$'
+        initiativeId:
+          type: string
+          description: "ENG: Id of the initiative - IT: Identificativo dell'iniziativa"
+          maxLength: 100
+          pattern: '^[A-Za-z0-9_-]+$'
+        initiativeName:
+          type: string
+          description: "ENG: Name of the initiative - IT: Nome della iniziativa"
+          maxLength: 1000
+          pattern: '.*'
+        trxDate:
+          type: string
+          format: date-time
+          description: 'ENG: Transaction date - IT: Data della transazione'
+          maxLength: 255
+        status:
+          type: string
+          enum:
+            - CREATED
+            - IDENTIFIED
+            - AUTHORIZED
+            - CAPTURED
+            - REWARDED
+            - REJECTED
+        trxExpirationSeconds:
+          type: number
+          description: "ENG: Expiration time of the transaction, in seconds - IT: Scadenza della transazione, in secondi"
+          minimum: 0
+        residualBudgetCents:
+          type: number
+          description: "ENG: The residual budget - IT: Budget residuo"
+          minimum: 0
     PreviewPaymentRequestDTO:
       type: object
       properties:
@@ -579,6 +995,7 @@ components:
           maximum: 1000000
     PointOfSaleTransactionProcessedDTO:
       type: object
+      additionalProperties: false
       properties:
         id:
           type: string
@@ -628,6 +1045,12 @@ components:
             - BARCODE
             - QRCODE
             - IDPAYCODE
+        additionalProperties:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 255
+            pattern: '.*'
     PointOfSaleTransactionsListDTO:
       type: object
       properties:
@@ -739,12 +1162,105 @@ components:
           format: uri
           maxLength: 2048
           description: "ENG: Url of the QR code link - IT: Url del QR code"
-        "additionalProperties":
+        additionalProperties:
           type: object
           additionalProperties:
             type: string
             maxLength: 255
             pattern: '.*'
+    PointOfSaleDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "ENG: The id for the point of sale <br> IT: Id del punto vendita"
+          maxLength: 255
+        type:
+          type: string
+          enum:
+            - PHYSICAL
+            - ONLINE
+          description: "ENG: The type of the point of sale <br> IT: Il tipo del punto vendita"
+        franchiseName:
+          type: string
+          maxLength: 255
+          description: "ENG: The name of the point of sale <br> IT: Il nome del punto vendita"
+        region:
+          type: string
+          description: "ENG: The region of the point of sale <br> IT: La regione del punto vendita"
+          maxLength: 255
+        province:
+          type: string
+          description: "ENG: The province of the point of sale <br> IT: La provincia del punto vendita"
+          maxLength: 255
+        city:
+          type: string
+          description: "ENG: The city of the point of sale <br> IT: La città del punto vendita"
+          maxLength: 255
+        zipCode:
+          type: string
+          description: "ENG: The zip code of the point of sale <br> IT: Il CAP del punto vendita"
+          maxLength: 255
+        address:
+          type: string
+          description: "ENG: The address of the point of sale <br> IT: L'indirizzo completo del punto vendita"
+          maxLength: 255
+        streetNumber:
+          type: string
+          description: "ENG: The street number of the point of sale <br> IT: Il numero civico del punto vendita"
+          maxLength: 255
+        webSite:
+          type: string
+          description: "ENG: The website of the point of sale <br> IT: Il sito web del punto vendita"
+          maxLength: 255
+        contactEmail:
+          type: string
+          description: "ENG: The email of the contact person <br> IT: L'email del referente"
+          maxLength: 255
+        contactName:
+          type: string
+          description: "ENG: The name of the contact person <br> IT: Il nome del referente"
+          maxLength: 255
+        contactSurname:
+          type: string
+          description: "ENG: The surname of the contact person <br> IT: Il cognome del referente"
+          maxLength: 255
+        channelEmail:
+          type: string
+          description: "ENG: Store contact via email address <br> IT: Contatto del punto vendita tramite indirizzo email."
+          maxLength: 255
+        channelPhone:
+          type: string
+          description: "ENG: Store contact via phone number <br> IT: Contatto del punto vendita tramite numero di telefono"
+          maxLength: 255
+        channelGeolink:
+          type: string
+          description: "ENG: Store contact providing a map link or location for navigation <br> IT: Contatto del punto vendita tramite link geografico o posizione sulla mappa"
+          maxLength: 255
+        channelWebsite:
+          type: string
+          description: "ENG: Store contact via a web-based portal <br> IT: Contatto del punto vendita tramite portale web"
+          maxLength: 255
+    PointOfSaleErrorDTO:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - POINT_OF_SALE_NOT_FOUND
+            - POINT_OF_SALE_BAD_REQUEST
+            - POINT_OF_SALE_INVALID_REQUEST
+            - MERCHANT_NOT_ONBOARDED
+            - POINT_OF_SALE_TOO_MANY_REQUESTS
+            - POINT_OF_SALE_GENERIC_ERROR
+          description: '"ENG: Error code:<br> POINT_OF_SALES_NOT_FOUND: The sale was not found,<br> MERCHANT_NOT_ONBOARDED: The merchant is not associated to the initiative,<br> POINT_OF_SALES_TOO_MANY_REQUESTS: Too many requests,<br> POINT_OF_SALES_INVALID_REQUEST: Something went wrong handling the request,<br> POINT_OF_SALES_GENERIC_ERROR: Application error,<br> - IT: Codice di errore:<br> POINT_OF_SALES_NOT_FOUND: Lo store non è stato trovato,<br> MERCHANT_NOT_ONBOARDED: L''esercente non è associato all''iniziativa,<br> POINT_OF_SALES_TOO_MANY_REQUESTS: Troppe richieste,<br> POINT_OF_SALES_INVALID_REQUEST: Qualcosa è andato storto durante l''invio della richiesta,<br> POINT_OF_SALES_GENERIC_ERROR: Errore applicativo"'
+        message:
+          type: string
+          description: "ENG: Error message- IT: Messaggio di errore"
+          maxLength: 1000
     ErrorDTO:
       type: object
       required:
@@ -777,12 +1293,12 @@ components:
           description: "ENG: Transaction acquirer ID- IT: Identificativo della transazione rispetto all'acquirer"
           maxLength: 100
           format: uuid
-        "additionalProperties":
-         type: object
-         additionalProperties:
-          type: string
-          maxLength: 255
-          pattern: '.*'
+        additionalProperties:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 255
+            pattern: '.*'
     AuthPaymentResponseDTO:
       type: object
       required:
@@ -1352,8 +1868,10 @@ components:
         enum:
           - elaborationDateTime, desc
           - status, desc
+          - productCategory, desc
           - elaborationDateTime, asc
           - status, asc
+          - productCategory, asc
     status_trx_in_progress_query:
       name: status
       in: query
@@ -1367,7 +1885,6 @@ components:
     productGtin_query:
       name: productGtin
       in: query
-      description: Product GTIN
       required: false
       schema:
         type: string
