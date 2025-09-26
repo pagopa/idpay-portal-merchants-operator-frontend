@@ -6,6 +6,7 @@ import { authStore } from '../store/authStore';
 import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
 import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
 import type { PointOfSaleTransactionsListDTO } from './generated/merchants/PointOfSaleTransactionsListDTO';
+import {TransactionBarCodeResponse} from "./generated/merchants/TransactionBarCodeResponse.ts";
 
 //axios instance 
 const createAxiosInstance = (): AxiosInstance => {
@@ -56,7 +57,7 @@ const handleAxiosResponse = <T>(response: AxiosResponse<T>): T => {
 export const MerchantApi = {
   getProducts: async (
    params: {
-    status?: string, 
+    status?: string 
     page?: number, 
     size?: number, 
     sort?: string, 
@@ -123,13 +124,28 @@ export const MerchantApi = {
     }
   },
 
+  capturePayment: async (
+      params: {
+        trxCode: string,
+        additionalProperties?: object
+      }
+  ): Promise<TransactionBarCodeResponse> => {
+    try {
+      const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/capture`, params);
+     return handleAxiosResponse(response);
+    } catch (error) {
+      console.error('Error in capturePayment:', error);
+      throw error;
+    }
+  },
+
   getProcessedTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
     page?: number,
     size?: number,
     sort?: string,
     fiscalCode?: string,
     status?: string,
-    gtiIn?: string
+    productGtin?: string
   }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     try {
         // Remove undefined params
@@ -153,6 +169,7 @@ export const MerchantApi = {
     sort?: string,
     fiscalCode?: string,
     status?: string,
+    productGtin?: string
   }): Promise<PointOfSaleTransactionsListDTO> => {
     try {
         // Remove undefined params
@@ -166,6 +183,17 @@ export const MerchantApi = {
       return result;
     } catch (error) {
       console.error('Error in getInProgressTransactions:', error);
+      throw error;
+    }
+  },
+
+  deleteTransactionInProgress: async (trxId: string): Promise<void> => {
+    try {
+      const response = await axiosInstance.delete(`/transactions/${trxId}`);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in deleteTransactionInProgress:', error);
       throw error;
     }
   },

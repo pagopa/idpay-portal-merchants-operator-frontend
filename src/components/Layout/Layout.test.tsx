@@ -20,6 +20,7 @@ vi.mock('../../routes', () => ({
     SOME_OTHER_PAGE: '/altra-pagina',
     PRIVACY_POLICY: '/privacy',
     TOS: '/termini-e-condizioni',
+    PRODUCTS: '/prodotti',
   },
 }));
 

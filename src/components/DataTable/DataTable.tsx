@@ -14,6 +14,7 @@ export interface DataTableProps {
   onPaginationPageChange?: (obj: GridPaginationModel) => void;
   paginationModel?: PaginationExtendedModel;
   loading?: boolean;
+  customUniqueField?: string;
 }
 
 const DataTable = ({ 
@@ -24,6 +25,7 @@ const DataTable = ({
   onPaginationPageChange, 
   paginationModel,
   loading = false,
+  customUniqueField,
   sortModel
 }: DataTableProps) => {
   const [finalColumns, setFinalColumns] = useState<Array<GridColDef>>();
@@ -74,7 +76,7 @@ const DataTable = ({
                   <ChevronRightIcon color='primary' fontSize='inherit' />
                 </IconButton>
               </Box>
-            )
+            ),
           }
         ]
       );
@@ -82,7 +84,7 @@ const DataTable = ({
   }, [columns, handleRowAction]);
 
   useEffect(() => {
-    if(sortModel){
+    if(sortModel !== sortModelState){
       setSortModelState(sortModel);
     }
   }, [sortModel]);
@@ -123,7 +125,8 @@ const DataTable = ({
     if(model.length > 0){
       setSortModelState(model);
       onSortModelChange?.(model);
-    }else{
+    } 
+    else{
       setSortModelState((prevState: GridSortModel) => {
         const newSortModel: GridSortModel = prevState?.[0]?.sort === 'asc'
           ? [{field: prevState?.[0].field, sort: 'desc'}]
@@ -143,6 +146,7 @@ const DataTable = ({
           <DataGrid
             rows={rows}
             columns={finalColumns}
+            getRowId={(row: any) => customUniqueField ? row[customUniqueField] : row?.id}
             disableRowSelectionOnClick
             sortingMode='server'
             paginationMode='server'
@@ -167,6 +171,7 @@ const DataTable = ({
               border: 'none',
               '& .MuiDataGrid-row': {
                 backgroundColor: '#FFFFFF',
+                borderBottom: '1px solid #E3E7EB', 
                 '&:hover': {
                   backgroundColor: '#FFFFFF',
                 },

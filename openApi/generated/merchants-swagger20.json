@@ -74,7 +74,6 @@
             "type": "string"
           },
           {
-            "description": "Product GTIN",
             "in": "query",
             "maxLength": 14,
             "name": "productGtin",
@@ -291,8 +290,10 @@
             "enum": [
               "elaborationDateTime, desc",
               "status, desc",
+              "productCategory, desc",
               "elaborationDateTime, asc",
-              "status, asc"
+              "status, asc",
+              "productCategory, asc"
             ],
             "in": "query",
             "name": "sort",
@@ -317,6 +318,14 @@
             ],
             "in": "query",
             "name": "status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 14,
+            "name": "productGtin",
+            "pattern": "^[a-zA-Z0-9]{1,14}$",
             "required": false,
             "type": "string"
           },
@@ -983,6 +992,223 @@
         "summary": "ENG: Authorize payment - IT: Autorizzazione pagamento"
       }
     },
+    "/transactions/bar-code/{trxCode}/capture": {
+      "put": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "ENG: The transaction's code - IT: Codice della transazione",
+            "in": "path",
+            "maxLength": 24,
+            "name": "trxCode",
+            "pattern": "^[a-zA-Z0-9]+$",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionBarCodeResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_INVALID_REQUEST",
+                "message": "Something went wrong handling the request"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorDTO"
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_FOUND_OR_EXPIRED",
+                "message": "Cannot find transaction with transactionCode [%s]"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_TOO_MANY_REQUESTS",
+                "message": "Too many requests"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "500": {
+            "description": "Generic error",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_GENERIC_ERROR",
+                "message": "Application error"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          }
+        },
+        "tags": [
+          "transaction"
+        ],
+        "description": "Capture the transaction",
+        "operationId": "capturePayment",
+        "summary": "Capture the transaction"
+      }
+    },
     "/transactions/bar-code/{trxCode}/preview": {
       "put": {
         "consumes": [
@@ -1145,6 +1371,431 @@
         "operationId": "previewPayment",
         "summary": "ENG: Preview Payment - IT: Anteprima pagamento"
       }
+    },
+    "/transactions/{transactionId}": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The transaction ID",
+            "in": "path",
+            "maxLength": 255,
+            "name": "transactionId",
+            "pattern": "^[a-zA-Z0-9]+$",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_INVALID_REQUEST",
+                "message": "Something went wrong handling the request"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT",
+                "message": "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_FOUND_OR_EXPIRED",
+                "message": "Cannot find transaction with transactionId [%s]"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_TOO_MANY_REQUESTS",
+                "message": "Too many requests"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "500": {
+            "description": "Generic error",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_GENERIC_ERROR",
+                "message": "Application error"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          }
+        },
+        "tags": [
+          "transaction"
+        ],
+        "description": "ENG: Delete a transaction associated to a point of sale - IT: Elimina una transazione associata ad un punto vendita",
+        "operationId": "deleteTransaction",
+        "summary": "Point of sales delete transaction"
+      }
+    },
+    "/{merchantId}/point-of-sales/{pointOfSaleId}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The merchant ID",
+            "in": "path",
+            "maxLength": 255,
+            "name": "merchantId",
+            "pattern": "^[a-zA-Z0-9]+$",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The point of sale ID",
+            "in": "path",
+            "maxLength": 255,
+            "name": "pointOfSaleId",
+            "pattern": "^[a-zA-Z0-9]+$",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with point of sale detail",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleDTO"
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid query parameters",
+            "examples": {
+              "application/json": {
+                "code": "POINT_OF_SALE_BAD_REQUEST",
+                "message": "Something went wrong handling request"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleErrorDTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication Failed",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "examples": {
+              "application/json": {
+                "code": "POINT_OF_SALE_NOT_FOUND",
+                "message": "Point of sale with id 123 not found."
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleErrorDTO"
+            }
+          },
+          "429": {
+            "description": "Too many Request - Rate limit exceeded",
+            "examples": {
+              "application/json": {
+                "code": "POINT_OF_SALE_TOO_MANY_REQUESTS",
+                "message": "Too many requests"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleErrorDTO"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "examples": {
+              "application/json": {
+                "code": "POINT_OF_SALE_GENERIC_ERROR",
+                "message": "An error occurred during file reading"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/PointOfSaleErrorDTO"
+            }
+          }
+        },
+        "tags": [
+          "point-of-sales"
+        ],
+        "description": "Return a point of sale for the specified merchant.",
+        "operationId": "getPointOfSale",
+        "summary": "Retrieve a point of sale"
+      }
     }
   },
   "definitions" : {"STRINGWrapper":{"type": "string"},"STRINGArray":{"type": "array", "items": {"type": "string"}},
@@ -1288,6 +1939,125 @@
       ],
       "type": "object"
     },
+    "PointOfSaleDTO": {
+      "properties": {
+        "address": {
+          "description": "ENG: The address of the point of sale <br> IT: L'indirizzo completo del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "channelEmail": {
+          "description": "ENG: Store contact via email address <br> IT: Contatto del punto vendita tramite indirizzo email.",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "channelGeolink": {
+          "description": "ENG: Store contact providing a map link or location for navigation <br> IT: Contatto del punto vendita tramite link geografico o posizione sulla mappa",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "channelPhone": {
+          "description": "ENG: Store contact via phone number <br> IT: Contatto del punto vendita tramite numero di telefono",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "channelWebsite": {
+          "description": "ENG: Store contact via a web-based portal <br> IT: Contatto del punto vendita tramite portale web",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "city": {
+          "description": "ENG: The city of the point of sale <br> IT: La città del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "contactEmail": {
+          "description": "ENG: The email of the contact person <br> IT: L'email del referente",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "contactName": {
+          "description": "ENG: The name of the contact person <br> IT: Il nome del referente",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "contactSurname": {
+          "description": "ENG: The surname of the contact person <br> IT: Il cognome del referente",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "franchiseName": {
+          "description": "ENG: The name of the point of sale <br> IT: Il nome del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "id": {
+          "description": "ENG: The id for the point of sale <br> IT: Id del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "province": {
+          "description": "ENG: The province of the point of sale <br> IT: La provincia del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "region": {
+          "description": "ENG: The region of the point of sale <br> IT: La regione del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "streetNumber": {
+          "description": "ENG: The street number of the point of sale <br> IT: Il numero civico del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "type": {
+          "description": "ENG: The type of the point of sale <br> IT: Il tipo del punto vendita",
+          "enum": [
+            "PHYSICAL",
+            "ONLINE"
+          ],
+          "type": "string"
+        },
+        "webSite": {
+          "description": "ENG: The website of the point of sale <br> IT: Il sito web del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "zipCode": {
+          "description": "ENG: The zip code of the point of sale <br> IT: Il CAP del punto vendita",
+          "maxLength": 255,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PointOfSaleErrorDTO": {
+      "properties": {
+        "code": {
+          "description": "\"ENG: Error code:<br> POINT_OF_SALES_NOT_FOUND: The sale was not found,<br> MERCHANT_NOT_ONBOARDED: The merchant is not associated to the initiative,<br> POINT_OF_SALES_TOO_MANY_REQUESTS: Too many requests,<br> POINT_OF_SALES_INVALID_REQUEST: Something went wrong handling the request,<br> POINT_OF_SALES_GENERIC_ERROR: Application error,<br> - IT: Codice di errore:<br> POINT_OF_SALES_NOT_FOUND: Lo store non è stato trovato,<br> MERCHANT_NOT_ONBOARDED: L'esercente non è associato all'iniziativa,<br> POINT_OF_SALES_TOO_MANY_REQUESTS: Troppe richieste,<br> POINT_OF_SALES_INVALID_REQUEST: Qualcosa è andato storto durante l'invio della richiesta,<br> POINT_OF_SALES_GENERIC_ERROR: Errore applicativo\"",
+          "enum": [
+            "POINT_OF_SALE_NOT_FOUND",
+            "POINT_OF_SALE_BAD_REQUEST",
+            "POINT_OF_SALE_INVALID_REQUEST",
+            "MERCHANT_NOT_ONBOARDED",
+            "POINT_OF_SALE_TOO_MANY_REQUESTS",
+            "POINT_OF_SALE_GENERIC_ERROR"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "description": "ENG: Error message- IT: Messaggio di errore",
+          "maxLength": 1000,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object"
+    },
     "PointOfSaleTransactionDTO": {
       "additionalProperties": false,
       "properties": {
@@ -1394,7 +2164,16 @@
       "type": "object"
     },
     "PointOfSaleTransactionProcessedDTO": {
+      "additionalProperties": false,
       "properties": {
+        "additionalProperties": {
+          "additionalProperties": {
+            "maxLength": 255,
+            "pattern": ".*",
+            "type": "string"
+          },
+          "type": "object"
+        },
         "channel": {
           "description": "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione",
           "enum": [
@@ -1792,6 +2571,72 @@
       },
       "type": "object"
     },
+    "TransactionBarCodeResponse": {
+      "properties": {
+        "id": {
+          "description": "ENG: Transaction ID <br> IT: ID della transazione",
+          "maxLength": 64,
+          "pattern": ".*",
+          "type": "string"
+        },
+        "initiativeId": {
+          "description": "ENG: Id of the initiative - IT: Identificativo dell'iniziativa",
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        "initiativeName": {
+          "description": "ENG: Name of the initiative - IT: Nome della iniziativa",
+          "maxLength": 1000,
+          "pattern": ".*",
+          "type": "string"
+        },
+        "residualBudgetCents": {
+          "description": "ENG: The residual budget - IT: Budget residuo",
+          "minimum": 0,
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "CREATED",
+            "IDENTIFIED",
+            "AUTHORIZED",
+            "CAPTURED",
+            "REWARDED",
+            "REJECTED"
+          ],
+          "type": "string"
+        },
+        "trxCode": {
+          "description": "ENG: Transaction code - IT: Codice della transazione (codice sconto)",
+          "maxLength": 24,
+          "pattern": "^[a-zA-Z0-9]+$",
+          "type": "string"
+        },
+        "trxDate": {
+          "description": "ENG: Transaction date - IT: Data della transazione",
+          "format": "date-time",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "trxExpirationSeconds": {
+          "description": "ENG: Expiration time of the transaction, in seconds - IT: Scadenza della transazione, in secondi",
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "trxCode",
+        "initiativeId",
+        "initiativeName",
+        "trxDate",
+        "status",
+        "trxExpirationSeconds",
+        "residualBudgetCents"
+      ],
+      "type": "object"
+    },
     "TransactionErrorDTO": {
       "properties": {
         "code": {
@@ -1861,6 +2706,10 @@
     {
       "description": "Operations related to transaction",
       "name": "transaction"
+    },
+    {
+      "description": "Operations on merchant points of sale",
+      "name": "point-of-sales"
     }
   ],
   "x-components": {
@@ -1951,7 +2800,6 @@
         "type": "string"
       },
       "productGtin_query": {
-        "description": "Product GTIN",
         "in": "query",
         "maxLength": 14,
         "name": "productGtin",
@@ -2014,8 +2862,10 @@
         "enum": [
           "elaborationDateTime, desc",
           "status, desc",
+          "productCategory, desc",
           "elaborationDateTime, asc",
-          "status, asc"
+          "status, asc",
+          "productCategory, asc"
         ],
         "in": "query",
         "name": "sort",

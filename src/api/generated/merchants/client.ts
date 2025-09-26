@@ -23,8 +23,14 @@ import {
   getProductsDefaultDecoder,
   AuthPaymentBarCodeT,
   authPaymentBarCodeDefaultDecoder,
+  CapturePaymentT,
+  capturePaymentDefaultDecoder,
   PreviewPaymentT,
-  previewPaymentDefaultDecoder
+  previewPaymentDefaultDecoder,
+  DeleteTransactionT,
+  deleteTransactionDefaultDecoder,
+  GetPointOfSaleT,
+  getPointOfSaleDefaultDecoder
 } from "./requestTypes";
 
 // This is a placeholder for undefined when dealing with object keys
@@ -37,13 +43,19 @@ export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsT> &
   TypeofApiCall<GetPointOfSaleTransactionsProcessedT> &
   TypeofApiCall<GetProductsT> &
   TypeofApiCall<AuthPaymentBarCodeT> &
-  TypeofApiCall<PreviewPaymentT>;
+  TypeofApiCall<CapturePaymentT> &
+  TypeofApiCall<PreviewPaymentT> &
+  TypeofApiCall<DeleteTransactionT> &
+  TypeofApiCall<GetPointOfSaleT>;
 
 export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
   TypeofApiParams<GetPointOfSaleTransactionsProcessedT> &
   TypeofApiParams<GetProductsT> &
   TypeofApiParams<AuthPaymentBarCodeT> &
-  TypeofApiParams<PreviewPaymentT>);
+  TypeofApiParams<CapturePaymentT> &
+  TypeofApiParams<PreviewPaymentT> &
+  TypeofApiParams<DeleteTransactionT> &
+  TypeofApiParams<GetPointOfSaleT>);
 
 /**
  * Defines an adapter for TypeofApiCall which omit one or more parameters in the signature
@@ -71,7 +83,10 @@ export type WithDefaultsT<
   | GetPointOfSaleTransactionsProcessedT
   | GetProductsT
   | AuthPaymentBarCodeT
-  | PreviewPaymentT,
+  | CapturePaymentT
+  | PreviewPaymentT
+  | DeleteTransactionT
+  | GetPointOfSaleT,
   K
 >;
 
@@ -95,7 +110,13 @@ export type Client<
 
       readonly authPaymentBarCode: TypeofApiCall<AuthPaymentBarCodeT>;
 
+      readonly capturePayment: TypeofApiCall<CapturePaymentT>;
+
       readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
+
+      readonly deleteTransaction: TypeofApiCall<DeleteTransactionT>;
+
+      readonly getPointOfSale: TypeofApiCall<GetPointOfSaleT>;
     }
   : {
       readonly getPointOfSaleTransactions: TypeofApiCall<
@@ -123,10 +144,31 @@ export type Client<
         >
       >;
 
+      readonly capturePayment: TypeofApiCall<
+        ReplaceRequestParams<
+          CapturePaymentT,
+          Omit<RequestParams<CapturePaymentT>, K>
+        >
+      >;
+
       readonly previewPayment: TypeofApiCall<
         ReplaceRequestParams<
           PreviewPaymentT,
           Omit<RequestParams<PreviewPaymentT>, K>
+        >
+      >;
+
+      readonly deleteTransaction: TypeofApiCall<
+        ReplaceRequestParams<
+          DeleteTransactionT,
+          Omit<RequestParams<DeleteTransactionT>, K>
+        >
+      >;
+
+      readonly getPointOfSale: TypeofApiCall<
+        ReplaceRequestParams<
+          GetPointOfSaleT,
+          Omit<RequestParams<GetPointOfSaleT>, K>
         >
       >;
     };
@@ -231,14 +273,16 @@ export function createClient<K extends ParamKeys>({
       ["size"]: size,
       ["sort"]: sort,
       ["fiscalCode"]: fiscalCode,
-      ["status"]: status
+      ["status"]: status,
+      ["productGtin"]: productGtin
     }) =>
       withoutUndefinedValues({
         ["page"]: page,
         ["size"]: size,
         ["sort"]: sort,
         ["fiscalCode"]: fiscalCode,
-        ["status"]: status
+        ["status"]: status,
+        ["productGtin"]: productGtin
       })
   };
   const getPointOfSaleTransactionsProcessed: TypeofApiCall<GetPointOfSaleTransactionsProcessedT> = createFetchRequestForApi(
@@ -318,6 +362,30 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const capturePaymentT: ReplaceRequestParams<
+    CapturePaymentT,
+    RequestParams<CapturePaymentT>
+  > = {
+    method: "put",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer,
+
+      "Content-Type": "application/json"
+    }),
+    response_decoder: capturePaymentDefaultDecoder(),
+    url: ({ ["trxCode"]: trxCode }) =>
+      `${basePath}/transactions/bar-code/${trxCode}/capture`,
+
+    body: () => "{}",
+
+    query: () => withoutUndefinedValues({})
+  };
+  const capturePayment: TypeofApiCall<CapturePaymentT> = createFetchRequestForApi(
+    capturePaymentT,
+    options
+  );
+
   const previewPaymentT: ReplaceRequestParams<
     PreviewPaymentT,
     RequestParams<PreviewPaymentT>
@@ -348,6 +416,48 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const deleteTransactionT: ReplaceRequestParams<
+    DeleteTransactionT,
+    RequestParams<DeleteTransactionT>
+  > = {
+    method: "delete",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer,
+
+      "Content-Type": "application/json"
+    }),
+    response_decoder: deleteTransactionDefaultDecoder(),
+    url: ({ ["transactionId"]: transactionId }) =>
+      `${basePath}/transactions/${transactionId}`,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const deleteTransaction: TypeofApiCall<DeleteTransactionT> = createFetchRequestForApi(
+    deleteTransactionT,
+    options
+  );
+
+  const getPointOfSaleT: ReplaceRequestParams<
+    GetPointOfSaleT,
+    RequestParams<GetPointOfSaleT>
+  > = {
+    method: "get",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: getPointOfSaleDefaultDecoder(),
+    url: ({ ["merchantId"]: merchantId, ["pointOfSaleId"]: pointOfSaleId }) =>
+      `${basePath}/${merchantId}/point-of-sales/${pointOfSaleId}`,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const getPointOfSale: TypeofApiCall<GetPointOfSaleT> = createFetchRequestForApi(
+    getPointOfSaleT,
+    options
+  );
+
   return {
     getPointOfSaleTransactions: (withDefaults || identity)(
       getPointOfSaleTransactions
@@ -357,6 +467,9 @@ export function createClient<K extends ParamKeys>({
     ),
     getProducts: (withDefaults || identity)(getProducts),
     authPaymentBarCode: (withDefaults || identity)(authPaymentBarCode),
-    previewPayment: (withDefaults || identity)(previewPayment)
+    capturePayment: (withDefaults || identity)(capturePayment),
+    previewPayment: (withDefaults || identity)(previewPayment),
+    deleteTransaction: (withDefaults || identity)(deleteTransaction),
+    getPointOfSale: (withDefaults || identity)(getPointOfSale)
   };
 }
