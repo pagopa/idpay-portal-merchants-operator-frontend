@@ -322,7 +322,7 @@ const RefundManagement = () => {
             </Typography>
             <Box>
                 {
-                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
+                    (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== ''))) && (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={handleApplyFilters}
@@ -336,6 +336,7 @@ const RefundManagement = () => {
                                 }
                                 formik.resetForm();
                             }}
+                            filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField
@@ -347,7 +348,7 @@ const RefundManagement = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField
                                     name="productGtin"
                                     label={t('commons.gtiInFilterPlaceholer')}
@@ -357,7 +358,7 @@ const RefundManagement = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                     <Select

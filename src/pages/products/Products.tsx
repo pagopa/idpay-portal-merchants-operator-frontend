@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography, Paper, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Drawer, Divider } from "@mui/material";
+import { Box, CircularProgress, Typography, Paper, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Drawer, Divider, Link } from "@mui/material";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useTranslation } from "react-i18next";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
@@ -191,7 +191,7 @@ const Products = () => {
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'
                                 }}>
-                                    {params.value}
+                                    <Link sx={{ color: '#0062C3' }} href={params?.row?.linkEprel} target="_blank">{params.value}</Link>
                                 </Typography>
                             </Tooltip>
                         </div>
@@ -279,6 +279,10 @@ const Products = () => {
         setSelectedProduct(row);
     };
 
+    const areFiltersApplied = () => {
+        return formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0;
+    };
+
 
     return (
         <Box>
@@ -299,6 +303,7 @@ const Products = () => {
                             formik={formik}
                             onFiltersApplied={handleFiltersApplied}
                             onFiltersReset={handleFiltersReset}
+                            filtersApplied={areFiltersApplied()}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">
@@ -339,7 +344,7 @@ const Products = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <TextField
                                     name="brand"
                                     label="Marca"
@@ -349,7 +354,7 @@ const Products = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <TextField
                                     name="model"
                                     label="Modello"

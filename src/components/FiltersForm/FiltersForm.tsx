@@ -9,13 +9,15 @@ interface Props<T = any> {
   formik: FormikProps<T>;
   onFiltersApplied?: (values: T) => void;
   onFiltersReset?: () => void;
+  filtersApplied?: boolean;
 }
 
 const FiltersForm = <T extends Record<string, any>>({
   children,
   formik,
   onFiltersApplied,
-  onFiltersReset
+  onFiltersReset,
+  filtersApplied
 }: Props<T>) => {
   const { t } = useTranslation();
 
@@ -66,7 +68,7 @@ const FiltersForm = <T extends Record<string, any>>({
         fullWidth
         size="small"
         onClick={handleApplyFilters}
-        disabled={formik.isSubmitting}
+        disabled={formik.isSubmitting || !filtersApplied}
         data-testid="apply-filters-test"
       >
         {t('commons.filterBtn')}
@@ -82,7 +84,7 @@ const FiltersForm = <T extends Record<string, any>>({
           gridColumn: 'span 1'
         }}
         onClick={handleResetFilters}
-        disabled={formik.isSubmitting}
+        disabled={formik.isSubmitting || !filtersApplied}
         data-testid="reset-filters-test"
       >
         {t('commons.removeFiltersBtn')}

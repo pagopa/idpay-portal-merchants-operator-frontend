@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
-import {getInProgressTransactions, deleteTransactionInProgress, capturePayment} from "../../services/merchantService";
+import { getInProgressTransactions, deleteTransactionInProgress, capturePayment } from "../../services/merchantService";
 import { jwtDecode } from 'jwt-decode';
 import { authStore } from "../../store/authStore";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
@@ -81,19 +81,19 @@ const PurchaseManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-        if(errorDeleteTransaction){
+        if (errorDeleteTransaction) {
             const timer = setTimeout(() => {
                 setErrorDeleteTransaction(false);
             }, 5000);
             return () => clearTimeout(timer);
         }
-        if(errorCaptureTransaction){
+        if (errorCaptureTransaction) {
             const timer = setTimeout(() => {
                 setErrorCaptureTransaction(false);
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert, transactionAuthorized, errorDeleteTransaction,errorCaptureTransaction,transactionCaptured]);
+    }, [errorAlert, transactionAuthorized, errorDeleteTransaction, errorCaptureTransaction, transactionCaptured]);
 
     useEffect(() => {
         if (errorAlert) {
@@ -103,7 +103,7 @@ const PurchaseManagement = () => {
             return () => clearTimeout(timer);
         }
 
-        if(transactionAuthorized){
+        if (transactionAuthorized) {
             const timer = setTimeout(() => {
                 utilsStore.setState({ transactionAuthorized: false });
             }, 5000);
@@ -304,7 +304,7 @@ const PurchaseManagement = () => {
     };
 
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
-        if(sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+        if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
 
             fetchTransactions({
                 sort: 'productCategory,' + sortModel[0].sort,
@@ -360,6 +360,7 @@ const PurchaseManagement = () => {
             await deleteTransactionInProgress(selectedTransaction?.id);
             setOpenDrawer(false);
             setCancelTransactionModal(false);
+            navigate(ROUTES.REFUNDS_MANAGEMENT);
         } catch (error) {
             console.error('Error deleting transaction:', error);
             setCancelTransactionModal(false);
@@ -370,7 +371,7 @@ const PurchaseManagement = () => {
 
     const captureTransaction = async () => {
         try {
-            await capturePayment({trxCode:selectedTransaction?.trxCode});
+            await capturePayment({ trxCode: selectedTransaction?.trxCode });
             setOpenDrawer(false);
             setCaptureTransactionModal(false);
             navigate(ROUTES.BUY_MANAGEMENT);
@@ -402,16 +403,15 @@ const PurchaseManagement = () => {
                 {t('pages.purchaseManagement.tableTitle')}
             </Typography>
             {
-                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
+                (transactions?.length > 0 || (transactions?.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== ''))) && (
                     <FiltersForm
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
                         onFiltersReset={() => {
-                            if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== "") {
-                                formik.resetForm();
-                                fetchTransactions({});
-                            }
+                            formik.resetForm();
+                            fetchTransactions({});
                         }}
+                        filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
                     >
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField
@@ -424,7 +424,7 @@ const PurchaseManagement = () => {
                                 data-testid="fiscal-code-filter"
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField
                                 name="productGtin"
                                 label={t('commons.gtiInFilterPlaceholer')}
@@ -434,7 +434,7 @@ const PurchaseManagement = () => {
                                 onChange={formik.handleChange}
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                             <FormControl fullWidth size="small">
                                 <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                 <Select
@@ -502,9 +502,9 @@ const PurchaseManagement = () => {
                     },
                 }}
             >
-                <Box p={1} sx={{position: 'relative', height: '100%'}}>
+                <Box p={1} sx={{ position: 'relative', height: '100%' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mb={4} className={style.cursorPointer}>
-                        <CloseIcon sx={{color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
+                        <CloseIcon sx={{ color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
                     </Box>
                     <Typography variant="h6" mb={4}>{t('pages.purchaseManagement.drawer.title')}</Typography>
                     <Grid container spacing={2}>
@@ -552,7 +552,7 @@ const PurchaseManagement = () => {
                     </Grid>
                     <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                         <Button variant="contained" fullWidth onClick={handleCaptureTransaction}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
-                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => {}} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
+                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => { }} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
                     </Box>
                 </Box>
             </Drawer>
@@ -562,35 +562,38 @@ const PurchaseManagement = () => {
             {errorDeleteTransaction && <AlertComponent error={true} message={t('pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction')} />}
             {errorCaptureTransaction && <AlertComponent error={true} message={t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')} />}
 
-                <ModalComponent open={cancelTransactionModal || captureTransactionModal} onClose={() => {
-                    setCancelTransactionModal(false);
-                    setCaptureTransactionModal(false);
-                }}>
-                    <Box display={'flex'} flexDirection={'column'} gap={2}>
-                        <Typography variant="h6">{captureTransactionModal ? t('pages.purchaseManagement.captureTransactionModal.title') : t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
-                        <Typography variant="body1">{captureTransactionModal ?
-                            `${t('pages.purchaseManagement.captureTransactionModal.description')}${selectedTransaction?.effectiveAmountCents}
+            <ModalComponent open={cancelTransactionModal || captureTransactionModal} onClose={() => {
+                setCancelTransactionModal(false);
+                setCaptureTransactionModal(false);
+            }}>
+                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <Typography variant="h6">{captureTransactionModal ? t('pages.purchaseManagement.captureTransactionModal.title') : t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
+                    <Typography variant="body1">{captureTransactionModal ?
+                        `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${(selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }) + ' €'}
                             ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
                             ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
-                            : t('pages.purchaseManagement.cancelTransactionModal.description')}</Typography>
-                    </Box>
-                    <Box
-                        display={'flex'}
-                        justifyContent={'flex-end'}
-                        gap={2}
-                        mt={1}
+                        : t('pages.purchaseManagement.cancelTransactionModal.description')}.</Typography>
+                </Box>
+                <Box
+                    display={'flex'}
+                    justifyContent={'flex-end'}
+                    gap={2}
+                    mt={4}
+                >
+                    <Button variant="outlined" onClick={() => { setCaptureTransactionModal(false); setCancelTransactionModal(false); setOpenDrawer(true) }}>
+                        {captureTransactionModal ? 'Indietro' : 'Esci'}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={captureTransactionModal ? captureTransaction : deleteTransaction}
                     >
-                        <Button variant="outlined" onClick={() => { setCaptureTransactionModal(false); setCancelTransactionModal(false); setOpenDrawer(true) }}>
-                            {captureTransactionModal ? 'Indietro' : 'Esci'}
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={captureTransactionModal ? captureTransaction :deleteTransaction}
-                        >
-                            {'Conferma'}
-                        </Button>
-                    </Box>
-                </ModalComponent>
+                        {'Conferma'}
+                    </Button>
+                </Box>
+            </ModalComponent>
 
         </Box>
     );
