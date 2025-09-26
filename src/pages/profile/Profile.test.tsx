@@ -34,33 +34,6 @@ vi.mock("../../components/errorAlert/ErrorAlert", () => ({
   ),
 }));
 
-vi.mock("../../components/DetailsCard/DetailsCard", () => ({
-  default: ({
-    title,
-    item,
-  }: {
-    title: string;
-    item: Record<string, string | number>;
-  }) => {
-    const mappedItem = Object.entries(item);
-    return (
-      <div data-testid="details-cards">
-        <h1>{title}</h1>
-        <div>
-          {mappedItem.map(([key, value], index) => {
-            return (
-              <div key={index}>
-                <p>{key}</p>
-                <p>{value}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  },
-}));
-
 //api service mock
 const mockGetPointOfSaleDetails = vi.fn();
 vi.mock("../../services/merchantService", () => ({

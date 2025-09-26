@@ -99,7 +99,7 @@ const Profile = () => {
         >
           <CircularProgress />
         </Box>) : details && !errorAlert ? (
-        <Grid container flexWrap="nowrap" flexDirection="row" spacing={2}>
+        <Grid data-testid='details-cards' container flexWrap="nowrap" flexDirection="row" spacing={2}>
           <DetailsCard title="Dati punto vendita" item={details[0]} />
           <DetailsCard title="Dati referente" item={details[1]} />
         </Grid>
