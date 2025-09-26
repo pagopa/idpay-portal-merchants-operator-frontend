@@ -345,10 +345,6 @@ const PurchaseManagement = () => {
         setSelectedTransaction(row);
     };
 
-    const handleRowAction = (row: transactionInProgreessDTO) => {
-        setOpenDrawer(true);
-        setSelectedTransaction(row);
-    };
     const handleCaptureTransaction = () => {
         setOpenDrawer(false);
         setCaptureTransactionModal(true);
