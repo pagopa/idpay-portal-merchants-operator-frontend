@@ -142,7 +142,7 @@ const Products = () => {
         },
         {
             field: 'gtinCode',
-            headerName: 'Codice GTIN',
+            headerName: 'Codice GTIN/EAN',
             flex: 1,
             disableColumnMenu: true,
             sortable: true,
