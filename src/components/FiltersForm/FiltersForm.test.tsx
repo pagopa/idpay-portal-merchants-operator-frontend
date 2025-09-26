@@ -18,7 +18,7 @@ describe("FiltersForm", () => {
     handleChange: vi.fn(),
     handleBlur: vi.fn(),
     resetForm: vi.fn(),
-    isSubmitting: false,
+    isSubmitting: false
   };
 
   it("renders Apply and Reset buttons with translated text", () => {
@@ -36,7 +36,7 @@ describe("FiltersForm", () => {
     const onFiltersApplied = vi.fn();
 
     render(
-      <FiltersForm formik={mockFormik as any} onFiltersApplied={onFiltersApplied} />
+      <FiltersForm formik={mockFormik as any} onFiltersApplied={onFiltersApplied} filtersApplied={true}/>
     );
 
     fireEvent.click(screen.getByTestId("apply-filters-test"));
@@ -48,7 +48,7 @@ describe("FiltersForm", () => {
     const onFiltersReset = vi.fn();
 
     render(
-      <FiltersForm formik={mockFormik as any} onFiltersReset={onFiltersReset} />
+      <FiltersForm formik={mockFormik as any} onFiltersReset={onFiltersReset} filtersApplied={true}/>
     );
 
     fireEvent.click(screen.getByTestId("reset-filters-test"));
