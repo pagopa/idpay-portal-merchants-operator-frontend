@@ -8,7 +8,7 @@ import ROUTES from './routes.ts';
 import RefundManagement from "./pages/refundManagement/RefundManagement.tsx";
 import PurchaseManagement from "./pages/purchaseManagement/PurchaseManagement.tsx";
 import Profile from './pages/profile/Profile.tsx';
-
+import Products from "./pages/products/Products.tsx";
 
 function App() {
 
@@ -23,6 +23,7 @@ function App() {
             <Route path={ROUTES.REFUNDS_MANAGEMENT} element={<RefundManagement />} />
             <Route path={ROUTES.BUY_MANAGEMENT} element={<PurchaseManagement />} />
             <Route path={ROUTES.PROFILE} element={<Profile />} />
+            <Route path={ROUTES.PRODUCTS} element={<Products />} />
           </Routes>
         </Layout>
       </ProtectedRoute>

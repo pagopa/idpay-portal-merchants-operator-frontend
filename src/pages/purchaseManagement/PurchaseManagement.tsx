@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
-import { getInProgressTransactions } from "../../services/merchantService";
+import {getInProgressTransactions, deleteTransactionInProgress, capturePayment} from "../../services/merchantService";
 import { jwtDecode } from 'jwt-decode';
 import { authStore } from "../../store/authStore";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
@@ -20,13 +20,16 @@ import style from './purchaseManagement.module.css';
 import { getStatusChip } from "../../utils/helpers";
 import AlertComponent from "../../components/Alert/AlertComponent";
 import { utilsStore } from "../../store/utilsStore";
-
+import ModalComponent from "../../components/Modal/ModalComponent";
 
 const PurchaseManagement = () => {
     const [loading, setLoading] = useState(true);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [errorAlert, setErrorAlert] = useState(false);
+    const [errorDeleteTransaction, setErrorDeleteTransaction] = useState(false);
+    const [errorCaptureTransaction, setErrorCaptureTransaction] = useState(false);
+    const [transactionCaptured, setTransactionCaptured] = useState(false);
     const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
         page: 0,
@@ -36,6 +39,8 @@ const PurchaseManagement = () => {
     const [transactions, setTransactions] = useState([]);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
+    const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const token = authStore.getState().token;
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
 
@@ -54,7 +59,41 @@ const PurchaseManagement = () => {
 
     useEffect(() => {
         fetchTransactions({});
-    }, []);
+    }, [transactionCaptured]);
+
+    useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+
+        if (transactionAuthorized) {
+            const timer = setTimeout(() => {
+                utilsStore.setState({ transactionAuthorized: false });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+        if (transactionCaptured) {
+            const timer = setTimeout(() => {
+                setTransactionCaptured(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+        if(errorDeleteTransaction){
+            const timer = setTimeout(() => {
+                setErrorDeleteTransaction(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+        if(errorCaptureTransaction){
+            const timer = setTimeout(() => {
+                setErrorCaptureTransaction(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert, transactionAuthorized, errorDeleteTransaction,errorCaptureTransaction,transactionCaptured]);
 
     useEffect(() => {
         if (errorAlert) {
@@ -82,7 +121,7 @@ const PurchaseManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
+                if (params?.value?.productName) {
                     return (
                         <div style={{
                             display: 'flex',
@@ -106,7 +145,7 @@ const PurchaseManagement = () => {
             },
         },
         {
-            field: 'trxDate',
+            field: 'updateDate',
             headerName: 'Data e ora',
             flex: 1,
             disableColumnMenu: true,
@@ -224,7 +263,7 @@ const PurchaseManagement = () => {
                 import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
-                    sort: 'trxDate,asc',
+                    sort: 'updateDate,asc',
                     page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
@@ -266,6 +305,7 @@ const PurchaseManagement = () => {
 
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
         if(sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+
             fetchTransactions({
                 sort: 'productCategory,' + sortModel[0].sort,
                 page: paginationModel.page,
@@ -305,6 +345,43 @@ const PurchaseManagement = () => {
         setSelectedTransaction(row);
     };
 
+    const handleCaptureTransaction = () => {
+        setOpenDrawer(false);
+        setCaptureTransactionModal(true);
+    };
+
+    const handleCancelTransaction = () => {
+        setOpenDrawer(false);
+        setCancelTransactionModal(true);
+    };
+
+    const deleteTransaction = async () => {
+        try {
+            await deleteTransactionInProgress(selectedTransaction?.id);
+            setOpenDrawer(false);
+            setCancelTransactionModal(false);
+        } catch (error) {
+            console.error('Error deleting transaction:', error);
+            setCancelTransactionModal(false);
+            setErrorDeleteTransaction(true);
+            setOpenDrawer(true);
+        }
+    };
+
+    const captureTransaction = async () => {
+        try {
+            await capturePayment({trxCode:selectedTransaction?.trxCode});
+            setOpenDrawer(false);
+            setCaptureTransactionModal(false);
+            navigate(ROUTES.BUY_MANAGEMENT);
+            setTransactionCaptured(true);
+        } catch (error) {
+            console.error('Error capture transaction:', error);
+            setCaptureTransactionModal(false);
+            setErrorCaptureTransaction(true);
+            setOpenDrawer(true);
+        }
+    };
 
 
     return (
@@ -319,7 +396,7 @@ const PurchaseManagement = () => {
                     mtTitle={0}
                     mbSubTitle={2}
                 />
-                <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
+                <Button variant="contained" size="small" startIcon={<QrCodeIcon />} sx={{ textWrap: 'nowrap' }} onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT)}>Accetta buono sconto</Button>
             </Box>
             <Typography variant="h6" >
                 {t('pages.purchaseManagement.tableTitle')}
@@ -330,8 +407,10 @@ const PurchaseManagement = () => {
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
                         onFiltersReset={() => {
-                            formik.resetForm();
-                            fetchTransactions({});
+                            if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== "") {
+                                formik.resetForm();
+                                fetchTransactions({});
+                            }
                         }}
                     >
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
@@ -431,13 +510,13 @@ const PurchaseManagement = () => {
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.trxDate')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{new Date(selectedTransaction?.trxDate).toLocaleDateString('it-IT', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        }).replace(',', '') ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{new Date(selectedTransaction?.updateDate).toLocaleDateString('it-IT', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }).replace(',', '') ?? MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.category')}</Typography>
@@ -454,16 +533,16 @@ const PurchaseManagement = () => {
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.totalAmount')}</Typography>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? (selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? (selectedTransaction?.rewardAmountCents / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.status')}</Typography>
@@ -471,14 +550,47 @@ const PurchaseManagement = () => {
                         </Grid>
 
                     </Grid>
-                    <Box sx={{position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1}}>
-                        <Button variant="contained" fullWidth onClick={() => setOpenDrawer(false)}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
-                        <Button fullWidth onClick={() => setOpenDrawer(false)} sx={{color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#'}}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
+                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Button variant="contained" fullWidth onClick={handleCaptureTransaction}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
+                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => {}} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
                     </Box>
                 </Box>
             </Drawer>
             {errorAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorAlert')} />}
             {transactionAuthorized && <AlertComponent error={false} message={t('pages.purchaseManagement.alertSuccess')} />}
+            {transactionCaptured && <AlertComponent error={false} message={t('pages.purchaseManagement.paymentSuccess')} />}
+            {errorDeleteTransaction && <AlertComponent error={true} message={t('pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction')} />}
+            {errorCaptureTransaction && <AlertComponent error={true} message={t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')} />}
+
+                <ModalComponent open={cancelTransactionModal || captureTransactionModal} onClose={() => {
+                    setCancelTransactionModal(false);
+                    setCaptureTransactionModal(false);
+                }}>
+                    <Box display={'flex'} flexDirection={'column'} gap={2}>
+                        <Typography variant="h6">{captureTransactionModal ? t('pages.purchaseManagement.captureTransactionModal.title') : t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
+                        <Typography variant="body1">{captureTransactionModal ?
+                            `${t('pages.purchaseManagement.captureTransactionModal.description')}${selectedTransaction?.effectiveAmountCents}
+                            ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
+                            ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
+                            : t('pages.purchaseManagement.cancelTransactionModal.description')}</Typography>
+                    </Box>
+                    <Box
+                        display={'flex'}
+                        justifyContent={'flex-end'}
+                        gap={2}
+                        mt={1}
+                    >
+                        <Button variant="outlined" onClick={() => { setCaptureTransactionModal(false); setCancelTransactionModal(false); setOpenDrawer(true) }}>
+                            {captureTransactionModal ? 'Indietro' : 'Esci'}
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={captureTransactionModal ? captureTransaction :deleteTransaction}
+                        >
+                            {'Conferma'}
+                        </Button>
+                    </Box>
+                </ModalComponent>
 
         </Box>
     );

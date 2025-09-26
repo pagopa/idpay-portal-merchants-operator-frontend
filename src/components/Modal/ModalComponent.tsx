@@ -26,6 +26,7 @@ const ModalComponent = ({ open, onClose, children, style, className }: ModalComp
           width: 600,
           bgcolor: 'background.paper',
           boxShadow: 24,
+          borderRadius: '4px',
           p: 4
         }} data-testid="iban-modal-content">{children}</Box>
       </Modal>

@@ -57,7 +57,7 @@ const FiltersForm = <T extends Record<string, any>>({
   });
 
   return (
-    <Grid sx={{ my: 4 }} container spacing={2} alignItems="center">
+    <Grid sx={{ my: 4, width: '100%' }} container spacing={2} alignItems="center" >
       {enhancedChildren}
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
       <Button
@@ -72,7 +72,7 @@ const FiltersForm = <T extends Record<string, any>>({
         {t('commons.filterBtn')}
       </Button>
       </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
       <ButtonNaked
         component="button"
         sx={{

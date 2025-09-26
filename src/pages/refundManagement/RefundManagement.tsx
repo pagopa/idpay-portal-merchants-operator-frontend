@@ -45,7 +45,7 @@ const RefundManagement = () => {
     useEffect(() => {
         setSortModel([
             {
-                field: 'trxDate',
+                field: 'updateDate',
                 sort: 'asc'
             }
         ]);
@@ -63,7 +63,7 @@ const RefundManagement = () => {
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
-        gtiIn?: string;
+        productGtin?: string;
         status?: string;
         page?: number;
         size?: number;
@@ -83,7 +83,7 @@ const RefundManagement = () => {
                 import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
-                    sort: 'trxDate,asc',
+                    sort: 'updateDate,asc',
                     page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
@@ -110,14 +110,14 @@ const RefundManagement = () => {
 
     const columns = [
         {
-            field: 'eletronicDevice',
+            field: 'additionalProperties',
             headerName: 'Elettrodomestico',
             flex: 1.5,
             disableColumnMenu: true,
             align: 'center',
-            sortable: false,
+            sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
+                if (params.value?.productName) {
                     return (
                         <div style={{
                             display: 'flex',
@@ -125,13 +125,13 @@ const RefundManagement = () => {
                             height: '100%',
                             width: '100%'
                         }}>
-                            <Tooltip title={params.value}>
+                            <Tooltip title={params.value?.productName}>
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'
                                 }}>
-                                    {params.value}
+                                    {params.value?.productName}
                                 </Typography>
                             </Tooltip>
                         </div>
@@ -141,7 +141,7 @@ const RefundManagement = () => {
             },
         },
         {
-            field: 'trxDate',
+            field: 'updateDate',
             headerName: 'Data e ora',
             flex: 1,
             disableColumnMenu: true,
@@ -245,39 +245,61 @@ const RefundManagement = () => {
         },
     ];
 
-    const setApiFilters = useCallback((filtersObj: GetProcessedTransactionsFilters) => {
-        fetchTransactions({
-            ...filtersObj,
-            page: 0,
-            size: paginationModel.pageSize || 10,
-            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-        });
-    }, [fetchTransactions, paginationModel.pageSize, sortModel]);
 
-    const handlePaginationChange = useCallback((newPaginationModel: GridPaginationModel) => {
-
-        if (newPaginationModel.page === paginationModel.page &&
-            newPaginationModel.pageSize === paginationModel.pageSize) {
-            return;
+    const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
+        if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+            fetchTransactions({
+                sort: 'productCategory,' + sortModel[0].sort,
+                page: paginationModel.page,
+                size: paginationModel.pageSize,
+                ...filtersObj
+            });
+        } else {
+            fetchTransactions({
+                sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+                page: paginationModel.page,
+                size: paginationModel.pageSize,
+                ...filtersObj
+            });
         }
+    };
 
-        fetchTransactions({
-            page: newPaginationModel.page,
-            size: newPaginationModel.pageSize,
-            sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-            ...formik.values
-        });
-    }, [fetchTransactions, paginationModel.page, paginationModel.pageSize, sortModel, formik.values]);
+    const handlePaginationChange = (model: GridPaginationModel) => {
+        if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+            fetchTransactions({
+                sort: 'productCategory,' + sortModel[0].sort,
+                page: model.page,
+                size: model.pageSize,
+                ...formik.values
+            });
+        } else {
+            fetchTransactions({
+                sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+                page: model.page,
+                size: model.pageSize,
+                ...formik.values
+            });
+        }
+    };
 
     const handleSortModelChange = (model: GridSortModel) => {
         if (model.length > 0) {
             setSortModel(model);
-            fetchTransactions({
-                sort: model[0].field + ',' + model[0].sort,
-                page: paginationModel.page,
-                size: paginationModel.pageSize,
-                ...formik.values
-            });
+            if (model[0].field === 'additionalProperties') {
+                fetchTransactions({
+                    sort: 'productCategory,' + model[0].sort,
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize,
+                    ...formik.values
+                });
+            } else {
+                fetchTransactions({
+                    sort: model[0].field + ',' + model[0].sort,
+                    page: paginationModel.page,
+                    size: paginationModel.pageSize,
+                    ...formik.values
+                });
+            }
         }
     };
 
@@ -303,13 +325,15 @@ const RefundManagement = () => {
                     (rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null))) && (
                         <FiltersForm
                             formik={formik}
-                            onFiltersApplied={setApiFilters}
+                            onFiltersApplied={handleApplyFilters}
                             onFiltersReset={() => {
-                                setApiFilters({
-                                    fiscalCode: '',
-                                    productGtin: '',
-                                    status: '',
-                                });
+                                if(formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
+                                    handleApplyFilters({
+                                        fiscalCode: '',
+                                        productGtin: '',
+                                        status: '',
+                                    });
+                                }
                                 formik.resetForm();
                             }}
                         >
@@ -369,14 +393,13 @@ const RefundManagement = () => {
                 )
             }
 
-            {(rows && rows?.length > 0) && (
+            {(rows && rows?.length > 0 && !loading) && (
                 <Grid container mt={2}>
                     <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                         <Box sx={{ height: 'auto', width: '100%' }}>
                             <DataTable
                                 rows={rows}
                                 columns={columns}
-                                loading={loading}
                                 onPaginationPageChange={handlePaginationChange}
                                 paginationModel={paginationModel}
                                 onSortModelChange={handleSortModelChange}
