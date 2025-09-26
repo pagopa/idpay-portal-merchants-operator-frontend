@@ -48,7 +48,7 @@ const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user 
 
 const Profile = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState();
   const [errorAlert, setErrorAlert] = useState(false);
   const { t } = useTranslation();
@@ -88,8 +88,7 @@ const Profile = () => {
           mbSubTitle={2}
         />
       </Box>
-      {loading && !details ? (
-        <Box
+      {loading ? (<Box
          data-testid="loading"
           sx={{
             display: "flex",
@@ -99,15 +98,15 @@ const Profile = () => {
           }}
         >
           <CircularProgress />
-        </Box>
-      ) : details && !errorAlert ? (
+        </Box>) : details && !errorAlert ? (
         <Grid container flexWrap="nowrap" flexDirection="row" spacing={2}>
           <DetailsCard title="Dati punto vendita" item={details[0]} />
           <DetailsCard title="Dati referente" item={details[1]} />
         </Grid>
       ) : (
         <Typography variant="body2">Nessun elemento trovato</Typography>
-      )}
+      )} 
+      
       {errorAlert && <AlertComponent error={true} message={t('pages.profile.errorAlert')} />}
     </Box>
   );
