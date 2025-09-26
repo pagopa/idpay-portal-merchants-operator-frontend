@@ -25,6 +25,11 @@ export const capturePayment = async (params: { trxCode: string, additionalProper
 };
 
   export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, productGtin?: string }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
+export const capturePayment = async (params: { trxCode: string, additionalProperties?: {} }): Promise<TransactionBarCodeResponse> => {
+  return MerchantApi.capturePayment(params);
+};
+
+  export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, productGtin?: string }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     return MerchantApi.getProcessedTransactions(initiativeId, pointOfSaleId, params);
   };
 
