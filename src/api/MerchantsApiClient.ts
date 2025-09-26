@@ -6,6 +6,7 @@ import { authStore } from '../store/authStore';
 import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
 import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
 import type { PointOfSaleTransactionsListDTO } from './generated/merchants/PointOfSaleTransactionsListDTO';
+import { PointOfSaleDTO } from './generated/merchants/PointOfSaleDTO';
 import {TransactionBarCodeResponse} from "./generated/merchants/TransactionBarCodeResponse.ts";
 
 //axios instance 
@@ -181,6 +182,17 @@ export const MerchantApi = {
       });
       const result = handleAxiosResponse(response);
       return result;
+    } catch (error) {
+      console.error('Error in getInProgressTransactions:', error);
+      throw error;
+    }
+  },
+
+  getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string): Promise<PointOfSaleDTO> => {
+    try {
+      const response = await axiosInstance.get(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
+      const result = handleAxiosResponse(response)
+      return result
     } catch (error) {
       console.error('Error in getInProgressTransactions:', error);
       throw error;
