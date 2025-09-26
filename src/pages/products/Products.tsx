@@ -52,7 +52,7 @@ const Products = () => {
         {
             field: 'category',
             headerName: 'Categoria',
-            flex: 1.5,
+            flex: 2,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
@@ -113,7 +113,7 @@ const Products = () => {
         {
             field: 'model',
             headerName: 'Modello',
-            flex: 1,
+            flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
@@ -143,7 +143,7 @@ const Products = () => {
         {
             field: 'gtinCode',
             headerName: 'Codice GTIN/EAN',
-            flex: 1,
+            flex: 2,
             disableColumnMenu: true,
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
@@ -191,7 +191,8 @@ const Products = () => {
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'
                                 }}>
-                                    <Link sx={{ color: '#0062C3' }} href={params?.row?.linkEprel} target="_blank">{params.value}</Link>
+                                    {(params.value && params?.value !== '' && params?.value !== null) && <Link sx={{ color: '#0062C3', fontWeight: theme.typography.fontWeightMedium }} href={params?.row?.linkEprel} target="_blank">{params.value}</Link>}
+                                    {(!params.value || params?.value === '' || params?.value === null) && MISSING_DATA_PLACEHOLDER}
                                 </Typography>
                             </Tooltip>
                         </div>

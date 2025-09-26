@@ -85,6 +85,6 @@ describe('SideMenu Component', () => {
     await user.click(refundItem);
     
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.HOME, { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT, { replace: true });
   });
 });
