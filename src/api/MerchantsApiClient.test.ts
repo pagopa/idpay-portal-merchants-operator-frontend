@@ -117,7 +117,25 @@ describe('MerchantApi', () => {
     });
   });
 
-  describe('getProcessedTransactions', () => {
+  describe('getPointOfSaleDetails', () => {
+    it('should call GET with correct initiative and pointOfSale IDs', async () => {
+      const merchantId = 'MI123';
+      const pointOfSaleId = 'POS456';
+      const mockResponse = { data: { transactions: [], total: 0 } };
+      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+
+      const result = await MerchantApi.getPointOfSaleDetails(
+        merchantId,
+        pointOfSaleId
+      );
+
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+        `/${merchantId}/point-of-sales/${pointOfSaleId}`);
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+
+   describe('getProcessedTransactions', () => {
     it('should call GET with correct initiative and pointOfSale IDs', async () => {
       const initiativeId = 'INIT123';
       const pointOfSaleId = 'POS456';
@@ -142,3 +160,4 @@ describe('MerchantApi', () => {
     });
   });
 });
+
