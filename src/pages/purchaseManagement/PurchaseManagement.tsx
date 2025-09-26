@@ -22,7 +22,6 @@ import AlertComponent from "../../components/Alert/AlertComponent";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 
-
 const PurchaseManagement = () => {
     const [loading, setLoading] = useState(true);
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -95,6 +94,22 @@ const PurchaseManagement = () => {
             return () => clearTimeout(timer);
         }
     }, [errorAlert, transactionAuthorized, errorDeleteTransaction,errorCaptureTransaction,transactionCaptured]);
+
+    useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+
+        if(transactionAuthorized){
+            const timer = setTimeout(() => {
+                utilsStore.setState({ transactionAuthorized: false });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert, transactionAuthorized]);
 
 
     const columns = [
@@ -289,7 +304,8 @@ const PurchaseManagement = () => {
     };
 
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
-        if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+        if(sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
+
             fetchTransactions({
                 sort: 'productCategory,' + sortModel[0].sort,
                 page: paginationModel.page,
@@ -322,6 +338,11 @@ const PurchaseManagement = () => {
                 ...formik.values
             });
         }
+    };
+
+    const handleRowAction = (row: transactionInProgreessDTO) => {
+        setOpenDrawer(true);
+        setSelectedTransaction(row);
     };
 
     const handleRowAction = (row: transactionInProgreessDTO) => {
@@ -485,9 +506,9 @@ const PurchaseManagement = () => {
                     },
                 }}
             >
-                <Box p={1} sx={{ position: 'relative', height: '100%' }}>
+                <Box p={1} sx={{position: 'relative', height: '100%'}}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mb={4} className={style.cursorPointer}>
-                        <CloseIcon sx={{ color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
+                        <CloseIcon sx={{color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
                     </Box>
                     <Typography variant="h6" mb={4}>{t('pages.purchaseManagement.drawer.title')}</Typography>
                     <Grid container spacing={2}>
