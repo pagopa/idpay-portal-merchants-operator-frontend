@@ -358,7 +358,7 @@ const RefundManagement = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                     <Select
