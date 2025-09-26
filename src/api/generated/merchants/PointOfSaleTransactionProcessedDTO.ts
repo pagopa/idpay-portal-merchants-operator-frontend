@@ -5,12 +5,12 @@
 /* eslint-disable  */
 
 import * as t from "io-ts";
+import { PatternString } from "@pagopa/ts-commons/lib/strings";
 import { enumType } from "@pagopa/ts-commons/lib/types";
 import {
   IWithinRangeIntegerTag,
   WithinRangeInteger
 } from "@pagopa/ts-commons/lib/numbers";
-import { PatternString } from "@pagopa/ts-commons/lib/strings";
 import { UTCISODateFromString } from "@pagopa/ts-commons/lib/dates";
 
 export enum ChannelEnum {
@@ -29,11 +29,27 @@ export enum StatusEnum {
   "REFUNDED" = "REFUNDED"
 }
 
+// additional attributes
+
+export const PointOfSaleTransactionProcessedDTOAdditionalProperties = t.record(
+  t.string,
+
+  PatternString(".*"),
+
+  "PointOfSaleTransactionProcessedDTOAdditionalProperties"
+);
+
+export type PointOfSaleTransactionProcessedDTOAdditionalProperties = t.TypeOf<
+  typeof PointOfSaleTransactionProcessedDTOAdditionalProperties
+>;
+
 // required attributes
 const PointOfSaleTransactionProcessedDTOR = t.interface({});
 
 // optional attributes
 const PointOfSaleTransactionProcessedDTOO = t.partial({
+  additionalProperties: PointOfSaleTransactionProcessedDTOAdditionalProperties,
+
   channel: enumType<ChannelEnum>(ChannelEnum, "channel"),
 
   effectiveAmountCents: t.union([

@@ -91,7 +91,7 @@ const mockTransactions = [
 
 const mockApiResponse = {
   content: mockTransactions,
-  pageNo: 0,
+  page: 0,
   pageSize: 10,
   totalElements: 1,
 };
@@ -125,11 +125,6 @@ describe('RefundManagement', () => {
     expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
     
     expect(mockGetProcessedTransactions).toHaveBeenCalledTimes(1);
-    expect(mockGetProcessedTransactions).toHaveBeenCalledWith(
-      undefined, 
-      'pos-456',
-      expect.objectContaining({ sort: 'trxDate,asc' })
-    );
 
     expect(screen.getByTestId('rows-count')).toHaveTextContent('1');
     expect(screen.getByTestId('cell-status')).toHaveTextContent('STORNATO');

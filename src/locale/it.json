@@ -195,6 +195,7 @@
       "noTransactions": "Non ci sono transazioni per questa iniziativa",
       "tableTitle": "Buoni sconto",
       "alertSuccess": "La transazione è andata a buon fine.",
+      "paymentSuccess": "Il pagamento è stato confermato.",
       "drawer": {
         "title": "Dettaglio transazione",
         "product": "Prodotto",
@@ -209,6 +210,18 @@
         "cancellPayment": "Annulla transazione",
         "requestRefund": "Richiedi rimborso",
         "refund": "Storna"
+      },
+      "cancelTransactionModal": {
+        "title": "Vuoi annullare la transazione?",
+        "description": "Sei sicuro di voler annullare questa transazione? <L’utente potrà continuare a usufruire del buono sconto>",
+        "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
+      },
+      "captureTransactionModal": {
+        "title": "Hai ricevuto il pagamento del bene?",
+        "description1": "Hai ricevuto",
+        "description2":" dal cliente per il prodotto ",
+        "description3":"? Confermando, la transazione passerà nello stato ",
+        "errorCaptureTransaction" : "Non è stato possibile confermare la transazione. Riprova."
       }
     },
     "refundManagement": {
@@ -226,9 +239,23 @@
     "products": {
       "title": "Prodotti",
       "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
-      "noProducts": "Non ci sono prodotti per questa iniziativa"
+      "noProducts": "Non ci sono prodotti per questa iniziativa",
+      "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+      "drawer": {
+        "subTitle": "SCHEDA PRODOTTO",
+        "eprelCode": "Codice EPREL",
+        "gtinCode": "Codice GTIN/EAN",
+        "productCode": "Codice prodotto",
+        "category": "Categoria",
+        "brand": "Marca",
+        "model": "Modello",
+        "capacity": "Capacità",
+        "energyClass": "Classe energetica",
+        "productionCountry": "Paese di produzione"
+      }
       
     }
+
   },
   "roles": {
     "admin": "Amministratore"
