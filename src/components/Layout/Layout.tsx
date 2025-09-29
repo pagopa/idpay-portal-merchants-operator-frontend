@@ -26,7 +26,8 @@ const Layout = ({ children }: Props) => {
     ROUTES.HOME,
     ROUTES.PROFILE,
     ROUTES.BUY_MANAGEMENT,
-    ROUTES.PRODUCTS
+    ROUTES.PRODUCTS,
+    ROUTES.REFUNDS_MANAGEMENT
   ]);
 
   return (

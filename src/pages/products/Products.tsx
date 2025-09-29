@@ -52,7 +52,7 @@ const Products = () => {
         {
             field: 'category',
             headerName: 'Categoria',
-            flex: 1.5,
+            flex: 2,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
@@ -113,7 +113,7 @@ const Products = () => {
         {
             field: 'model',
             headerName: 'Modello',
-            flex: 1,
+            flex: 1.5,
             disableColumnMenu: true,
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
@@ -143,7 +143,7 @@ const Products = () => {
         {
             field: 'gtinCode',
             headerName: 'Codice GTIN/EAN',
-            flex: 1,
+            flex: 2,
             disableColumnMenu: true,
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
@@ -189,9 +189,11 @@ const Products = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: theme.typography.fontWeightMedium
                                 }}>
-                                    <Link sx={{ color: '#0062C3' }} href={params?.row?.linkEprel} target="_blank">{params.value}</Link>
+                                    {(params.value && params?.value !== '' && params?.value !== null) && <Link sx={{ color: '#0062C3', fontWeight: theme.typography.fontWeightMedium }} href={params?.row?.linkEprel} target="_blank">{params.value}</Link>}
+                                    {(!params.value || params?.value === '' || params?.value === null) && MISSING_DATA_PLACEHOLDER}
                                 </Typography>
                             </Tooltip>
                         </div>
@@ -206,6 +208,15 @@ const Products = () => {
         fetchProducts({});
         setProductsListIsLoading(true);
     }, []);
+
+    useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert]);
 
     const fetchProducts = useCallback(async (params: GetProductsParams) => {
         setProductsListIsLoading(true);
@@ -269,10 +280,8 @@ const Products = () => {
     };
 
     const handleFiltersReset = () => {
-        if(formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0){
-            formik.resetForm();
-            fetchProducts({});
-        }
+        formik.resetForm();
+        fetchProducts({});
     };
     const handleRowAction = (row: any) => {
         setOpenDrawer(true);
@@ -298,12 +307,13 @@ const Products = () => {
 
             <Box>
                 {
-                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0)) )&& (
+                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0))) && (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={handleFiltersApplied}
                             onFiltersReset={handleFiltersReset}
                             filtersApplied={areFiltersApplied()}
+                            totalElements={paginationModel?.totalElements}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">
@@ -485,7 +495,7 @@ const Products = () => {
                                     <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.productionCountry')}</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.countryOfProduction ?? MISSING_DATA_PLACEHOLDER}</Typography>
                                 </Grid>
-                                
+
 
                             </Grid>
                         </Box>

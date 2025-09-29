@@ -22,6 +22,9 @@ vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({
 vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({
   default: () => <div data-testid="purchase-management-page">Purchase Management</div>,
 }));
+vi.mock('./pages/profile/Profile.tsx', () => ({
+  default: () => <div data-testid="profile-page">Profile</div>,
+}));
 
 describe('App', () => {
 
@@ -46,8 +49,8 @@ describe('App', () => {
       </MemoryRouter>
     );
 
-    // Check if the mocked RefundManagement component is rendered.
-    expect(screen.getByTestId('refund-management-page')).toBeInTheDocument();
+    // Check if the mocked PurchaseManagement component is rendered.
+    expect(screen.getByTestId('purchase-management-page')).toBeInTheDocument();
   });
 
   it('renders the acceptDiscount component on the correct route', () => {
@@ -78,5 +81,14 @@ describe('App', () => {
       </MemoryRouter>
     );
     expect(screen.getByTestId('purchase-management-page')).toBeInTheDocument();
+  });
+
+  it('renders the Profile component on the correct route', () => {
+    render(
+      <MemoryRouter initialEntries={[ROUTES.PROFILE]}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByTestId('profile-page')).toBeInTheDocument();
   });
 });

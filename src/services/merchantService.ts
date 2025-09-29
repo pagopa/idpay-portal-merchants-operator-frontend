@@ -32,7 +32,10 @@ export const capturePayment = async (params: { trxCode: string, additionalProper
     return MerchantApi.getInProgressTransactions(initiativeId, pointOfSaleId, params);
   };
 
+  export const getPointOfSaleDetails = async (merchantId: string, pointOfSaleId: string) => {
+    return MerchantApi.getPointOfSaleDetails(merchantId, pointOfSaleId);
+  };
+
   export const deleteTransactionInProgress = async (trxId: string): Promise<void> => {
     return MerchantApi.deleteTransactionInProgress(trxId);
-  };
-  
+  }

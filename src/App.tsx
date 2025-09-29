@@ -1,12 +1,13 @@
 import './App.css'
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import AcceptDiscount from "./pages/acceptDiscount/AcceptDiscount.tsx";
 import SummaryAcceptDiscount from "./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx";
 import ROUTES from './routes.ts';
 import RefundManagement from "./pages/refundManagement/RefundManagement.tsx";
 import PurchaseManagement from "./pages/purchaseManagement/PurchaseManagement.tsx";
+import Profile from './pages/profile/Profile.tsx';
 import Products from "./pages/products/Products.tsx";
 
 function App() {
@@ -16,11 +17,12 @@ function App() {
       <ProtectedRoute>
         <Layout>
           <Routes>
-            <Route path={ROUTES.HOME} element={<RefundManagement />} />
+            <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.BUY_MANAGEMENT} />} />
             <Route path={ROUTES.ACCEPT_DISCOUNT} element={<AcceptDiscount />} />
             <Route path={ROUTES.ACCEPT_DISCOUNT_SUMMARY} element={<SummaryAcceptDiscount />} />
             <Route path={ROUTES.REFUNDS_MANAGEMENT} element={<RefundManagement />} />
             <Route path={ROUTES.BUY_MANAGEMENT} element={<PurchaseManagement />} />
+            <Route path={ROUTES.PROFILE} element={<Profile />} />
             <Route path={ROUTES.PRODUCTS} element={<Products />} />
           </Routes>
         </Layout>
