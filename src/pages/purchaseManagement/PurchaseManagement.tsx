@@ -396,7 +396,6 @@ const PurchaseManagement = () => {
                             fetchTransactions({});
                         }}
                         filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
-                        totalElements={paginationModel?.totalElements}
                     >
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField
