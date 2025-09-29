@@ -344,7 +344,7 @@ const PurchaseManagement = () => {
             await deleteTransactionInProgress(selectedTransaction?.id);
             setOpenDrawer(false);
             setCancelTransactionModal(false);
-            navigate(ROUTES.HOME);
+            navigate(ROUTES.REFUNDS_MANAGEMENT);
         } catch (error) {
             console.error('Error deleting transaction:', error);
             setCancelTransactionModal(false);
