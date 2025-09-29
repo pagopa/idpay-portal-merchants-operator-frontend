@@ -33,7 +33,7 @@ const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user 
   const mappedResponse = [
     {
       "ID univoco": response?.id ?? "",
-      "Indirizzo": response?.address ?? "",
+      "Indirizzo": `${response?.address ?? ""} - ${response?.zipCode ?? ""}, ${response?.city ?? ""}, ${response?.province ?? ""} `,
       "Telefono": response?.channelPhone ?? "",
       "Email": response?.channelEmail ?? "",
     },
