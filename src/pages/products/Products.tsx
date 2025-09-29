@@ -209,6 +209,15 @@ const Products = () => {
         setProductsListIsLoading(true);
     }, []);
 
+    useEffect(() => {
+        if (errorAlert) {
+            const timer = setTimeout(() => {
+                setErrorAlert(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert]);
+
     const fetchProducts = useCallback(async (params: GetProductsParams) => {
         setProductsListIsLoading(true);
         try {
@@ -271,10 +280,8 @@ const Products = () => {
     };
 
     const handleFiltersReset = () => {
-        if(formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0){
-            formik.resetForm();
-            fetchProducts({});
-        }
+        formik.resetForm();
+        fetchProducts({});
     };
     const handleRowAction = (row: any) => {
         setOpenDrawer(true);
@@ -300,12 +307,13 @@ const Products = () => {
 
             <Box>
                 {
-                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0)) )&& (
+                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0))) && (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={handleFiltersApplied}
                             onFiltersReset={handleFiltersReset}
                             filtersApplied={areFiltersApplied()}
+                            totalElements={paginationModel?.totalElements}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">
@@ -487,7 +495,7 @@ const Products = () => {
                                     <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.products.drawer.productionCountry')}</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedProduct?.countryOfProduction ?? MISSING_DATA_PLACEHOLDER}</Typography>
                                 </Grid>
-                                
+
 
                             </Grid>
                         </Box>
