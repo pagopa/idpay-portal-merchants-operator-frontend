@@ -1,4 +1,4 @@
-import { List, Box } from '@mui/material';
+import { List, Box, Divider } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
@@ -42,6 +42,7 @@ export default function SideMenu() {
             level={0}
             data-testid="initiativeList-click-test"
           />
+          <Divider sx={{margin: "1rem 0"}} orientation="horizontal"/>
           <SideNavItem
             title={t('sideMenu.profile')}
             handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
