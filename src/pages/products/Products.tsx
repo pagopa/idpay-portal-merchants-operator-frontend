@@ -189,7 +189,8 @@ const Products = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: theme.typography.fontWeightMedium
                                 }}>
                                     {(params.value && params?.value !== '' && params?.value !== null) && <Link sx={{ color: '#0062C3', fontWeight: theme.typography.fontWeightMedium }} href={params?.row?.linkEprel} target="_blank">{params.value}</Link>}
                                     {(!params.value || params?.value === '' || params?.value === null) && MISSING_DATA_PLACEHOLDER}

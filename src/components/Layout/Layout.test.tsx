@@ -17,6 +17,7 @@ vi.mock('../../routes', () => ({
     HOME: '/home',
     PROFILE: '/profilo',
     BUY_MANAGEMENT: '/gestione-acquisti',
+    REFUNDS_MANAGEMENT: '/gestione-rimborsi',
     SOME_OTHER_PAGE: '/altra-pagina',
     PRIVACY_POLICY: '/privacy',
     TOS: '/termini-e-condizioni',
@@ -49,6 +50,7 @@ describe('Layout Component', () => {
     { route: ROUTES.HOME },
     { route: ROUTES.PROFILE },
     { route: ROUTES.BUY_MANAGEMENT },
+    { route: ROUTES.REFUNDS_MANAGEMENT },
   ])('should show side menu for route $route', ({ route }) => {
     renderInRouter(route, null);
     expect(screen.getByTestId('side-menu-mock')).toBeInTheDocument();

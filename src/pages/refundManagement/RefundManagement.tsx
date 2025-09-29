@@ -112,7 +112,7 @@ const RefundManagement = () => {
         {
             field: 'additionalProperties',
             headerName: 'Elettrodomestico',
-            flex: 3.5,
+            flex: 3,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,

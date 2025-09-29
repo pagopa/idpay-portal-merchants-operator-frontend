@@ -95,28 +95,12 @@ const PurchaseManagement = () => {
         }
     }, [errorAlert, transactionAuthorized, errorDeleteTransaction, errorCaptureTransaction, transactionCaptured]);
 
-    useEffect(() => {
-        if (errorAlert) {
-            const timer = setTimeout(() => {
-                setErrorAlert(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-
-        if (transactionAuthorized) {
-            const timer = setTimeout(() => {
-                utilsStore.setState({ transactionAuthorized: false });
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorAlert, transactionAuthorized]);
-
 
     const columns = [
         {
             field: "additionalProperties",
             headerName: 'Elettrodomestico',
-            flex: 3.5,
+            flex: 3,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
