@@ -7,7 +7,7 @@ const ROUTES = {
     PRODUCTS: '/prodotti',
     BUY_MANAGEMENT: '/gestione-acquisti',
     REFUNDS_MANAGEMENT:'/gestione-rimborsi',
-    PROFILE:'/profilo'
+    PROFILE:'/profilo',
 };
 
 export default ROUTES;

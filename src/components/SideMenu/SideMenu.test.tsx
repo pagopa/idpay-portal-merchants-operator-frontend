@@ -87,4 +87,15 @@ describe('SideMenu Component', () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT, { replace: true });
   });
+
+  it('should navigate to profile on click', async () => {
+    const user = userEvent.setup();
+    render(<SideMenu />);
+
+    const profileItem = screen.getByText('sideMenu.profile');
+    await user.click(profileItem);
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.PROFILE, { replace: true });
+  });
 });

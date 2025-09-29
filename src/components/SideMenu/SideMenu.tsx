@@ -6,6 +6,7 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import ROUTES from '../../routes';
 import SideNavItem from './SideNavItem';
+import { Person } from '@mui/icons-material';
 
 /** The side menu of the application */
 export default function SideMenu() {
@@ -30,6 +31,14 @@ export default function SideMenu() {
             handleClick={() => navigate(ROUTES.REFUNDS_MANAGEMENT, { replace: true })}
             isSelected={location.pathname === ROUTES.REFUNDS_MANAGEMENT}
             icon={PaymentsIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+          />
+          <SideNavItem
+            title={t('sideMenu.profile')}
+            handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
+            isSelected={location.pathname === ROUTES.PROFILE}
+            icon={Person}
             level={0}
             data-testid="initiativeList-click-test"
           />
