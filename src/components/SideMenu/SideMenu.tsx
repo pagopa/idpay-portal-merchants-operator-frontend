@@ -35,18 +35,18 @@ export default function SideMenu() {
             data-testid="initiativeList-click-test"
           />
           <SideNavItem
-            title={t('sideMenu.profile')}
-            handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
-            isSelected={location.pathname === ROUTES.PROFILE}
-            icon={Person}
-            level={0}
-            data-testid="initiativeList-click-test"
-          />
-          <SideNavItem
             title={t('sideMenu.products')}
             handleClick={() => navigate(ROUTES.PRODUCTS, { replace: true })}
             isSelected={location.pathname === ROUTES.PRODUCTS}
             icon={InventoryIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+          />
+          <SideNavItem
+            title={t('sideMenu.profile')}
+            handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
+            isSelected={location.pathname === ROUTES.PROFILE}
+            icon={Person}
             level={0}
             data-testid="initiativeList-click-test"
           />
