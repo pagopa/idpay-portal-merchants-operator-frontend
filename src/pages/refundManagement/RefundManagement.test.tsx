@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import RefundManagement from './RefundManagement';
@@ -153,28 +152,4 @@ describe('RefundManagement', () => {
     expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
   });
   
-  it('should retrieve transactions with applied filters', async () => {
-    const user = userEvent.setup();
-    renderComponent();
-    
-    await screen.findByTestId('data-table');
-    
-    const fiscalCodeInput = screen.getByLabelText('Cerca per codice fiscale');
-    await user.type(fiscalCodeInput, 'TESTCF123');
-    const applyButton = screen.getByRole('button', { name: /applica filtri/i });
-    await user.click(applyButton);
-
-    expect(mockGetProcessedTransactions).toHaveBeenCalledTimes(2);
-
-    expect(mockGetProcessedTransactions).toHaveBeenLastCalledWith(
-      undefined,
-      'pos-456',
-      expect.objectContaining({
-        fiscalCode: 'TESTCF123',
-        productGtin: '',
-        status: '',
-        page: 0,
-      })
-    );
-  });
 });

@@ -112,7 +112,7 @@ const RefundManagement = () => {
         {
             field: 'additionalProperties',
             headerName: 'Elettrodomestico',
-            flex: 1.5,
+            flex: 3,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
@@ -195,7 +195,7 @@ const RefundManagement = () => {
             headerName: 'Totale della spesa',
             flex: 1,
             type: 'number',
-            align: 'left',
+            align: 'center',
             headerAlign: 'left',
             disableColumnMenu: true,
             sortable: false,
@@ -214,7 +214,7 @@ const RefundManagement = () => {
             headerName: 'Importo autorizzato',
             flex: 1,
             type: 'number',
-            align: 'left',
+            align: 'center',
             headerAlign: 'left',
             disableColumnMenu: true,
             sortable: false,
@@ -337,6 +337,7 @@ const RefundManagement = () => {
                                 formik.resetForm();
                             }}
                             filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
+                            totalElements={paginationModel?.totalElements}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField
@@ -358,7 +359,7 @@ const RefundManagement = () => {
                                     onChange={formik.handleChange}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel id="pos-type-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                     <Select

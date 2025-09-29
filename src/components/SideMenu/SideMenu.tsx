@@ -28,8 +28,8 @@ export default function SideMenu() {
           />
           <SideNavItem
             title={t('sideMenu.refundManagement')}
-            handleClick={() => navigate(ROUTES.HOME, { replace: true })}
-            isSelected={location.pathname === ROUTES.HOME}
+            handleClick={() => navigate(ROUTES.REFUNDS_MANAGEMENT, { replace: true })}
+            isSelected={location.pathname === ROUTES.REFUNDS_MANAGEMENT}
             icon={PaymentsIcon}
             level={0}
             data-testid="initiativeList-click-test"

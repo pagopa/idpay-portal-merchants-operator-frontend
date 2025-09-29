@@ -67,7 +67,7 @@ const DataTable = ({
             sortable: false,
             filterable: false,
             disableColumnMenu: true,
-            flex: 1,
+            flex: 0.5,
             renderCell: (params: GridRenderCellParams) => (
               <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%', height: '100%' }}>
                 <IconButton
