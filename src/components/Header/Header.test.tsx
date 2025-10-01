@@ -35,7 +35,7 @@ const mockAuthContextValue = {
   login: vi.fn(),
   logout: vi.fn(),
   loading: false,
-  productsList: [{ title: 'Portale esercenti' }],
+  productsList: [{ title: 'Bonus Elettrodomestici' }],
   partyList: [{ id: '1', name: 'Euronics' }],
   partyId: '1',
 };
@@ -61,7 +61,7 @@ describe('Header Component', () => {
   it('should render HeaderProduct with product and selected party', () => {
     renderWithAuth();
 
-    expect(screen.getByText('Portale esercenti')).toBeInTheDocument();
+    expect(screen.getByText('Bonus Elettrodomestici')).toBeInTheDocument();
     expect(screen.getByText('Comet S.P.A.')).toBeInTheDocument();
   });
 
