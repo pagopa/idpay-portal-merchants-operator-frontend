@@ -12,7 +12,8 @@ import AlertComponent from "../../components/Alert/AlertComponent";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
-import { getStatusChip } from "../../utils/helpers";
+import { getStatusChip, formatEuro } from "../../utils/helpers";
+
 
 const RefundManagement = () => {
     const [rows, setRows] = useState([]);
@@ -129,7 +130,9 @@ const RefundManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: '400',
+                                    fontSize: '16px'
                                 }}>
                                     {params.value?.productName}
                                 </Typography>
@@ -164,7 +167,9 @@ const RefundManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: '400',
+                                    fontSize: '16px'
                                 }}>
                                     {
                                         params.value ? new Date(params.value).toLocaleDateString('it-IT', {
@@ -201,10 +206,7 @@ const RefundManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -220,10 +222,7 @@ const RefundManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }

@@ -893,7 +893,7 @@ components:
             - Lavatrice
             - Lavasciuga
             - Piano cottura
-            - Frigorifero
+            - Apparecchio di refrigerazione
             - Asciugatrice
             - Lavastoviglie
             - Cappa da cucina
@@ -938,7 +938,7 @@ components:
           type: string
           description: 'ENG: The batch name the product <br> IT: il nomelotto del
             prodotto'
-          pattern: ^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$
+          pattern: ^(Apparecchi_di_refrigerazione|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$
           maxLength: 255
         linkEprel:
           type: string
@@ -1866,10 +1866,10 @@ components:
       schema:
         type: string
         enum:
-          - elaborationDateTime, desc
+          - updateDate, desc
           - status, desc
           - productCategory, desc
-          - elaborationDateTime, asc
+          - updateDate, asc
           - status, asc
           - productCategory, asc
     status_trx_in_progress_query:
@@ -1897,10 +1897,10 @@ components:
       schema:
         type: string
         enum:
-          - elaborationDateTime, desc
+          - updateDate, desc
           - status, desc
           - productCategory, desc
-          - elaborationDateTime, asc
+          - updateDate, asc
           - status, asc
           - productCategory, asc
     initiativeId_path:

@@ -41,10 +41,10 @@
           },
           {
             "enum": [
-              "elaborationDateTime, desc",
+              "updateDate, desc",
               "status, desc",
               "productCategory, desc",
-              "elaborationDateTime, asc",
+              "updateDate, asc",
               "status, asc",
               "productCategory, asc"
             ],
@@ -288,10 +288,10 @@
           },
           {
             "enum": [
-              "elaborationDateTime, desc",
+              "updateDate, desc",
               "status, desc",
               "productCategory, desc",
-              "elaborationDateTime, asc",
+              "updateDate, asc",
               "status, asc",
               "productCategory, asc"
             ],
@@ -2415,7 +2415,7 @@
         "batchName": {
           "description": "ENG: The batch name the product <br> IT: il nomelotto del prodotto",
           "maxLength": 255,
-          "pattern": "^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\\\.csv$",
+          "pattern": "^(Apparecchi_di_refrigerazione|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\\\.csv$",
           "type": "string"
         },
         "brand": {
@@ -2437,7 +2437,7 @@
             "Lavatrice",
             "Lavasciuga",
             "Piano cottura",
-            "Frigorifero",
+            "Apparecchio di refrigerazione",
             "Asciugatrice",
             "Lavastoviglie",
             "Cappa da cucina",
@@ -2846,10 +2846,10 @@
       },
       "sort_trx_in_progress_query": {
         "enum": [
-          "elaborationDateTime, desc",
+          "updateDate, desc",
           "status, desc",
           "productCategory, desc",
-          "elaborationDateTime, asc",
+          "updateDate, asc",
           "status, asc",
           "productCategory, asc"
         ],
@@ -2860,10 +2860,10 @@
       },
       "sort_trx_processed_query": {
         "enum": [
-          "elaborationDateTime, desc",
+          "updateDate, desc",
           "status, desc",
           "productCategory, desc",
-          "elaborationDateTime, asc",
+          "updateDate, asc",
           "status, asc",
           "productCategory, asc"
         ],

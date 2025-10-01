@@ -17,7 +17,7 @@ import { useFormik } from "formik";
 import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from './purchaseManagement.module.css';
-import { getStatusChip } from "../../utils/helpers";
+import { getStatusChip, formatEuro } from "../../utils/helpers";
 import AlertComponent from "../../components/Alert/AlertComponent";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
@@ -189,10 +189,7 @@ const PurchaseManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -208,10 +205,7 @@ const PurchaseManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -516,17 +510,11 @@ const PurchaseManagement = () => {
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.totalAmount')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? (selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? formatEuro(selectedTransaction?.effectiveAmountCents)  : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? (selectedTransaction?.rewardAmountCents / 100).toLocaleString('it-IT', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? formatEuro(selectedTransaction?.rewardAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.status')}</Typography>
@@ -553,10 +541,7 @@ const PurchaseManagement = () => {
                 <Box display={'flex'} flexDirection={'column'} gap={2}>
                     <Typography variant="h6">{captureTransactionModal ? t('pages.purchaseManagement.captureTransactionModal.title') : t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
                     <Typography variant="body1">{captureTransactionModal ?
-                        `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${(selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }) + ' €'}
+                        `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.effectiveAmountCents)}
                             ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
                             ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
                         : t('pages.purchaseManagement.cancelTransactionModal.description')}.</Typography>
