@@ -85,7 +85,7 @@ const SummaryAcceptDiscount = () => {
                     />
                 </Box>
                 {
-                    summaryDataObj?.extendedAuthorization && (
+                    summaryDataObj?.extendedAuthorization === true && (
                         <Alert
                             icon={<WarningAmberIcon />}
                             severity="warning"
@@ -109,7 +109,7 @@ const SummaryAcceptDiscount = () => {
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography variant="body1" fontWeight={theme.typography.fontWeightBold} sx={{ textTransform: 'uppercase' }}>{t('pages.acceptDiscount.beneficiaryData')}</Typography>
                                     {
-                                        !summaryDataObj?.extendedAuthorization && (
+                                        summaryDataObj?.extendedAuthorization === false && (
                                             <Chip label="Identità verificata tramite IO" size='small' icon={<VerifiedIcon sx={{ color: "#0073E6 !important" }}/>}/>
                                         )
                                     }

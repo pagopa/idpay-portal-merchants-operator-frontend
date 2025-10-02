@@ -39,7 +39,7 @@ const BreadcrumbsBox = ({ backLabel, items, active, onClickBackButton, backButto
           {backLabel}
         </ButtonNaked>
         {items.map((label, index) => (
-          <Typography color="text.primary" variant="body2" key={index}  >
+          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} >
             {label}
           </Typography>
         ))}

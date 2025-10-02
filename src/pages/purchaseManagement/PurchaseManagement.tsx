@@ -41,6 +41,7 @@ const PurchaseManagement = () => {
     const navigate = useNavigate();
     const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
+    const [refundTransactionModal, setRefundTransactionModal] = useState(false);
     const token = authStore.getState().token;
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
 
@@ -384,6 +385,15 @@ const PurchaseManagement = () => {
     };
 
 
+    const handleReverseTransaction = async () => {
+         console.log("reverse transaction");
+         navigate(ROUTES.REVERSE);
+    };
+
+    const handleRequestRefund = async () => {
+         console.log("request refund");
+    };
+
     return (
         <Box>
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
@@ -523,7 +533,7 @@ const PurchaseManagement = () => {
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.brand')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.additionalProperties?.productName ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{`${selectedTransaction?.additionalProperties?.productBrand && selectedTransaction?.additionalProperties?.productModel ? selectedTransaction?.additionalProperties?.productBrand + ' ' + selectedTransaction?.additionalProperties?.productModel : MISSING_DATA_PLACEHOLDER}`}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.fiscalCode')}</Typography>
@@ -544,8 +554,8 @@ const PurchaseManagement = () => {
 
                     </Grid>
                     <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Button variant="contained" fullWidth onClick={handleCaptureTransaction}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
-                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => { }} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
+                        <Button variant="contained" fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCaptureTransaction : handleRequestRefund}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
+                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => {setRefundTransactionModal(true); setOpenDrawer(false);}} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
                     </Box>
                 </Box>
             </Drawer>
@@ -581,6 +591,29 @@ const PurchaseManagement = () => {
                         onClick={captureTransactionModal ? captureTransaction : deleteTransaction}
                     >
                         {'Conferma'}
+                    </Button>
+                </Box>
+            </ModalComponent>
+
+            <ModalComponent open={refundTransactionModal} onClose={() => setRefundTransactionModal(false)}>
+                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <Typography variant="h6">{t('pages.purchaseManagement.refundTransactionModal.title')}</Typography>
+                    <Typography variant="body1">{t('pages.purchaseManagement.refundTransactionModal.description')}</Typography>
+                </Box>
+                <Box
+                    display={'flex'}
+                    justifyContent={'flex-end'}
+                    gap={2}
+                    mt={4}
+                >
+                    <Button variant="outlined" onClick={() => { setRefundTransactionModal(false); setOpenDrawer(true) }}>
+                        {'Indietro'}
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleReverseTransaction}
+                    >
+                        {t('pages.purchaseManagement.drawer.refund')}
                     </Button>
                 </Box>
             </ModalComponent>
