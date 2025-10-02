@@ -49,10 +49,7 @@ const AcceptDiscount = () => {
             const discountCoupon = JSON.parse(sessionStorage.getItem('discountCoupon')!);
             setFormData({
                 product: discountCoupon.product,
-                totalAmount: (discountCoupon.originalAmountCents / 100).toLocaleString('it-IT', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }),
+                totalAmount: (discountCoupon.originalAmountCents / 100).toString(),
                 discountCode: discountCoupon.trxCode
             });
         }
@@ -98,7 +95,7 @@ const AcceptDiscount = () => {
         if (isValid) {
             setPreviewIsLoading(true);
             try {
-                const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100), discountCode: formData.discountCode.trim()! });
+                const response = await previewPayment({ productGtin: formData.product!.gtinCode!, productName: formData.product!.productName!, amountCents: Number(formData.totalAmount.replace(',', '.')) * 100, discountCode: formData.discountCode.trim()! });
                     sessionStorage.setItem('discountCoupon', JSON.stringify({...response, product: formData.product}));
                     setPreviewIsLoading(false);
                     navigate('/accetta-buono-sconto/riepilogo');

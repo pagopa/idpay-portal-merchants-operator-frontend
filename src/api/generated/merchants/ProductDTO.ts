@@ -16,7 +16,7 @@ export enum CategoryEnum {
 
   "Piano cottura" = "Piano cottura",
 
-  "Frigorifero" = "Frigorifero",
+  "Apparecchio di refrigerazione" = "Apparecchio di refrigerazione",
 
   "Asciugatrice" = "Asciugatrice",
 
@@ -41,7 +41,7 @@ const ProductDTOR = t.interface({});
 // optional attributes
 const ProductDTOO = t.partial({
   batchName: PatternString(
-    "^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$"
+    "^(Apparecchi_di_refrigerazione|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$"
   ),
 
   brand: PatternString("^.{1,100}$"),

@@ -41,4 +41,12 @@ export function getStatusChip(t: any, status: string) {
                 sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
             />
     }
+};
+
+export function formatEuro(value: number) {
+    return (value / 100).toLocaleString('it-IT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }) + '€';
 }
+    
