@@ -820,6 +820,9 @@ components:
           description: 'ENG: prodcut GTIN - IT: il codice GTIN del prodotto'
           maxLength: 14
           pattern: ^[a-zA-Z0-9]{1,14}$
+        extendedAuthorization:
+          type: boolean
+          description: 'ENG: True, if extended authorization - IT: True, se l''autorizzazione è estesa'
     ProductListDTO:
       type: object
       properties:
