@@ -17,7 +17,7 @@ import { useFormik } from "formik";
 import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from './purchaseManagement.module.css';
-import { getStatusChip } from "../../utils/helpers";
+import { getStatusChip, formatEuro } from "../../utils/helpers";
 import AlertComponent from "../../components/Alert/AlertComponent";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
@@ -176,7 +176,28 @@ const PurchaseManagement = () => {
             headerName: 'Beneficiario',
             flex: 1.5,
             disableColumnMenu: true,
-            sortable: false
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value) {
+                    return <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: '100%',
+                        width: '100%'
+                    }}>
+                        <Tooltip title={params.value}>
+                            <Typography sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                                {params.value}
+                            </Typography>
+                        </Tooltip>
+                    </div>
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            },
         },
         {
             field: 'effectiveAmountCents',
@@ -189,10 +210,7 @@ const PurchaseManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -208,10 +226,7 @@ const PurchaseManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -271,7 +286,7 @@ const PurchaseManagement = () => {
             setSortModel(model);
             if (model[0].field === 'additionalProperties') {
                 fetchTransactions({
-                    sort: 'productCategory,' + model[0].sort,
+                    sort: 'productName,' + model[0].sort,
                     page: paginationModel.page,
                     size: paginationModel.pageSize,
                     ...formik.values
@@ -291,7 +306,7 @@ const PurchaseManagement = () => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
 
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: paginationModel.page,
                 size: paginationModel.pageSize,
                 ...filtersObj
@@ -309,7 +324,7 @@ const PurchaseManagement = () => {
     const handlePaginationChange = (model: GridPaginationModel) => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: model.page,
                 size: model.pageSize,
                 ...formik.values
@@ -396,7 +411,6 @@ const PurchaseManagement = () => {
                             fetchTransactions({});
                         }}
                         filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
-                        totalElements={paginationModel?.totalElements}
                     >
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField
@@ -517,17 +531,11 @@ const PurchaseManagement = () => {
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.totalAmount')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? (selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? formatEuro(selectedTransaction?.effectiveAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? (selectedTransaction?.rewardAmountCents / 100).toLocaleString('it-IT', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            }) + '€' : MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? formatEuro(selectedTransaction?.rewardAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.status')}</Typography>
@@ -554,10 +562,7 @@ const PurchaseManagement = () => {
                 <Box display={'flex'} flexDirection={'column'} gap={2}>
                     <Typography variant="h6">{captureTransactionModal ? t('pages.purchaseManagement.captureTransactionModal.title') : t('pages.purchaseManagement.cancelTransactionModal.title')}</Typography>
                     <Typography variant="body1">{captureTransactionModal ?
-                        `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${(selectedTransaction?.effectiveAmountCents / 100).toLocaleString('it-IT', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }) + ' €'}
+                        `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.effectiveAmountCents)}
                             ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
                             ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
                         : t('pages.purchaseManagement.cancelTransactionModal.description')}.</Typography>

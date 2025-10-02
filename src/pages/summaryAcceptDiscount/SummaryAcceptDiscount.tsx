@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Chip, Button, CircularProgress, Backdrop } from '@mui/material';
+import { Box, Grid, Typography, Chip, Button, CircularProgress, Backdrop, Alert } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
@@ -10,6 +10,8 @@ import { useEffect, useState } from 'react';
 import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { utilsStore } from '../../store/utilsStore';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 const SummaryAcceptDiscount = () => {
 
@@ -82,12 +84,35 @@ const SummaryAcceptDiscount = () => {
                         variantSubTitle='body2'
                     />
                 </Box>
-                <Grid container spacing={2} sx={{ maxWidth: '920px' }}>
+                {
+                    summaryDataObj?.extendedAuthorization && (
+                        <Alert
+                            icon={<WarningAmberIcon />}
+                            severity="warning"
+                            sx={{
+                                backgroundColor: 'white',
+                                '& .MuiAlert-icon': {
+                                    color: '#FFCB46',
+                                },
+                            }}
+                        >
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
+                            &lt;{t('pages.summaryAcceptDiscount.alert')}&gt;
+                            </Typography>
+                        </Alert>
+                    )
+                }
+                <Grid container spacing={2} sx={{ maxWidth: '920px' }} mt={2}>
                     <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                         <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }} py={3} px={3}>
                             <Grid container spacing={2}>
-                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                <Grid size={{ xs: 12, md: 12, lg: 12 }} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography variant="body1" fontWeight={theme.typography.fontWeightBold} sx={{ textTransform: 'uppercase' }}>{t('pages.acceptDiscount.beneficiaryData')}</Typography>
+                                    {
+                                        !summaryDataObj?.extendedAuthorization && (
+                                            <Chip label="Identità verificata tramite IO" size='small' icon={<VerifiedIcon sx={{ color: "#0073E6 !important" }}/>}/>
+                                        )
+                                    }
                                 </Grid>
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.fiscalCode')}</Typography>

@@ -820,6 +820,9 @@ components:
           description: 'ENG: prodcut GTIN - IT: il codice GTIN del prodotto'
           maxLength: 14
           pattern: ^[a-zA-Z0-9]{1,14}$
+        extendedAuthorization:
+          type: boolean
+          description: 'ENG: True, if extended authorization - IT: True, se l''autorizzazione è estesa'
     ProductListDTO:
       type: object
       properties:
@@ -893,7 +896,7 @@ components:
             - Lavatrice
             - Lavasciuga
             - Piano cottura
-            - Frigorifero
+            - Apparecchio di refrigerazione
             - Asciugatrice
             - Lavastoviglie
             - Cappa da cucina
@@ -938,7 +941,7 @@ components:
           type: string
           description: 'ENG: The batch name the product <br> IT: il nomelotto del
             prodotto'
-          pattern: ^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$
+          pattern: ^(Apparecchi_di_refrigerazione|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$
           maxLength: 255
         linkEprel:
           type: string
@@ -1866,12 +1869,12 @@ components:
       schema:
         type: string
         enum:
-          - elaborationDateTime, desc
+          - updateDate, desc
           - status, desc
-          - productCategory, desc
-          - elaborationDateTime, asc
+          - productName, desc
+          - updateDate, asc
           - status, asc
-          - productCategory, asc
+          - productName, asc
     status_trx_in_progress_query:
       name: status
       in: query
@@ -1897,12 +1900,12 @@ components:
       schema:
         type: string
         enum:
-          - elaborationDateTime, desc
+          - updateDate, desc
           - status, desc
-          - productCategory, desc
-          - elaborationDateTime, asc
+          - productName, desc
+          - updateDate, asc
           - status, asc
-          - productCategory, asc
+          - productName, asc
     initiativeId_path:
       name: initiativeId
       in: path

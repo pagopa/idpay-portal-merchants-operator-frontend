@@ -41,12 +41,12 @@
           },
           {
             "enum": [
-              "elaborationDateTime, desc",
+              "updateDate, desc",
               "status, desc",
-              "productCategory, desc",
-              "elaborationDateTime, asc",
+              "productName, desc",
+              "updateDate, asc",
               "status, asc",
-              "productCategory, asc"
+              "productName, asc"
             ],
             "in": "query",
             "name": "sort",
@@ -288,12 +288,12 @@
           },
           {
             "enum": [
-              "elaborationDateTime, desc",
+              "updateDate, desc",
               "status, desc",
-              "productCategory, desc",
-              "elaborationDateTime, asc",
+              "productName, desc",
+              "updateDate, asc",
               "status, asc",
-              "productCategory, asc"
+              "productName, asc"
             ],
             "in": "query",
             "name": "sort",
@@ -2317,6 +2317,10 @@
     },
     "PreviewPaymentDTO": {
       "properties": {
+        "extendedAuthorization": {
+          "description": "ENG: True, if extended authorization - IT: True, se l'autorizzazione è estesa",
+          "type": "boolean"
+        },
         "originalAmountCents": {
           "description": "ENG: Original amount cents - IT: Importo originale da pagare in centesimi",
           "format": "int64",
@@ -2415,7 +2419,7 @@
         "batchName": {
           "description": "ENG: The batch name the product <br> IT: il nomelotto del prodotto",
           "maxLength": 255,
-          "pattern": "^(Frigoriferi|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\\\.csv$",
+          "pattern": "^(Apparecchi_di_refrigerazione|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\\\.csv$",
           "type": "string"
         },
         "brand": {
@@ -2437,7 +2441,7 @@
             "Lavatrice",
             "Lavasciuga",
             "Piano cottura",
-            "Frigorifero",
+            "Apparecchio di refrigerazione",
             "Asciugatrice",
             "Lavastoviglie",
             "Cappa da cucina",
@@ -2846,12 +2850,12 @@
       },
       "sort_trx_in_progress_query": {
         "enum": [
-          "elaborationDateTime, desc",
+          "updateDate, desc",
           "status, desc",
-          "productCategory, desc",
-          "elaborationDateTime, asc",
+          "productName, desc",
+          "updateDate, asc",
           "status, asc",
-          "productCategory, asc"
+          "productName, asc"
         ],
         "in": "query",
         "name": "sort",
@@ -2860,12 +2864,12 @@
       },
       "sort_trx_processed_query": {
         "enum": [
-          "elaborationDateTime, desc",
+          "updateDate, desc",
           "status, desc",
-          "productCategory, desc",
-          "elaborationDateTime, asc",
+          "productName, desc",
+          "updateDate, asc",
           "status, asc",
-          "productCategory, asc"
+          "productName, asc"
         ],
         "in": "query",
         "name": "sort",

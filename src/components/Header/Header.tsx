@@ -39,7 +39,7 @@ const Header = ({userProps}: HeaderProps) => {
   const welfareProduct: ProductEntity = {
     // TODO check if correct
     id: 'prod-idpay-merchants',
-    title: "Portale esercenti",
+    title: "Bonus Elettrodomestici",
     productUrl: "test",
     linkType: 'internal',
   };

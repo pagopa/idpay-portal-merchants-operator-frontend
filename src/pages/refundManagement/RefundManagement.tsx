@@ -12,7 +12,8 @@ import AlertComponent from "../../components/Alert/AlertComponent";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
-import { getStatusChip } from "../../utils/helpers";
+import { getStatusChip, formatEuro } from "../../utils/helpers";
+
 
 const RefundManagement = () => {
     const [rows, setRows] = useState([]);
@@ -129,7 +130,9 @@ const RefundManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: '400',
+                                    fontSize: '16px'
                                 }}>
                                     {params.value?.productName}
                                 </Typography>
@@ -164,7 +167,9 @@ const RefundManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: '400',
+                                    fontSize: '16px'
                                 }}>
                                     {
                                         params.value ? new Date(params.value).toLocaleDateString('it-IT', {
@@ -201,10 +206,7 @@ const RefundManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -220,10 +222,7 @@ const RefundManagement = () => {
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value || params.value === 0) {
-                    return (params.value / 100).toLocaleString('it-IT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) + '€';
+                    return formatEuro(params.value);
                 }
                 return MISSING_DATA_PLACEHOLDER;
             }
@@ -249,7 +248,7 @@ const RefundManagement = () => {
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: paginationModel.page,
                 size: paginationModel.pageSize,
                 ...filtersObj
@@ -267,7 +266,7 @@ const RefundManagement = () => {
     const handlePaginationChange = (model: GridPaginationModel) => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: model.page,
                 size: model.pageSize,
                 ...formik.values
@@ -287,7 +286,7 @@ const RefundManagement = () => {
             setSortModel(model);
             if (model[0].field === 'additionalProperties') {
                 fetchTransactions({
-                    sort: 'productCategory,' + model[0].sort,
+                    sort: 'productName,' + model[0].sort,
                     page: paginationModel.page,
                     size: paginationModel.pageSize,
                     ...formik.values
@@ -337,7 +336,6 @@ const RefundManagement = () => {
                                 formik.resetForm();
                             }}
                             filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
-                            totalElements={paginationModel?.totalElements}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <TextField

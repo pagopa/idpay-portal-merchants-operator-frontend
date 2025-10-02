@@ -313,7 +313,6 @@ const Products = () => {
                             onFiltersApplied={handleFiltersApplied}
                             onFiltersReset={handleFiltersReset}
                             filtersApplied={areFiltersApplied()}
-                            totalElements={paginationModel?.totalElements}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">

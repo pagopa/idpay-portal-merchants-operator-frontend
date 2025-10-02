@@ -47,7 +47,7 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
         width: '50%',
         '& .MuiFormLabel-root.Mui-error': {
           color: '#5C6E82 !important',
-        }
+        },
       }}
       open={open}
       onOpen={() => {
@@ -94,7 +94,17 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
       )}
       slotProps={{
         popper: {
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 8], 
+              },
+            },
+          ],
           sx: {
+             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15), 0px 0px 2px rgba(0, 0, 0, 0.05)',
+             borderRadius: '4px',
             '& .MuiAutocomplete-option': {
               '&:hover': {
                 backgroundColor: '#0073E614 !important',

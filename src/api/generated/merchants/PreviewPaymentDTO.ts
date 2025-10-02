@@ -28,6 +28,8 @@ const PreviewPaymentDTOR = t.interface({});
 
 // optional attributes
 const PreviewPaymentDTOO = t.partial({
+  extendedAuthorization: t.boolean,
+
   originalAmountCents: t.union([
     WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
       0,
