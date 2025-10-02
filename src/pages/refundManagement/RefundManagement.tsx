@@ -248,7 +248,7 @@ const RefundManagement = () => {
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: paginationModel.page,
                 size: paginationModel.pageSize,
                 ...filtersObj
@@ -266,7 +266,7 @@ const RefundManagement = () => {
     const handlePaginationChange = (model: GridPaginationModel) => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: model.page,
                 size: model.pageSize,
                 ...formik.values
@@ -286,7 +286,7 @@ const RefundManagement = () => {
             setSortModel(model);
             if (model[0].field === 'additionalProperties') {
                 fetchTransactions({
-                    sort: 'productCategory,' + model[0].sort,
+                    sort: 'productName,' + model[0].sort,
                     page: paginationModel.page,
                     size: paginationModel.pageSize,
                     ...formik.values

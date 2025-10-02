@@ -43,10 +43,10 @@
             "enum": [
               "updateDate, desc",
               "status, desc",
-              "productCategory, desc",
+              "productName, desc",
               "updateDate, asc",
               "status, asc",
-              "productCategory, asc"
+              "productName, asc"
             ],
             "in": "query",
             "name": "sort",
@@ -290,10 +290,10 @@
             "enum": [
               "updateDate, desc",
               "status, desc",
-              "productCategory, desc",
+              "productName, desc",
               "updateDate, asc",
               "status, asc",
-              "productCategory, asc"
+              "productName, asc"
             ],
             "in": "query",
             "name": "sort",
@@ -2848,10 +2848,10 @@
         "enum": [
           "updateDate, desc",
           "status, desc",
-          "productCategory, desc",
+          "productName, desc",
           "updateDate, asc",
           "status, asc",
-          "productCategory, asc"
+          "productName, asc"
         ],
         "in": "query",
         "name": "sort",
@@ -2862,10 +2862,10 @@
         "enum": [
           "updateDate, desc",
           "status, desc",
-          "productCategory, desc",
+          "productName, desc",
           "updateDate, asc",
           "status, asc",
-          "productCategory, asc"
+          "productName, asc"
         ],
         "in": "query",
         "name": "sort",

@@ -1868,10 +1868,10 @@ components:
         enum:
           - updateDate, desc
           - status, desc
-          - productCategory, desc
+          - productName, desc
           - updateDate, asc
           - status, asc
-          - productCategory, asc
+          - productName, asc
     status_trx_in_progress_query:
       name: status
       in: query
@@ -1899,10 +1899,10 @@ components:
         enum:
           - updateDate, desc
           - status, desc
-          - productCategory, desc
+          - productName, desc
           - updateDate, asc
           - status, asc
-          - productCategory, asc
+          - productName, asc
     initiativeId_path:
       name: initiativeId
       in: path

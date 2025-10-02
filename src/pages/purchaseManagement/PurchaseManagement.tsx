@@ -176,7 +176,28 @@ const PurchaseManagement = () => {
             headerName: 'Beneficiario',
             flex: 1.5,
             disableColumnMenu: true,
-            sortable: false
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value) {
+                    return <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: '100%',
+                        width: '100%'
+                    }}>
+                        <Tooltip title={params.value}>
+                            <Typography sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                            }}>
+                                {params.value}
+                            </Typography>
+                        </Tooltip>
+                    </div>
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            },
         },
         {
             field: 'effectiveAmountCents',
@@ -265,7 +286,7 @@ const PurchaseManagement = () => {
             setSortModel(model);
             if (model[0].field === 'additionalProperties') {
                 fetchTransactions({
-                    sort: 'productCategory,' + model[0].sort,
+                    sort: 'productName,' + model[0].sort,
                     page: paginationModel.page,
                     size: paginationModel.pageSize,
                     ...formik.values
@@ -285,7 +306,7 @@ const PurchaseManagement = () => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
 
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: paginationModel.page,
                 size: paginationModel.pageSize,
                 ...filtersObj
@@ -303,7 +324,7 @@ const PurchaseManagement = () => {
     const handlePaginationChange = (model: GridPaginationModel) => {
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
-                sort: 'productCategory,' + sortModel[0].sort,
+                sort: 'productName,' + sortModel[0].sort,
                 page: model.page,
                 size: model.pageSize,
                 ...formik.values
@@ -510,7 +531,7 @@ const PurchaseManagement = () => {
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.totalAmount')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? formatEuro(selectedTransaction?.effectiveAmountCents)  : MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? formatEuro(selectedTransaction?.effectiveAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
