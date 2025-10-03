@@ -13,9 +13,12 @@ import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 import { getStatusChip, formatEuro } from "../../utils/helpers";
+import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 
 
 const RefundManagement = () => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [selectedTransaction, setSelectedTransaction] = useState({})
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
@@ -35,6 +38,21 @@ const RefundManagement = () => {
         productGtin: '',
         status: ''
     };
+
+    const handleRowAction = useCallback((transaction) => {
+        setIsOpen(true)
+        const mappedTransaction = {
+            'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {}).replace(',', ''),
+            'Elettrodomestico': transaction?.additionalProperties.productName,
+            'Codice Fiscale': transaction?.fiscalCode,
+            'Totale della spesa': transaction?.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents),
+            'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
+            'Importo autorizzato': transaction?.rewardAmountCents && transaction?.rewardAmountCents && formatEuro( transaction.effectiveAmountCents - transaction.rewardAmountCents),
+            'Stato': getStatusChip(t, transaction?.status),
+            'Fattura': ''
+        }
+        setSelectedTransaction(mappedTransaction)
+    }, [])
 
     const formik = useFormik<GetProcessedTransactionsFilters>({
         initialValues,
@@ -304,6 +322,7 @@ const RefundManagement = () => {
 
     return (
         <Box>
+            <DetailsDrawer setIsOpen={() => setIsOpen(false)} isOpen={isOpen} title={t('pages.purchaseManagement.drawer.title')} item={selectedTransaction} />
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox
                     title={t('pages.refundManagement.title')}
@@ -404,6 +423,7 @@ const RefundManagement = () => {
                                 paginationModel={paginationModel}
                                 onSortModelChange={handleSortModelChange}
                                 sortModel={sortModel}
+                                handleRowAction={handleRowAction}
                             />
                         </Box>
                     </Grid>
