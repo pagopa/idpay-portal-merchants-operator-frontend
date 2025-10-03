@@ -14,4 +14,8 @@
         }
     }
 
+    [data-testid="CloseIcon"] {
+        color:  #17324D !important;
+    }
+
 }
