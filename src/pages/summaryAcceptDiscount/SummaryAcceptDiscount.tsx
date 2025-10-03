@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, Chip, Button, CircularProgress, Backdrop, Alert } from '@mui/material';
+import { Box, Grid, Typography, Chip, Button, CircularProgress, Backdrop, Alert, Stack } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
@@ -116,7 +116,14 @@ const SummaryAcceptDiscount = () => {
                                 </Grid>
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.acceptDiscount.fiscalCode')}</Typography>
-                                    <Typography variant="body1" sx={{ fontWeight: theme.typography.fontWeightMedium, textTransform: 'uppercase' }}>{summaryDataObj?.userId}</Typography>
+                                    <Stack direction="row" spacing={1}>
+                                        <Typography variant="body1" sx={{ fontWeight: theme.typography.fontWeightMedium, textTransform: 'uppercase' }}>{summaryDataObj?.userId}</Typography>
+                                        {
+                                            summaryDataObj?.extendedAuthorization === false   && (
+                                                <VerifiedIcon sx={{ color: "#0073E6 !important" }} fontSize='small'/>
+                                            )
+                                        }
+                                    </Stack>
                                 </Grid>
                             </Grid>
                         </Box>
