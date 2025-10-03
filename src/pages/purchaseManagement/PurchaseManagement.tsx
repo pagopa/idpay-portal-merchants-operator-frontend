@@ -392,6 +392,7 @@ const PurchaseManagement = () => {
 
     const handleRequestRefund = async () => {
          console.log("request refund");
+         navigate(ROUTES.REFUND);
     };
 
     return (

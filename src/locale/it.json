@@ -86,6 +86,10 @@
       "title":"Storna transazione",
       "subtitle":"Carica la documentazione necessaria per avvisare lo storno."
     },
+    "refund":{
+      "title":"Richiedi rimborso",
+      "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. "
+    },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
       "exitModalTitle": "Vuoi uscire?",
