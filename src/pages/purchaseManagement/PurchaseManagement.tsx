@@ -59,6 +59,12 @@ const PurchaseManagement = () => {
     });
 
     useEffect(() => {
+        setSortModel([
+            {
+                field: 'updateDate',
+                sort: 'desc'
+            }
+        ]);
         fetchTransactions({});
     }, [transactionCaptured]);
 
@@ -263,7 +269,7 @@ const PurchaseManagement = () => {
                 import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
-                    sort: 'updateDate,asc',
+                    sort: 'updateDate,desc',
                     page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
@@ -528,12 +534,8 @@ const PurchaseManagement = () => {
                             }).replace(',', '') ?? MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.category')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.additionalProperties?.productCategory ?? MISSING_DATA_PLACEHOLDER}</Typography>
-                        </Grid>
-                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.brand')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{`${selectedTransaction?.additionalProperties?.productBrand && selectedTransaction?.additionalProperties?.productModel ? selectedTransaction?.additionalProperties?.productBrand + ' ' + selectedTransaction?.additionalProperties?.productModel : MISSING_DATA_PLACEHOLDER}`}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.additionalProperties?.productName ?? MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.fiscalCode')}</Typography>
