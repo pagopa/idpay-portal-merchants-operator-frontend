@@ -535,7 +535,7 @@ const PurchaseManagement = () => {
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.brand')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.additionalProperties?.productName ?? MISSING_DATA_PLACEHOLDER}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{`${selectedTransaction?.additionalProperties?.productBrand && selectedTransaction?.additionalProperties?.productModel ? selectedTransaction?.additionalProperties?.productBrand + ' ' + selectedTransaction?.additionalProperties?.productModel : MISSING_DATA_PLACEHOLDER}`}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.fiscalCode')}</Typography>
