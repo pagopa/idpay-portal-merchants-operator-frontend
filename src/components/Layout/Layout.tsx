@@ -9,8 +9,10 @@ type Props = {
 //components
 import Header from '../Header/Header';
 import SideMenu from '../SideMenu/SideMenu';
+import { useState } from 'react';
 
 const Layout = ({ children }: Props) => {
+  const [isOpen, setIsOpen] = useState(true)
   const location = useLocation();
 
   const match = (paths) => {
@@ -45,9 +47,7 @@ const Layout = ({ children }: Props) => {
       </Box>
       {isMatched ? (
         <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
-          <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
-            <SideMenu />
-          </Box>
+            <SideMenu isOpen={isOpen} setIsOpen={setIsOpen} />
           <Box
             gridColumn="auto"
             sx={{ backgroundColor: '#F5F5F5' }}
