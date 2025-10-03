@@ -8,6 +8,7 @@ type Props = {
   icon: SvgIconComponent;
   level: number;
   disabled?: boolean;
+  hideLabels?: boolean;
 };
 
 export default function SideNavItem({
@@ -17,13 +18,14 @@ export default function SideNavItem({
   icon,
   level,
   disabled = false,
+  hideLabels = false
 }: Props) {
   return (
     <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick}>
       <ListItemIcon sx={{ ml: level }}>
         <Icon component={icon} />
       </ListItemIcon>
-      <ListItemText
+      {!hideLabels && <ListItemText
         primary={title}
         sx={{
           wordWrap: 'break-word',
@@ -32,7 +34,7 @@ export default function SideNavItem({
           textAlign: 'left',
           display: 'block',
         }}
-      />
+      />}
     </ListItemButton>
   );
 }
