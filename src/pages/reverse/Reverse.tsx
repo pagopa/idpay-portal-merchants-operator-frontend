@@ -30,10 +30,7 @@ const Reverse = () => {
     };
 
     const handleButtonClick = () => {
-        const input = document.querySelector<HTMLInputElement>(
-            '[data-testid="fileInput"] input[type="file"]'
-        );
-        input?.click();
+        fileInputRef.current?.click();
     };
 
 
@@ -54,23 +51,33 @@ const Reverse = () => {
                 <Typography variant="body2" mt={4} mb={1}>{t('pages.reverse.creditNoteSubtitle')}</Typography>
                 <Link href="#" sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t('pages.reverse.manualLink')}</Link>
                 <Box mt={3} mb={2}>
-                    <SingleFileInput onFileSelected={handleFileSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel="Trascina qui il file <PDF> della fattura da caricare o " dropzoneButton="selezionalo dal tuo computer" rejectedLabel="File type not supported" />
+                    <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel={t('pages.reverse.uploadFile')} dropzoneButton={t('pages.reverse.uploadFileButton')} rejectedLabel={t('pages.reverse.fileNotSupported')} />
                 </Box>
                 <input
                     type="file"
+                    accept='application/pdf, application/xml'
                     ref={fileInputRef}
                     style={{ display: 'none' }}
-                    onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                        const selectedFile = e.target.files?.[0];
+                        if (selectedFile) {
+                            handleFileSelect(selectedFile);
+                        }
+                    }}
                 />
 
-                <Button
+               {
+                file && (
+                    <Button
                     variant="naked"
                     startIcon={<FileUploadIcon />}
                     onClick={handleButtonClick}
                     sx={{ fontWeight: 'bold', fontSize: '14px' }}
                 >
-                    Sostituisci
+                    {t('pages.reverse.replaceFile')}
                 </Button>
+                )
+               }
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
                 <Button variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>Indietro</Button>

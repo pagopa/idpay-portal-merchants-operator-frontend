@@ -82,10 +82,6 @@
       "title": "Accetta un buono sconto",
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
-    "reverse":{
-      "title":"Storna transazione",
-      "subtitle":"Carica la documentazione necessaria per avvisare lo storno."
-    },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
       "exitModalTitle": "Vuoi uscire?",
@@ -278,7 +274,13 @@
       "creditNote": "Carica nota di credito",
       "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
       "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
-      "manualLink": "Dubbi? Vai sul manuale"
+      "manualLink": "Dubbi? Vai sul manuale",
+      "manualLinkText": "Dubbi? Vai sul manuale",
+      "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
+      "uploadFile": "Trascina qui il file <PDF> della fattura da caricare o ",
+      "uploadFileButton": "selezionalo dal tuo computer",
+      "replaceFile": "Sostituisci"
+
     }
 
   },
