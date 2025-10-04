@@ -1,13 +1,13 @@
 import { ListItemButton, ListItemText, ListItemIcon, Icon } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
-    
+
 type Props = {
   handleClick: () => void;
   title: string;
   isSelected?: boolean;
   icon: SvgIconComponent;
-  level: number;
   disabled?: boolean;
+  hideLabels?: boolean;
 };
 
 export default function SideNavItem({
@@ -15,24 +15,23 @@ export default function SideNavItem({
   title,
   isSelected,
   icon,
-  level,
   disabled = false,
+  hideLabels = false,
 }: Props) {
   return (
-    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick}>
-      <ListItemIcon sx={{ ml: level }}>
+    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick} sx={{justifyContent: hideLabels ? 'center' : ''}}>
+      <ListItemIcon >
         <Icon component={icon} />
       </ListItemIcon>
-      <ListItemText
+      {!hideLabels && <ListItemText
         primary={title}
         sx={{
-          wordWrap: 'break-word',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          textAlign: 'left',
-          display: 'block',
+          height: '100%',
+          width: '100%',
+          display: hideLabels ? 'grid' : '',
+          justifyContent: hideLabels ? 'center' : '',
         }}
-      />
+      />}
     </ListItemButton>
   );
 }

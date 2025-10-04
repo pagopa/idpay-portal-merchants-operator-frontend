@@ -3,15 +3,18 @@ import { Footer } from '@pagopa/selfcare-common-frontend/lib';
 import { useLocation, matchPath } from 'react-router-dom';
 
 import ROUTES from '../../routes';
-type Props = {
-  children?: React.ReactNode;
-};
 //components
 import Header from '../Header/Header';
 import SideMenu from '../SideMenu/SideMenu';
+import { useState } from 'react';
+
+type Props = {
+  children?: React.ReactNode;
+};
 
 const Layout = ({ children }: Props) => {
   const location = useLocation();
+  const [hideLabels, setHideLabels] = useState(false);
 
   const match = (paths) => {
     for (const path of paths) {
@@ -44,9 +47,9 @@ const Layout = ({ children }: Props) => {
         <Header />
       </Box>
       {isMatched ? (
-        <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
-          <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
-            <SideMenu />
+        <Box gridArea="body" display="grid" gridTemplateColumns={"minmax(250px, 1fr) 10fr"}>
+          <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper', maxWidth:hideLabels?'140px':'auto', justifyContent:hideLabels?'center':'left' }}>
+            <SideMenu hideLabels={hideLabels} setHideLabels={setHideLabels} />
           </Box>
           <Box
             gridColumn="auto"
