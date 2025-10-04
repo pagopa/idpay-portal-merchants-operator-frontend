@@ -19,6 +19,8 @@ import {
   getPointOfSaleTransactionsDefaultDecoder,
   GetPointOfSaleTransactionsProcessedT,
   getPointOfSaleTransactionsProcessedDefaultDecoder,
+  DownloadInvoiceFileT,
+  downloadInvoiceFileDefaultDecoder,
   GetProductsT,
   getProductsDefaultDecoder,
   AuthPaymentBarCodeT,
@@ -29,6 +31,8 @@ import {
   previewPaymentDefaultDecoder,
   DeleteTransactionT,
   deleteTransactionDefaultDecoder,
+  ReversalTransactionT,
+  reversalTransactionDefaultDecoder,
   GetPointOfSaleT,
   getPointOfSaleDefaultDecoder
 } from "./requestTypes";
@@ -41,20 +45,24 @@ type __UNDEFINED_KEY = "_____";
 
 export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsT> &
   TypeofApiCall<GetPointOfSaleTransactionsProcessedT> &
+  TypeofApiCall<DownloadInvoiceFileT> &
   TypeofApiCall<GetProductsT> &
   TypeofApiCall<AuthPaymentBarCodeT> &
   TypeofApiCall<CapturePaymentT> &
   TypeofApiCall<PreviewPaymentT> &
   TypeofApiCall<DeleteTransactionT> &
+  TypeofApiCall<ReversalTransactionT> &
   TypeofApiCall<GetPointOfSaleT>;
 
 export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
   TypeofApiParams<GetPointOfSaleTransactionsProcessedT> &
+  TypeofApiParams<DownloadInvoiceFileT> &
   TypeofApiParams<GetProductsT> &
   TypeofApiParams<AuthPaymentBarCodeT> &
   TypeofApiParams<CapturePaymentT> &
   TypeofApiParams<PreviewPaymentT> &
   TypeofApiParams<DeleteTransactionT> &
+  TypeofApiParams<ReversalTransactionT> &
   TypeofApiParams<GetPointOfSaleT>);
 
 /**
@@ -81,11 +89,13 @@ export type WithDefaultsT<
 > = OmitApiCallParams<
   | GetPointOfSaleTransactionsT
   | GetPointOfSaleTransactionsProcessedT
+  | DownloadInvoiceFileT
   | GetProductsT
   | AuthPaymentBarCodeT
   | CapturePaymentT
   | PreviewPaymentT
   | DeleteTransactionT
+  | ReversalTransactionT
   | GetPointOfSaleT,
   K
 >;
@@ -106,6 +116,8 @@ export type Client<
         GetPointOfSaleTransactionsProcessedT
       >;
 
+      readonly downloadInvoiceFile: TypeofApiCall<DownloadInvoiceFileT>;
+
       readonly getProducts: TypeofApiCall<GetProductsT>;
 
       readonly authPaymentBarCode: TypeofApiCall<AuthPaymentBarCodeT>;
@@ -115,6 +127,8 @@ export type Client<
       readonly previewPayment: TypeofApiCall<PreviewPaymentT>;
 
       readonly deleteTransaction: TypeofApiCall<DeleteTransactionT>;
+
+      readonly reversalTransaction: TypeofApiCall<ReversalTransactionT>;
 
       readonly getPointOfSale: TypeofApiCall<GetPointOfSaleT>;
     }
@@ -130,6 +144,13 @@ export type Client<
         ReplaceRequestParams<
           GetPointOfSaleTransactionsProcessedT,
           Omit<RequestParams<GetPointOfSaleTransactionsProcessedT>, K>
+        >
+      >;
+
+      readonly downloadInvoiceFile: TypeofApiCall<
+        ReplaceRequestParams<
+          DownloadInvoiceFileT,
+          Omit<RequestParams<DownloadInvoiceFileT>, K>
         >
       >;
 
@@ -162,6 +183,13 @@ export type Client<
         ReplaceRequestParams<
           DeleteTransactionT,
           Omit<RequestParams<DeleteTransactionT>, K>
+        >
+      >;
+
+      readonly reversalTransaction: TypeofApiCall<
+        ReplaceRequestParams<
+          ReversalTransactionT,
+          Omit<RequestParams<ReversalTransactionT>, K>
         >
       >;
 
@@ -287,6 +315,30 @@ export function createClient<K extends ParamKeys>({
   };
   const getPointOfSaleTransactionsProcessed: TypeofApiCall<GetPointOfSaleTransactionsProcessedT> = createFetchRequestForApi(
     getPointOfSaleTransactionsProcessedT,
+    options
+  );
+
+  const downloadInvoiceFileT: ReplaceRequestParams<
+    DownloadInvoiceFileT,
+    RequestParams<DownloadInvoiceFileT>
+  > = {
+    method: "get",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: downloadInvoiceFileDefaultDecoder(),
+    url: ({
+      ["initiativeId"]: initiativeId,
+      ["pointOfSaleId"]: pointOfSaleId,
+      ["transactionId"]: transactionId
+    }) =>
+      `${basePath}/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/${transactionId}/download`,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const downloadInvoiceFile: TypeofApiCall<DownloadInvoiceFileT> = createFetchRequestForApi(
+    downloadInvoiceFileT,
     options
   );
 
@@ -438,6 +490,40 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const reversalTransactionT: ReplaceRequestParams<
+    ReversalTransactionT,
+    RequestParams<ReversalTransactionT>
+  > = {
+    method: "post",
+
+    // There is a well-known issue about fetch and Content-Type header when it comes to add multipart/form-data files.
+    //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
+    // The solution is to skip the Content-Type header and let fetch add it for us.
+    // @ts-ignore as IRequestType would require something
+    headers: ({
+      ["Bearer"]: Bearer,
+      ["x-merchant-id"]: xMerchantId,
+      ["x-point-of-sale-id"]: xPointOfSaleId
+    }) => ({
+      Authorization: Bearer,
+
+      "x-merchant-id": xMerchantId,
+
+      "x-point-of-sale-id": xPointOfSaleId
+    }),
+    response_decoder: reversalTransactionDefaultDecoder(),
+    url: ({ ["transactionId"]: transactionId }) =>
+      `${basePath}/transactions/${transactionId}/reversal`,
+
+    body: ({ ["fileName"]: fileName, ["type"]: type }) => fileName.uri,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const reversalTransaction: TypeofApiCall<ReversalTransactionT> = createFetchRequestForApi(
+    reversalTransactionT,
+    options
+  );
+
   const getPointOfSaleT: ReplaceRequestParams<
     GetPointOfSaleT,
     RequestParams<GetPointOfSaleT>
@@ -465,11 +551,13 @@ export function createClient<K extends ParamKeys>({
     getPointOfSaleTransactionsProcessed: (withDefaults || identity)(
       getPointOfSaleTransactionsProcessed
     ),
+    downloadInvoiceFile: (withDefaults || identity)(downloadInvoiceFile),
     getProducts: (withDefaults || identity)(getProducts),
     authPaymentBarCode: (withDefaults || identity)(authPaymentBarCode),
     capturePayment: (withDefaults || identity)(capturePayment),
     previewPayment: (withDefaults || identity)(previewPayment),
     deleteTransaction: (withDefaults || identity)(deleteTransaction),
+    reversalTransaction: (withDefaults || identity)(reversalTransaction),
     getPointOfSale: (withDefaults || identity)(getPointOfSale)
   };
 }

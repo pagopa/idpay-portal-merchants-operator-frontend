@@ -6,7 +6,7 @@ import styles from './breadcrumsBox.module.css';
 
 interface Props {
   backLabel: string;
-  items: Array<{label: string, path?: string}>;
+  items: Array<{label: string, path: string}>;
   active: boolean;
   onClickBackButton?: () => void;
   backButtonPath?: string;

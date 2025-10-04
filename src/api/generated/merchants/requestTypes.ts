@@ -13,13 +13,15 @@ import { ErrorDTO } from "./ErrorDTO";
 
 import { PointOfSaleTransactionsProcessedListDTO } from "./PointOfSaleTransactionsProcessedListDTO";
 
+import { DownloadInvoiceResponseDTO } from "./DownloadInvoiceResponseDTO";
+
+import { TransactionErrorDTO } from "./TransactionErrorDTO";
+
 import { ProductListDTO } from "./ProductListDTO";
 
 import { AuthBarCodePaymentDTO } from "./AuthBarCodePaymentDTO";
 
 import { AuthPaymentResponseDTO } from "./AuthPaymentResponseDTO";
-
-import { TransactionErrorDTO } from "./TransactionErrorDTO";
 
 import { TransactionBarCodeResponse } from "./TransactionBarCodeResponse";
 
@@ -760,6 +762,298 @@ export function getPointOfSaleTransactionsProcessedDecoder<
 // Decodes the success response with the type defined in the specs
 export const getPointOfSaleTransactionsProcessedDefaultDecoder = () =>
   getPointOfSaleTransactionsProcessedDecoder();
+
+/****************************************************************
+ * downloadInvoiceFile
+ */
+
+// Request type definition
+export type DownloadInvoiceFileT = r.IGetApiRequestType<
+  {
+    readonly Bearer: string;
+    readonly initiativeId: string;
+    readonly pointOfSaleId: string;
+    readonly transactionId: string;
+  },
+  "Authorization",
+  never,
+  | r.IResponseType<
+      200,
+      DownloadInvoiceResponseDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, TransactionErrorDTO, "Access-Control-Allow-Origin">
+>;
+
+export const downloadInvoiceFileDefaultResponses = {
+  200: DownloadInvoiceResponseDTO,
+  400: TransactionErrorDTO,
+  401: TransactionErrorDTO,
+  429: TransactionErrorDTO,
+  500: TransactionErrorDTO
+};
+
+export type DownloadInvoiceFileResponsesT<
+  A0 = DownloadInvoiceResponseDTO,
+  C0 = DownloadInvoiceResponseDTO,
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO
+> = {
+  200: t.Type<A0, C0>;
+  400: t.Type<A1, C1>;
+  401: t.Type<A2, C2>;
+  429: t.Type<A3, C3>;
+  500: t.Type<A4, C4>;
+};
+
+export function downloadInvoiceFileDecoder<
+  A0 = DownloadInvoiceResponseDTO,
+  C0 = DownloadInvoiceResponseDTO,
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO
+>(
+  overrideTypes:
+    | Partial<
+        DownloadInvoiceFileResponsesT<A0, C0, A1, C1, A2, C2, A3, C3, A4, C4>
+      >
+    | t.Type<A0, C0>
+    | undefined = {}
+): r.ResponseDecoder<
+  | r.IResponseType<
+      200,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+> {
+  const isDecoder = (d: any): d is t.Type<A0, C0> =>
+    typeof d["_A"] !== "undefined";
+
+  const type = {
+    ...((downloadInvoiceFileDefaultResponses as unknown) as DownloadInvoiceFileResponsesT<
+      A0,
+      C0,
+      A1,
+      C1,
+      A2,
+      C2,
+      A3,
+      C3,
+      A4,
+      C4
+    >),
+    ...(isDecoder(overrideTypes) ? { 200: overrideTypes } : overrideTypes)
+  };
+
+  const d200 = (type[200].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        200,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(200, undefined)
+    : r.ioResponseDecoder<
+        200,
+        typeof type[200]["_A"],
+        typeof type[200]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(200, type[200])) as r.ResponseDecoder<
+    r.IResponseType<
+      200,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d400 = (type[400].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        400,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, undefined)
+    : r.ioResponseDecoder<
+        400,
+        typeof type[400]["_A"],
+        typeof type[400]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, type[400])) as r.ResponseDecoder<
+    r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d401 = (type[401].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        401,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, undefined)
+    : r.ioResponseDecoder<
+        401,
+        typeof type[401]["_A"],
+        typeof type[401]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, type[401])) as r.ResponseDecoder<
+    r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d429 = (type[429].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        429,
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, undefined)
+    : r.ioResponseDecoder<
+        429,
+        typeof type[429]["_A"],
+        typeof type[429]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, type[429])) as r.ResponseDecoder<
+    r.IResponseType<
+      429,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d500 = (type[500].name === "undefined"
+    ? r.constantResponseDecoder<undefined, 500, "Access-Control-Allow-Origin">(
+        500,
+        undefined
+      )
+    : r.ioResponseDecoder<
+        500,
+        typeof type[500]["_A"],
+        typeof type[500]["_O"],
+        "Access-Control-Allow-Origin"
+      >(500, type[500])) as r.ResponseDecoder<
+    r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+  >;
+
+  return r.composeResponseDecoders(
+    r.composeResponseDecoders(
+      r.composeResponseDecoders(r.composeResponseDecoders(d200, d400), d401),
+      d429
+    ),
+    d500
+  );
+}
+
+// Decodes the success response with the type defined in the specs
+export const downloadInvoiceFileDefaultDecoder = () =>
+  downloadInvoiceFileDecoder();
 
 /****************************************************************
  * getProducts
@@ -2539,6 +2833,424 @@ export function deleteTransactionDecoder<
 
 // Decodes the success response with the type defined in the specs
 export const deleteTransactionDefaultDecoder = () => deleteTransactionDecoder();
+
+/****************************************************************
+ * reversalTransaction
+ */
+
+// Request type definition
+export type ReversalTransactionT = r.IPostApiRequestType<
+  {
+    readonly Bearer: string;
+    readonly transactionId: string;
+    readonly "x-merchant-id": string;
+    readonly "x-point-of-sale-id": string;
+    readonly file: File;
+    readonly fileName: string;
+    readonly type: string;
+  },
+  "Content-Type" | "Authorization",
+  never,
+  | r.IResponseType<
+      204,
+      undefined,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      undefined,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      403,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, TransactionErrorDTO, never>
+>;
+
+export const reversalTransactionDefaultResponses = {
+  204: t.undefined,
+  400: TransactionErrorDTO,
+  401: t.undefined,
+  403: TransactionErrorDTO,
+  404: TransactionErrorDTO,
+  429: TransactionErrorDTO,
+  500: TransactionErrorDTO
+};
+
+export type ReversalTransactionResponsesT<
+  A0 = undefined,
+  C0 = undefined,
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = undefined,
+  C2 = undefined,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO,
+  A5 = TransactionErrorDTO,
+  C5 = TransactionErrorDTO,
+  A6 = TransactionErrorDTO,
+  C6 = TransactionErrorDTO
+> = {
+  204: t.Type<A0, C0>;
+  400: t.Type<A1, C1>;
+  401: t.Type<A2, C2>;
+  403: t.Type<A3, C3>;
+  404: t.Type<A4, C4>;
+  429: t.Type<A5, C5>;
+  500: t.Type<A6, C6>;
+};
+
+export function reversalTransactionDecoder<
+  A0 = undefined,
+  C0 = undefined,
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = undefined,
+  C2 = undefined,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO,
+  A5 = TransactionErrorDTO,
+  C5 = TransactionErrorDTO,
+  A6 = TransactionErrorDTO,
+  C6 = TransactionErrorDTO
+>(
+  overrideTypes:
+    | Partial<
+        ReversalTransactionResponsesT<
+          A0,
+          C0,
+          A1,
+          C1,
+          A2,
+          C2,
+          A3,
+          C3,
+          A4,
+          C4,
+          A5,
+          C5,
+          A6,
+          C6
+        >
+      >
+    | t.Type<A0, C0>
+    | undefined = {}
+): r.ResponseDecoder<
+  | r.IResponseType<
+      204,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      403,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      A5,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, A6, never>
+> {
+  const isDecoder = (d: any): d is t.Type<A0, C0> =>
+    typeof d["_A"] !== "undefined";
+
+  const type = {
+    ...((reversalTransactionDefaultResponses as unknown) as ReversalTransactionResponsesT<
+      A0,
+      C0,
+      A1,
+      C1,
+      A2,
+      C2,
+      A3,
+      C3,
+      A4,
+      C4,
+      A5,
+      C5,
+      A6,
+      C6
+    >),
+    ...(isDecoder(overrideTypes) ? { 204: overrideTypes } : overrideTypes)
+  };
+
+  const d204 = (type[204].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        204,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(204, undefined)
+    : r.ioResponseDecoder<
+        204,
+        typeof type[204]["_A"],
+        typeof type[204]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(204, type[204])) as r.ResponseDecoder<
+    r.IResponseType<
+      204,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d400 = (type[400].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        400,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, undefined)
+    : r.ioResponseDecoder<
+        400,
+        typeof type[400]["_A"],
+        typeof type[400]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, type[400])) as r.ResponseDecoder<
+    r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d401 = (type[401].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        401,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, undefined)
+    : r.ioResponseDecoder<
+        401,
+        typeof type[401]["_A"],
+        typeof type[401]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, type[401])) as r.ResponseDecoder<
+    r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d403 = (type[403].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        403,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(403, undefined)
+    : r.ioResponseDecoder<
+        403,
+        typeof type[403]["_A"],
+        typeof type[403]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(403, type[403])) as r.ResponseDecoder<
+    r.IResponseType<
+      403,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d404 = (type[404].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        404,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, undefined)
+    : r.ioResponseDecoder<
+        404,
+        typeof type[404]["_A"],
+        typeof type[404]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, type[404])) as r.ResponseDecoder<
+    r.IResponseType<
+      404,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d429 = (type[429].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        429,
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, undefined)
+    : r.ioResponseDecoder<
+        429,
+        typeof type[429]["_A"],
+        typeof type[429]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, type[429])) as r.ResponseDecoder<
+    r.IResponseType<
+      429,
+      A5,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d500 = (type[500].name === "undefined"
+    ? r.constantResponseDecoder<undefined, 500, never>(500, undefined)
+    : r.ioResponseDecoder<
+        500,
+        typeof type[500]["_A"],
+        typeof type[500]["_O"],
+        never
+      >(500, type[500])) as r.ResponseDecoder<r.IResponseType<500, A6, never>>;
+
+  return r.composeResponseDecoders(
+    r.composeResponseDecoders(
+      r.composeResponseDecoders(
+        r.composeResponseDecoders(
+          r.composeResponseDecoders(
+            r.composeResponseDecoders(d204, d400),
+            d401
+          ),
+          d403
+        ),
+        d404
+      ),
+      d429
+    ),
+    d500
+  );
+}
+
+// Decodes the success response with the type defined in the specs
+export const reversalTransactionDefaultDecoder = () =>
+  reversalTransactionDecoder();
 
 /****************************************************************
  * getPointOfSale

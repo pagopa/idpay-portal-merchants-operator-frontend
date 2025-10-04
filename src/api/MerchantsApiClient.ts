@@ -210,6 +210,17 @@ export const MerchantApi = {
     }
   },
 
+  downloadInvoiceFile: async (initiativeId: string, pointOfSaleId: string, transactionId: string): Promise<void> => {
+    try {
+      const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/${transactionId}/download`);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in downloadInvoiceFile:', error);
+      throw error;
+    }
+  }
+
 };
 
 
