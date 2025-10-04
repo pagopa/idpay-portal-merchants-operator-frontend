@@ -88,7 +88,8 @@
     },
     "refund":{
       "title":"Richiedi rimborso",
-      "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. "
+      "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
+      "replaceFile":"Sostituisci"
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
