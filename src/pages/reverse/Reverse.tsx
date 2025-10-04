@@ -6,24 +6,25 @@ import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
 import { theme } from '@pagopa/mui-italia';
 import { SingleFileInput } from '@pagopa/mui-italia';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import styles from './reverse.module.css';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import Alert from '@mui/material/Alert';
 
 const Reverse = () => {
     const [file, setFile] = useState<File | null>(null);
+    const [fileSizeError, setFileSizeError] = useState<boolean>(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
 
-    useEffect(() => {
-        if (file) {
-            console.log(file);
-        }
-    }, [file]);
-
     const handleFileSelect = (file: File) => {
-        setFile(file);
+        if(file.size <= 20971520){ //20MB is max size
+            setFile(file);
+            setFileSizeError(false);
+        }else{
+            setFileSizeError(true);
+        }
     };
     const handleRemoveFile = () => {
         setFile(null);
@@ -37,7 +38,7 @@ const Reverse = () => {
     return (
         <Box p={4}>
             <BreadcrumbsBox
-                backLabel={t('commons.exitBtn')} items={['Gestione acquisti', 'Storna transazione']} active={true} onClickBackButton={() => navigate(ROUTES.BUY_MANAGEMENT)} />
+                backLabel={t('commons.exitBtn')} items={[{label: 'Gestione acquisti', path: ROUTES.BUY_MANAGEMENT}, {label: 'Storna transazione', path: ROUTES.REVERSE}]} active={true} onClickBackButton={() => navigate(ROUTES.BUY_MANAGEMENT)} />
             <TitleBox
                 title={t('pages.reverse.title')}
                 mtTitle={3}
@@ -49,8 +50,17 @@ const Reverse = () => {
             <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styles.uploadFileContainer} >
                 <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t('pages.reverse.creditNote')}</Typography>
                 <Typography variant="body2" mt={4} mb={1}>{t('pages.reverse.creditNoteSubtitle')}</Typography>
-                <Link href="#" sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t('pages.reverse.manualLink')}</Link>
-                <Box mt={3} mb={2}>
+                <Link href={import.meta.env.VITE_MANUAL_LINK} sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t('pages.reverse.manualLink')}</Link>
+                {
+                    fileSizeError && (
+                       <Box mt={2}>
+                            <Alert severity="error">
+                                {t('pages.reverse.fileSizeError')}
+                            </Alert>
+                       </Box>
+                    )
+                }
+                <Box mt={1} mb={2}>
                     <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel={t('pages.reverse.uploadFile')} dropzoneButton={t('pages.reverse.uploadFileButton')} rejectedLabel={t('pages.reverse.fileNotSupported')} />
                 </Box>
                 <input

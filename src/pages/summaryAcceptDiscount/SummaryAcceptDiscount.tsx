@@ -73,8 +73,8 @@ const SummaryAcceptDiscount = () => {
                     <BreadcrumbsBox
                         active={true}
                         backLabel={t('commons.exitBtn')} items={[
-                            t('pages.acceptDiscount.title'),
-                            t('pages.acceptDiscount.summary'),
+                            {label: t('pages.acceptDiscount.title'), path: ROUTES.ACCEPT_DISCOUNT},
+                            {label: t('pages.acceptDiscount.summary'), path: ROUTES.ACCEPT_DISCOUNT_SUMMARY},
                         ]} />
                     <TitleBox
                         title={t('pages.acceptDiscount.summary')}

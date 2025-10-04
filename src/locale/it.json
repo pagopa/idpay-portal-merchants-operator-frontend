@@ -85,7 +85,13 @@
     "refund":{
       "title":"Richiedi rimborso",
       "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
-      "replaceFile":"Sostituisci"
+      "uploadInvoice": "Carica la fattura",
+      "uploadInvoiceDescription": "Carica il file della fattura elettronica relativa a questo acquisto. <Assicurati che il documento sia in formato .xml o .pdf> e <conforme agli standard della fatturazione elettronica.>",
+      "replaceFile":"Sostituisci",
+      "manualLink": "Dubbi? Vai sul manuale",
+      "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
+      "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
+      "uploadFileButton": "selezionalo dal tuo computer"
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
@@ -280,11 +286,11 @@
       "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
       "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
       "manualLink": "Dubbi? Vai sul manuale",
-      "manualLinkText": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
-      "uploadFile": "Trascina qui il file <PDF> della fattura da caricare o ",
+      "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
       "uploadFileButton": "selezionalo dal tuo computer",
-      "replaceFile": "Sostituisci"
+      "replaceFile": "Sostituisci",
+      "fileSizeError": "Il file supera la dimensione massima di 20MB"
 
     }
 

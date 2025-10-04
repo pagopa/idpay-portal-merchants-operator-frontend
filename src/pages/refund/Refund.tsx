@@ -1,4 +1,4 @@
-import { Box, Typography, Link, Stack, Button } from '@mui/material';
+import { Box, Typography, Link, Stack, Button, Alert } from '@mui/material';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
@@ -12,27 +12,30 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 const Refund = () => {
     const [file, setFile] = useState<File | null>(null);
+    const [fileSizeError, setFileSizeError] = useState<boolean>(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleRemove = () => setFile(null)
 
-    const handleRefund = () => file && navigate(ROUTES.REFUNDS_MANAGEMENT)
-    const handleNavigateBack = () => navigate(ROUTES.BUY_MANAGEMENT)
-
     const handleButtonClick = () => {
         fileInputRef.current?.click();
     };
 
     const handleFileSelect = (file: File) => {
-        setFile(file);
+        if (file.size <= 20971520) { //20MB is max size
+            setFile(file);
+            setFileSizeError(false);
+        } else {
+            setFileSizeError(true);
+        }
     };
 
     return (
         <Box>
             <BreadcrumbsBox
-                backLabel={t('commons.exitBtn')} items={['Gestione acquisti', 'Richiedi rimborso']} active={true} onClickBackButton={() => navigate(ROUTES.BUY_MANAGEMENT)} />
+                backLabel={t('commons.exitBtn')} items={[{ label: 'Gestione acquisti', path: ROUTES.BUY_MANAGEMENT }, { label: 'Richiedi rimborso', path: ROUTES.REFUND }]} active={true} onClickBackButton={() => navigate(ROUTES.BUY_MANAGEMENT)} />
             <TitleBox
                 title={t('pages.refund.title')}
                 mtTitle={3}
@@ -41,12 +44,21 @@ const Refund = () => {
                 variantSubTitle='body2'
             />
 
-            <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }} mt={4} p={2} className={style.uploadFileContainer} >
-                <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>Carica la fattura</Typography>
-                <Typography variant="body2" mt={4} mb={1}>Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica</Typography>
-                <Link href="#" sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>Dubbi? Vai sul manuale</Link>
-                <Box mb={2}>
-                    <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemove} value={file} dropzoneLabel="Trascina qui il file <PDF> della fattura da caricare o " dropzoneButton="selezionalo dal tuo computer" rejectedLabel="File type not supported" />
+            <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }} mt={4} p={2} className={style.uploadFileContainer} minWidth={{ lg: '1000px' }}>
+                <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t('pages.refund.uploadInvoice')}</Typography>
+                <Typography variant="body2" mt={4} mb={1}>{t('pages.refund.uploadInvoiceDescription')}</Typography>
+                <Link href="#" sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t('pages.refund.manualLink')}</Link>
+                {
+                    fileSizeError && (
+                        <Box mt={2}>
+                            <Alert severity="error">
+                                {t('pages.reverse.fileSizeError')}
+                            </Alert>
+                        </Box>
+                    )
+                }
+                <Box mb={2} mt={1}>
+                    <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemove} value={file} dropzoneLabel={t('pages.refund.uploadFile')} dropzoneButton={t('pages.refund.uploadFileButton')} rejectedLabel={t('pages.refund.fileNotSupported')} />
                 </Box>
                 <input
                     type="file"
@@ -74,9 +86,9 @@ const Refund = () => {
                     )
                 }
             </Box>
-            <Stack direction="row" spacing={2} mt={3} justifyContent="space-between">
-                <Button onClick={handleNavigateBack} variant="outlined">Indietro</Button>
-                <Button onClick={handleRefund} variant="contained">Continua</Button>
+            <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
+                <Button variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>Indietro</Button>
+                <Button variant="contained">Continua</Button>
             </Stack>
         </Box>
     );

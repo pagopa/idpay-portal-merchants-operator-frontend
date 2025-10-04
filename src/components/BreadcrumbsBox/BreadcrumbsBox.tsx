@@ -6,7 +6,7 @@ import styles from './breadcrumsBox.module.css';
 
 interface Props {
   backLabel: string;
-  items: Array<string | undefined>;
+  items: Array<{label: string, path?: string}>;
   active: boolean;
   onClickBackButton?: () => void;
   backButtonPath?: string;
@@ -39,9 +39,9 @@ const BreadcrumbsBox = ({ backLabel, items, active, onClickBackButton, backButto
         >
           {backLabel}
         </ButtonNaked>
-        {items.map((label, index) => (
-          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} className={styles.breadcrumbItemCustom}>
-            {label}
+        {items.map((obj, index) => (
+          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} className={styles.breadcrumbItemCustom} onClick={() => obj.path && navigate(obj.path)}>
+            {obj.label}
           </Typography>
         ))}
       </Breadcrumbs>
