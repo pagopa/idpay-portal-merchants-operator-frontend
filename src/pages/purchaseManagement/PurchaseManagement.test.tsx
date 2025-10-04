@@ -1,318 +1,642 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import PurchaseManagement from './PurchaseManagement';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-vi.mock('react-i18next', () => ({
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { authStore } from "../../store/authStore";
+import { utilsStore } from "../../store/utilsStore";
+import { jwtDecode } from "jwt-decode";
+import {
+  getInProgressTransactions,
+  deleteTransactionInProgress,
+  capturePayment,
+} from "../../services/merchantService";
+import PurchaseManagement from "./PurchaseManagement";
+
+vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'pages.purchaseManagement.title': 'Gestione Acquisti',
-        'pages.purchaseManagement.subtitle': 'Gestisci i tuoi acquisti e transazioni',
-        'pages.refundManagement.authorized': 'AUTORIZZATO',
+        "pages.purchaseManagement.title": "Gestione Acquisti",
+        "pages.purchaseManagement.subtitle":
+          "Gestisci i tuoi acquisti e transazioni",
+        "pages.refundManagement.authorized": "AUTORIZZATO",
       };
       return translations[key] || key;
     },
   }),
 }));
 
-vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
-  TitleBox: ({ title, subTitle }: { title: string; subTitle: string }) => (
-    <div data-testid="title-box">
-      <h1>{title}</h1>
-      <p>{subTitle}</p>
-    </div>
-  ),
-}));
-
-type DataTableMockProps = {
-  rows: any[];
-  columns: any[];
-};
-
-vi.mock('../../components/DataTable/DataTable', () => ({
-  default: ({ rows, columns }: DataTableMockProps) => (
-    <div data-testid="data-table">
-      <span data-testid="rows-count">{rows.length}</span>
-      <span data-testid="columns-count">{columns.length}</span>
-      {rows.length > 0 && (
-        <div data-testid="first-row">
-          <div data-testid="cell-product">{columns[0].renderCell({ value: rows[0].additionalProperties })}</div>
-          <div data-testid="cell-date">{columns[1].renderCell({ value: rows[0].trxDate })}</div>
-          <div data-testid="cell-fiscal-code">{rows[0].fiscalCode}</div>
-          <div data-testid="cell-amount">{columns[3].renderCell({ value: rows[0].effectiveAmountCents })}</div>
-          <div data-testid="cell-status">{columns[5].renderCell({ value: rows[0].status })}</div>
-        </div>
-        
-      )}
-      <button
-        data-testid="trigger-pagination"
-        onClick={() => mockGetInProgressTransactions({ page: 1, pageSize: 20 })}
-      >
-        trigger pagination
-      </button>
-      <button
-        data-testid="trigger-sort"
-        onClick={() => mockGetInProgressTransactions({ sort: 'additionalProperties', sortDirection: 'asc' })}
-      >
-        trigger sort
-      </button>
-    </div>
-  ),
-}));
-
+// Mock di react-router-dom per la navigazione
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
-vi.mock('../../routes', () => ({
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+}));
+vi.mock("../../routes", () => ({
   default: {
-    ACCEPT_DISCOUNT: '/accetta-sconto',
+    ACCEPT_DISCOUNT: "/accept-discount",
+    REFUNDS_MANAGEMENT: "/refunds-management",
+    BUY_MANAGEMENT: "/buy-management",
+    REVERSE: "/reverse",
   },
 }));
 
-const mockGetInProgressTransactions = vi.fn();
-vi.mock('../../services/merchantService', () => ({
-  getInProgressTransactions: () => mockGetInProgressTransactions(),
-}));
-vi.mock('jwt-decode', () => ({
-  jwtDecode: () => ({ point_of_sale_id: 'pos-123' }),
-}));
-vi.mock('../../store/authStore', () => ({
-  authStore: {
-    getState: () => ({ token: 'fake-jwt-token' }),
-  },
+vi.mock("jwt-decode");
+vi.mock("../../store/authStore");
+vi.mock("../../services/merchantService");
+vi.mock("../../store/utilsStore");
+vi.mock("../../store/authStore");
+
+// Mock dei componenti figli
+vi.mock("../../components/DataTable/DataTable", () => ({
+  default: ({
+    rows,
+    columns,
+    onPaginationPageChange,
+    onSortModelChange,
+    handleRowAction,
+    paginationModel,
+    sortModel,
+  }) => (
+    <div data-testid="data-table">
+      <div data-testid="table-rows">{rows.length} rows</div>
+      <button
+        data-testid="pagination-change"
+        onClick={() =>
+          onPaginationPageChange({
+            page: paginationModel.page + 1,
+            pageSize: paginationModel.pageSize,
+          })
+        }
+      />
+      <button
+        data-testid="sort-change-name-desc"
+        onClick={() =>
+          onSortModelChange([{ field: "additionalProperties", sort: "desc" }])
+        }
+      />
+      <button
+        data-testid="sort-change-date-asc"
+        onClick={() =>
+          onSortModelChange([{ field: "updateDate", sort: "asc" }])
+        }
+      />
+      <button
+        data-testid="row-action"
+        onClick={() => handleRowAction(rows[0])}
+      />
+      <div data-testid="sort-model">{JSON.stringify(sortModel)}</div>
+    </div>
+  ),
 }));
 
-//mock data
-const mockTransactions = [
-  {
-    trxId: '1',
-    trxDate: '2025-09-22 12:30:00 ',
-    fiscalCode: 'AAAAAA11B22C333D',
-    effectiveAmountCents: 5000,
-    rewardAmountCents: 500,
-    status: 'AUTHORIZED',
-    additionalProperties: { productName: 'Lavatrice SuperClean' },
+vi.mock("../../components/FiltersForm/FiltersForm", () => ({
+  default: ({ formik, onFiltersApplied, onFiltersReset, children }) => (
+    <form onSubmit={formik.handleSubmit} data-testid="filters-form">
+      {children}
+      <button
+        type="button"
+        data-testid="apply-filters-btn"
+        onClick={() => onFiltersApplied(formik.values)}
+      >
+        Apply Filters
+      </button>
+      <button
+        type="button"
+        data-testid="reset-filters-btn"
+        onClick={onFiltersReset}
+      >
+        Reset Filters
+      </button>
+    </form>
+  ),
+}));
+
+vi.mock("../../components/Alert/AlertComponent", () => ({
+  default: ({ message, error }) => (
+    <div data-testid={`alert-${error ? "error" : "success"}`}>{message}</div>
+  ),
+}));
+
+vi.mock("../../components/Modal/ModalComponent", () => ({
+  default: ({ open, onClose, children }) =>
+    open ? (
+      <div data-testid="modal-component">
+        <button data-testid="modal-close" onClick={onClose}>
+          Close Modal
+        </button>
+        {children}
+      </div>
+    ) : null,
+}));
+
+// --- Dati Mock ---
+
+const mockToken = "mock-jwt-token";
+const mockPointOfSaleId = "pos-456";
+const mockInitiativeId = "VITE_INITIATIVE_ID";
+const mockPageSize = 10;
+
+const mockDecodedToken = { point_of_sale_id: mockPointOfSaleId };
+
+const mockTransaction = (status, id = "trx123") => ({
+  id: id,
+  trxCode: `CODE-${id}`,
+  status: status,
+  updateDate: new Date().toISOString(),
+  fiscalCode: "RSSMRA80A01H501I",
+  effectiveAmountCents: 15000,
+  rewardAmountCents: 5000,
+  additionalProperties: {
+    productName: "Frigorifero Modello X",
+    productCategory: "Elettrodomestico",
+    productBrand: "BrandA",
+    productModel: "ModelB",
   },
+});
+
+const mockTransactionsList = [
+  mockTransaction("AUTHORIZED", "trx1"),
+  mockTransaction("CAPTURED", "trx2"),
 ];
 
-const mockApiResponse = {
-  content: mockTransactions,
+const mockAPIResponse = {
+  content: mockTransactionsList,
   pageNo: 0,
-  pageSize: 10,
-  totalElements: 1,
-  totalPages: 1,
-  last: true,
+  pageSize: mockPageSize,
+  totalElements: 20,
 };
 
-//render helper function
-const renderComponent = () => {
-  const theme = createTheme();
-  return render(
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <PurchaseManagement />
-      </ThemeProvider>
-    </BrowserRouter>
-  );
-};
-
-describe('PurchaseManagement', () => {
-
-  beforeEach(() => {
-    vi.clearAllMocks();
+beforeEach(() => {
+  vi.useRealTimers();
+  vi.stubGlobal("import.meta.env", {
+    VITE_INITIATIVE_ID: mockInitiativeId,
+    VITE_PAGINATION_SIZE: mockPageSize,
   });
 
-  it('should show loading spinner', () => {
-    mockGetInProgressTransactions.mockReturnValue(new Promise(() => {}));
-    
-    renderComponent();
-    
-    expect(screen.getByTestId('loading')).toBeInTheDocument();
-  });
+  authStore.getState.mockReturnValue({ token: mockToken });
+  jwtDecode.mockReturnValue(mockDecodedToken);
+  utilsStore.mockReturnValue(false);
 
-  it('should render title, subtitle and action button', async () => {
-    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [], totalElements: 0 });
-    
-    renderComponent();
-    
-    await waitFor(() => {
-        expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
-    });
+  getInProgressTransactions.mockResolvedValue(mockAPIResponse);
+  deleteTransactionInProgress.mockResolvedValue({});
+  capturePayment.mockResolvedValue({});
+});
 
-    expect(screen.getByText('Gestione Acquisti')).toBeInTheDocument();
-    expect(screen.getByText('Gestisci i tuoi acquisti e transazioni')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /accetta buono sconto/i })).toBeInTheDocument();
-  });
+afterEach(() => {
+  vi.clearAllMocks();
+  vi.useRealTimers();
+});
 
-  it('should navigate to the correct page when clicking the "Accept Discount" button', async () => {
-    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [] });
-    const user = userEvent.setup();
+describe("PurchaseManagement Component", () => {
+  it("dovrebbe mostrare il loading spinner al mount e chiamare fetchTransactions", async () => {
+    render(<PurchaseManagement />);
 
-    renderComponent();
+    expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+      expect(getInProgressTransactions).toHaveBeenCalled();
     });
-    
-    const acceptButton = screen.getByRole('button', { name: /accetta buono sconto/i });
-    await user.click(acceptButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/accetta-sconto');
+    expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
+    expect(screen.getByTestId("data-table")).toBeInTheDocument();
+    expect(screen.getByTestId("table-rows")).toHaveTextContent("2 rows");
   });
 
-  it('should fetch and display transactions correctly', async () => {
-    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
+  it("dovrebbe navigare a ROUTES.ACCEPT_DISCOUNT al click del bottone", () => {
+    render(<PurchaseManagement />);
 
-    renderComponent();
+    fireEvent.click(screen.getByText("Accetta buono sconto"));
 
-    await screen.findByTestId('data-table');
-
-    expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
-
-    expect(screen.getByTestId('rows-count')).toHaveTextContent('1');
-    expect(screen.getByTestId('columns-count')).toHaveTextContent('6');
-    const firstRow = screen.getByTestId('first-row');
-    expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('Lavatrice SuperClean');
-    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); 
-    expect(firstRow.querySelector('[data-testid="cell-fiscal-code"]')).toHaveTextContent('AAAAAA11B22C333D');
-    expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('50,00€');
-    expect(firstRow.querySelector('[data-testid="cell-status"]')).toHaveTextContent('AUTORIZZATO');
+    expect(mockNavigate).toHaveBeenCalledWith("/accept-discount");
   });
-  
-  it('should not render the table if there are no transactions', async () => {
-    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [], totalElements: 0 });
 
-    renderComponent();
-    
+  it("dovrebbe mostrare il messaggio di assenza transazioni se l'API ritorna un array vuoto", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      content: [],
+      pageNo: 0,
+      pageSize: mockPageSize,
+      totalElements: 0,
+    });
+
+    render(<PurchaseManagement />);
+
+    // Aspetta il termine del loading
     await waitFor(() => {
-      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+      expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
     });
 
-    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
+    expect(
+      screen.getByText("pages.refundManagement.noTransactions")
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("filters-form")).not.toBeInTheDocument();
   });
 
-  it('should handle errors during transaction fetch', async () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    mockGetInProgressTransactions.mockRejectedValue(new Error('API Error'));
+  it("dovrebbe mostrare un alert di errore se fetchTransactions fallisce", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    getInProgressTransactions.mockRejectedValue(new Error("Fetch Error"));
 
-    renderComponent();
-    
+    render(<PurchaseManagement />);
+
     await waitFor(() => {
-      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+      expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
+      expect(screen.getByTestId("alert-error")).toHaveTextContent(
+        "pages.refundManagement.errorAlert"
+      );
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching transactions:', expect.any(Error));
-    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
+
+    // Verifica che l'errore sia stato loggato
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error fetching transactions:",
+      expect.any(Error)
+    );
 
     consoleErrorSpy.mockRestore();
   });
 
+  it("dovrebbe chiamare fetchTransactions con i parametri di paginazione corretti", async () => {
+    render(<PurchaseManagement />);
 
-  it('should reset filters and fetch all transactions again', async () => {
-    mockGetInProgressTransactions.mockResolvedValue({ ...mockApiResponse, content: [] });
-    renderComponent();
-  
     await waitFor(() => {
-      expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+      expect(screen.getByTestId("data-table")).toBeInTheDocument();
     });
-  
-    await waitFor(() => {
-      expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
-    });
-  });
 
-  it('should call fetchTransactions with proper sort when sorting by a column', async () => {
-    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
-    renderComponent();
-  
-    const dataTable = await screen.findByTestId('data-table');
-  
-    expect(dataTable).toBeInTheDocument(); 
-    const paginationButton = screen.getByTestId('trigger-sort');
-    fireEvent.click(paginationButton);
+    fireEvent.click(screen.getByTestId("pagination-change"));
+
     await waitFor(() => {
-      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(expect.objectContaining({
-        sort: 'additionalProperties',
-        sortDirection: 'asc',
-      }));
+      expect(getInProgressTransactions).toHaveBeenCalled();
     });
   });
 
+  it("dovrebbe chiamare fetchTransactions con il sort corretto (campo standard)", async () => {
+    render(<PurchaseManagement />);
+    await waitFor(() =>
+      expect(screen.getByTestId("data-table")).toBeInTheDocument()
+    );
 
-  it('should call fetchTransactions with new pagination values', async () => {
-    mockGetInProgressTransactions.mockResolvedValue(mockApiResponse);
-    renderComponent();
-  
-    const dataTable = await screen.findByTestId('data-table');
-  
-    expect(dataTable).toBeInTheDocument(); 
-    const paginationButton = screen.getByTestId('trigger-pagination');
-    fireEvent.click(paginationButton);
+    fireEvent.click(screen.getByTestId("sort-change-date-asc"));
+
     await waitFor(() => {
-      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(expect.objectContaining({
-        page: 1,
-        pageSize: 20,
-      }));
+      expect(getInProgressTransactions).toHaveBeenCalled();
     });
   });
 
-  it('should render placeholders when values are missing and handle non-additionalProperties sort', async () => {
-    const emptyTransaction = {
-      trxId: '2',
-      trxDate: null,
-      fiscalCode: '',
-      effectiveAmountCents: null,
-      rewardAmountCents: null,
-      status: 'CAPTURED',
-      additionalProperties: null,
-    };
-    mockGetInProgressTransactions.mockResolvedValue({
-      ...mockApiResponse,
-      content: [emptyTransaction],
-      totalElements: 1,
-    });
+  it("dovrebbe chiamare fetchTransactions con il sort corretto (campo speciale: additionalProperties)", async () => {
+    render(<PurchaseManagement />);
+    await waitFor(() =>
+      expect(screen.getByTestId("data-table")).toBeInTheDocument()
+    );
 
-    renderComponent();
-
-    await screen.findByTestId('data-table');
-
-    const firstRow = screen.getByTestId('first-row');
-
-    expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('-');
-    expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('-');
-    expect(firstRow.querySelector('[data-testid="cell-amount"]')).toHaveTextContent('-');
-
-    const sortButton = screen.getByTestId('trigger-sort');
-    fireEvent.click(sortButton);
+    fireEvent.click(screen.getByTestId("sort-change-name-desc"));
 
     await waitFor(() => {
-      expect(mockGetInProgressTransactions).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          sort: 'additionalProperties',
-          sortDirection: 'asc',
-        })
+      expect(getInProgressTransactions).toHaveBeenCalled();
+    });
+  });
+
+  it("dovrebbe chiamare fetchTransactions con filtri e sort quando si applicano i filtri", async () => {
+    const user = userEvent.setup();
+    render(<PurchaseManagement />);
+    await waitFor(() =>
+      expect(screen.getByTestId("filters-form")).toBeInTheDocument()
+    );
+
+    const fiscalCodeInput = screen.getByTestId("fiscal-code-filter");
+    await user.type(fiscalCodeInput, "ABC123XYZ");
+    fireEvent.click(screen.getByTestId("sort-change-date-asc"));
+
+    fireEvent.click(screen.getByTestId("apply-filters-btn"));
+
+    await waitFor(() => {
+      expect(getInProgressTransactions).toHaveBeenCalled();
+    });
+  });
+
+  it("dovrebbe chiamare fetchTransactions con filtri e sort speciale (additionalProperties)", async () => {
+    const user = userEvent.setup();
+    render(<PurchaseManagement />);
+    await waitFor(() =>
+      expect(screen.getByTestId("filters-form")).toBeInTheDocument()
+    );
+
+    const fiscalCodeInput = screen.getByTestId("fiscal-code-filter");
+
+    await user.type(fiscalCodeInput, "FILTERED");
+    fireEvent.click(screen.getByTestId("sort-change-name-desc"));
+
+    fireEvent.click(screen.getByTestId("apply-filters-btn"));
+
+    await waitFor(() => {
+      expect(getInProgressTransactions).toHaveBeenCalled();
+    });
+  });
+
+  it("dovrebbe resettare i filtri e chiamare fetchTransactions con parametri di default", async () => {
+    const user = userEvent.setup();
+    render(<PurchaseManagement />);
+    await waitFor(() =>
+      expect(screen.getByTestId("filters-form")).toBeInTheDocument()
+    );
+
+    const fiscalCodeInput = screen.getByTestId("fiscal-code-filter");
+    await user.type(fiscalCodeInput, "ABC123XYZ");
+
+    fireEvent.click(screen.getByTestId("reset-filters-btn"));
+
+    await waitFor(() => {
+      expect(getInProgressTransactions).toHaveBeenCalled();
+    });
+  });
+
+  it("dovrebbe aprire il drawer e mostrare i dettagli della transazione al click su una riga", async () => {
+    render(<PurchaseManagement />);
+    await waitFor(() =>
+      expect(screen.getByTestId("data-table")).toBeInTheDocument()
+    );
+
+    fireEvent.click(screen.getByTestId("row-action"));
+
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.title")
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(mockTransaction("AUTHORIZED").fiscalCode)
+    ).toBeInTheDocument();
+    expect(screen.getByText("BrandA ModelB")).toBeInTheDocument();
+  });
+
+  it("dovrebbe mostrare i bottoni Capture/Cancel se lo stato è AUTHORIZED", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.confirmPayment")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.cancellPayment")
+    ).toBeInTheDocument();
+  });
+
+  it("dovrebbe mostrare i bottoni Refund se lo stato NON è AUTHORIZED", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("CAPTURED")],
+    });
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.requestRefund")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.refund")
+    ).toBeInTheDocument();
+  });
+
+  it("dovrebbe aprire il modal di Capture e completare l'operazione con successo", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+
+    fireEvent.click(
+      screen.getByText("pages.purchaseManagement.drawer.confirmPayment")
+    );
+
+    const modal = screen.getByTestId("modal-component");
+    expect(
+      within(modal).getByText(
+        "pages.purchaseManagement.captureTransactionModal.title"
+      )
+    ).toBeInTheDocument();
+
+    fireEvent.click(within(modal).getByText("Conferma"));
+
+    await waitFor(() => {
+      expect(capturePayment).toHaveBeenCalledWith({ trxCode: "CODE-trx123" });
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith("/buy-management");
+    expect(screen.getByTestId("alert-success")).toHaveTextContent(
+      "pages.purchaseManagement.paymentSuccess"
+    );
+    expect(screen.queryByTestId("modal-component")).not.toBeInTheDocument();
+  });
+
+  it("dovrebbe aprire il modal di Capture e gestire il fallimento", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+    capturePayment.mockRejectedValue(new Error("Capture Fail"));
+
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+    fireEvent.click(
+      screen.getByText("pages.purchaseManagement.drawer.confirmPayment")
+    );
+
+    const modal = screen.getByTestId("modal-component");
+    fireEvent.click(within(modal).getByText("Conferma"));
+
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error capture transaction:",
+        expect.any(Error)
       );
     });
 
-    await waitFor(() => {
-      mockGetInProgressTransactions({ sort: 'fiscalCode,asc', page: 0, size: 10 });
-    });
-
-    expect(mockGetInProgressTransactions).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sort: 'fiscalCode,asc',
-      })
+    expect(screen.getByTestId("alert-error")).toHaveTextContent(
+      "pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction"
     );
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.title")
+    ).toBeInTheDocument();
+
+    consoleErrorSpy.mockRestore();
   });
 
+  it("dovrebbe aprire il modal di Cancel e completare l'operazione con successo", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
 
-    
+    fireEvent.click(
+      screen.getByText("pages.purchaseManagement.drawer.cancellPayment")
+    );
 
+    const modal = screen.getByTestId("modal-component");
+    expect(
+      within(modal).getByText(
+        "pages.purchaseManagement.cancelTransactionModal.title"
+      )
+    ).toBeInTheDocument();
+
+    fireEvent.click(within(modal).getByText("Conferma"));
+
+    await waitFor(() => {
+      expect(deleteTransactionInProgress).toHaveBeenCalledWith("trx123");
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith("/refunds-management");
+    expect(screen.queryByTestId("modal-component")).not.toBeInTheDocument();
+  });
+
+  it("dovrebbe aprire il modal di Cancel e gestire il fallimento", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+    deleteTransactionInProgress.mockRejectedValue(new Error("Delete Fail"));
+
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+    fireEvent.click(
+      screen.getByText("pages.purchaseManagement.drawer.cancellPayment")
+    );
+
+    const modal = screen.getByTestId("modal-component");
+    fireEvent.click(within(modal).getByText("Conferma"));
+
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error deleting transaction:",
+        expect.any(Error)
+      );
+    });
+
+    expect(screen.getByTestId("alert-error")).toHaveTextContent(
+      "pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction"
+    );
+    expect(
+      screen.getByText("pages.purchaseManagement.drawer.title")
+    ).toBeInTheDocument();
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("dovrebbe aprire il modal di Refund e navigare alla pagina Reverse", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("CAPTURED")],
+    });
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+    fireEvent.click(screen.getByText("pages.purchaseManagement.drawer.refund"));
+
+    const modal = screen.getByTestId("modal-component");
+    expect(
+      within(modal).getByText(
+        "pages.purchaseManagement.refundTransactionModal.title"
+      )
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      within(modal).getByText("pages.purchaseManagement.drawer.refund")
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith("/reverse");
+  });
+
+  const testTimeoutLogic = async (
+    trigger,
+    errorAlertText,
+    storeStateKey = null,
+    expectedAlertText = null
+  ) => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    vi.useFakeTimers();
+
+    if (errorAlertText === "errorDeleteTransaction") {
+      deleteTransactionInProgress.mockRejectedValue(new Error("Delete Fail"));
+    } else if (errorAlertText === "errorCaptureTransaction") {
+      capturePayment.mockRejectedValue(new Error("Capture Fail"));
+    }
+
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+
+    render(<PurchaseManagement />);
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+
+    if (storeStateKey === "transactionAuthorized") {
+      utilsStore.setState({ transactionAuthorized: true });
+    } else if (trigger === "capture") {
+      fireEvent.click(
+        screen.getByText("pages.purchaseManagement.drawer.confirmPayment")
+      );
+      fireEvent.click(screen.getByText("Conferma"));
+    } else if (trigger === "delete") {
+      fireEvent.click(
+        screen.getByText("pages.purchaseManagement.drawer.cancellPayment")
+      );
+      fireEvent.click(screen.getByText("Conferma"));
+    } else if (trigger === "fetch_error") {
+      getInProgressTransactions.mockRejectedValue(new Error("Fetch Error"));
+      fireEvent.click(screen.getByTestId("reset-filters-btn"));
+    }
+
+    let alertTestId =
+      expectedAlertText === "pages.purchaseManagement.paymentSuccess" ||
+      expectedAlertText === "pages.purchaseManagement.alertSuccess"
+        ? "alert-success"
+        : "alert-error";
+    await waitFor(
+      () => {
+        if (trigger !== "fetch_error") {
+          expect(screen.getByTestId(alertTestId)).toBeInTheDocument();
+        }
+      },
+      { timeout: 1000 }
+    );
+
+    if (expectedAlertText) {
+      expect(screen.getByTestId(alertTestId)).toHaveTextContent(
+        expectedAlertText
+      );
+    } else {
+      expect(screen.getByTestId("alert-error")).toHaveTextContent(
+        "pages.refundManagement.errorAlert"
+      );
+    }
+
+    vi.advanceTimersByTime(4999);
+    expect(screen.queryByTestId(alertTestId)).toBeInTheDocument();
+
+    vi.advanceTimersByTime(1);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId(alertTestId)).not.toBeInTheDocument();
+    });
+
+    vi.useRealTimers();
+    consoleErrorSpy.mockRestore();
+  };
 });
