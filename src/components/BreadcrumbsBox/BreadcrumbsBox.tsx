@@ -3,6 +3,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import { useNavigate } from 'react-router-dom';
 import styles from './breadcrumsBox.module.css';
+import styles from './breadcrumsBox.module.css';
 
 interface Props {
   backLabel: string;
