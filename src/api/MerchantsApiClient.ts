@@ -219,6 +219,37 @@ export const MerchantApi = {
       console.error('Error in downloadInvoiceFile:', error);
       throw error;
     }
+  },
+
+  reverseTransaction: async (
+    trxId: string, 
+    merchantId: string, 
+    pointOfSaleId: string, 
+    file: File
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileName', file.name);
+      formData.append('type', file.type);
+      
+      const response = await axiosInstance.post(
+        `/transactions/${trxId}/reversal`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-merchant-id': merchantId,
+            'x-point-of-sale-id': pointOfSaleId
+          }
+        }
+      );
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in reverseTransaction:', error);
+      throw error;
+    }
   }
 
 };
