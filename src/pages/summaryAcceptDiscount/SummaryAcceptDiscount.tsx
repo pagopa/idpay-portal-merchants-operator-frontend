@@ -97,7 +97,7 @@ const SummaryAcceptDiscount = () => {
                             }}
                         >
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
-                            &lt;{t('pages.summaryAcceptDiscount.alert')}&gt;
+                            {t('pages.summaryAcceptDiscount.alert')}
                             </Typography>
                         </Alert>
                     )

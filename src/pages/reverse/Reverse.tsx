@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import ROUTES from '../../routes';
 import { theme } from '@pagopa/mui-italia';
 import { SingleFileInput } from '@pagopa/mui-italia';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './reverse.module.css';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 
@@ -14,13 +14,29 @@ const Reverse = () => {
     const [file, setFile] = useState<File | null>(null);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
 
-    const handleSelect = (file: File) => {
+    useEffect(() => {
+        if (file) {
+            console.log(file);
+        }
+    }, [file]);
+
+    const handleFileSelect = (file: File) => {
         setFile(file);
     };
     const handleRemoveFile = () => {
         setFile(null);
     };
+
+    const handleButtonClick = () => {
+        const input = document.querySelector<HTMLInputElement>(
+            '[data-testid="fileInput"] input[type="file"]'
+        );
+        input?.click();
+    };
+
+
     return (
         <Box p={4}>
             <BreadcrumbsBox
@@ -38,11 +54,25 @@ const Reverse = () => {
                 <Typography variant="body2" mt={4} mb={1}>{t('pages.reverse.creditNoteSubtitle')}</Typography>
                 <Link href="#" sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t('pages.reverse.manualLink')}</Link>
                 <Box mt={3} mb={2}>
-                    <SingleFileInput onFileSelected={handleSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel="Trascina qui il file <PDF> della fattura da caricare o " dropzoneButton="selezionalo dal tuo computer" rejectedLabel="File type not supported" />
+                    <SingleFileInput onFileSelected={handleFileSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel="Trascina qui il file <PDF> della fattura da caricare o " dropzoneButton="selezionalo dal tuo computer" rejectedLabel="File type not supported" />
                 </Box>
-                <Button variant="naked" startIcon={<FileUploadIcon />} onClick={() => navigate(ROUTES.BUY_MANAGEMENT)} sx={{fontWeight: theme.typography.fontWeightBold, fontSize: '14px'}}>Sostituisci</Button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+                />
+
+                <Button
+                    variant="naked"
+                    startIcon={<FileUploadIcon />}
+                    onClick={handleButtonClick}
+                    sx={{ fontWeight: 'bold', fontSize: '14px' }}
+                >
+                    Sostituisci
+                </Button>
             </Box>
-            <Stack  direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
+            <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
                 <Button variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>Indietro</Button>
                 <Button variant="contained">Continua</Button>
             </Stack>
