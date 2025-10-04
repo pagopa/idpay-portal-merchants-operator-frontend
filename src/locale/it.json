@@ -230,8 +230,6 @@
         "requestRefund": "Richiedi rimborso",
         "refund": "Storna",
         "householdAppliance": "Elettrodomestico"
-        "refund": "Storna",
-        "householdAppliance": "Elettrodomestico"
       },
       "cancelTransactionModal": {
         "title": "Vuoi annullare la transazione?",
