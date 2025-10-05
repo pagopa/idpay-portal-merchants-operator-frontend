@@ -41,7 +41,6 @@ const RefundManagement = () => {
 
     const handleRowAction = useCallback((transaction) => {
         setIsOpen(true)
-        console.log(transaction)
         const mappedTransaction = {
             'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {}).replace(',', ''),
             'Elettrodomestico': transaction?.additionalProperties.productName,
