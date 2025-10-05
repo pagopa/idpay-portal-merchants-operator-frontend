@@ -15,7 +15,7 @@ type Props = {
   setIsOpen: (value: boolean) => void;
   title: string;
   subtitle?: string;
-  item: Record<string, string>;
+  item: Record<string, string | number | JSX.Element>;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
 };
@@ -80,7 +80,7 @@ export const DetailsDrawer = ({
           </>
         )}
 
-        <Grid container spacing={2}>
+        <Grid container spacing={2} data-testId='item-test'>
           {itemsEntries.map(([key, value], index) => {
             return (
               <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
