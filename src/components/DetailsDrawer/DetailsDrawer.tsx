@@ -94,9 +94,11 @@ export const DetailsDrawer = ({
                   {key}
                 </Typography>
                 {key === "Fattura" && value !== MISSING_DATA_PLACEHOLDER ? (
+                  <a href={value} download={value}>
                   <Button sx={{ padding: "0" }}>
                     <DescriptionOutlinedIcon /> {value}
                   </Button>
+                  </a>
                 ) : (
                   <Typography
                     variant="body2"
