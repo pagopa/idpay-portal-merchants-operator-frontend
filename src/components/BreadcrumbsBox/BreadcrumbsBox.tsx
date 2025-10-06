@@ -2,6 +2,7 @@ import { Box, Breadcrumbs, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import { useNavigate } from 'react-router-dom';
+import styles from './breadcrumsBox.module.css';
 
 interface Props {
   backLabel: string;
@@ -39,7 +40,7 @@ const BreadcrumbsBox = ({ backLabel, items, active, onClickBackButton, backButto
           {backLabel}
         </ButtonNaked>
         {items.map((label, index) => (
-          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} >
+          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} className={styles.breadcrumbItemCustom}>
             {label}
           </Typography>
         ))}

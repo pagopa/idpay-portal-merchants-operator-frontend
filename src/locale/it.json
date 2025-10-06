@@ -226,7 +226,8 @@
         "confirmPayment": "Conferma pagamento",
         "cancellPayment": "Annulla transazione",
         "requestRefund": "Richiedi rimborso",
-        "refund": "Storna"
+        "refund": "Storna",
+        "householdAppliance": "Elettrodomestico"
       },
       "cancelTransactionModal": {
         "title": "Vuoi annullare la transazione?",
@@ -276,6 +277,13 @@
         "productionCountry": "Paese di produzione"
       }
       
+    },
+    "reverse": {
+      "title": "Storna transazione",
+      "creditNote": "Carica nota di credito",
+      "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
+      "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
+      "manualLink": "Dubbi? Vai sul manuale"
     }
 
   },
