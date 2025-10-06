@@ -49,10 +49,10 @@ const RefundManagement = () => {
             'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
             'Importo autorizzato': transaction?.rewardAmountCents && transaction?.rewardAmountCents && formatEuro( transaction.effectiveAmountCents - transaction.rewardAmountCents),
             'Stato': getStatusChip(t, transaction?.status),
-            'Fattura': ''
+            'Fattura': transaction?.invoiceFile?.filename
         }
         setSelectedTransaction(mappedTransaction)
-    }, [])
+    }, [t])
 
     const formik = useFormik<GetProcessedTransactionsFilters>({
         initialValues,
