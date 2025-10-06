@@ -259,7 +259,8 @@
       "rewarded": "Rimborso richiesto",
       "authorized": "Da autorizzare",
       "captured": "Da rimborsare",
-      "tableTitle": "Transazioni"
+      "tableTitle": "Transazioni",
+      "refundSuccessUpload": "La richiesta di rimborso è stata inviata."
     },
     "products": {
       "title": "Prodotti",

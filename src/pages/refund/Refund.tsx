@@ -2,20 +2,25 @@ import { Box, Typography, Link, Stack, Button, Alert } from '@mui/material';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ROUTES from '../../routes';
 import { theme } from '@pagopa/mui-italia';
 import { SingleFileInput } from '@pagopa/mui-italia';
 import { useState, useRef } from 'react';
 import style from './style.module.css'
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { rewardTransactionApi } from '../../services/merchantService';
+import AlertComponent from '../../components/Alert/AlertComponent';
 
 const Refund = () => {
     const [file, setFile] = useState<File | null>(null);
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
+    const [errorAlert, setErrorAlert] = useState<boolean>(false);
+    const [loadingFile, setLoadingFile] = useState<boolean>(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { trxId } = useParams<{ trxId: string }>();
 
     const handleRemove = () => setFile(null)
 
@@ -31,6 +36,26 @@ const Refund = () => {
             setFileSizeError(true);
         }
     };
+
+    const rewardTransaction = async () => {
+        if (file) {
+            setLoadingFile(true);
+            try {
+                const response = await rewardTransactionApi(trxId, file);
+                console.log(response);
+                setLoadingFile(false);
+                navigate(ROUTES.REFUNDS_MANAGEMENT, {
+                    state: {
+                        refundUploadSuccess: true
+                    }
+                });
+            } catch (error) {
+                console.log(error);
+                setErrorAlert(true);
+                setLoadingFile(false);
+            }
+        }
+    }
 
     return (
         <Box>
@@ -58,7 +83,7 @@ const Refund = () => {
                     )
                 }
                 <Box mb={2} mt={1}>
-                    <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemove} value={file} dropzoneLabel={t('pages.refund.uploadFile')} dropzoneButton={t('pages.refund.uploadFileButton')} rejectedLabel={t('pages.refund.fileNotSupported')} />
+                    <SingleFileInput loading={loadingFile} accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemove} value={file} dropzoneLabel={t('pages.refund.uploadFile')} dropzoneButton={t('pages.refund.uploadFileButton')} rejectedLabel={t('pages.refund.fileNotSupported')} />
                 </Box>
                 <input
                     type="file"
@@ -88,8 +113,16 @@ const Refund = () => {
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
                 <Button variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>Indietro</Button>
-                <Button variant="contained">Continua</Button>
+                <Button variant="contained" onClick={rewardTransaction}>Continua</Button>
             </Stack>
+            {
+                errorAlert && (
+                    <AlertComponent
+                        error={true}
+                        message={t('pages.reverse.errorAlert')}
+                    />
+                )
+            }
         </Box>
     );
 };

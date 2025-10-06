@@ -18,6 +18,8 @@ type Props = {
   item: Record<string, string | number | JSX.Element>;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
+  onFileDownloadCallback?: () => void;
+
 };
 
 export const DetailsDrawer = ({
@@ -28,6 +30,7 @@ export const DetailsDrawer = ({
   item,
   primaryButton,
   secondaryButton,
+  onFileDownloadCallback
 }: Props) => {
   const itemsEntries = Object.entries(item).reduce(
     (acc, [key, value]) => [
@@ -36,6 +39,7 @@ export const DetailsDrawer = ({
     ],
     []
   );
+
   return (
     <Drawer
       anchor="right"
@@ -94,7 +98,7 @@ export const DetailsDrawer = ({
                   {key}
                 </Typography>
                 {key === "Fattura" && value !== MISSING_DATA_PLACEHOLDER ? (
-                  <a href={value} download={value}>
+                  <a href={value} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
                   <Button sx={{ padding: "0" }}>
                     <DescriptionOutlinedIcon /> {value}
                   </Button>

@@ -246,7 +246,7 @@ export const MerchantApi = {
     }
   },
 
-  rewardTransaction: async (
+  rewardTransactionApi: async (
     trxId: string, 
     file: File
   ): Promise<void> => {

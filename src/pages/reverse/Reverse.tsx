@@ -17,6 +17,7 @@ import AlertComponent from '../../components/Alert/AlertComponent';
 const Reverse = () => {
     const [file, setFile] = useState<File | null>(null);
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
+    const [loadingFile, setLoadingFile] = useState<boolean>(false);
     const [errorAlert, setErrorAlert] = useState<boolean>(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -49,13 +50,17 @@ const Reverse = () => {
     };
 
     const reverseTransaction = async () => {
-        if (file) {
+            if (file) {
+                setLoadingFile(true);
             try {
                 const response = await reverseTransactionApi(trxId, file);
                 console.log(response);
+                setLoadingFile(false);
+                navigate(ROUTES.REFUNDS_MANAGEMENT);
             } catch (error) {
                 console.log(error);
                 setErrorAlert(true);
+                setLoadingFile(false);
             }
         }
     }
@@ -87,7 +92,7 @@ const Reverse = () => {
                     )
                 }
                 <Box mt={1} mb={2}>
-                    <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel={t('pages.reverse.uploadFile')} dropzoneButton={t('pages.reverse.uploadFileButton')} rejectedLabel={t('pages.reverse.fileNotSupported')} />
+                    <SingleFileInput accept={['application/pdf', 'application/xml']} onFileSelected={handleFileSelect} onFileRemoved={handleRemoveFile} value={file} dropzoneLabel={t('pages.reverse.uploadFile')} dropzoneButton={t('pages.reverse.uploadFileButton')} rejectedLabel={t('pages.reverse.fileNotSupported')} loading={loadingFile} />
                 </Box>
                 <input
                     type="file"
@@ -121,10 +126,10 @@ const Reverse = () => {
             </Stack>
             {
                 errorAlert && (
-                        <AlertComponent
-                            error={true}
-                            message={t('pages.reverse.errorAlert')}
-                        />
+                    <AlertComponent
+                        error={true}
+                        message={t('pages.reverse.errorAlert')}
+                    />
                 )
             }
         </Box>

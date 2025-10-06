@@ -14,6 +14,7 @@ import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 import { getStatusChip, formatEuro } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
+import { useLocation } from "react-router-dom";
 
 
 const RefundManagement = () => {
@@ -30,8 +31,9 @@ const RefundManagement = () => {
     const [errorAlert, setErrorAlert] = useState(false);
     const { t } = useTranslation();
     const token = authStore.getState().token;
-
+    const location = useLocation();
     const isLoadingRef = useRef(false);
+    
 
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
@@ -79,6 +81,10 @@ const RefundManagement = () => {
             return () => clearTimeout(timer);
         }
     }, [errorAlert]);
+
+    useEffect(() => {
+        console.log("LOCATION",location.state)
+    },[location.state])
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
@@ -320,9 +326,18 @@ const RefundManagement = () => {
         }
     };
 
+    // const downloadInvoiceFile = async (trxId: string) => {
+    //     try {
+    //         const response = await downloadInvoiceFile(trxId);
+    //         console.log("RESPONSE",response);
+    //     } catch (error) {
+    //         console.error('Errore download file:', error);
+    //     }
+    // };
+
     return (
         <Box>
-            <DetailsDrawer setIsOpen={() => setIsOpen(false)} isOpen={isOpen} title={t('pages.purchaseManagement.drawer.title')} item={selectedTransaction} />
+            <DetailsDrawer setIsOpen={() => setIsOpen(false)} isOpen={isOpen} title={t('pages.purchaseManagement.drawer.title')} item={selectedTransaction} onFileDownloadCallback={() => {}} />
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox
                     title={t('pages.refundManagement.title')}
