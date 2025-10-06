@@ -46,17 +46,15 @@ const Layout = ({ children }: Props) => {
         <Header />
       </Box>
       {isMatched ? (
-        <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
+        <Box gridArea="body" display='flex' maxWidth='100vw'>
             <SideMenu isOpen={isOpen} setIsOpen={setIsOpen} />
           <Box
-            gridColumn="auto"
+            width='100%'
+            maxWidth={isOpen ? 'calc(100vw - 300px)' : '100%'}
             sx={{ backgroundColor: '#F5F5F5' }}
-            display="grid"
-            justifyContent="center"
             pb={16}
             pt={2}
             px={2}
-            gridTemplateColumns="1fr"
           >
             {children}
           </Box>

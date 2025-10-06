@@ -24,7 +24,7 @@ export default function SideMenu({isOpen = true, setIsOpen}: {isOpen: boolean, s
         height: "100%",
         justifyContent: "space-between",
         backgroundColor: "background.paper",
-        width: isOpen ? "100%" : "fit-content",
+        minWidth: isOpen ? '300px' : 'fit-content'
       }}
       pt={1}
     >
