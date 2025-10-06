@@ -290,7 +290,8 @@
       "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
       "uploadFileButton": "selezionalo dal tuo computer",
       "replaceFile": "Sostituisci",
-      "fileSizeError": "Il file supera la dimensione massima di 20MB"
+      "fileSizeError": "Il file supera la dimensione massima di 20MB",
+      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova."
 
     }
 

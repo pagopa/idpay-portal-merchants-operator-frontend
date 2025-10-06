@@ -8,8 +8,8 @@ const ROUTES = {
     BUY_MANAGEMENT: '/gestione-acquisti',
     REFUNDS_MANAGEMENT:'/gestione-rimborsi',
     PROFILE:'/profilo',
-    REVERSE: '/storna-transazione',
-    REFUND: '/richiedi-rimborso'
+    REVERSE: '/storna-transazione/:trxId',
+    REFUND: '/richiedi-rimborso/:trxId'
 };
 
 export default ROUTES;

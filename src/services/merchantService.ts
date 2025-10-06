@@ -40,10 +40,10 @@ export const capturePayment = async (params: { trxCode: string, additionalProper
     return MerchantApi.deleteTransactionInProgress(trxId);
   }
 
-  export const downloadInvoiceFile = async (initiativeId: string, pointOfSaleId: string, transactionId: string): Promise<void> => {
-    return MerchantApi.downloadInvoiceFile(initiativeId, pointOfSaleId, transactionId);
+  export const downloadInvoiceFile = async (trxId: string): Promise<void> => {
+    return MerchantApi.downloadInvoiceFile(trxId);
   }
 
-  export const reverseTransaction = async (trxId: string, merchantId: string, pointOfSaleId: string): Promise<void> => {
-    return MerchantApi.reverseTransaction(trxId, merchantId, pointOfSaleId);
+  export const reverseTransactionApi = async (trxId: string, file: File): Promise<void> => {
+    return MerchantApi.reverseTransactionApi(trxId, file);
   }

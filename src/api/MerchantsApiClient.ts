@@ -210,9 +210,9 @@ export const MerchantApi = {
     }
   },
 
-  downloadInvoiceFile: async (initiativeId: string, pointOfSaleId: string, transactionId: string): Promise<void> => {
+  downloadInvoiceFile: async (trxId: string): Promise<void> => {
     try {
-      const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/${transactionId}/download`);
+      const response = await axiosInstance.get(`/transactions/${trxId}/download`);
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
@@ -221,26 +221,20 @@ export const MerchantApi = {
     }
   },
 
-  reverseTransaction: async (
+  reverseTransactionApi: async (
     trxId: string, 
-    merchantId: string, 
-    pointOfSaleId: string, 
     file: File
   ): Promise<void> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('fileName', file.name);
-      formData.append('type', file.type);
       
       const response = await axiosInstance.post(
         `/transactions/${trxId}/reversal`, 
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            'x-merchant-id': merchantId,
-            'x-point-of-sale-id': pointOfSaleId
+            'Content-Type': 'multipart/form-data'
           }
         }
       );
@@ -248,6 +242,30 @@ export const MerchantApi = {
       return result;
     } catch (error) {
       console.error('Error in reverseTransaction:', error);
+      throw error;
+    }
+  },
+
+  rewardTransaction: async (
+    trxId: string, 
+    file: File
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await axiosInstance.post(
+        `/transactions/${trxId}/reward`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in rewardTransaction:', error);
       throw error;
     }
   }
