@@ -82,6 +82,10 @@
       "title": "Accetta un buono sconto",
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
+    "reverse":{
+      "title":"Storna transazione",
+      "subtitle":"Carica la documentazione necessaria per avvisare lo storno."
+    },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
       "exitModalTitle": "Vuoi uscire?",
@@ -217,7 +221,8 @@
         "confirmPayment": "Conferma pagamento",
         "cancellPayment": "Annulla transazione",
         "requestRefund": "Richiedi rimborso",
-        "refund": "Storna"
+        "refund": "Storna",
+        "householdAppliance": "Elettrodomestico"
       },
       "cancelTransactionModal": {
         "title": "Vuoi annullare la transazione?",
@@ -230,6 +235,11 @@
         "description2":" dal cliente per il prodotto ",
         "description3":"? Confermando, la transazione passerà nello stato ",
         "errorCaptureTransaction" : "Non è stato possibile confermare la transazione. Riprova."
+      },
+      "refundTransactionModal": {
+        "title": "Storna transazione",
+        "description": "Sei sicuro di voler stornare questa transazione?  L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+        "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
       }
     },
     "refundManagement": {
@@ -262,6 +272,13 @@
         "productionCountry": "Paese di produzione"
       }
       
+    },
+    "reverse": {
+      "title": "Storna transazione",
+      "creditNote": "Carica nota di credito",
+      "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
+      "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
+      "manualLink": "Dubbi? Vai sul manuale"
     }
 
   },

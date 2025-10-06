@@ -47,8 +47,8 @@ const RefundManagement = () => {
         setSortModel([
             {
                 field: 'updateDate',
-                sort: 'asc'
-            }
+                sort: 'desc'
+            }   
         ]);
         fetchTransactions({});
     }, []);
@@ -84,7 +84,7 @@ const RefundManagement = () => {
                 import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
-                    sort: 'updateDate,asc',
+                    sort: 'updateDate,desc',
                     page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
