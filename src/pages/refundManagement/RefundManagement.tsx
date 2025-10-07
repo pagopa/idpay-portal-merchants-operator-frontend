@@ -51,7 +51,7 @@ const RefundManagement = () => {
             'Codice Fiscale': transaction?.fiscalCode,
             'Totale della spesa': transaction?.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents),
             'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
-            'Importo autorizzato': transaction?.rewardAmountCents && transaction?.rewardAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
+            'Importo autorizzato': transaction?.rewardAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
             'Stato': getStatusChip(t, transaction?.status),
             'Fattura': transaction?.invoiceFile?.filename,
             'id': transaction?.id,
