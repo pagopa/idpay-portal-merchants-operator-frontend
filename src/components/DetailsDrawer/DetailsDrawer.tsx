@@ -86,7 +86,7 @@ export const DetailsDrawer = ({
 
         <Grid container spacing={2} data-testId='item-test'>
           {itemsEntries.map(([key, value], index) => {
-            return (
+            return key !== 'id' && (
               <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
                 <Typography
                   variant="body2"
