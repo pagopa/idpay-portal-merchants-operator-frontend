@@ -1,0 +1,297 @@
+{
+  "commons": {
+    "headerTitle": "Portale Esercenti",
+    "backBtn": "Indietro",
+    "cancelBtn": "Torna indietro",
+    "closeBtn": "Chiudi",
+    "confirmBtn": "Conferma",
+    "continueBtn": "Continua",
+    "modify": "Modifica",
+    "saveBtn": "Salva",
+    "cancel": "Annulla",
+    "copyCodeBtn": "Copia codice",
+    "copyLinkBtn": "Copia link",
+    "gtiInFilterPlaceholer": "Cerca per GTIN",
+    "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
+    "statusFilterPlaceholer": "Stato",
+    "gtiInFilterPlaceholer": "Cerca per GTIN",
+    "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
+    "statusFilterPlaceholer": "Stato",
+    "discountStatusEnum": {
+      "authorized": "Autorizzato",
+      "authorizationRequested": "Autorizzazione in corso",
+      "cancelled": "Annullato",
+      "identified": "Da autorizzare",
+      "invalidated": "Invalidato",
+      "rejected": "Rifiutato",
+      "rewarded": "Contabilizzato"
+    },
+    "downloadQrBtn": "Scarica codice QR",
+    "exitBtn": "Esci",
+    "filterBtn": "Filtra",
+    "initiativeStatusEnum": {
+      "closed": "Terminata",
+      "published": "In corso"
+    },
+    "removeFiltersBtn": "Rimuovi filtri",
+    "sendBtn": "Invia",
+    "title": "Portale Esercenti"
+  },
+  "sideMenu": {
+    "purchaseManagement": "Gestione acquisti",
+    "profile": "Profilo",
+    "refundManagement": "Gestione rimborsi",
+    "products": "Prodotti"
+  },
+  "errors": {
+    "contactAdmin": "Contatta l'assistenza",
+    "genericDescription": "Riprovare",
+    "genericTitle": "Si è verificato un errore",
+    "sessionExpiredMessage": "Ti stiamo reindirizzando alla pagina di accesso",
+    "sessionExpiredTitle": "La tua sessione è scaduta",
+    "tcDescription": "Non siamo riusciti a recuperare le informazioni sull’accettazione dei termini e condizioni d’uso. Riprova.",
+    "tcSave": "Non siamo riusciti a salvare l'accettazione dei Termini e condizioni d’uso. Riprova",
+    "validationDescription": "Verifica che i dati inseriti siano corretti"
+  },
+  "pages": {
+    "acceptNewDiscount": {
+      "discountAccepted": "Buono sconto accettato",
+      "discountCodeLabel": "Codice sconto",
+      "discountDataStepperTitle": "Inserisci il codice sconto",
+      "discountInfoSubtitle": "Inserisci il codice sconto generato dal cliente sull'app IO",
+      "discountInfoTitle": "Qual è il codice sconto?",
+      "errors": {
+        "paymentAlreadyAuthorized": "Transazione già autorizzata",
+        "paymentAmountNotValid": "Importo non valido",
+        "paymentBudgetExhausted": "Budget esaurito",
+        "paymentGenericError": "Si è verificato un errore",
+        "paymentGenericRejected": "Transazione rifiutata",
+        "paymentInitiativeInvalidDate": "Periodo di fruizione non valido",
+        "paymentInitiativeNotFound": "Non è possibile trovare l'iniziativa",
+        "paymentMerchantOrAcquirerNotAllowed": "Esercente non autorizzato",
+        "paymentMerchantNotFound": "L'esercente non è stato trovato",
+        "paymentNotFoundExpired": "Transazione non trovata oppure scaduta",
+        "paymentStatusNotValid": "Stato della transazione non valido",
+        "paymentUserNotOnboarded": "L'utente non ha aderito all'iniziativa",
+        "paymentUserNotValid": "Utente non valido",
+        "paymentUserSuspended": "L'utente è stato sospeso sull'iniziativa",
+        "paymentUserUnsubscribed": "L'utente ha effettuato il recesso dall'iniziativa"
+      },
+      "exitModalTitle": "Vuoi uscire?",
+      "exitModalBody": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice.",
+      "title": "Accetta un buono sconto",
+      "spendingDataStepperTitle": "Inserisci i dati della spesa"
+    },
+    "reverse":{
+      "title":"Storna transazione",
+      "subtitle":"Carica la documentazione necessaria per avvisare lo storno."
+    },
+    "assistanceRequest": {
+      "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
+      "exitModalTitle": "Vuoi uscire?",
+      "message": "Descrivi il tuo problema",
+      "subject": "Oggetto",
+      "subtitle": "Compila e invia il modulo. Ti risponderemo al più presto.",
+      "thankYouDescription": "Ti risponderemo al più presto all’indirizzo e-mail che hai indicato.",
+      "thankYouTitle": "Abbiamo ricevuto la tua richiesta!",
+      "title": "Come possiamo aiutarti?"
+    },
+    "tos": {
+      "and": "e l’",
+      "backHome": "Torna alla home",
+      "linkPrivacy": "Informativa Privacy",
+      "linkTos": "Termini e condizioni d’uso",
+      "termsDescription": "Accedendo, accetti i",
+      "termsDescription2": "del servizio e confermi di aver letto l’",
+      "termsDescriptionChanged": "Recentemente abbiamo cambiato i",
+      "title": "Portale Esercenti"
+    },
+    "initiativeDiscounts": {
+      "acceptBtn": "Accetta buono sconto",
+      "amount": "Importo",
+      "authorizationRequestModalTitle": "Vuoi richiedere l’autorizzazione?",
+      "authorizedAmount": "Importo autorizzato",
+      "beneficiary": "Beneficiario",
+      "cancelDiscount": "Annulla buono sconto",
+      "cancelDiscountAuthorizedModalBody": "Il buono sconto è già stato autorizzato, se decidi di annullarlo l’importo verrà riaccreditato sull’iniziativa del cittadino e il rimborso da parte dell’Ente non verrà avviato.",
+      "cancelDiscountModalTitle": "Vuoi annullare il buono sconto?",
+      "cancelDiscountNotAuthorizedModalBody": "Il buono sconto non è ancora stato autorizzato, se decidi di annullarlo il link magico e il codice QR smetteranno di funzionare e non sarà più possibile per il cittadino procedere con l’autorizzazione.",
+      "confirmPayment": "Conferma pagamento",
+      "createBtn": "Crea buono sconto",
+      "currentMerchantTransactions": "Buoni sconto in corso",
+      "dateAndHours": "Data e ora",
+      "detailTitle": "Dettaglio buono sconto",
+      "discountAuthorized": "Autorizzato",
+      "discountStatus": "Stato",
+      "emptyList": "Non ci sono buoni sconto in corso per questa iniziativa.",
+      "emptyProcessedList": "Non ci sono buoni sconto contabilizzati per questa iniziativa",
+      "filterByStatus": "Stato",
+      "listTitle": "Buoni sconto emessi",
+      "paymentConfirmed": "Pagamento confermato",
+      "processedMerchantTransactions": "Buoni sconto contabilizzati",
+      "refundsDataTitle": "Dati rimborso",
+      "refundsStatusTitle": "Stato rimborsi",
+      "requestAuthorization": "Richiedi autorizzazione",
+      "searchByFiscalCode": "Cerca per Codice Fiscale",
+      "subtitle": "Visualizza e gestisci i buoni sconto emessi per l’iniziativa.",
+      "title": "Buoni sconto",
+      "totalAmount": "Totale erogato",
+      "totalRefunded": "Totale rimborsato",
+      "totalSpent": "Totale della spesa",
+      "iban": "IBAN"
+    },
+    "newDiscount": {
+      "codeCopied": "Codice copiato",
+      "createdSubtitle": "Invia il buono sconto al tuo cliente, gli servirà per autorizzare la spesa con l’app IO.",
+      "createdTitle": "Buono sconto creato!",
+      "expiringDiscountInfoAlertText": "Il buono sconto ha una durata di {{days}} giorni: è necessario autorizzare la spesa entro le {{hour}} del {{date}}.",
+      "handleDiscountsBtn": "Gestisci buoni sconto",
+      "magicLinkCopied": "Link copiato",
+      "magicLinkLabel": "Link magico",
+      "numericCodeLabel": "Codice numerico",
+      "qrCodeDownloaded": "Codice QR scaricato",
+      "qrCodeLabel": "Codice QR",
+      "sendAuthorizationRequestSubtitle": "Invia al tuo cliente una richiesta di autorizzazione della spesa del buono sconto.",
+      "sendAuthorizationRequestTitle": "Invio richiesta di autorizzazione",
+      "sendMagicLinkSubtitle": "Copia il link e invialo al tuo cliente con la modalità che preferisci.",
+      "sendMagicLinkTitle": "Invia un link magico",
+      "sendQrSubtitle": "Salva l’immagine e inviala al tuo cliente con la modalità che preferisci. In caso di problemi con la lettura del codice QR è possibile inserire manualmente sull’app IO il codice di 8 cifre.",
+      "sendQrTitle": "Oppure invia un codice QR",
+      "spendingAmountLabel": "Importo spesa",
+      "spendingInfoSubtitle": "Inserisci l’importo totale della spesa, ci servirà per calcolare lo sconto massimo applicabile.",
+      "spendingInfoTitle": "Qual è l'Importo totale della spesa?",
+      "subtitle": "Compila i campi e genera buoni sconto da inviare ai tuoi clienti per usufruire dell’iniziativa.",
+      "title": "Crea un nuovo buono sconto"
+    },
+    "acceptDiscount": {
+      "title": "Accetta buono sconto",
+      "subtitle": "Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa",
+      "selectProduct": "Seleziona il prodotto soggetto all'iniziativa",
+      "selectProductTitle": "Seleziona il prodotto",
+      "expenseAmount": "Qual è l'importo totale della spesa?",
+      "insertAmount": "Inserisci l'importo totale della spesa, ci servirà per calcolare lo sconto massimo applicabile.",
+      "search": "Cerca",
+      "expenditureAmount": "Importo della spesa",
+      "whatDiscountCode": "Qual è il codice sconto?",
+      "discountCode": "Codice sconto",
+      "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
+      "noOptionsText": "Nessun risultato",
+      "loadingText": "Caricamento...",
+      "errorAlert": "Non è stato possibile finalizzare l' operazione. Riprova.",
+      "summary": "Riepilogo",
+      "reviewTransactionInfo": "Rivedi qui le informazioni di questa transazione",
+      "beneficiaryData": "Dati beneficiario",
+      "fiscalCode": "Codice fiscale",
+      "discountCodeSummary": "Riepilogo buono",
+      "product": "Prodotto",
+      "emissionDate": "Data di emissione",
+      "amountToDiscount": "Importo da scontare",
+      "discount": "Sconto",
+      "totalAmount": "Importo totale",
+      "status": "Stato",
+      "toBeAuthorized": "Da autorizzare",
+      "modalTitle": "Vuoi uscire?",
+      "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
+    },
+    "summaryAcceptDiscount": {
+      "alert": "Ricordati di richiedere la tessera sanitaria per confermare l’identità dell’acquirente. Per verificare la corrispondenza dell’intestatario richiedi la tessera sanitaria"
+    },
+    "profile": {
+      "title": "Profilo",
+      "subtitle": "Consulta i dati identificativi dell’azienda.",
+      "errorAlert":"Non è stato possibile recuperare i dati. Riprova."
+    },
+    "purchaseManagement": {
+      "title": "Gestione acquisti",
+      "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa",
+      "tableTitle": "Buoni sconto",
+      "alertSuccess": "La transazione è andata a buon fine.",
+      "paymentSuccess": "Il pagamento è stato confermato.",
+      "drawer": {
+        "title": "Dettaglio transazione",
+        "product": "Prodotto",
+        "totalAmount": "Totale della spesa",
+        "authorizedAmount": "Importo autorizzato",
+        "status": "Stato",
+        "fiscalCode": "Codice fiscale",
+        "trxDate": "Data e ora",
+        "brand": "Modello",
+        "category": "Categoria",
+        "confirmPayment": "Conferma pagamento",
+        "cancellPayment": "Annulla transazione",
+        "requestRefund": "Richiedi rimborso",
+        "refund": "Storna",
+        "householdAppliance": "Elettrodomestico"
+      },
+      "cancelTransactionModal": {
+        "title": "Vuoi annullare la transazione?",
+        "description": "Sei sicuro di voler annullare questa transazione? <L’utente potrà continuare a usufruire del buono sconto>",
+        "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
+      },
+      "captureTransactionModal": {
+        "title": "Hai ricevuto il pagamento del bene?",
+        "description1": "Hai ricevuto",
+        "description2":" dal cliente per il prodotto ",
+        "description3":"? Confermando, la transazione passerà nello stato ",
+        "errorCaptureTransaction" : "Non è stato possibile confermare la transazione. Riprova."
+      },
+      "refundTransactionModal": {
+        "title": "Storna transazione",
+        "description": "Sei sicuro di voler stornare questa transazione?  L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+        "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
+      }
+    },
+    "refundManagement": {
+      "title": "Gestione rimborsi",
+      "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici",
+      "noTransactions": "Non ci sono transazioni per questa iniziativa",
+      "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
+      "cancelled": "Annullato",
+      "refunded": "Stornato",
+      "rewarded": "Rimborso richiesto",
+      "authorized": "Da autorizzare",
+      "captured": "Da rimborsare",
+      "tableTitle": "Transazioni"
+    },
+    "products": {
+      "title": "Prodotti",
+      "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
+      "noProducts": "Non ci sono prodotti per questa iniziativa",
+      "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+      "drawer": {
+        "subTitle": "SCHEDA PRODOTTO",
+        "eprelCode": "Codice EPREL",
+        "gtinCode": "Codice GTIN/EAN",
+        "productCode": "Codice prodotto",
+        "category": "Categoria",
+        "brand": "Marca",
+        "model": "Modello",
+        "capacity": "Capacità",
+        "energyClass": "Classe energetica",
+        "productionCountry": "Paese di produzione"
+      }
+      
+    },
+    "reverse": {
+      "title": "Storna transazione",
+      "creditNote": "Carica nota di credito",
+      "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
+      "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
+      "manualLink": "Dubbi? Vai sul manuale"
+    }
+
+  },
+  "roles": {
+    "admin": "Amministratore"
+  },
+  "validation": {
+    "assistanceSubject": "Inserisci l’argomento della tua richiesta",
+    "exactChars": "Deve essere esattamente di {{x}} caratteri",
+    "maxChars": "Scrivi massimo {{x}} caratteri",
+    "minValue": "Inserisci un valore maggiore o uguale a {{x}}",
+    "positiveNumber": "Inserisci un valore positivo",
+    "requiredField": "Campo obbligatorio",
+    "number": "Inserisci un numero"
+  }
+}

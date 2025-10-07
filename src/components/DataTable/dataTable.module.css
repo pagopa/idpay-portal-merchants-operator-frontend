@@ -1,0 +1,5 @@
+[data-field="actions"] {
+    display: flex !important;
+    justify-content: end !important;
+    align-items: center !important;
+}
