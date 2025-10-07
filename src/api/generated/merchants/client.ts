@@ -510,16 +510,8 @@ export function createClient<K extends ParamKeys>({
     //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
     // The solution is to skip the Content-Type header and let fetch add it for us.
     // @ts-ignore as IRequestType would require something
-    headers: ({
-      ["Bearer"]: Bearer,
-      ["x-merchant-id"]: xMerchantId,
-      ["x-point-of-sale-id"]: xPointOfSaleId
-    }) => ({
-      Authorization: Bearer,
-
-      "x-merchant-id": xMerchantId,
-
-      "x-point-of-sale-id": xPointOfSaleId
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
     }),
     response_decoder: reversalTransactionDefaultDecoder(),
     url: ({ ["transactionId"]: transactionId }) =>
@@ -552,16 +544,8 @@ export function createClient<K extends ParamKeys>({
     //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
     // The solution is to skip the Content-Type header and let fetch add it for us.
     // @ts-ignore as IRequestType would require something
-    headers: ({
-      ["Bearer"]: Bearer,
-      ["x-merchant-id"]: xMerchantId,
-      ["x-point-of-sale-id"]: xPointOfSaleId
-    }) => ({
-      Authorization: Bearer,
-
-      "x-merchant-id": xMerchantId,
-
-      "x-point-of-sale-id": xPointOfSaleId
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
     }),
     response_decoder: rewardTransactionDefaultDecoder(),
     url: ({ ["transactionId"]: transactionId }) =>

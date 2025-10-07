@@ -2838,8 +2838,6 @@ export type ReversalTransactionT = r.IPostApiRequestType<
   {
     readonly Bearer: string;
     readonly transactionId: string;
-    readonly "x-merchant-id": string;
-    readonly "x-point-of-sale-id": string;
     readonly file: File;
   },
   "Content-Type" | "Authorization",
@@ -3254,8 +3252,6 @@ export type RewardTransactionT = r.IPostApiRequestType<
   {
     readonly Bearer: string;
     readonly transactionId: string;
-    readonly "x-merchant-id": string;
-    readonly "x-point-of-sale-id": string;
     readonly file: File;
   },
   "Content-Type" | "Authorization",

@@ -1783,20 +1783,6 @@
             "type": "string"
           },
           {
-            "in": "header",
-            "maxLength": 255,
-            "name": "x-merchant-id",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "header",
-            "maxLength": 255,
-            "name": "x-point-of-sale-id",
-            "required": true,
-            "type": "string"
-          },
-          {
             "format": "binary",
             "in": "formData",
             "name": "file",
@@ -2026,20 +2012,6 @@
             "maxLength": 255,
             "name": "transactionId",
             "pattern": "^[a-zA-Z0-9]+$",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "header",
-            "maxLength": 255,
-            "name": "x-merchant-id",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "header",
-            "maxLength": 255,
-            "name": "x-point-of-sale-id",
             "required": true,
             "type": "string"
           },

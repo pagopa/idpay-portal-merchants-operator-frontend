@@ -683,18 +683,6 @@ paths:
             type: string
             maxLength: 255
             pattern: "^[a-zA-Z0-9]+$"
-        - name: x-merchant-id
-          in: header
-          required: true
-          schema:
-            type: string
-            maxLength: 255
-        - name: x-point-of-sale-id
-          in: header
-          required: true
-          schema:
-            type: string
-            maxLength: 255
       requestBody:
         content:
           multipart/form-data:
@@ -822,18 +810,6 @@ paths:
             type: string
             maxLength: 255
             pattern: "^[a-zA-Z0-9]+$"
-        - name: x-merchant-id
-          in: header
-          required: true
-          schema:
-            type: string
-            maxLength: 255
-        - name: x-point-of-sale-id
-          in: header
-          required: true
-          schema:
-            type: string
-            maxLength: 255
       requestBody:
         content:
           multipart/form-data:
