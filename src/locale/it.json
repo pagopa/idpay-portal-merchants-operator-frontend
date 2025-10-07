@@ -260,7 +260,9 @@
       "authorized": "Da autorizzare",
       "captured": "Da rimborsare",
       "tableTitle": "Transazioni",
-      "refundSuccessUpload": "La richiesta di rimborso è stata inviata."
+      "refundSuccessUpload": "La richiesta di rimborso è stata inviata.",
+      "reverseSuccessUpload": "La richiesta di storno è stata inviata."
+
     },
     "products": {
       "title": "Prodotti",

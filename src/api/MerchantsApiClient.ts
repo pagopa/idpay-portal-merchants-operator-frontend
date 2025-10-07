@@ -210,7 +210,7 @@ export const MerchantApi = {
     }
   },
 
-  downloadInvoiceFile: async (trxId: string): Promise<void> => {
+  downloadInvoiceFileApi: async (trxId: string): Promise<{ invoiceUrl: string }> => {
     try {
       const response = await axiosInstance.get(`/transactions/${trxId}/download`);
       const result = handleAxiosResponse(response);

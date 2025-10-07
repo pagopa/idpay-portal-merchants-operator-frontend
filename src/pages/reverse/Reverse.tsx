@@ -56,7 +56,11 @@ const Reverse = () => {
                 const response = await reverseTransactionApi(trxId, file);
                 console.log(response);
                 setLoadingFile(false);
-                navigate(ROUTES.REFUNDS_MANAGEMENT);
+                navigate(ROUTES.REFUNDS_MANAGEMENT, {
+                    state: {
+                        reverseUploadSuccess: true
+                    }
+                });
             } catch (error) {
                 console.log(error);
                 setErrorAlert(true);
