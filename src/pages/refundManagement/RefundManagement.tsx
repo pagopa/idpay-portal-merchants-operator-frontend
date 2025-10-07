@@ -13,11 +13,17 @@ import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams, GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 import { getStatusChip, formatEuro } from "../../utils/helpers";
+import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
+import { useLocation } from "react-router-dom";
 
 
 const RefundManagement = () => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [selectedTransaction, setSelectedTransaction] = useState({})
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
+    const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
         page: 0,
         pageSize: import.meta.env.VITE_PAGINATION_SIZE,
@@ -27,14 +33,31 @@ const RefundManagement = () => {
     const [errorAlert, setErrorAlert] = useState(false);
     const { t } = useTranslation();
     const token = authStore.getState().token;
-
+    const location = useLocation();
     const isLoadingRef = useRef(false);
+
 
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
         productGtin: '',
         status: ''
     };
+
+    const handleRowAction = useCallback((transaction) => {
+        setIsOpen(true)
+        const mappedTransaction = {
+            'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {}).replace(',', ''),
+            'Elettrodomestico': transaction?.additionalProperties.productName,
+            'Codice Fiscale': transaction?.fiscalCode,
+            'Totale della spesa': transaction?.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents),
+            'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
+            'Importo autorizzato': transaction?.rewardAmountCents && transaction.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
+            'Stato': getStatusChip(t, transaction?.status),
+            'Fattura': transaction?.invoiceFile?.filename,
+            'id': transaction?.id,
+        }
+        setSelectedTransaction(mappedTransaction)
+    }, [t])
 
     const formik = useFormik<GetProcessedTransactionsFilters>({
         initialValues,
@@ -48,7 +71,7 @@ const RefundManagement = () => {
             {
                 field: 'updateDate',
                 sort: 'desc'
-            }   
+            }
         ]);
         fetchTransactions({});
     }, []);
@@ -60,7 +83,31 @@ const RefundManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [errorAlert]);
+        if (transactionRefundSuccess) {
+            const timer = setTimeout(() => {
+                setTransactionRefundSuccess(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+        if (transactionReverseSuccess) {
+            const timer = setTimeout(() => {
+                setTransactionReverseSuccess(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorAlert, transactionRefundSuccess, transactionReverseSuccess]);
+
+    useEffect(() => {
+        console.log("LOCATION", location.state)
+        if (location.state) {
+            const { refundUploadSuccess, reverseUploadSuccess } = location.state;
+            if (refundUploadSuccess) {
+                setTransactionRefundSuccess(true);
+            } else if (reverseUploadSuccess) {
+                setTransactionReverseSuccess(true);
+            }
+        }
+    }, [location.state])
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
@@ -302,8 +349,24 @@ const RefundManagement = () => {
         }
     };
 
+    const downloadInvoiceFile = async () => {
+        // try {
+        //     const response = await downloadInvoiceFileApi(selectedTransaction?.id);
+        //     console.log("RESPONSE", response);
+        //     const { invoiceUrl } = response;
+        //     const link = document.createElement("a");
+        //     link.href = invoiceUrl;
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     document.body.removeChild(link);
+        // } catch (error) {
+        //     console.error('Errore download file:', error);
+        // }
+    };
+
     return (
         <Box>
+            <DetailsDrawer setIsOpen={() => setIsOpen(false)} isOpen={isOpen} title={t('pages.purchaseManagement.drawer.title')} item={selectedTransaction} onFileDownloadCallback={downloadInvoiceFile} />
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox
                     title={t('pages.refundManagement.title')}
@@ -326,7 +389,7 @@ const RefundManagement = () => {
                             formik={formik}
                             onFiltersApplied={handleApplyFilters}
                             onFiltersReset={() => {
-                                if(formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
+                                if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
                                     handleApplyFilters({
                                         fiscalCode: '',
                                         productGtin: '',
@@ -404,6 +467,7 @@ const RefundManagement = () => {
                                 paginationModel={paginationModel}
                                 onSortModelChange={handleSortModelChange}
                                 sortModel={sortModel}
+                                handleRowAction={handleRowAction}
                             />
                         </Box>
                     </Grid>
@@ -416,6 +480,8 @@ const RefundManagement = () => {
             )}
 
             {errorAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorAlert')} />}
+            {transactionRefundSuccess && <AlertComponent error={false} message={t('pages.refundManagement.refundSuccessUpload')} />}
+            {transactionReverseSuccess && <AlertComponent error={false} message={t('pages.refundManagement.reverseSuccessUpload')} />}
         </Box>
     );
 };
