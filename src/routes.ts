@@ -8,7 +8,7 @@ const ROUTES = {
     BUY_MANAGEMENT: '/gestione-acquisti',
     REFUNDS_MANAGEMENT:'/gestione-rimborsi',
     PROFILE:'/profilo',
-    REVERSE: '/storna-transazione',
+    REVERSE: '/storna-transazione/:trxId',
     REFUND: '/richiedi-rimborso/:trxId'
 };
 
