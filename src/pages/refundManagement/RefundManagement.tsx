@@ -418,7 +418,7 @@ const RefundManagement = () => {
             </Box>
 
             <Typography variant="h6">
-                {t('pages.refundManagement.tableTitle')}
+                {t('pages.refundManagement.tableTitle')} 
             </Typography>
             <Box>
                 {
