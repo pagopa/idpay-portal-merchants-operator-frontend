@@ -46,7 +46,7 @@ const RefundManagement = () => {
     const handleRowAction = useCallback((transaction) => {
         setIsOpen(true)
         const mappedTransaction = {
-            'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {}).replace(',', ''),
+            'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'}).replace(',', ''),
             'Elettrodomestico': transaction?.additionalProperties.productName,
             'Codice Fiscale': transaction?.fiscalCode,
             'Totale della spesa': transaction?.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents),
@@ -56,6 +56,7 @@ const RefundManagement = () => {
             'Fattura': transaction?.invoiceFile?.filename,
             'id': transaction?.id,
         }
+        console.log(transaction)
         setSelectedTransaction(mappedTransaction)
     }, [t])
 
