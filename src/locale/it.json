@@ -217,6 +217,7 @@
         "product": "Prodotto",
         "totalAmount": "Totale della spesa",
         "authorizedAmount": "Importo autorizzato",
+        "rewardAmount": "Sconto applicato",
         "status": "Stato",
         "fiscalCode": "Codice fiscale",
         "trxDate": "Data e ora",

@@ -547,8 +547,12 @@ const PurchaseManagement = () => {
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined ? formatEuro(selectedTransaction?.effectiveAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.rewardAmount')}</Typography>
                             <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined ? formatEuro(selectedTransaction?.rewardAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.authorizedAmount')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>{selectedTransaction?.residualAmountCents !== null && selectedTransaction?.residualAmountCents !== undefined ? formatEuro(selectedTransaction?.residualAmountCents) : MISSING_DATA_PLACEHOLDER}</Typography>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>{t('pages.purchaseManagement.drawer.status')}</Typography>
