@@ -1308,6 +1308,12 @@ components:
           description: "ENG: Reward amount in cents - IT: Premio generato in centesimi"
           minimum: 0
           maximum: 1000000000
+        authorizedAmountCents:
+          type: integer
+          format: int64
+          description: "ENG: Authorized amount in cents - IT: Importo autorizzato in centesimi"
+          minimum: 0
+          maximum: 1000000000
         trxDate:
           type: string
           format: date-time

@@ -21,6 +21,7 @@ import { getStatusChip, formatEuro } from "../../utils/helpers";
 import AlertComponent from "../../components/Alert/AlertComponent";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
+import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
 
 const PurchaseManagement = () => {
     const [loading, setLoading] = useState(true);
@@ -45,6 +46,13 @@ const PurchaseManagement = () => {
     const token = authStore.getState().token;
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
 
+    useAutoResetBanner([
+        [errorAlert, setErrorAlert],
+        [errorDeleteTransaction, setErrorDeleteTransaction],
+        [errorCaptureTransaction, setErrorCaptureTransaction],
+        [transactionCaptured, setTransactionCaptured]
+    ])
+
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
         productGtin: '',
@@ -66,41 +74,17 @@ const PurchaseManagement = () => {
             }
         ]);
         fetchTransactions({});
-    }, [transactionCaptured]);
+    }, []);
 
     useEffect(() => {
-        if (errorAlert) {
-            const timer = setTimeout(() => {
-                setErrorAlert(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-
         if (transactionAuthorized) {
             const timer = setTimeout(() => {
                 utilsStore.setState({ transactionAuthorized: false });
             }, 5000);
             return () => clearTimeout(timer);
         }
-        if (transactionCaptured) {
-            const timer = setTimeout(() => {
-                setTransactionCaptured(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-        if (errorDeleteTransaction) {
-            const timer = setTimeout(() => {
-                setErrorDeleteTransaction(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-        if (errorCaptureTransaction) {
-            const timer = setTimeout(() => {
-                setErrorCaptureTransaction(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorAlert, transactionAuthorized, errorDeleteTransaction, errorCaptureTransaction, transactionCaptured]);
+
+    }, [transactionAuthorized]);
 
 
     const columns = [
@@ -224,6 +208,22 @@ const PurchaseManagement = () => {
         },
         {
             field: 'rewardAmountCents',
+            headerName: 'Sconto applicato',
+            flex: 1,
+            type: 'number',
+            headerAlign: 'left',
+            align: 'center',
+            disableColumnMenu: true,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value || params.value === 0) {
+                    return formatEuro(params.value);
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            }
+        },
+        {
+            field: 'authorizedAmountCents',
             headerName: 'Importo autorizzato',
             flex: 1,
             type: 'number',
@@ -392,13 +392,13 @@ const PurchaseManagement = () => {
 
 
     const handleReverseTransaction = async () => {
-         console.log("reverse transaction");
-         navigate('/storna-transazione/' + selectedTransaction?.id);
+        console.log("reverse transaction");
+        navigate('/storna-transazione/' + selectedTransaction?.id);
     };
 
     const handleRequestRefund = async () => {
-         console.log("request refund");
-         navigate("/richiedi-rimborso/" + selectedTransaction?.id);
+        console.log("request refund");
+        navigate("/richiedi-rimborso/" + selectedTransaction?.id);
     };
 
     return (
@@ -558,7 +558,7 @@ const PurchaseManagement = () => {
                     </Grid>
                     <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                         <Button variant="contained" fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCaptureTransaction : handleRequestRefund}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.confirmPayment') : t('pages.purchaseManagement.drawer.requestRefund')}</Button>
-                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => {setRefundTransactionModal(true); setOpenDrawer(false);}} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
+                        <Button fullWidth onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCancelTransaction : () => { setRefundTransactionModal(true); setOpenDrawer(false); }} sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}>{selectedTransaction?.status === 'AUTHORIZED' ? t('pages.purchaseManagement.drawer.cancellPayment') : t('pages.purchaseManagement.drawer.refund')} </Button>
                     </Box>
                 </Box>
             </Drawer>

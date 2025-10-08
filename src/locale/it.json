@@ -198,7 +198,7 @@
       "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
     },
     "summaryAcceptDiscount": {
-      "alert": "<Ricordati di richiedere la tessera sanitaria per confermare l’identità dell’acquirente.> <Per verificare la corrispondenza dell’intestatario richiedi la tessera sanitaria>"
+      "alert": "Ricordati di verificare che il Codice Fiscale sul voucher corrisponda a quello riportato sulla tessera sanitaria del richiedente"
     },
     "profile": {
       "title": "Profilo",
@@ -258,7 +258,8 @@
       "captured": "Da rimborsare",
       "tableTitle": "Transazioni",
       "refundSuccessUpload": "La richiesta di rimborso è stata inviata.",
-      "reverseSuccessUpload": "La richiesta di storno è stata inviata."
+      "reverseSuccessUpload": "La richiesta di storno è stata inviata.",
+      "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova."
 
     },
     "products": {

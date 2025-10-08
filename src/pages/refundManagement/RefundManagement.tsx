@@ -5,7 +5,7 @@ import DataTable from "../../components/DataTable/DataTable";
 import { useEffect, useState, useCallback, useRef } from "react";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
-import { getProcessedTransactions } from "../../services/merchantService";
+import { getProcessedTransactions, downloadInvoiceFileApi } from "../../services/merchantService";
 import { authStore } from "../../store/authStore";
 import { jwtDecode } from 'jwt-decode';
 import AlertComponent from "../../components/Alert/AlertComponent";
@@ -15,13 +15,16 @@ import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtTok
 import { getStatusChip, formatEuro } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 import { useLocation } from "react-router-dom";
+import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
+import {useAutoResetBanner} from "../../hooks/useAutoResetBanner";
 
 
 const RefundManagement = () => {
     const [isOpen, setIsOpen] = useState(false)
-    const [selectedTransaction, setSelectedTransaction] = useState({})
+    const [selectedTransaction, setSelectedTransaction] = useState<PointOfSaleTransactionProcessedDTO>({})
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
@@ -35,6 +38,12 @@ const RefundManagement = () => {
     const token = authStore.getState().token;
     const location = useLocation();
     const isLoadingRef = useRef(false);
+    useAutoResetBanner([ //custom hook in order to hide banners after 5 seconds
+        [errorAlert, setErrorAlert],
+        [transactionReverseSuccess, setTransactionReverseSuccess],
+        [transactionRefundSuccess, setTransactionRefundSuccess],
+        [errorDownloadAlert, setErrorDownloadAlert]
+    ]);
 
 
     const initialValues: GetProcessedTransactionsFilters = {
@@ -77,28 +86,6 @@ const RefundManagement = () => {
     }, []);
 
     useEffect(() => {
-        if (errorAlert) {
-            const timer = setTimeout(() => {
-                setErrorAlert(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-        if (transactionRefundSuccess) {
-            const timer = setTimeout(() => {
-                setTransactionRefundSuccess(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-        if (transactionReverseSuccess) {
-            const timer = setTimeout(() => {
-                setTransactionReverseSuccess(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorAlert, transactionRefundSuccess, transactionReverseSuccess]);
-
-    useEffect(() => {
-        console.log("LOCATION", location.state)
         if (location.state) {
             const { refundUploadSuccess, reverseUploadSuccess } = location.state;
             if (refundUploadSuccess) {
@@ -240,7 +227,33 @@ const RefundManagement = () => {
             headerName: 'Beneficiario',
             flex: 1.5,
             disableColumnMenu: true,
-            sortable: false
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value) {
+                    return (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            height: '100%',
+                            width: '100%'
+                        }}>
+                            <Tooltip title={params.value}>
+                                <Typography sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    fontWeight: '400',
+                                    fontSize: '16px'
+                                }}>
+                                    {params.value}
+                                </Typography>
+                            </Tooltip>
+                        </div>
+                    )
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            },
+
         },
         {
             field: 'effectiveAmountCents',
@@ -260,6 +273,22 @@ const RefundManagement = () => {
         },
         {
             field: 'rewardAmountCents',
+            headerName: 'Sconto applicato',
+            flex: 1,
+            type: 'number',
+            align: 'center',
+            headerAlign: 'left',
+            disableColumnMenu: true,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value || params.value === 0) {
+                    return formatEuro(params.value);
+                }
+                return MISSING_DATA_PLACEHOLDER;
+            }
+        },
+        {
+            field: 'authorizedAmountCents',
             headerName: 'Importo autorizzato',
             flex: 1,
             type: 'number',
@@ -350,18 +379,19 @@ const RefundManagement = () => {
     };
 
     const downloadInvoiceFile = async () => {
-        // try {
-        //     const response = await downloadInvoiceFileApi(selectedTransaction?.id);
-        //     console.log("RESPONSE", response);
-        //     const { invoiceUrl } = response;
-        //     const link = document.createElement("a");
-        //     link.href = invoiceUrl;
-        //     document.body.appendChild(link);
-        //     link.click();
-        //     document.body.removeChild(link);
-        // } catch (error) {
-        //     console.error('Errore download file:', error);
-        // }
+        try {
+            const response = await downloadInvoiceFileApi(selectedTransaction?.id);
+            console.log("RESPONSE", response);
+            const { invoiceUrl } = response;
+            const link = document.createElement("a");
+            link.href = invoiceUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Errore download file:', error);
+            setErrorDownloadAlert(true);
+        }
     };
 
     return (
@@ -482,6 +512,7 @@ const RefundManagement = () => {
             {errorAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorAlert')} />}
             {transactionRefundSuccess && <AlertComponent error={false} message={t('pages.refundManagement.refundSuccessUpload')} />}
             {transactionReverseSuccess && <AlertComponent error={false} message={t('pages.refundManagement.reverseSuccessUpload')} />}
+            {errorDownloadAlert && <AlertComponent error={true} message={t('pages.refundManagement.errorDownloadAlert')} />}
         </Box>
     );
 };

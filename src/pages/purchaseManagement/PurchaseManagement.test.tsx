@@ -43,7 +43,7 @@ vi.mock('../../components/DataTable/DataTable', () => ({
           <div data-testid="cell-date">{columns[1].renderCell({ value: rows[0].trxDate })}</div>
           <div data-testid="cell-fiscal-code">{rows[0].fiscalCode}</div>
           <div data-testid="cell-amount">{columns[3].renderCell({ value: rows[0].effectiveAmountCents })}</div>
-          <div data-testid="cell-status">{columns[5].renderCell({ value: rows[0].status })}</div>
+          <div data-testid="cell-status">{columns[6].renderCell({ value: rows[0].status })}</div>
         </div>
         
       )}
@@ -178,7 +178,7 @@ describe('PurchaseManagement', () => {
     expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
 
     expect(screen.getByTestId('rows-count')).toHaveTextContent('1');
-    expect(screen.getByTestId('columns-count')).toHaveTextContent('6');
+    expect(screen.getByTestId('columns-count')).toHaveTextContent('7');
     const firstRow = screen.getByTestId('first-row');
     expect(firstRow.querySelector('[data-testid="cell-product"]')).toHaveTextContent('Lavatrice SuperClean');
     expect(firstRow.querySelector('[data-testid="cell-date"]')).toHaveTextContent('22/09/2025 12:30'); 

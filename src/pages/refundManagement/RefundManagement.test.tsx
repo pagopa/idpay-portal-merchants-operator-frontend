@@ -39,7 +39,7 @@ vi.mock('../../components/DataTable/DataTable', () => ({
       {rows.length > 0 && (
         <div data-testid="first-row">
           <div data-testid="cell-date">{columns[1].renderCell({ value: rows[0].trxDate })}</div>
-          <div data-testid="cell-status">{columns[5].renderCell({ value: rows[0].status })}</div>
+          <div data-testid="cell-status">{columns[6].renderCell({ value: rows[0].status })}</div>
         </div>
       )}
     </div>
