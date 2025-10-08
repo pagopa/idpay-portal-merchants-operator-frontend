@@ -259,7 +259,7 @@ const RefundManagement = () => {
         {
             field: 'effectiveAmountCents',
             headerName: 'Totale della spesa',
-            flex: 1,
+            flex: 1.2,
             type: 'number',
             align: 'center',
             headerAlign: 'left',
@@ -275,7 +275,7 @@ const RefundManagement = () => {
         {
             field: 'rewardAmountCents',
             headerName: 'Sconto applicato',
-            flex: 1,
+            flex: 1.2,
             type: 'number',
             align: 'center',
             headerAlign: 'left',
@@ -291,7 +291,7 @@ const RefundManagement = () => {
         {
             field: 'authorizedAmountCents',
             headerName: 'Importo autorizzato',
-            flex: 1,
+            flex: 1.4,
             type: 'number',
             align: 'center',
             headerAlign: 'left',

@@ -91,7 +91,7 @@ const PurchaseManagement = () => {
         {
             field: "additionalProperties",
             headerName: 'Elettrodomestico',
-            flex: 3,
+            flex: 2.5,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
@@ -193,7 +193,7 @@ const PurchaseManagement = () => {
         {
             field: 'effectiveAmountCents',
             headerName: 'Totale della spesa',
-            flex: 1,
+            flex: 1.2,
             type: 'number',
             headerAlign: 'left',
             align: 'center',
@@ -209,7 +209,7 @@ const PurchaseManagement = () => {
         {
             field: 'rewardAmountCents',
             headerName: 'Sconto applicato',
-            flex: 1,
+            flex: 1.2,
             type: 'number',
             headerAlign: 'left',
             align: 'center',
@@ -225,7 +225,7 @@ const PurchaseManagement = () => {
         {
             field: 'residualAmountCents',
             headerName: 'Importo autorizzato',
-            flex: 1,
+            flex: 1.2,
             type: 'number',
             headerAlign: 'left',
             align: 'center',
