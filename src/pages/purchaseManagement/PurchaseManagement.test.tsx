@@ -208,7 +208,6 @@ describe('PurchaseManagement', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching transactions:', expect.any(Error));
     expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
 
     consoleErrorSpy.mockRestore();

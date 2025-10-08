@@ -270,9 +270,9 @@ export const MerchantApi = {
     }
   },
 
-  testDownload: async (): Promise<{ invoiceUrl: string }> => {
+  getFileUrl: async (url: string): Promise<any> => {
     try {
-      const response = await axiosInstance.get(`https://link.testfile.org/ihDc9s`);
+      const response = await axiosInstance.get(url);
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
