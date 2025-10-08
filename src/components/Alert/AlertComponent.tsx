@@ -15,7 +15,7 @@ const AlertComponent = ({ error, message }: AlertProps) => {
             icon={error ? <ErrorOutline /> : <CheckCircleOutline />}
             sx={{
                 position: 'fixed',
-                bottom: 178,
+                bottom: 20,
                 right: 20,
                 backgroundColor: 'white',
                 width: 'auto',

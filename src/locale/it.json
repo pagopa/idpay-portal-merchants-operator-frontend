@@ -14,9 +14,6 @@
     "gtiInFilterPlaceholer": "Cerca per GTIN",
     "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
     "statusFilterPlaceholer": "Stato",
-    "gtiInFilterPlaceholer": "Cerca per GTIN",
-    "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
-    "statusFilterPlaceholer": "Stato",
     "discountStatusEnum": {
       "authorized": "Autorizzato",
       "authorizationRequested": "Autorizzazione in corso",
@@ -82,9 +79,16 @@
       "title": "Accetta un buono sconto",
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
-    "reverse":{
-      "title":"Storna transazione",
-      "subtitle":"Carica la documentazione necessaria per avvisare lo storno."
+    "refund":{
+      "title":"Richiedi rimborso",
+      "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
+      "creditNote": "Carica la fattura",
+      "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. <Assicurati che il documento sia in formato .xml o .pdf> e <conforme agli standard della fatturazione elettronica.>",
+      "replaceFile":"Sostituisci",
+      "manualLink": "Dubbi? Vai sul manuale",
+      "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
+      "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
+      "uploadFileButton": "selezionalo dal tuo computer"
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
@@ -194,7 +198,7 @@
       "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
     },
     "summaryAcceptDiscount": {
-      "alert": "Ricordati di richiedere la tessera sanitaria per confermare l’identità dell’acquirente. Per verificare la corrispondenza dell’intestatario richiedi la tessera sanitaria"
+      "alert": "<Ricordati di richiedere la tessera sanitaria per confermare l’identità dell’acquirente.> <Per verificare la corrispondenza dell’intestatario richiedi la tessera sanitaria>"
     },
     "profile": {
       "title": "Profilo",
@@ -252,7 +256,10 @@
       "rewarded": "Rimborso richiesto",
       "authorized": "Da autorizzare",
       "captured": "Da rimborsare",
-      "tableTitle": "Transazioni"
+      "tableTitle": "Transazioni",
+      "refundSuccessUpload": "La richiesta di rimborso è stata inviata.",
+      "reverseSuccessUpload": "La richiesta di storno è stata inviata."
+
     },
     "products": {
       "title": "Prodotti",
@@ -278,7 +285,14 @@
       "creditNote": "Carica nota di credito",
       "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
       "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
-      "manualLink": "Dubbi? Vai sul manuale"
+      "manualLink": "Dubbi? Vai sul manuale",
+      "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
+      "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
+      "uploadFileButton": "selezionalo dal tuo computer",
+      "replaceFile": "Sostituisci",
+      "fileSizeError": "Il file supera la dimensione massima di 20MB",
+      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova."
+
     }
 
   },
@@ -293,5 +307,10 @@
     "positiveNumber": "Inserisci un valore positivo",
     "requiredField": "Campo obbligatorio",
     "number": "Inserisci un numero"
+  },
+  "routes": {
+    "buyManagement": "Gestione acquisti",
+    "reverse": "Storna transazione",
+    "refund": "Richiedi rimborso"
   }
 }

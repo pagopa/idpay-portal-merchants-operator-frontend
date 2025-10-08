@@ -48,7 +48,7 @@ const PointOfSaleDTOO = t.partial({
 
   type: enumType<TypeEnum>(TypeEnum, "type"),
 
-  webSite: t.string,
+  website: t.string,
 
   zipCode: t.string
 });

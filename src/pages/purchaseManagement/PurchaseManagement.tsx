@@ -393,11 +393,12 @@ const PurchaseManagement = () => {
 
     const handleReverseTransaction = async () => {
          console.log("reverse transaction");
-         navigate(ROUTES.REVERSE);
+         navigate('/storna-transazione/' + selectedTransaction?.id);
     };
 
     const handleRequestRefund = async () => {
          console.log("request refund");
+         navigate("/richiedi-rimborso/" + selectedTransaction?.id);
     };
 
     return (
