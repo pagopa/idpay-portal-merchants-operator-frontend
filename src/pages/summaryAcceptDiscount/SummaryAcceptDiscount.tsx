@@ -27,7 +27,6 @@ const SummaryAcceptDiscount = () => {
     ])
 
     useEffect(() => {
-        setErrorAlert(true)
         const discountCoupon = sessionStorage.getItem('discountCoupon');
         if (discountCoupon) {
             const formData = JSON.parse(discountCoupon);

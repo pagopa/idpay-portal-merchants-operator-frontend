@@ -376,19 +376,26 @@ const RefundManagement = () => {
                     ...formik.values
                 });
             }
-        }
+        } 
     };
 
     const downloadInvoiceFile = async () => {
         try {
             const response = await downloadInvoiceFileApi(selectedTransaction?.id);
-            console.log("RESPONSE", response);
             const { invoiceUrl } = response;
+            
+            const fileResponse = await fetch(invoiceUrl);
+            const blob = await fileResponse.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            const filename = selectedTransaction?.invoiceFile?.filename || "fattura.pdf";
+            
             const link = document.createElement("a");
-            link.href = invoiceUrl;
-            document.body.appendChild(link);
+            link.href = blobUrl;
+            link.download = filename;
             link.click();
-            document.body.removeChild(link);
+            
+            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
         } catch (error) {
             console.error('Errore download file:', error);
             setErrorDownloadAlert(true);

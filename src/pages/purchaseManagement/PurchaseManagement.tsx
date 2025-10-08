@@ -223,7 +223,7 @@ const PurchaseManagement = () => {
             }
         },
         {
-            field: 'authorizedAmountCents',
+            field: 'residualAmountCents',
             headerName: 'Importo autorizzato',
             flex: 1,
             type: 'number',
