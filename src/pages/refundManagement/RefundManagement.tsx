@@ -257,6 +257,7 @@ const RefundManagement = () => {
             onRowAction={handleRowAction}
             DrawerComponent={
                 <DetailsDrawer
+                    isLoading={downloadInProgress}
                     setIsOpen={() => setIsOpen(false)}
                     isOpen={isOpen}
                     title={t('pages.purchaseManagement.drawer.title')}
