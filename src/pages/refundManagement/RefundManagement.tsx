@@ -20,6 +20,7 @@ const RefundManagement = () => {
     const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
+    const [downloadInProgress, setDownloadInProgress] = useState(false);
     const { t } = useTranslation();
     const location = useLocation();
     const token = authStore.getState().token;
@@ -59,25 +60,23 @@ const RefundManagement = () => {
 
     const downloadInvoiceFile = async () => {
         const decodeToken: DecodedJwtToken = jwtDecode(token);
+        setDownloadInProgress(true);
         try {
             const response = await downloadInvoiceFileApi(decodeToken?.point_of_sale_id,selectedTransaction?.id);
             const { invoiceUrl } = response;
 
-            const fileResponse = await fetch(invoiceUrl);
-            const blob = await fileResponse?.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
-
             const filename = selectedTransaction?.invoiceFile?.filename || "fattura.pdf";
 
             const link = document.createElement("a");
-            link.href = blobUrl;
+            link.href = invoiceUrl;
             link.download = filename;
             link.click();
+            setDownloadInProgress(false);
 
-            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
         } catch (error) {
             console.error('Errore download file:', error);
             setErrorDownloadAlert(true);
+            setDownloadInProgress(false);
         }
     };
 
