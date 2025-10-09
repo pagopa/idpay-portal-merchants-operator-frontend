@@ -36,6 +36,7 @@ interface TransactionsLayoutProps {
     externalState?: {
         [key: string]: any;
     };
+    triggerFetchTransactions?: boolean;
 }
 
 const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({

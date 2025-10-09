@@ -28,6 +28,7 @@ const PurchaseManagement = () => {
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const [refundTransactionModal, setRefundTransactionModal] = useState(false);
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
+    const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
 
     useEffect(() => {
         if (transactionAuthorized) {
@@ -219,7 +220,7 @@ const PurchaseManagement = () => {
             await capturePayment({ trxCode: selectedTransaction?.trxCode });
             setOpenDrawer(false);
             setCaptureTransactionModal(false);
-            navigate(ROUTES.BUY_MANAGEMENT);
+            setTriggerFetchTransactions(true);
             setTransactionCaptured(true);
         } catch (error) {
             console.error('Error capture transaction:', error);
@@ -265,6 +266,7 @@ const PurchaseManagement = () => {
                     errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')
                 }}
                 noDataMessage={t('pages.refundManagement.noTransactions')}
+                triggerFetchTransactions={triggerFetchTransactions}
                 onRowAction={handleRowAction}
                 DrawerComponent={
                     <Drawer

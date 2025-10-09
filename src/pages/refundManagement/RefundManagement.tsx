@@ -9,7 +9,7 @@ import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 import { useLocation } from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
-import { getFileUrl } from "../../services/merchantService";
+// import { getFileUrl } from "../../services/merchantService";
 
 const RefundManagement = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +58,7 @@ const RefundManagement = () => {
             const response = await downloadInvoiceFileApi(selectedTransaction?.id);
             const { invoiceUrl } = response;
 
-            const fileResponse = await getFileUrl(invoiceUrl);
+            const fileResponse = await fetch(invoiceUrl);
             const blob = await fileResponse?.blob();
             const blobUrl = window.URL.createObjectURL(blob);
 
