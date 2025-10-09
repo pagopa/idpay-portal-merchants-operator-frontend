@@ -10,6 +10,7 @@ import PurchaseManagement from "./pages/purchaseManagement/PurchaseManagement.ts
 import Profile from './pages/profile/Profile.tsx';
 import Products from "./pages/products/Products.tsx";
 import Reverse from "./pages/reverse/Reverse.tsx";
+import Refund from "./pages/refund/Refund.tsx";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
             <Route path={ROUTES.PROFILE} element={<Profile />} />
             <Route path={ROUTES.PRODUCTS} element={<Products />} />
             <Route path={ROUTES.REVERSE} element={<Reverse />} />
+            <Route path={ROUTES.REFUND} element={<Refund />} />
           </Routes>
         </Layout>
       </ProtectedRoute>

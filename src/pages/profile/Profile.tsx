@@ -29,11 +29,11 @@ const fetchDetails = async ({ setLoading, setErrorAlert, token, user }) => {
 
 const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user }) => {
   const response = await fetchDetails({ setLoading, setErrorAlert, token, user });
-
+  
   const mappedResponse = [
     {
       "ID univoco": response?.id ?? "",
-      "Indirizzo": `${response?.address ?? ""} - ${response?.zipCode ?? ""}, ${response?.city ?? ""}, ${response?.province ?? ""} `,
+      "Indirizzo": (response?.address && response?.zipCode && response?.city && response?.province && `${response.address} - ${response.zipCode}, ${response.city}, ${response.province}`) ?? "",
       "Telefono": response?.channelPhone ?? "",
       "Email": response?.channelEmail ?? "",
     },
