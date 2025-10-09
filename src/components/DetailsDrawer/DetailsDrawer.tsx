@@ -1,4 +1,4 @@
-import { Divider, Grid, Typography, Box, Drawer, Button } from "@mui/material";
+import { Divider, Grid, Typography, Box, Drawer, Button, CircularProgress } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { theme } from "@pagopa/mui-italia";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
@@ -13,18 +13,19 @@ type ButtonProps = {
 type Props = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  isLoading?: boolean
   title: string;
   subtitle?: string;
-  item: Record<string, string | number | JSX.Element>;
+  item: unknown;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
   onFileDownloadCallback?: () => void;
-
 };
 
 export const DetailsDrawer = ({
   isOpen,
   setIsOpen,
+  isLoading,
   title,
   subtitle,
   item,
@@ -86,7 +87,9 @@ export const DetailsDrawer = ({
 
         <Grid container spacing={2} data-testId='item-test'>
           {itemsEntries.map(([key, value], index) => {
-            return key !== 'id' && (
+            const isDownload = (key === 'Fattura' || key === 'Nota di credito')
+
+            return key !== 'id' && key !== 'cancelled' && (
               <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
                 <Typography
                   variant="body2"
@@ -97,12 +100,10 @@ export const DetailsDrawer = ({
                 >
                   {key}
                 </Typography>
-                {key === "Fattura" && value !== MISSING_DATA_PLACEHOLDER ? (
-                  <a href={value} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
-                  <Button sx={{ padding: "0" }}>
-                    <DescriptionOutlinedIcon /> {value}
+                {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
+                   <Button sx={{ padding: "0" }} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
+                    {isLoading ? <CircularProgress color="inherit" size={20} /> : <><DescriptionOutlinedIcon /> {value}</>}
                   </Button>
-                  </a>
                 ) : (
                   <Typography
                     variant="body2"

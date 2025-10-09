@@ -210,9 +210,9 @@ export const MerchantApi = {
     }
   },
 
-  downloadInvoiceFileApi: async (trxId: string): Promise<{ invoiceUrl: string }> => {
+  downloadInvoiceFileApi: async (pointOfSaleId: string,trxId: string): Promise<{ invoiceUrl: string }> => {
     try {
-      const response = await axiosInstance.get(`/transactions/${trxId}/download`);
+      const response = await axiosInstance.get(`${pointOfSaleId}/transactions/${trxId}/download`);
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
@@ -268,7 +268,18 @@ export const MerchantApi = {
       console.error('Error in rewardTransaction:', error);
       throw error;
     }
-  }
+  },
+
+  getFileUrl: async (url: string): Promise<any> => {
+    try {
+      const response = await axiosInstance.get(url);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in downloadInvoiceFile:', error);
+      throw error;
+    }
+  },
 
 };
 

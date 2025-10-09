@@ -2830,6 +2830,13 @@
           },
           "type": "object"
         },
+        "authorizedAmountCents": {
+          "description": "ENG: Authorized amount in cents - IT: Importo autorizzato in centesimi",
+          "format": "int64",
+          "maximum": 1000000000,
+          "minimum": 0,
+          "type": "integer"
+        },
         "channel": {
           "description": "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione",
           "enum": [
