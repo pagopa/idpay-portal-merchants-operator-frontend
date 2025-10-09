@@ -14,6 +14,7 @@
     "gtiInFilterPlaceholer": "Cerca per GTIN",
     "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
     "statusFilterPlaceholer": "Stato",
+    "fileSizeError": "Il file supera la dimensione massima di 20MB",
     "discountStatusEnum": {
       "authorized": "Autorizzato",
       "authorizationRequested": "Autorizzazione in corso",
@@ -243,7 +244,7 @@
       },
       "refundTransactionModal": {
         "title": "Storna transazione",
-        "description": "Sei sicuro di voler stornare questa transazione?  L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+        "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
         "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
       }
     },
