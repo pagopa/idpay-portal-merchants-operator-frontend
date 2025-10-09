@@ -20,7 +20,6 @@ type Props = {
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
   onFileDownloadCallback?: () => void;
-
 };
 
 export const DetailsDrawer = ({
@@ -88,7 +87,9 @@ export const DetailsDrawer = ({
 
         <Grid container spacing={2} data-testId='item-test'>
           {itemsEntries.map(([key, value], index) => {
-            return key !== 'id' && (
+            const isDownload = (key === 'Fattura' || key === 'Nota di credito')
+
+            return key !== 'id' && key !== 'cancelled' && (
               <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
                 <Typography
                   variant="body2"
@@ -99,7 +100,7 @@ export const DetailsDrawer = ({
                 >
                   {key}
                 </Typography>
-                {key === "Fattura" && value !== MISSING_DATA_PLACEHOLDER ? (
+                {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
                    <Button sx={{ padding: "0" }} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
                     {isLoading ? <CircularProgress color="inherit" size={20} /> : <><DescriptionOutlinedIcon /> {value}</>}
                   </Button>

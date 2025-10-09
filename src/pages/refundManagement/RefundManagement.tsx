@@ -38,6 +38,8 @@ const RefundManagement = () => {
 
     const handleRowAction = useCallback((transaction) => {
         setIsOpen(true);
+        const invoiceLabel = transaction?.status === 'REFUNDED' ? 'Nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Fattura'
+
         const mappedTransaction = {
             'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {
                 day: '2-digit',
@@ -52,7 +54,7 @@ const RefundManagement = () => {
             'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
             'Importo autorizzato': transaction?.rewardAmountCents && transaction.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
             'Stato': getStatusChip(t, transaction?.status),
-            'Fattura': transaction?.invoiceFile?.filename,
+            [invoiceLabel]: transaction?.invoiceFile?.filename,
             'id': transaction?.id,
         };
         setSelectedTransaction(mappedTransaction);
