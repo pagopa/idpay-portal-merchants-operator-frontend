@@ -28,6 +28,7 @@ const PurchaseManagement = () => {
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const [refundTransactionModal, setRefundTransactionModal] = useState(false);
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
+    const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
 
     useEffect(() => {
         if (transactionAuthorized) {
@@ -36,7 +37,14 @@ const PurchaseManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-    }, [transactionAuthorized]);
+        if(triggerFetchTransactions){
+            const timer = setTimeout(() => {
+                setTriggerFetchTransactions(false);
+            },3000);
+
+        return () => clearTimeout(timer);
+        }
+    }, [transactionAuthorized, triggerFetchTransactions]);
 
     const columns = [
         {
@@ -54,7 +62,8 @@ const PurchaseManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontSize: '16px'
                                 }}>
                                     {params.value?.productName}
                                 </Typography>
@@ -68,7 +77,7 @@ const PurchaseManagement = () => {
         {
             field: 'updateDate',
             headerName: 'Data e ora',
-            flex: 1,
+            flex: 1.5,
             disableColumnMenu: true,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
@@ -85,7 +94,8 @@ const PurchaseManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontSize: '16px'
                                 }}>
                                     {formattedDate}
                                 </Typography>
@@ -99,7 +109,7 @@ const PurchaseManagement = () => {
         {
             field: 'fiscalCode',
             headerName: 'Beneficiario',
-            flex: 1.5,
+            flex: 1.2,
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
@@ -110,7 +120,8 @@ const PurchaseManagement = () => {
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    fontSize: '16px'
                                 }}>
                                     {params.value}
                                 </Typography>
@@ -219,8 +230,8 @@ const PurchaseManagement = () => {
             await capturePayment({ trxCode: selectedTransaction?.trxCode });
             setOpenDrawer(false);
             setCaptureTransactionModal(false);
-            navigate(ROUTES.BUY_MANAGEMENT);
             setTransactionCaptured(true);
+            setTriggerFetchTransactions(true);
         } catch (error) {
             console.error('Error capture transaction:', error);
             setCaptureTransactionModal(false);
@@ -265,6 +276,7 @@ const PurchaseManagement = () => {
                     errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')
                 }}
                 noDataMessage={t('pages.refundManagement.noTransactions')}
+                triggerFetchTransactions={triggerFetchTransactions}
                 onRowAction={handleRowAction}
                 DrawerComponent={
                     <Drawer

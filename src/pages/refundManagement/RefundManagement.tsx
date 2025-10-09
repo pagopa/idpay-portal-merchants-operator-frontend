@@ -9,7 +9,10 @@ import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 import { useLocation } from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
-import { getFileUrl } from "../../services/merchantService";
+import { authStore } from "../../store/authStore";
+import { DecodedJwtToken } from "../../utils/types";
+import { jwtDecode } from 'jwt-decode';
+// import { getFileUrl } from "../../services/merchantService";
 
 const RefundManagement = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +20,10 @@ const RefundManagement = () => {
     const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
+    const [downloadInProgress, setDownloadInProgress] = useState(false);
     const { t } = useTranslation();
     const location = useLocation();
+    const token = authStore.getState().token;
 
     useEffect(() => {
         if (location.state) {
@@ -33,6 +38,8 @@ const RefundManagement = () => {
 
     const handleRowAction = useCallback((transaction) => {
         setIsOpen(true);
+        const invoiceLabel = transaction?.status === 'REFUNDED' ? 'Nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Fattura'
+
         const mappedTransaction = {
             'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {
                 day: '2-digit',
@@ -47,32 +54,31 @@ const RefundManagement = () => {
             'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
             'Importo autorizzato': transaction?.rewardAmountCents && transaction.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
             'Stato': getStatusChip(t, transaction?.status),
-            'Fattura': transaction?.invoiceFile?.filename,
+            [invoiceLabel]: transaction?.invoiceFile?.filename,
             'id': transaction?.id,
         };
         setSelectedTransaction(mappedTransaction);
     }, [t]);
 
     const downloadInvoiceFile = async () => {
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
+        setDownloadInProgress(true);
         try {
-            const response = await downloadInvoiceFileApi(selectedTransaction?.id);
+            const response = await downloadInvoiceFileApi(decodeToken?.point_of_sale_id,selectedTransaction?.id);
             const { invoiceUrl } = response;
-
-            const fileResponse = await getFileUrl(invoiceUrl);
-            const blob = await fileResponse?.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
 
             const filename = selectedTransaction?.invoiceFile?.filename || "fattura.pdf";
 
             const link = document.createElement("a");
-            link.href = blobUrl;
+            link.href = invoiceUrl;
             link.download = filename;
             link.click();
+            setDownloadInProgress(false);
 
-            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
         } catch (error) {
             console.error('Errore download file:', error);
             setErrorDownloadAlert(true);
+            setDownloadInProgress(false);
         }
     };
 
@@ -80,7 +86,7 @@ const RefundManagement = () => {
         {
             field: 'additionalProperties',
             headerName: 'Elettrodomestico',
-            flex: 3,
+            flex: 2.5,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
@@ -108,7 +114,7 @@ const RefundManagement = () => {
         {
             field: 'updateDate',
             headerName: 'Data e ora',
-            flex: 1,
+            flex: 1.5,
             disableColumnMenu: true,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
@@ -141,7 +147,7 @@ const RefundManagement = () => {
         {
             field: 'fiscalCode',
             headerName: 'Beneficiario',
-            flex: 1.5,
+            flex: 1.2,
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
@@ -168,7 +174,7 @@ const RefundManagement = () => {
         {
             field: 'effectiveAmountCents',
             headerName: 'Totale della spesa',
-            flex: 1.2,
+            flex: 1,
             type: 'number',
             align: 'center',
             headerAlign: 'left',
@@ -184,7 +190,7 @@ const RefundManagement = () => {
         {
             field: 'rewardAmountCents',
             headerName: 'Sconto applicato',
-            flex: 1.2,
+            flex: 1,
             type: 'number',
             align: 'center',
             headerAlign: 'left',
@@ -253,6 +259,7 @@ const RefundManagement = () => {
             onRowAction={handleRowAction}
             DrawerComponent={
                 <DetailsDrawer
+                    isLoading={downloadInProgress}
                     setIsOpen={() => setIsOpen(false)}
                     isOpen={isOpen}
                     title={t('pages.purchaseManagement.drawer.title')}

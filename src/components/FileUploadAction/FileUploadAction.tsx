@@ -23,6 +23,7 @@ interface FileUploadActionProps {
 }
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; 
+const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
 
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
     titleKey,
@@ -36,6 +37,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 }) => {
     const [file, setFile] = useState<File | null>(null);
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
+    const [fileTypeError, setFileTypeError] = useState<boolean>(false);
     const [loadingFile, setLoadingFile] = useState<boolean>(false);
     const [errorAlert, setErrorAlert] = useState<boolean>(false);
     const { t } = useTranslation();
@@ -53,11 +55,18 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     }, [errorAlert]);
 
     const handleFileSelect = (selectedFile: File) => {
+        if(!VALID_MIME_TYPES.includes(selectedFile.type)){
+            setFileTypeError(true);
+            setFile(null);
+            return;
+        };
         if (selectedFile.size <= MAX_FILE_SIZE_BYTES) {
             setFile(selectedFile);
             setFileSizeError(false);
+            setFileTypeError(false);
         } else {
             setFileSizeError(true);
+            setFileTypeError(false);
         }
     };
 
@@ -115,14 +124,22 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     fileSizeError && (
                         <Box mt={2}>
                             <Alert severity="error">
-                                {t(`${i18nBlockKey}.fileSizeError`)}
+                                {t(`commons.fileSizeError`)}
+                            </Alert>
+                        </Box>
+                    )
+                }
+                {
+                    fileTypeError && (
+                        <Box mt={2}>
+                            <Alert severity="error">
+                                {t(`${i18nBlockKey}.fileNotSupported`)}
                             </Alert>
                         </Box>
                     )
                 }
                 <Box mt={1} mb={2}>
                     <SingleFileInput
-                        accept={['application/pdf', 'application/xml']}
                         onFileSelected={handleFileSelect}
                         onFileRemoved={handleRemoveFile}
                         value={file}
@@ -168,7 +185,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 errorAlert && (
                     <AlertComponent
                         error={true}
-                        // Usiamo una chiave generica per l'errore, assumendo che i testi siano simili
                         message={t('pages.reverse.errorAlert')} 
                     />
                 )
