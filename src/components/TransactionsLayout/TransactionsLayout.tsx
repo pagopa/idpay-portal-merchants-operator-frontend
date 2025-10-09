@@ -52,6 +52,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     noDataMessage,
     onRowAction,
     DrawerComponent,
+    triggerFetchTransactions,
     externalState = {}
 }) => {
     const [rows, setRows] = useState([]);
@@ -67,7 +68,6 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const token = authStore.getState().token;
     const isLoadingRef = useRef(false);
 
-    // Combina gli alerts locali con quelli esterni
     const allAlerts = [
         [errorAlert, setErrorAlert],
         ...alerts
@@ -97,6 +97,12 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         ]);
         fetchTransactions({});
     }, []);
+
+    useEffect(() => {
+        if(triggerFetchTransactions){
+            fetchTransactions({});
+        }
+    },[triggerFetchTransactions])
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;

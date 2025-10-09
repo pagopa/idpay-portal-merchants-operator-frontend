@@ -9,6 +9,9 @@ import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 import { useLocation } from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
+import { authStore } from "../../store/authStore";
+import { DecodedJwtToken } from "../../utils/types";
+import { jwtDecode } from 'jwt-decode';
 // import { getFileUrl } from "../../services/merchantService";
 
 const RefundManagement = () => {
@@ -19,6 +22,7 @@ const RefundManagement = () => {
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const { t } = useTranslation();
     const location = useLocation();
+    const token = authStore.getState().token;
 
     useEffect(() => {
         if (location.state) {
@@ -54,8 +58,9 @@ const RefundManagement = () => {
     }, [t]);
 
     const downloadInvoiceFile = async () => {
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
         try {
-            const response = await downloadInvoiceFileApi(selectedTransaction?.id);
+            const response = await downloadInvoiceFileApi(decodeToken?.point_of_sale_id,selectedTransaction?.id);
             const { invoiceUrl } = response;
 
             const fileResponse = await fetch(invoiceUrl);
@@ -80,7 +85,7 @@ const RefundManagement = () => {
         {
             field: 'additionalProperties',
             headerName: 'Elettrodomestico',
-            flex: 3,
+            flex: 2.5,
             disableColumnMenu: true,
             align: 'center',
             sortable: true,
@@ -108,7 +113,7 @@ const RefundManagement = () => {
         {
             field: 'updateDate',
             headerName: 'Data e ora',
-            flex: 1,
+            flex: 1.5,
             disableColumnMenu: true,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value) {
@@ -141,7 +146,7 @@ const RefundManagement = () => {
         {
             field: 'fiscalCode',
             headerName: 'Beneficiario',
-            flex: 1.5,
+            flex: 1.2,
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
@@ -168,7 +173,7 @@ const RefundManagement = () => {
         {
             field: 'effectiveAmountCents',
             headerName: 'Totale della spesa',
-            flex: 1.2,
+            flex: 1,
             type: 'number',
             align: 'center',
             headerAlign: 'left',
@@ -184,7 +189,7 @@ const RefundManagement = () => {
         {
             field: 'rewardAmountCents',
             headerName: 'Sconto applicato',
-            flex: 1.2,
+            flex: 1,
             type: 'number',
             align: 'center',
             headerAlign: 'left',

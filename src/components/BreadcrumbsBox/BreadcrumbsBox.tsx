@@ -40,7 +40,7 @@ const BreadcrumbsBox = ({ backLabel, items, active, onClickBackButton, backButto
           {backLabel}
         </ButtonNaked>
         {items.map((obj, index) => (
-          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} className={styles.breadcrumbItemCustom} onClick={() => obj.path && navigate(obj.path)}>
+          <Typography color={`text.${index === items.length - 1 ? 'disabled' : 'primary'}`} variant="body2" key={index} className={styles.breadcrumbItemCustom} onClick={() => index !== items.length - 1 && obj.path && navigate(obj.path)}>
             {obj.label}
           </Typography>
         ))}

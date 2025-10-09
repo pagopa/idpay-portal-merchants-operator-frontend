@@ -407,7 +407,7 @@ paths:
           $ref: "#/components/responses/GET_transactions_in_progress_429_Response"
         "500":
           $ref: "#/components/responses/GET_transactions_in_progress_500_Response"
-  /transactions/{transactionId}/download:
+  /{pointOfSaleId}/transactions/{transactionId}/download:
     get:
       tags:
         - transaction
@@ -416,6 +416,7 @@ paths:
         IT: Scarica il file della fattura della transazione"
       operationId: downloadInvoiceFile
       parameters:
+        - $ref: "#/components/parameters/pointOfSaleId_path"
         - $ref: "#/components/parameters/transactionId_path"
       responses:
         "200":
