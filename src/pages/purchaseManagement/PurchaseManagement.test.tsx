@@ -40,9 +40,9 @@ vi.mock("react-router-dom", () => ({
 vi.mock("../../routes", () => ({
   default: {
     ACCEPT_DISCOUNT: "/accept-discount",
-    REFUNDS_MANAGEMENT: "/refunds-management",
+    REFUNDS_MANAGEMENT: "/richiedi-rimborso/",
     BUY_MANAGEMENT: "/buy-management",
-    REVERSE: "/reverse",
+    REVERSE: "/storna-transazione",
   },
 }));
 
@@ -154,9 +154,7 @@ const mockTransaction = (status, id = "trx123") => ({
   rewardAmountCents: 5000,
   additionalProperties: {
     productName: "Frigorifero Modello X",
-    productCategory: "Elettrodomestico",
-    productBrand: "BrandA",
-    productModel: "ModelB",
+    productCategory: "Elettrodomestico"
   },
 });
 
@@ -254,7 +252,7 @@ describe("PurchaseManagement Component", () => {
 
     // Verifica che l'errore sia stato loggato
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Error fetching transactions:",
+      "Errore fetch:",
       expect.any(Error)
     );
 
@@ -308,8 +306,8 @@ describe("PurchaseManagement Component", () => {
       expect(screen.getByTestId("filters-form")).toBeInTheDocument()
     );
 
-    const fiscalCodeInput = screen.getByTestId("fiscal-code-filter");
-    await user.type(fiscalCodeInput, "ABC123XYZ");
+    const sortInput = screen.getByTestId("sort-model");
+    await user.type(sortInput, "ABC123XYZ");
     fireEvent.click(screen.getByTestId("sort-change-date-asc"));
 
     fireEvent.click(screen.getByTestId("apply-filters-btn"));
@@ -326,9 +324,9 @@ describe("PurchaseManagement Component", () => {
       expect(screen.getByTestId("filters-form")).toBeInTheDocument()
     );
 
-    const fiscalCodeInput = screen.getByTestId("fiscal-code-filter");
+    const sortInput = screen.getByTestId("sort-model");
 
-    await user.type(fiscalCodeInput, "FILTERED");
+    await user.type(sortInput, "FILTERED");
     fireEvent.click(screen.getByTestId("sort-change-name-desc"));
 
     fireEvent.click(screen.getByTestId("apply-filters-btn"));
@@ -345,8 +343,8 @@ describe("PurchaseManagement Component", () => {
       expect(screen.getByTestId("filters-form")).toBeInTheDocument()
     );
 
-    const fiscalCodeInput = screen.getByTestId("fiscal-code-filter");
-    await user.type(fiscalCodeInput, "ABC123XYZ");
+    const sortInput = screen.getByTestId("sort-model");
+    await user.type(sortInput, "ABC123XYZ");
 
     fireEvent.click(screen.getByTestId("reset-filters-btn"));
 
@@ -370,7 +368,7 @@ describe("PurchaseManagement Component", () => {
     expect(
       screen.getByText(mockTransaction("AUTHORIZED").fiscalCode)
     ).toBeInTheDocument();
-    expect(screen.getByText("BrandA ModelB")).toBeInTheDocument();
+    expect(screen.getByText("Frigorifero Modello X")).toBeInTheDocument();
   });
 
   it("dovrebbe mostrare i bottoni Capture/Cancel se lo stato è AUTHORIZED", async () => {
@@ -498,7 +496,7 @@ describe("PurchaseManagement Component", () => {
       expect(deleteTransactionInProgress).toHaveBeenCalledWith("trx123");
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith("/refunds-management");
+    expect(mockNavigate).toHaveBeenCalledWith("/richiedi-rimborso/");
     expect(screen.queryByTestId("modal-component")).not.toBeInTheDocument();
   });
 
@@ -558,7 +556,7 @@ describe("PurchaseManagement Component", () => {
       within(modal).getByText("pages.purchaseManagement.drawer.refund")
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith("/reverse");
+    expect(mockNavigate).toHaveBeenCalledWith("/storna-transazione/trx123");
   });
 
   const testTimeoutLogic = async (
@@ -603,7 +601,7 @@ describe("PurchaseManagement Component", () => {
       fireEvent.click(screen.getByTestId("reset-filters-btn"));
     }
 
-    let alertTestId =
+    const alertTestId =
       expectedAlertText === "pages.purchaseManagement.paymentSuccess" ||
       expectedAlertText === "pages.purchaseManagement.alertSuccess"
         ? "alert-success"

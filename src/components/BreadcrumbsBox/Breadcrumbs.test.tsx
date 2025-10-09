@@ -18,7 +18,7 @@ describe("BreadcrumbsBox", () => {
     mockNavigate.mockClear();
   });
 
-  const items = ["Home", "Page 1", "Page 2"];
+  const items = [{label: 'Home', path: 'Home'}, {label: 'Page 1', path: 'Page 1'}, {label: 'Page 2', path: 'Page 2'}];
 
   it("renderizza correttamente le voci dei breadcrumb e il back button", () => {
     render(
@@ -32,7 +32,7 @@ describe("BreadcrumbsBox", () => {
 
     // verifica breadcrumb
     items.forEach((item) => {
-      expect(screen.getByText(item)).toBeInTheDocument();
+      expect(screen.getByText(item.label)).toBeInTheDocument();
     });
   });
 

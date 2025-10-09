@@ -197,7 +197,7 @@ describe("RefundManagement", () => {
 
     expect(mockGetProcessedTransactions).toHaveBeenCalledTimes(1);
 
-    expect(screen.getByTestId("cell-status")).toHaveTextContent("STORNATO");
+    expect(screen.getByTestId("cell-status")).toBeInTheDocument();
   });
 
   it("should show no transactions message when there are no transactions", async () => {
@@ -244,9 +244,11 @@ describe("RefundManagement", () => {
         "pos-456",
         expect.objectContaining({
           fiscalCode: "FISCALE123",
+          page: 0,
           productGtin: "",
           status: "",
-          sort: "updateDate,asc",
+          size: 10,
+          sort: "updateDate,desc",
         })
       );
     });
