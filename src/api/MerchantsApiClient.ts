@@ -268,7 +268,18 @@ export const MerchantApi = {
       console.error('Error in rewardTransaction:', error);
       throw error;
     }
-  }
+  },
+
+  getFileUrl: async (url: string): Promise<any> => {
+    try {
+      const response = await axiosInstance.get(url);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in downloadInvoiceFile:', error);
+      throw error;
+    }
+  },
 
 };
 

@@ -12,6 +12,7 @@ import AlertComponent from '../../components/Alert/AlertComponent';
 import { utilsStore } from '../../store/utilsStore';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
 
 const SummaryAcceptDiscount = () => {
 
@@ -21,6 +22,9 @@ const SummaryAcceptDiscount = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const setTransactionAuthorized = utilsStore((state) => state.setTransactionAuthorized);
+    useAutoResetBanner([
+        [errorAlert, setErrorAlert]
+    ])
 
     useEffect(() => {
         const discountCoupon = sessionStorage.getItem('discountCoupon');
@@ -29,15 +33,6 @@ const SummaryAcceptDiscount = () => {
             setSummaryDataObj(formData);
         }
     }, []);
-
-    useEffect(() => {
-        if (errorAlert) {
-            const timer = setTimeout(() => {
-                setErrorAlert(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorAlert]);
 
 
     const handleAuthorizeDiscount = async () => {

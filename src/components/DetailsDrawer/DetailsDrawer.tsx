@@ -15,7 +15,7 @@ type Props = {
   setIsOpen: (value: boolean) => void;
   title: string;
   subtitle?: string;
-  item: Record<string, string | number | JSX.Element>;
+  item: unknown;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
   onFileDownloadCallback?: () => void;
@@ -98,11 +98,9 @@ export const DetailsDrawer = ({
                   {key}
                 </Typography>
                 {key === "Fattura" && value !== MISSING_DATA_PLACEHOLDER ? (
-                  <a href={value} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
-                  <Button sx={{ padding: "0" }}>
+                  <Button sx={{ padding: "0" }} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
                     <DescriptionOutlinedIcon /> {value}
                   </Button>
-                  </a>
                 ) : (
                   <Typography
                     variant="body2"
