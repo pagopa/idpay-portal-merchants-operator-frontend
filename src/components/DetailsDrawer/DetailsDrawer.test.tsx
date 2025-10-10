@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { formatEuro, getStatusChip } from "../../utils/helpers";
 import { t } from "i18next";
 import { DetailsDrawer } from "./DetailsDrawer";
+import userEvent from "@testing-library/user-event";
 
 const mockedTransactionDetails = {
   "Data e ora": "",
@@ -12,7 +13,7 @@ const mockedTransactionDetails = {
   "Sconto applicato": formatEuro(10000),
   "Importo autorizzato": formatEuro(50000 - 10000),
   Stato: getStatusChip(t, "REWARDED"),
-  Fattura: "",
+  Fattura: "file",
 };
 
 const testTitle = "This is a test title";
@@ -20,17 +21,20 @@ const testSubtitle = "This is a test subtitle";
 const testItem = mockedTransactionDetails;
 const testPrimaryButton = {label: 'primary button', url: '/'}
 const testSecondaryButton = {label: 'secondary button', url: '/'}
+let testIsLoading = false
 
 const DetailsDrawerSetup = (
   item: Record<string, string | number | JSX.Element>,
   title: string,
   subtitle?: string,
+  isLoading?: boolean,
   primaryButton?: typeof testPrimaryButton,
-  secondaryButton?: typeof testSecondaryButton
+  secondaryButton?: typeof testSecondaryButton,
 ) => {
   render(
     <DetailsDrawer
       isOpen
+      isLoading = {isLoading}
       setIsOpen={() => null}
       title={title}
       subtitle={subtitle}
@@ -43,7 +47,7 @@ const DetailsDrawerSetup = (
 
 describe("DetailsDrawer", () => {
   it("should render the component with full content", () => {
-    DetailsDrawerSetup(testItem, testTitle, testSubtitle, testPrimaryButton, testSecondaryButton);
+    DetailsDrawerSetup(testItem, testTitle, testSubtitle, testIsLoading, testPrimaryButton, testSecondaryButton);
 
     const drawerTitle = screen.getByText(testTitle);
     const drawerSubtitle = screen.getByText(testSubtitle);
@@ -66,5 +70,31 @@ describe("DetailsDrawer", () => {
 
     expect(drawerTitle).toBeInTheDocument();
     expect(drawerItem).toBeInTheDocument();
+  });
+
+  it("should click button", async () => {
+    DetailsDrawerSetup(testItem, testTitle);
+
+    const onClick = {
+      click: () => {}
+    }
+
+    const onClickSpy = vi.spyOn(onClick, 'click')
+    
+    const button = screen.getByTestId("btn-test")
+    button.addEventListener('click', onClick.click)
+    await userEvent.click(button)
+
+    expect(onClickSpy).toBeCalledTimes(1)
+
+  })
+
+  it("should show loader", () => {
+    testIsLoading = true
+    DetailsDrawerSetup(testItem, testTitle, testSubtitle, testIsLoading);
+
+    const drawerLoader = screen.getByTestId("item-loader");
+
+    expect(drawerLoader).toBeInTheDocument();
   });
 });

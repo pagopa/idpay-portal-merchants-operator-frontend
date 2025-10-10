@@ -42,6 +42,7 @@ describe("FiltersForm", () => {
     fireEvent.click(screen.getByTestId("apply-filters-test"));
 
     expect(onFiltersApplied).toHaveBeenCalledWith(mockFormik.values);
+    expect(onFiltersApplied).toHaveBeenCalled();
   });
 
   it("calls formik.resetForm and onFiltersReset when Reset button is clicked", () => {
