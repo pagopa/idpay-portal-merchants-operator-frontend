@@ -15,7 +15,7 @@ import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from '../purchaseManagement/purchaseManagement.module.css';
 import AlertComponent from '../../components/Alert/AlertComponent';
-
+import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
 
 
 
@@ -33,6 +33,9 @@ const Products = () => {
     });
     const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const { t } = useTranslation();
+    useAutoResetBanner([
+        [errorAlert, setErrorAlert]
+    ])
 
     const initialValues = {
         category: '',
@@ -208,15 +211,6 @@ const Products = () => {
         fetchProducts({});
         setProductsListIsLoading(true);
     }, []);
-
-    useEffect(() => {
-        if (errorAlert) {
-            const timer = setTimeout(() => {
-                setErrorAlert(false);
-            }, 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [errorAlert]);
 
     const fetchProducts = useCallback(async (params: GetProductsParams) => {
         setProductsListIsLoading(true);
