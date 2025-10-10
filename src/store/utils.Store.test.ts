@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { utilsStore } from "./utilsStore";
 
 describe("utilsStore", () => {
@@ -6,8 +6,11 @@ describe("utilsStore", () => {
     utilsStore.setState({ transactionAuthorized: false });
   });
 
-  it("dovrebbe avere lo stato iniziale corretto", () => {
+  
     const state = utilsStore.getState();
+    const setTransactionSpy = vi.spyOn(state, 'setTransactionAuthorized')
+
+  it("dovrebbe avere lo stato iniziale corretto", () => {
     expect(state.transactionAuthorized).toBe(false);
   });
 
@@ -15,6 +18,7 @@ describe("utilsStore", () => {
     utilsStore.getState().setTransactionAuthorized(true);
     const state = utilsStore.getState();
     expect(state.transactionAuthorized).toBe(true);
+    expect(setTransactionSpy).toBeCalled();
   });
 
   it("dovrebbe aggiornare transactionAuthorized a false", () => {
@@ -22,5 +26,6 @@ describe("utilsStore", () => {
     utilsStore.getState().setTransactionAuthorized(false);
     const state = utilsStore.getState();
     expect(state.transactionAuthorized).toBe(false);
+    expect(setTransactionSpy).toBeCalled();
   });
 });

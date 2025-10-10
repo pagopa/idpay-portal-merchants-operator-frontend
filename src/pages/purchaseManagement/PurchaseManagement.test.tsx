@@ -52,6 +52,11 @@ vi.mock("../../services/merchantService");
 vi.mock("../../store/utilsStore");
 vi.mock("../../store/authStore");
 
+const onClick = {
+  click: () => {}
+}
+const onClickSpy = vi.spyOn(onClick, 'click')
+
 // Mock dei componenti figli
 vi.mock("../../components/DataTable/DataTable", () => ({
   default: ({
@@ -76,19 +81,25 @@ vi.mock("../../components/DataTable/DataTable", () => ({
       />
       <button
         data-testid="sort-change-name-desc"
-        onClick={() =>
+        onClick={() => {
+          onClick.click()
           onSortModelChange([{ field: "additionalProperties", sort: "desc" }])
-        }
+        }}
       />
       <button
         data-testid="sort-change-date-asc"
-        onClick={() =>
+        onClick={() => {
+          onClick.click()
           onSortModelChange([{ field: "updateDate", sort: "asc" }])
+        }
         }
       />
       <button
         data-testid="row-action"
-        onClick={() => handleRowAction(rows[0])}
+        onClick={() => {
+          onClick.click()
+          handleRowAction(rows[0])
+        }}
       />
       <div data-testid="sort-model">{JSON.stringify(sortModel)}</div>
     </div>
@@ -102,7 +113,10 @@ vi.mock("../../components/FiltersForm/FiltersForm", () => ({
       <button
         type="button"
         data-testid="apply-filters-btn"
-        onClick={() => onFiltersApplied(formik.values)}
+        onClick={() => {
+          onClick.click()
+          onFiltersApplied(formik.values)
+        }}
       >
         Apply Filters
       </button>
@@ -282,6 +296,7 @@ describe("PurchaseManagement Component", () => {
     fireEvent.click(screen.getByTestId("sort-change-date-asc"));
 
     await waitFor(() => {
+      expect(onClickSpy).toHaveBeenCalled();
       expect(getInProgressTransactions).toHaveBeenCalled();
     });
   });
@@ -295,6 +310,7 @@ describe("PurchaseManagement Component", () => {
     fireEvent.click(screen.getByTestId("sort-change-name-desc"));
 
     await waitFor(() => {
+      expect(onClickSpy).toHaveBeenCalled();
       expect(getInProgressTransactions).toHaveBeenCalled();
     });
   });
@@ -313,6 +329,7 @@ describe("PurchaseManagement Component", () => {
     fireEvent.click(screen.getByTestId("apply-filters-btn"));
 
     await waitFor(() => {
+      expect(onClickSpy).toHaveBeenCalled();
       expect(getInProgressTransactions).toHaveBeenCalled();
     });
   });
@@ -332,6 +349,7 @@ describe("PurchaseManagement Component", () => {
     fireEvent.click(screen.getByTestId("apply-filters-btn"));
 
     await waitFor(() => {
+      expect(onClickSpy).toHaveBeenCalled();
       expect(getInProgressTransactions).toHaveBeenCalled();
     });
   });
@@ -425,6 +443,7 @@ describe("PurchaseManagement Component", () => {
     fireEvent.click(within(modal).getByText("Conferma"));
 
     await waitFor(() => {
+      expect(onClickSpy).toHaveBeenCalled();
       expect(capturePayment).toHaveBeenCalledWith({ trxCode: "CODE-trx123" });
     });
 
