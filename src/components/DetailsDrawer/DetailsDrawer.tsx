@@ -101,7 +101,7 @@ export const DetailsDrawer = ({
                   {key}
                 </Typography>
                 {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
-                   <Button sx={{ padding: "0" }} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
+                   <Button data-testid='btn-test' sx={{ padding: "0" }} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
                     {isLoading ? <CircularProgress color="inherit" size={20} data-testid='item-loader' /> : <><DescriptionOutlinedIcon /> {value}</>}
                   </Button>
                 ) : (

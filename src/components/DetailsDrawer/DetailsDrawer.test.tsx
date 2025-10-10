@@ -1,8 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { formatEuro, getStatusChip } from "../../utils/helpers";
 import { t } from "i18next";
 import { DetailsDrawer } from "./DetailsDrawer";
+import userEvent from "@testing-library/user-event";
 
 const mockedTransactionDetails = {
   "Data e ora": "",
@@ -70,6 +71,23 @@ describe("DetailsDrawer", () => {
     expect(drawerTitle).toBeInTheDocument();
     expect(drawerItem).toBeInTheDocument();
   });
+
+  it("should click button", async () => {
+    DetailsDrawerSetup(testItem, testTitle);
+
+    const onClick = {
+      click: () => {}
+    }
+
+    const onClickSpy = vi.spyOn(onClick, 'click')
+    
+    const button = screen.getByTestId("btn-test")
+    button.addEventListener('click', onClick.click)
+    await userEvent.click(button)
+
+    expect(onClickSpy).toBeCalledTimes(1)
+
+  })
 
   it("should show loader", () => {
     testIsLoading = true
