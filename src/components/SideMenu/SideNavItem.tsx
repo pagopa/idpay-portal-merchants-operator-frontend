@@ -1,4 +1,4 @@
-import { ListItemButton, ListItemText, ListItemIcon, Icon } from '@mui/material';
+import { ListItemButton, ListItemText, ListItemIcon, Icon, Tooltip } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
     
 type Props = {
@@ -23,7 +23,13 @@ export default function SideNavItem({
   return (
     <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick}>
       <ListItemIcon sx={{ ml: level }}>
-        <Icon component={icon} />
+        {
+          hideLabels ? (
+            <Tooltip title={title}>
+              <Icon component={icon} />
+            </Tooltip>
+          ) : (<Icon component={icon} />)
+        }
       </ListItemIcon>
       {!hideLabels && <ListItemText
         primary={title}
