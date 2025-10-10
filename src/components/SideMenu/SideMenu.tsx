@@ -9,6 +9,7 @@ import SideNavItem from "./SideNavItem";
 import { Person } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { theme } from "@pagopa/mui-italia";
+import styles from './SideMenu.module.css';
 
 /** The side menu of the application */
 export default function SideMenu({isOpen = true, setIsOpen}: {isOpen: boolean, setIsOpen: (isOpen: boolean) => void}) {
@@ -73,7 +74,7 @@ export default function SideMenu({isOpen = true, setIsOpen}: {isOpen: boolean, s
           />
         </List>
       </Box>
-      <Box>
+      <Box className={!isOpen ? styles.sideMenuBurger : ''}>
         <Divider
           sx={{ margin: "1rem 0", justifySelf: "flex-end", width: "100%" }}
           orientation="horizontal"
