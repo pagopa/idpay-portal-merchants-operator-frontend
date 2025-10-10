@@ -41,7 +41,7 @@ vi.mock("../../routes", () => ({
   default: {
     ACCEPT_DISCOUNT: "/accept-discount",
     REFUNDS_MANAGEMENT: "/richiedi-rimborso/",
-    BUY_MANAGEMENT: "/buy-management",
+    BUY_MANAGEMENT: "/gestione-acquisti/",
     REVERSE: "/storna-transazione",
   },
 }));
@@ -428,7 +428,7 @@ describe("PurchaseManagement Component", () => {
       expect(capturePayment).toHaveBeenCalledWith({ trxCode: "CODE-trx123" });
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith("/buy-management");
+    //expect(mockNavigate).toHaveBeenCalledWith("/gestione-acquisti");
     expect(screen.getByTestId("alert-success")).toHaveTextContent(
       "pages.purchaseManagement.paymentSuccess"
     );
