@@ -1,5 +1,6 @@
 import { ListItemButton, ListItemText, ListItemIcon, Icon, Tooltip } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
+import styles from './SideMenu.module.css';
     
 type Props = {
   handleClick: () => void;
@@ -21,7 +22,7 @@ export default function SideNavItem({
   hideLabels = false
 }: Props) {
   return (
-    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick}>
+    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick} className={hideLabels ? styles.sideMenuItem : ''}>
       <ListItemIcon sx={{ ml: level }}>
         {
           hideLabels ? (
