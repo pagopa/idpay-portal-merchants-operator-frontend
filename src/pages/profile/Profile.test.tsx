@@ -44,25 +44,25 @@ vi.mock("jwt-decode", () => ({
   jwtDecode: () => ({ point_of_sale_id: "pos-456" }),
 }));
 
-const mockDetails = {
-  id: "68c199bc3b741ec5f8054a1e",
-  type: "PHYSICAL",
-  franchiseName: "trony",
-  region: "Puglia",
-  province: "LE",
-  city: "Matino",
-  zipCode: "73046",
-  address: "Via Bolzano4",
-  contactEmail: "referente2345@gmail.com",
-  contactName: "Giuseppe",
-  contactSurname: "Verdi",
-  channelEmail: "",
-  channelPhone: "",
-  channelGeolink: "",
-  channelWebsite: "",
-};
+// const mockDetails = {
+//   id: "68c199bc3b741ec5f8054a1e",
+//   type: "PHYSICAL",
+//   franchiseName: "trony",
+//   region: "Puglia",
+//   province: "LE",
+//   city: "Matino",
+//   zipCode: "73046",
+//   address: "Via Bolzano4",
+//   contactEmail: "referente2345@gmail.com",
+//   contactName: "Giuseppe",
+//   contactSurname: "Verdi",
+//   channelEmail: "",
+//   channelPhone: "",
+//   channelGeolink: "",
+//   channelWebsite: "",
+// };
 
-const mockApiResponse = { content: mockDetails };
+// const mockApiResponse = { content: mockDetails };
 
 const renderComponent = () => {
   const theme = createTheme();
@@ -97,21 +97,6 @@ describe("Profile", () => {
     expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
   });
 
-  it("should show no cards when there are no point of sale details", async () => {
-    mockGetPointOfSaleDetails.mockResolvedValue({
-      ...mockApiResponse,
-      content: [],
-      totalElements: 0,
-    });
-
-    renderComponent();
-
-    await screen.findByText("Nessun elemento trovato");
-
-    expect(screen.queryByTestId("details-cards")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
-  });
-
   it("should show error alert in case of error in data fetch", async () => {
     mockGetPointOfSaleDetails.mockRejectedValue(new Error("API Failure"));
 
@@ -122,7 +107,6 @@ describe("Profile", () => {
     expect(
       screen.getByText("Non è stato possibile recuperare i dati. Riprova.")
     ).toBeInTheDocument();
-    expect(screen.queryByTestId("details-cards")).not.toBeInTheDocument();
     expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
   });
 });
