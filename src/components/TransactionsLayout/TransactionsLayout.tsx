@@ -67,6 +67,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const { t } = useTranslation();
     const token = authStore.getState().token;
     const isLoadingRef = useRef(false);
+    const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
 
     const allAlerts = [
         [errorAlert, setErrorAlert],
@@ -149,6 +150,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     }, [token, paginationModel.page, paginationModel.pageSize, fetchTransactionsApi]);
 
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
+        setFiltersAppliedOnce(true);
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
                 sort: 'productName,' + sortModel[0].sort,
@@ -205,8 +207,21 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         }
     };
 
+    const handleResetFilters = () => {
+        if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
+            handleApplyFilters({
+                fiscalCode: '',
+                productGtin: '',
+                status: '',
+            });
+        }
+        setFiltersAppliedOnce(false);
+        formik.resetForm();
+    };
+
     return (
         <Box>
+            <>{console.log("APPLIED", filtersAppliedOnce)}</>
             {DrawerComponent}
             
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
@@ -237,21 +252,13 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             </Typography>
 
             <Box>
-                {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== ''))) && (
+                {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== '')) || filtersAppliedOnce) && (
                     <FiltersForm
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
-                        onFiltersReset={() => {
-                            if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
-                                handleApplyFilters({
-                                    fiscalCode: '',
-                                    productGtin: '',
-                                    status: '',
-                                });
-                            }
-                            formik.resetForm();
-                        }}
+                        onFiltersReset={handleResetFilters}
                         filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
+                        filtersAppliedOnce={filtersAppliedOnce}
                     >
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                             <TextField

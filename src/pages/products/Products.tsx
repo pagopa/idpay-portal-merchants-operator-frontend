@@ -31,6 +31,7 @@ const Products = () => {
         pageSize: import.meta.env.VITE_PAGINATION_SIZE,
         totalElements: 0
     });
+    const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
     const [sortModel, setSortModel] = useState<GridSortModel>([]);
     const { t } = useTranslation();
     useAutoResetBanner([
@@ -258,6 +259,7 @@ const Products = () => {
 
 
     const handleFiltersApplied = (filtersObj: any) => {
+        setFiltersAppliedOnce(true);
         const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
             const value = filtersObj[key];
             if (value !== '' && value !== null && value !== undefined) {
@@ -274,6 +276,7 @@ const Products = () => {
     };
 
     const handleFiltersReset = () => {
+        setFiltersAppliedOnce(false);
         formik.resetForm();
         fetchProducts({});
     };
@@ -301,12 +304,13 @@ const Products = () => {
 
             <Box>
                 {
-                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0))) && (
+                    ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0)) || filtersAppliedOnce) && (
                         <FiltersForm
                             formik={formik}
                             onFiltersApplied={handleFiltersApplied}
                             onFiltersReset={handleFiltersReset}
                             filtersApplied={areFiltersApplied()}
+                            filtersAppliedOnce={filtersAppliedOnce}
                         >
                             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
                                 <FormControl fullWidth size="small">
