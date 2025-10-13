@@ -412,7 +412,7 @@ const PurchaseManagement = () => {
                     </Typography>
                     <Typography variant="body1">
                         {captureTransactionModal 
-                            ? `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.effectiveAmountCents)}
+                            ? `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.residualAmountCents)}
                                 ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
                                 ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
                             : t('pages.purchaseManagement.cancelTransactionModal.description')}.
