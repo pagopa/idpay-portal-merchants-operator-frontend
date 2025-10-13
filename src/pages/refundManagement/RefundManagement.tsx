@@ -12,7 +12,6 @@ import TransactionsLayout from "../../components/TransactionsLayout/Transactions
 import { authStore } from "../../store/authStore";
 import { DecodedJwtToken } from "../../utils/types";
 import { jwtDecode } from 'jwt-decode';
-// import { getFileUrl } from "../../services/merchantService";
 
 const RefundManagement = () => {
     const [isOpen, setIsOpen] = useState(false);
