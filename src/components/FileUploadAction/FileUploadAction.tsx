@@ -118,7 +118,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
             <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
                 <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t(`${i18nBlockKey}.creditNote`)}</Typography>
-                <Typography variant="body2" mt={4} mb={1}>{t(`${i18nBlockKey}.creditNoteSubtitle`)}</Typography>
+                <Typography variant="body2" mt={4} mb={1} sx={{marginTop: '32px !important'}}>{t(`${i18nBlockKey}.creditNoteSubtitle`)}</Typography>
                 <Link href={manualLink} sx={{ fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t(`${i18nBlockKey}.manualLink`)}</Link>
                 {
                     fileSizeError && (

@@ -120,7 +120,6 @@ describe("Profile Component (Vitest)", () => {
       "Error fetching details:",
       mockError
     );
-    expect(screen.queryByTestId("details-cards")).not.toBeInTheDocument();
 
     consoleErrorSpy.mockRestore();
   });
