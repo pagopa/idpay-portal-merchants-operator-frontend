@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import Layout from "./Layout";
 import ROUTES from "../../routes";
@@ -8,11 +9,31 @@ vi.mock("../Header/Header", () => ({
   default: () => <div data-testid="header">MockHeader</div>,
 }));
 vi.mock("../SideMenu/SideMenu", () => ({
-  default: () => <div data-testid="sidemenu">MockSideMenu</div>,
+  default: ({
+    isOpen,
+    setIsOpen,
+  }: {
+    isOpen: boolean;
+    setIsOpen: (value: boolean) => void;
+  }) => (
+    <div data-testid="sidemenu">
+      <span>SideMenu is {isOpen ? "open" : "closed"}</span>
+      <button onClick={() => setIsOpen(!isOpen)}>Toggle Menu</button>
+    </div>
+  ),
 }));
 vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
-  Footer: ({ loggedUser }: { loggedUser: boolean }) => (
-    <div data-testid="footer">MockFooter logged={String(loggedUser)}</div>
+  Footer: ({
+    onExit,
+    loggedUser,
+  }: {
+    onExit: () => void;
+    loggedUser: boolean;
+  }) => (
+    <div data-testid="footer">
+      MockFooter logged={String(loggedUser)}
+      <button onClick={onExit}>Exit</button>
+    </div>
   ),
 }));
 
@@ -82,6 +103,33 @@ describe("Layout component", () => {
     );
     const childBox2 = screen.getByTestId("child").parentElement;
     expect(childBox2).toHaveStyle({ maxWidth: "100%" });
+  });
+
+  it("should change layout when SideMenu is closed", async () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.HOME });
+    const user = userEvent.setup();
+    render(<Layout />);
+
+    const sideMenuContainer = screen.getByTestId("sidemenu").parentElement;
+    expect(sideMenuContainer).toHaveStyle("width: 300px");
+    expect(screen.getByText("SideMenu is open")).toBeInTheDocument();
+
+    const toggleButton = screen.getByRole("button", { name: /toggle menu/i });
+    await user.click(toggleButton);
+
+    expect(sideMenuContainer).toHaveStyle("width: min-content");
+    expect(screen.getByText("SideMenu is closed")).toBeInTheDocument();
+  });
+
+  it("should cover the onExit function from Footer", async () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.HOME });
+    const user = userEvent.setup();
+
+    render(<Layout />);
+
+    const exitButton = screen.getByRole("button", { name: /exit/i });
+
+    await user.click(exitButton);
   });
 
   it("applies default maxWidth for other non-matching routes", () => {
