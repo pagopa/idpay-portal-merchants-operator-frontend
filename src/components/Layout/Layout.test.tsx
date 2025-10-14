@@ -1,80 +1,145 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
+import Layout from "./Layout";
+import ROUTES from "../../routes";
+import { useLocation } from "react-router-dom";
 
-vi.mock('../Header/Header', () => ({
-  default: () => <div data-testid="header-mock" />,
+vi.mock("../Header/Header", () => ({
+  default: () => <div data-testid="header">MockHeader</div>,
 }));
-vi.mock('../SideMenu/SideMenu', () => ({
-  default: () => <div data-testid="side-menu-mock" />,
+vi.mock("../SideMenu/SideMenu", () => ({
+  default: ({
+    isOpen,
+    setIsOpen,
+  }: {
+    isOpen: boolean;
+    setIsOpen: (value: boolean) => void;
+  }) => (
+    <div data-testid="sidemenu">
+      <span>SideMenu is {isOpen ? "open" : "closed"}</span>
+      <button onClick={() => setIsOpen(!isOpen)}>Toggle Menu</button>
+    </div>
+  ),
 }));
-vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
-  Footer: () => <div data-testid="footer-mock" />,
+vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
+  Footer: ({
+    onExit,
+    loggedUser,
+  }: {
+    onExit: () => void;
+    loggedUser: boolean;
+  }) => (
+    <div data-testid="footer">
+      MockFooter logged={String(loggedUser)}
+      <button onClick={onExit}>Exit</button>
+    </div>
+  ),
 }));
 
-vi.mock('../../routes', () => ({
-  default: {
-    HOME: '/home',
-    PROFILE: '/profilo',
-    BUY_MANAGEMENT: '/gestione-acquisti',
-    REFUNDS_MANAGEMENT: '/gestione-rimborsi',
-    SOME_OTHER_PAGE: '/altra-pagina',
-    PRIVACY_POLICY: '/privacy',
-    TOS: '/termini-e-condizioni',
-    PRODUCTS: '/prodotti',
-  },
-}));
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-router-dom")>();
+  return {
+    ...actual,
+    useLocation: vi.fn(),
+  };
+});
 
-import Layout from './Layout';
-import ROUTES from '../../routes';
-
-const renderInRouter = (initialRoute: string, children: React.ReactNode) => {
-  render(
-    <MemoryRouter initialEntries={[initialRoute]}>
-      <Routes>
-        <Route path="*" element={<Layout>{children}</Layout>} />
-      </Routes>
-    </MemoryRouter>
-  );
-};
-
-describe('Layout Component', () => {
-  it('should render header, footer and children', () => {
-    renderInRouter('/rotta-test', <div>Contenuto Figlio</div>);
-    expect(screen.getByTestId('header-mock')).toBeInTheDocument();
-    expect(screen.getByTestId('footer-mock')).toBeInTheDocument();
-    expect(screen.getByText('Contenuto Figlio')).toBeInTheDocument();
+describe("Layout component", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
-  it.each([
-    { route: ROUTES.HOME },
-    { route: ROUTES.PROFILE },
-    { route: ROUTES.BUY_MANAGEMENT },
-    { route: ROUTES.REFUNDS_MANAGEMENT },
-  ])('should show side menu for route $route', ({ route }) => {
-    renderInRouter(route, null);
-    expect(screen.getByTestId('side-menu-mock')).toBeInTheDocument();
+  it("renders header and footer always", () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.HOME });
+    render(
+      <Layout>
+        <div data-testid="child">ChildContent</div>
+      </Layout>
+    );
+    expect(screen.getByTestId("header")).toBeInTheDocument();
+    expect(screen.getByTestId("footer")).toBeInTheDocument();
   });
 
-  it('should not show side menu for non matching routes', () => {
-    renderInRouter('/rotta-test', null);
-    expect(screen.queryByTestId('side-menu-mock')).not.toBeInTheDocument();
+  it("renders SideMenu when route matches", () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.PRODUCTS });
+    render(
+      <Layout>
+        <div data-testid="child">ChildContent</div>
+      </Layout>
+    );
+    expect(screen.getByTestId("sidemenu")).toBeInTheDocument();
+    expect(screen.getByTestId("child")).toBeInTheDocument();
   });
 
-  it('should apply maxWidth: 920px for standard routes without SideMenu', () => {
-    const childTestId = 'child-content';
-    renderInRouter('/rotta-test', <div data-testid={childTestId}>Contenuto</div>);
-    const contentContainer = screen.getByTestId(childTestId).parentElement;
-    expect(contentContainer).toHaveStyle('max-width: 920px');
+  it("renders single column layout when route does not match", () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: "/random" });
+    render(
+      <Layout>
+        <div data-testid="child">ChildContent</div>
+      </Layout>
+    );
+    expect(screen.queryByTestId("sidemenu")).not.toBeInTheDocument();
+    expect(screen.getByTestId("child")).toBeInTheDocument();
   });
 
-  it.each([
-    { route: ROUTES.PRIVACY_POLICY },
-    { route: ROUTES.TOS },
-  ])('should apply maxWidth: 100% for route $route', ({ route }) => {
-    const childTestId = 'child-content';
-    renderInRouter(route, <div data-testid={childTestId}>Policy</div>);
-    const contentContainer = screen.getByTestId(childTestId).parentElement;
-    expect(contentContainer).toHaveStyle('max-width: 100%');
+  it("applies maxWidth=100% for privacy policy and tos routes", () => {
+    (useLocation as vi.Mock).mockReturnValue({
+      pathname: ROUTES.PRIVACY_POLICY,
+    });
+    const { rerender } = render(
+      <Layout>
+        <div data-testid="child">ChildContent</div>
+      </Layout>
+    );
+    const childBox = screen.getByTestId("child").parentElement;
+    expect(childBox).toHaveStyle({ maxWidth: "100%" });
+
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.TOS });
+    rerender(
+      <Layout>
+        <div data-testid="child">ChildContent</div>
+      </Layout>
+    );
+    const childBox2 = screen.getByTestId("child").parentElement;
+    expect(childBox2).toHaveStyle({ maxWidth: "100%" });
+  });
+
+  it("should change layout when SideMenu is closed", async () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.HOME });
+    const user = userEvent.setup();
+    render(<Layout />);
+
+    const sideMenuContainer = screen.getByTestId("sidemenu").parentElement;
+    expect(sideMenuContainer).toHaveStyle("width: 300px");
+    expect(screen.getByText("SideMenu is open")).toBeInTheDocument();
+
+    const toggleButton = screen.getByRole("button", { name: /toggle menu/i });
+    await user.click(toggleButton);
+
+    expect(sideMenuContainer).toHaveStyle("width: min-content");
+    expect(screen.getByText("SideMenu is closed")).toBeInTheDocument();
+  });
+
+  it("should cover the onExit function from Footer", async () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.HOME });
+    const user = userEvent.setup();
+
+    render(<Layout />);
+
+    const exitButton = screen.getByRole("button", { name: /exit/i });
+
+    await user.click(exitButton);
+  });
+
+  it("applies default maxWidth for other non-matching routes", () => {
+    (useLocation as vi.Mock).mockReturnValue({ pathname: "/about" });
+    render(
+      <Layout>
+        <div data-testid="child">ChildContent</div>
+      </Layout>
+    );
+    const childBox = screen.getByTestId("child").parentElement;
+    expect(childBox).toHaveStyle({ maxWidth: "920px" });
   });
 });

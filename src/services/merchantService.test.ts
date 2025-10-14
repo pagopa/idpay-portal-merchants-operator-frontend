@@ -5,6 +5,12 @@ import {
   authPaymentBarCode,
   getProcessedTransactions,
   getPointOfSaleDetails,
+  capturePayment,
+  getInProgressTransactions,
+  deleteTransactionInProgress,
+  downloadInvoiceFileApi,
+  reverseTransactionApi,
+  rewardTransactionApi,
 } from "./merchantService";
 import { MerchantApi } from "../api/MerchantsApiClient";
 
@@ -15,9 +21,21 @@ vi.mock("../api/MerchantsApiClient", () => ({
     previewPayment: vi.fn(),
     authPaymentBarCode: vi.fn(),
     getProcessedTransactions: vi.fn(),
-    getPointOfSaleDetails: vi.fn()
+    getPointOfSaleDetails: vi.fn(),
+    capturePayment: vi.fn(),
+    getInProgressTransactions: vi.fn(),
+    deleteTransactionInProgress: vi.fn(),
+    downloadInvoiceFileApi: vi.fn(),
+    reverseTransactionApi: vi.fn(),
+    rewardTransactionApi: vi.fn(),
   },
 }));
+
+const mockCapturePayment = MerchantApi.capturePayment as vi.Mock;
+const mockGetInProgressTransactions =
+  MerchantApi.getInProgressTransactions as vi.Mock;
+const mockDeleteTransactionInProgress =
+  MerchantApi.deleteTransactionInProgress as vi.Mock;
 
 describe("Merchant Service Functions", () => {
   beforeEach(() => {
@@ -26,6 +44,57 @@ describe("Merchant Service Functions", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe("downloadInvoiceFileApi", () => {
+    it("should call MerchantApi.downloadInvoiceFileApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.downloadInvoiceFileApi).mockResolvedValue(
+        {} as any
+      );
+
+      const result = await downloadInvoiceFileApi("salesPoint", "trxId");
+
+      expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledWith(
+        "salesPoint",
+        "trxId"
+      );
+      expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("reverseTransactionApi", () => {
+    it("should call MerchantApi.reverseTransactionApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.reverseTransactionApi).mockResolvedValue({} as any);
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+
+      const result = await reverseTransactionApi("trxId", testFile);
+
+      expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith(
+        "trxId",
+        testFile
+      );
+      expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("reverseTransactionApi", () => {
+    it("should call MerchantApi.reverseTransactionApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.rewardTransactionApi).mockResolvedValue({} as any);
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+
+      const result = await rewardTransactionApi("trxId", testFile);
+
+      expect(MerchantApi.rewardTransactionApi).toHaveBeenCalledWith(
+        "trxId",
+        testFile
+      );
+      expect(MerchantApi.rewardTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
   });
 
   describe("getProductsList", () => {
@@ -421,10 +490,12 @@ describe("Merchant Service Functions", () => {
         channelWebsite: "",
       };
 
-    vi.mocked(MerchantApi.getPointOfSaleDetails).mockResolvedValue(mockResponse);
+      vi.mocked(MerchantApi.getPointOfSaleDetails).mockResolvedValue(
+        mockResponse
+      );
 
       const result = await getPointOfSaleDetails(merchantId, pointOfSaleId);
- 
+
       expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith(
         merchantId,
         pointOfSaleId
@@ -453,11 +524,16 @@ describe("Merchant Service Functions", () => {
         channelWebsite: "",
       };
 
-      vi.mocked(MerchantApi.getPointOfSaleDetails).mockResolvedValue(mockResponse);
+      vi.mocked(MerchantApi.getPointOfSaleDetails).mockResolvedValue(
+        mockResponse
+      );
 
       const result = await getPointOfSaleDetails(merchantId, pointOfSaleId);
 
-      expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith(merchantId, pointOfSaleId);
+      expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith(
+        merchantId,
+        pointOfSaleId
+      );
       expect(result).toEqual(mockResponse);
     });
 
@@ -468,8 +544,116 @@ describe("Merchant Service Functions", () => {
 
       vi.mocked(MerchantApi.getPointOfSaleDetails).mockRejectedValue(mockError);
 
-      await expect(getPointOfSaleDetails(merchantId, pointOfSaleId)).rejects.toThrow("API Error");
-      expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith(merchantId, pointOfSaleId);
+      await expect(
+        getPointOfSaleDetails(merchantId, pointOfSaleId)
+      ).rejects.toThrow("API Error");
+      expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith(
+        merchantId,
+        pointOfSaleId
+      );
+    });
+  });
+
+  describe("capturePayment", () => {
+    const mockTrxCode = "TRX123";
+    const mockCaptureResponse = {
+      id: "mockId",
+      trxCode: mockTrxCode,
+      status: "CAPTURED",
+    };
+    const params = {
+      trxCode: mockTrxCode,
+      additionalProperties: { test: "value" },
+    };
+
+    it("should call MerchantApi.capturePayment with correct parameters on success", async () => {
+      mockCapturePayment.mockResolvedValue(mockCaptureResponse);
+
+      const result = await capturePayment(params);
+
+      expect(mockCapturePayment).toHaveBeenCalledWith(params);
+
+      expect(result).toEqual(mockCaptureResponse);
+    });
+
+    it("should throw an error if MerchantApi.capturePayment fails", async () => {
+      const mockError = new Error("Capture failed");
+      mockCapturePayment.mockRejectedValue(mockError);
+
+      await expect(capturePayment(params)).rejects.toThrow(mockError);
+      expect(mockCapturePayment).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("getInProgressTransactions", () => {
+    const initiativeId = "initId123";
+    const pointOfSaleId = "posId456";
+    const params = {
+      page: 0,
+      size: 10,
+      sort: "date,desc",
+      fiscalCode: "RSSGNR",
+      status: "IN_PROGRESS",
+    };
+    const mockTransactions = {
+      content: [
+        { id: "trx1", status: "IN_PROGRESS" },
+        { id: "trx2", status: "IN_PROGRESS" },
+      ],
+      pageNo: 0,
+      pageSize: 10,
+      totalElements: 2,
+    };
+
+    it("should call MerchantApi.getInProgressTransactions with correct parameters on success", async () => {
+      mockGetInProgressTransactions.mockResolvedValue(mockTransactions);
+
+      const result = await getInProgressTransactions(
+        initiativeId,
+        pointOfSaleId,
+        params
+      );
+
+      expect(mockGetInProgressTransactions).toHaveBeenCalledWith(
+        initiativeId,
+        pointOfSaleId,
+        params
+      );
+
+      expect(result).toEqual(mockTransactions);
+    });
+
+    it("should throw an error if MerchantApi.getInProgressTransactions fails", async () => {
+      const mockError = new Error("Fetch failed");
+      mockGetInProgressTransactions.mockRejectedValue(mockError);
+
+      await expect(
+        getInProgressTransactions(initiativeId, pointOfSaleId, params)
+      ).rejects.toThrow(mockError);
+      expect(mockGetInProgressTransactions).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("deleteTransactionInProgress", () => {
+    const trxId = "TRX_TO_DELETE";
+
+    it("should call MerchantApi.deleteTransactionInProgress with correct ID and resolve successfully", async () => {
+      mockDeleteTransactionInProgress.mockResolvedValue(undefined);
+
+      await expect(deleteTransactionInProgress(trxId)).resolves.toBeUndefined();
+
+      expect(mockDeleteTransactionInProgress).toHaveBeenCalledWith(trxId);
+      expect(mockDeleteTransactionInProgress).toHaveBeenCalledTimes(1);
+    });
+
+    it("should throw an error if MerchantApi.deleteTransactionInProgress fails", async () => {
+      const mockError = new Error("Deletion failed");
+      mockDeleteTransactionInProgress.mockRejectedValue(mockError);
+
+      await expect(deleteTransactionInProgress(trxId)).rejects.toThrow(
+        mockError
+      );
+      expect(mockDeleteTransactionInProgress).toHaveBeenCalledTimes(1);
     });
   });
 });

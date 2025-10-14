@@ -123,7 +123,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 {
                     fileSizeError && (
                         <Box mt={2}>
-                            <Alert severity="error">
+                            <Alert data-testid='alert' severity="error">
                                 {t(`commons.fileSizeError`)}
                             </Alert>
                         </Box>
@@ -131,8 +131,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 }
                 {
                     fileTypeError && (
-                        <Box mt={2}>
-                            <Alert severity="error">
+                        <Box data-testid='alert' mt={2}>
+                            <Alert  severity="error">
                                 {t(`${i18nBlockKey}.fileNotSupported`)}
                             </Alert>
                         </Box>
@@ -155,6 +155,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     accept='application/pdf, application/xml'
                     ref={fileInputRef}
                     style={{ display: 'none' }}
+                    data-testid="upload-input-test"
                     onChange={(e) => {
                         const selectedFile = e.target.files?.[0];
                         if (selectedFile) {
@@ -167,6 +168,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 {
                     file && (
                         <Button
+                            data-testid='file-btn-test'
                             variant="naked"
                             startIcon={<FileUploadIcon />}
                             onClick={handleButtonClick}
@@ -178,12 +180,13 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 }
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
-                <Button variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>{t('commons.backBtn')}</Button>
-                <Button variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
+                <Button data-testid='back-btn-test' variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>{t('commons.backBtn')}</Button>
+                <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
             </Stack>
             {
                 errorAlert && (
                     <AlertComponent
+                        data-testid='alert-component'
                         error={true}
                         message={t('pages.reverse.errorAlert')} 
                     />
