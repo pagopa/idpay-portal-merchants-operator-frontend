@@ -1,3 +1,4 @@
+import { waitFor } from "@testing-library/dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const renderMock = vi.fn();
@@ -37,7 +38,7 @@ describe("main.tsx bootstrap", () => {
   });
 
   it("should call createRoot and render the app", async () => {
-    await import("./main");
+    await waitFor(()=> import("./main")) 
 
     expect(createRootMock).toHaveBeenCalledTimes(1);
     expect(renderMock).toHaveBeenCalledTimes(1);
