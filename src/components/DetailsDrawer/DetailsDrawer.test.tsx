@@ -19,9 +19,9 @@ const mockedTransactionDetails = {
 const testTitle = "This is a test title";
 const testSubtitle = "This is a test subtitle";
 const testItem = mockedTransactionDetails;
-const testPrimaryButton = {label: 'primary button', url: '/'}
-const testSecondaryButton = {label: 'secondary button', url: '/'}
-let testIsLoading = false
+const testPrimaryButton = { label: "primary button", url: "/" };
+const testSecondaryButton = { label: "secondary button", url: "/" };
+let testIsLoading = false;
 
 const DetailsDrawerSetup = (
   item: Record<string, string | number | JSX.Element>,
@@ -30,30 +30,39 @@ const DetailsDrawerSetup = (
   isLoading?: boolean,
   primaryButton?: typeof testPrimaryButton,
   secondaryButton?: typeof testSecondaryButton,
+  onFileDownloadCallback?: () => void
 ) => {
   render(
     <DetailsDrawer
       isOpen
-      isLoading = {isLoading}
+      isLoading={isLoading}
       setIsOpen={() => null}
       title={title}
       subtitle={subtitle}
       item={item}
       primaryButton={primaryButton}
       secondaryButton={secondaryButton}
+      onFileDownloadCallback={onFileDownloadCallback}
     />
   );
 };
 
 describe("DetailsDrawer", () => {
   it("should render the component with full content", () => {
-    DetailsDrawerSetup(testItem, testTitle, testSubtitle, testIsLoading, testPrimaryButton, testSecondaryButton);
+    DetailsDrawerSetup(
+      testItem,
+      testTitle,
+      testSubtitle,
+      testIsLoading,
+      testPrimaryButton,
+      testSecondaryButton
+    );
 
     const drawerTitle = screen.getByText(testTitle);
     const drawerSubtitle = screen.getByText(testSubtitle);
     const drawerItem = screen.getByTestId("item-test");
-    const drawerPrimaryButton = screen.getByText(testPrimaryButton.label)
-    const drawerSecondaryButton = screen.getByText(testSecondaryButton.label)
+    const drawerPrimaryButton = screen.getByText(testPrimaryButton.label);
+    const drawerSecondaryButton = screen.getByText(testSecondaryButton.label);
 
     expect(drawerTitle).toBeInTheDocument();
     expect(drawerSubtitle).toBeInTheDocument();
@@ -72,25 +81,33 @@ describe("DetailsDrawer", () => {
     expect(drawerItem).toBeInTheDocument();
   });
 
-  it("should click button", async () => {
-    DetailsDrawerSetup(testItem, testTitle);
+  it("should click file button", async () => {
+    DetailsDrawerSetup(
+      testItem,
+      testTitle,
+      testSubtitle,
+      testIsLoading,
+      testPrimaryButton,
+      testSecondaryButton,
+      () => console.log("button clicked")
+    );
 
     const onClick = {
-      click: () => {}
-    }
+      click: () => {},
+    };
 
-    const onClickSpy = vi.spyOn(onClick, 'click')
-    
-    const button = screen.getByTestId("btn-test")
-    button.addEventListener('click', onClick.click)
-    await userEvent.click(button)
+    const onClickSpy = vi.spyOn(onClick, "click");
 
-    expect(onClickSpy).toBeCalledTimes(1)
+    const button = screen.getByTestId("btn-test");
+    screen.debug(undefined, Infinity);
+    button.addEventListener("click", onClick.click);
+    await userEvent.click(button);
 
-  })
+    expect(onClickSpy).toBeCalledTimes(1);
+  });
 
   it("should show loader", () => {
-    testIsLoading = true
+    testIsLoading = true;
     DetailsDrawerSetup(testItem, testTitle, testSubtitle, testIsLoading);
 
     const drawerLoader = screen.getByTestId("item-loader");
@@ -98,3 +115,4 @@ describe("DetailsDrawer", () => {
     expect(drawerLoader).toBeInTheDocument();
   });
 });
+
