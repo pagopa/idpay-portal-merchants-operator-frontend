@@ -66,6 +66,17 @@ vi.mock("@mui/x-data-grid", async () => {
         >
           Unsort
         </button>
+        <div data-testid="mock-pagination-label">
+          {props.localeText?.paginationDisplayedRows?.({
+            from: 1,
+            to: 10,
+            count: props.rowCount || 0,
+          })}
+        </div>
+        <div data-testid="mock-pagination-model-display">
+          Page: {props.paginationModel.page}, PageSize:{" "}
+          {props.paginationModel.pageSize}
+        </div>
       </div>
     ),
   };
@@ -144,7 +155,9 @@ describe("DataTable complete coverage", () => {
     expect(onPaginationPageChange).not.toHaveBeenCalled();
   });
 
-  it("non chiama onPaginationPageChange se la pagina e pageSize sono le stesse (righe 113-114)", () => {
+  it("non chiama onPaginationPageChange se la pagina e pageSize sono le stesse", async () => {
+    vi.useFakeTimers();
+
     const initialPagination = { page: 5, pageSize: 25, totalElements: 100 };
     render(
       <DataTable
@@ -155,11 +168,16 @@ describe("DataTable complete coverage", () => {
       />
     );
 
+    await vi.advanceTimersByTimeAsync(100);
+
     fireEvent.click(screen.getByTestId("mock-pagination-same"));
+
     expect(onPaginationPageChange).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
   });
 
-  it("chiama onSortModelChange se modello non vuoto (riga 126)", () => {
+  it("chiama onSortModelChange se modello non vuoto", () => {
     render(
       <DataTable
         rows={rows}
@@ -181,5 +199,119 @@ describe("DataTable complete coverage", () => {
     );
 
     expect(screen.getByTestId("row-u1")).toBeInTheDocument();
+  });
+
+  it("inverte l'ordinamento da asc a desc quando si deseleziona", () => {
+    render(
+      <DataTable
+        rows={rows}
+        columns={columns}
+        onSortModelChange={onSortModelChange}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("mock-sort"));
+    expect(onSortModelChange).toHaveBeenCalledWith([
+      { field: "name", sort: "asc" },
+    ]);
+
+    fireEvent.click(screen.getByTestId("mock-unsort"));
+
+    expect(onSortModelChange).toHaveBeenLastCalledWith([
+      { field: "name", sort: "desc" },
+    ]);
+  });
+
+  it("inverte l'ordinamento da desc a asc quando si deseleziona (ramo else)", () => {
+    const initialSortModel = [{ field: "name", sort: "desc" }];
+    render(
+      <DataTable
+        rows={rows}
+        columns={columns}
+        onSortModelChange={onSortModelChange}
+        sortModel={initialSortModel}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("mock-unsort"));
+
+    expect(onSortModelChange).toHaveBeenCalledWith([
+      { field: "name", sort: "asc" },
+    ]);
+  });
+
+  it("usa la funzione renderCell personalizzata se fornita in una colonna", () => {
+    const customRenderCell = vi.fn((params) => `Custom: ${params.value}`);
+    const columnsWithCustomRender = [
+      { field: "name", headerName: "Name", renderCell: customRenderCell },
+      { field: "value", headerName: "Value" },
+    ];
+
+    render(<DataTable rows={rows} columns={columnsWithCustomRender} />);
+
+    expect(customRenderCell).toHaveBeenCalled();
+    expect(screen.getByText("Custom: Item 1")).toBeInTheDocument();
+  });
+
+  it("non renderizza la DataGrid se non ci sono righe", () => {
+    render(<DataTable rows={[]} columns={columns} />);
+
+    expect(screen.queryByTestId("mock-data-grid")).not.toBeInTheDocument();
+  });
+
+  it("renderizza correttamente il testo della paginazione (paginationDisplayedRows)", () => {
+    render(
+      <DataTable
+        rows={rows}
+        columns={columns}
+        paginationModel={{ page: 0, pageSize: 10, totalElements: 50 }}
+      />
+    );
+
+    expect(screen.getByText("1–10 di 50")).toBeInTheDocument();
+  });
+
+  it("non chiama onPaginationPageChange durante un aggiornamento esterno (testa isExternalUpdate.current)", () => {
+    const initialPagination = { page: 0, pageSize: 10, totalElements: 100 };
+
+    const { rerender } = render(
+      <DataTable
+        rows={rows}
+        columns={columns}
+        onPaginationPageChange={onPaginationPageChange}
+        paginationModel={initialPagination}
+      />
+    );
+
+    const newPagination = { page: 1, pageSize: 10, totalElements: 100 };
+    rerender(
+      <DataTable
+        rows={rows}
+        columns={columns}
+        onPaginationPageChange={onPaginationPageChange}
+        paginationModel={newPagination}
+      />
+    );
+
+    fireEvent.click(screen.getByTestId("mock-pagination-next"));
+
+    expect(onPaginationPageChange).not.toHaveBeenCalled();
+  });
+  it("usa i valori di fallback per page e pageSize se non forniti", () => {
+    const initialPagination = {
+      page: undefined,
+      pageSize: undefined,
+      totalElements: undefined,
+    };
+    render(
+      <DataTable
+        rows={rows}
+        columns={columns}
+        paginationModel={initialPagination}
+      />
+    );
+
+    const display = screen.getByTestId("mock-pagination-model-display");
+    expect(display).toHaveTextContent("Page: 0, PageSize: 10");
   });
 });
