@@ -85,4 +85,98 @@ describe("fileUploadAction component test", () => {
 
     expect(onClickSpy).toHaveBeenCalled();
   });
+
+  it("should show file size error alert", () => {
+    render(<FileUploadAction styleClass={""} {...mockFileUpload} />);
+    const uploadInputTest = screen.getByTestId("upload-input-test");
+    const bigFile = new File(
+      [new Array(21 * 1024 * 1024).fill("a").join("")],
+      "big.pdf",
+      { type: "application/pdf" }
+    );
+    Object.defineProperty(uploadInputTest, "files", { value: [bigFile] });
+    fireEvent.change(uploadInputTest);
+    expect(screen.getByTestId("alert")).toBeInTheDocument();
+  });
+
+  it("should remove file when remove is called", () => {
+    render(<FileUploadAction styleClass={""} {...mockFileUpload} />);
+    const uploadInputTest = screen.getByTestId("upload-input-test");
+    const file = new File(["foo"], "foo.pdf", { type: "application/pdf" });
+    Object.defineProperty(uploadInputTest, "files", { value: [file] });
+    fireEvent.change(uploadInputTest);
+    // Simula la rimozione tramite SingleFileInput
+    // Non possiamo triggerare direttamente onFileRemoved, quindi resettiamo l'input
+    fireEvent.change(uploadInputTest, { target: { files: [] } });
+    expect(screen.queryByTestId("file-btn-test")).not.toBeInTheDocument();
+  });
+
+  it("should show and click replace file button", () => {
+    render(<FileUploadAction styleClass={""} {...mockFileUpload} />);
+    const uploadInputTest = screen.getByTestId("upload-input-test");
+    const file = new File(["foo"], "foo.pdf", { type: "application/pdf" });
+    Object.defineProperty(uploadInputTest, "files", { value: [file] });
+    fireEvent.change(uploadInputTest);
+    const replaceBtn = screen.getByTestId("file-btn-test");
+    expect(replaceBtn).toBeInTheDocument();
+    fireEvent.click(replaceBtn);
+  });
+
+  it("should show AlertComponent on api error", async () => {
+    const apiCallMock = vi.fn(() => Promise.reject("fail"));
+    render(
+      <FileUploadAction
+        styleClass={""}
+        {...mockFileUpload}
+        apiCall={apiCallMock}
+      />
+    );
+    const uploadInputTest = screen.getByTestId("upload-input-test");
+    const file = new File(["foo"], "foo.pdf", { type: "application/pdf" });
+    Object.defineProperty(uploadInputTest, "files", { value: [file] });
+    fireEvent.change(uploadInputTest);
+    const continueBtn = screen.getByTestId("continue-btn-test");
+    fireEvent.click(continueBtn);
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
+    });
+  });
+
+  it("should navigate to REFUNDS_MANAGEMENT on api success", async () => {
+    const apiCallMock = vi.fn(() => Promise.resolve({}));
+    render(
+      <FileUploadAction
+        styleClass={""}
+        {...mockFileUpload}
+        apiCall={apiCallMock}
+      />
+    );
+    const uploadInputTest = screen.getByTestId("upload-input-test");
+    const file = new File(["foo"], "foo.pdf", { type: "application/pdf" });
+    Object.defineProperty(uploadInputTest, "files", { value: [file] });
+    fireEvent.change(uploadInputTest);
+    const continueBtn = screen.getByTestId("continue-btn-test");
+    fireEvent.click(continueBtn);
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        ROUTES.REFUNDS_MANAGEMENT,
+        expect.anything()
+      );
+    });
+  });
+
+  it("should hide error alert after 5 seconds", async () => {
+    vi.useFakeTimers();
+    render(<FileUploadAction styleClass={""} {...mockFileUpload} />);
+    const uploadInputTest = screen.getByTestId("upload-input-test");
+    const file = new File(["foo"], "foo.xml", { type: "wrong/file" });
+    Object.defineProperty(uploadInputTest, "files", { value: [file] });
+    fireEvent.change(uploadInputTest);
+    expect(screen.getByTestId("alert")).toBeInTheDocument();
+    vi.advanceTimersByTime(5000);
+    await waitFor(() => {
+      expect(screen.queryByTestId("alert")).not.toBeInTheDocument();
+    });
+    vi.useRealTimers();
+  });
 });
