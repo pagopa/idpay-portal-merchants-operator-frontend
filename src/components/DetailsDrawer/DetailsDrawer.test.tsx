@@ -99,7 +99,29 @@ describe("DetailsDrawer", () => {
     const onClickSpy = vi.spyOn(onClick, "click");
 
     const button = screen.getByTestId("btn-test");
-    screen.debug(undefined, Infinity);
+    button.addEventListener("click", onClick.click);
+    await userEvent.click(button);
+
+    expect(onClickSpy).toBeCalledTimes(1);
+  });
+
+  it("should close drawer", async () => {
+    DetailsDrawerSetup(
+      testItem,
+      testTitle,
+      testSubtitle,
+      testIsLoading,
+      testPrimaryButton,
+      testSecondaryButton
+    );
+
+    const onClick = {
+      click: () => {},
+    };
+
+    const onClickSpy = vi.spyOn(onClick, "click");
+
+    const button = screen.getByTestId("close-details-drawer-button");
     button.addEventListener("click", onClick.click);
     await userEvent.click(button);
 
@@ -115,4 +137,3 @@ describe("DetailsDrawer", () => {
     expect(drawerLoader).toBeInTheDocument();
   });
 });
-
