@@ -38,7 +38,7 @@ describe("main.tsx bootstrap", () => {
   });
 
   it("should call createRoot and render the app", async () => {
-    await waitFor(()=> import("./main")) 
+    await import("./main")
 
     expect(createRootMock).toHaveBeenCalledTimes(1);
     expect(renderMock).toHaveBeenCalledTimes(1);
