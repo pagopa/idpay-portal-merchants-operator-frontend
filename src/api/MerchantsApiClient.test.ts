@@ -5,6 +5,7 @@ import { MerchantApi } from "./MerchantsApiClient";
 vi.mock("axios", () => {
   const mockGet = vi.fn();
   const mockPut = vi.fn();
+  const mockPost = vi.fn();
   const mockDelete = vi.fn();
   const mockRequestUse = vi.fn();
   const mockResponseUse = vi.fn();
@@ -14,6 +15,7 @@ vi.mock("axios", () => {
       create: vi.fn(() => ({
         get: mockGet,
         put: mockPut,
+        post: mockPost,
         delete: mockDelete,
         interceptors: {
           request: { use: mockRequestUse },
@@ -301,6 +303,64 @@ describe("MerchantApi", () => {
       );
 
       await expect(promise).rejects.toThrow("404 Not Found from API");
+    });
+  });
+
+  describe("rewardTransactionApi", () => {
+    it("should call POST /transactions/:trxID/reward with correct payload", async () => {
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+      const trxID = "123456789";
+
+      const mockResponse = { data: {}, status: 204 };
+      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+
+      const result = await MerchantApi.rewardTransactionApi(trxID, testFile);
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("should throw an errore when API call fail", async () => {
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+      const trxId = "123456789";
+
+      const apiError = new Error("404 Not Found from API");
+      mockAxiosInstance.post.mockRejectedValue(apiError);
+
+      await expect(
+        MerchantApi.rewardTransactionApi(trxId, testFile)
+      ).rejects.toThrow("404 Not Found from API");
+    });
+  });
+
+  describe("reverseTransactionApi", () => {
+    it("should call POST /transactions/:trxId/reversal with correct payload", async () => {
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+      const trxID = "123456789";
+
+      const mockResponse = { data: {}, status: 204 };
+      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+
+      const result = await MerchantApi.reverseTransactionApi(trxID, testFile);
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("should throw an errore when API call fail", async () => {
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+      const trxId = "123456789";
+
+      const apiError = new Error("404 Not Found from API");
+      mockAxiosInstance.post.mockRejectedValue(apiError);
+
+      await expect(
+        MerchantApi.reverseTransactionApi(trxId, testFile)
+      ).rejects.toThrow("404 Not Found from API");
     });
   });
 
