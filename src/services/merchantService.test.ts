@@ -8,6 +8,9 @@ import {
   capturePayment,
   getInProgressTransactions,
   deleteTransactionInProgress,
+  downloadInvoiceFileApi,
+  reverseTransactionApi,
+  rewardTransactionApi,
 } from "./merchantService";
 import { MerchantApi } from "../api/MerchantsApiClient";
 
@@ -22,6 +25,9 @@ vi.mock("../api/MerchantsApiClient", () => ({
     capturePayment: vi.fn(),
     getInProgressTransactions: vi.fn(),
     deleteTransactionInProgress: vi.fn(),
+    downloadInvoiceFileApi: vi.fn(),
+    reverseTransactionApi: vi.fn(),
+    rewardTransactionApi: vi.fn(),
   },
 }));
 
@@ -38,6 +44,57 @@ describe("Merchant Service Functions", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe("downloadInvoiceFileApi", () => {
+    it("should call MerchantApi.downloadInvoiceFileApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.downloadInvoiceFileApi).mockResolvedValue(
+        {} as any
+      );
+
+      const result = await downloadInvoiceFileApi("salesPoint", "trxId");
+
+      expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledWith(
+        "salesPoint",
+        "trxId"
+      );
+      expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("reverseTransactionApi", () => {
+    it("should call MerchantApi.reverseTransactionApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.reverseTransactionApi).mockResolvedValue({} as any);
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+
+      const result = await reverseTransactionApi("trxId", testFile);
+
+      expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith(
+        "trxId",
+        testFile
+      );
+      expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("reverseTransactionApi", () => {
+    it("should call MerchantApi.reverseTransactionApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.rewardTransactionApi).mockResolvedValue({} as any);
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, "fileName");
+
+      const result = await rewardTransactionApi("trxId", testFile);
+
+      expect(MerchantApi.rewardTransactionApi).toHaveBeenCalledWith(
+        "trxId",
+        testFile
+      );
+      expect(MerchantApi.rewardTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
   });
 
   describe("getProductsList", () => {
