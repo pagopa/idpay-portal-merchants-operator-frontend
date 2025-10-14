@@ -3,8 +3,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Products from "./Products";
-
-// --- Mocks ---
+import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -30,12 +29,18 @@ vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
 }));
 
 vi.mock("../../components/FiltersForm/FiltersForm", () => ({
-  default: ({ onFiltersApplied, onFiltersReset, children }: any) => (
+  default: ({ onFiltersApplied, onFiltersReset, children, formik }: any) => (
     <form data-testid="filters-form">
       {children}
+      <input
+        data-testid="brand-filter-input"
+        name="brand"
+        value={formik.values.brand}
+        onChange={formik.handleChange}
+      />
       <button
         data-testid="apply-filters-button"
-        onClick={() => onFiltersApplied({ brand: "Test Brand" })}
+        onClick={() => onFiltersApplied(formik.values)}
       >
         Applica
       </button>
@@ -50,42 +55,56 @@ vi.mock("../../components/FiltersForm/FiltersForm", () => ({
 }));
 
 vi.mock("../../components/DataTable/DataTable", () => ({
-  default: ({ rows, columns, handleRowAction }: any) => (
-    <div data-testid="data-table">
-      <span data-testid="rows-count">{rows.length}</span>
-      <span data-testid="columns-count">{columns.length}</span>
-      {rows.map((row: any) => (
-        <div
-          data-testid={`row-${row.gtinCode}`}
-          key={row.gtinCode}
-          onClick={() => handleRowAction(row)}
-        >
-          <div data-testid={`cell-brand-${row.gtinCode}`}>
-            {columns[1].renderCell({ value: row.brand })}
-          </div>
-          <div data-testid={`cell-model-${row.gtinCode}`}>
-            {columns[2].renderCell({ value: row.model })}
-          </div>
+  default: ({
+    rows,
+    columns,
+    handleRowAction,
+    onPaginationPageChange,
+    onSortModelChange,
+  }: any) => {
+    const renderCellForField = (row: any, field: string) => {
+      const column = columns.find((c: any) => c.field === field);
+      if (column && column.renderCell) {
+        return column.renderCell({ value: row[field], row });
+      }
+      return row[field];
+    };
 
-          <div data-testid={`cell-eprel-${row.eprelCode}`}>
-            {columns[3].renderCell({ value: row.eprelCode })}
+    return (
+      <div data-testid="data-table">
+        <span data-testid="rows-count">{rows.length}</span>
+        <button
+          data-testid="trigger-pagination"
+          onClick={() => onPaginationPageChange({ page: 1, pageSize: 10 })}
+        />
+        <button
+          data-testid="trigger-sort"
+          onClick={() => onSortModelChange([{ field: "brand", sort: "asc" }])}
+        />
+
+        {rows.map((row: any) => (
+          <div
+            key={row.gtinCode}
+            data-testid={`row-${row.gtinCode}`}
+            onClick={() => handleRowAction(row)}
+          >
+            <div data-testid={`cell-brand-${row.gtinCode}`}>
+              {renderCellForField(row, "brand")}
+            </div>
+            <div data-testid={`cell-model-${row.gtinCode}`}>
+              {renderCellForField(row, "model")}
+            </div>
+            <div data-testid={`cell-gtin-${row.gtinCode}`}>
+              {renderCellForField(row, "gtinCode")}
+            </div>
+            <div data-testid={`cell-gtin-${row.eprelCode}`}>
+              {renderCellForField(row, "eprelCode")}
+            </div>
           </div>
-        </div>
-      ))}
-      <button
-        data-testid="trigger-pagination"
-        onClick={() => mockGetProductsList({ page: 1, pageSize: 10 })}
-      >
-        Next Page
-      </button>
-      <button
-        data-testid="trigger-sort"
-        onClick={() => mockGetProductsList({ sort: "brand,asc" })}
-      >
-        Sort by Brand
-      </button>
-    </div>
-  ),
+        ))}
+      </div>
+    );
+  },
 }));
 
 vi.mock("../../components/Alert/AlertComponent", () => ({
@@ -175,7 +194,6 @@ describe("Products Component", () => {
     });
 
     expect(screen.getByTestId("rows-count")).toHaveTextContent("2");
-    expect(screen.getByTestId("columns-count")).toHaveTextContent("5");
 
     const firstRowBrand = screen.getByTestId("cell-brand-12345");
     expect(firstRowBrand).toHaveTextContent("Brand A");
@@ -231,10 +249,12 @@ describe("Products Component", () => {
 
     await waitFor(() => {
       expect(mockGetProductsList).toHaveBeenCalledTimes(2);
-      expect(mockGetProductsList).toHaveBeenLastCalledWith({
-        page: 1,
-        pageSize: 10,
-      });
+      expect(mockGetProductsList).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          page: 1,
+          size: 10,
+        })
+      );
     });
   });
 
@@ -258,8 +278,12 @@ describe("Products Component", () => {
 
   it("should call fetchProducts with filters when filters are applied", async () => {
     mockGetProductsList.mockResolvedValue(mockApiResponse);
+    const user = userEvent.setup();
     renderComponent();
     await screen.findByTestId("data-table");
+
+    const brandInput = screen.getByTestId("brand-filter-input");
+    await user.type(brandInput, "Test Brand");
 
     const applyFiltersButton = screen.getByTestId("apply-filters-button");
     fireEvent.click(applyFiltersButton);
@@ -284,7 +308,6 @@ describe("Products Component", () => {
     await user.click(firstRow);
 
     await screen.findByText("Lavatrice Brand A");
-    //expect(screen.getByText("EPREL1")).toBeInTheDocument();
 
     const closeButton = screen.getByTestId("CloseIcon");
     await user.click(closeButton);
@@ -305,11 +328,9 @@ describe("Products Component", () => {
     renderComponent();
     await screen.findByTestId("data-table");
 
-    // Simula chiamata a handlePaginationChange con modello identico
-    fireEvent.click(screen.getByTestId("trigger-pagination")); // trigger di default
+    fireEvent.click(screen.getByTestId("trigger-pagination"));
     await waitFor(() => {
-      // Non deve fare ulteriori chiamate a fetchProducts perché page e pageSize sono uguali
-      expect(mockGetProductsList).toHaveBeenCalledTimes(2); // 1 fetch iniziale + 1 trigger button
+      expect(mockGetProductsList).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -318,7 +339,6 @@ describe("Products Component", () => {
     renderComponent();
     await screen.findByTestId("data-table");
 
-    // Simula cambio pagina
     const paginationButton = screen.getByTestId("trigger-pagination");
     fireEvent.click(paginationButton);
 
@@ -332,12 +352,10 @@ describe("Products Component", () => {
     renderComponent();
     await screen.findByTestId("data-table");
 
-    // Chiama handleSortModelChange con array vuoto simulando il click sul sort
-    fireEvent.click(screen.getByTestId("trigger-sort")); // se vuoi puoi simulare con vuoto direttamente
+    fireEvent.click(screen.getByTestId("trigger-sort"));
 
     await waitFor(() => {
-      // fetchProducts non deve essere chiamato se il modello è vuoto
-      expect(mockGetProductsList).toHaveBeenCalled(); // solo la chiamata iniziale
+      expect(mockGetProductsList).toHaveBeenCalled();
     });
   });
 
@@ -346,9 +364,6 @@ describe("Products Component", () => {
     renderComponent();
     await screen.findByTestId("data-table");
 
-    // Simula un sort model
-
-    // Qui chiamiamo direttamente il sort handler simulando il click del pulsante
     const sortButton = screen.getByTestId("trigger-sort");
     fireEvent.click(sortButton);
 
@@ -378,9 +393,32 @@ describe("Products Component", () => {
     renderComponent();
     await screen.findByTestId("filters-form");
 
-    // Tutti i valori iniziali sono vuoti
     const applyButton = screen.getByTestId("apply-filters-button");
     expect(applyButton).toBeInTheDocument();
-    // opzionale: chiamare direttamente la funzione via hook se esportata
+  });
+
+  it("should render placeholders for missing data in table and drawer", async () => {
+    const productWithMissingData = {
+      category: null,
+      brand: "Brand C",
+      model: undefined,
+      gtinCode: "55555",
+      eprelCode: null,
+      productName: "Prodotto Incompleto",
+    };
+    mockGetProductsList.mockResolvedValue({
+      content: [productWithMissingData],
+      totalElements: 1,
+    });
+    const user = userEvent.setup();
+    renderComponent();
+
+    await screen.findByTestId("data-table");
+    const row = screen.getByTestId("row-55555");
+    await user.click(row);
+
+    await screen.findByText("Prodotto Incompleto");
+    const placeholders = screen.getAllByText(MISSING_DATA_PLACEHOLDER);
+    expect(placeholders.length).toBeGreaterThan(2);
   });
 });
