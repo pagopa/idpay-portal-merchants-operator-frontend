@@ -60,7 +60,7 @@ const Header = ({userProps}: HeaderProps) => {
         label: "PagoPA S.p.A.",
         ariaLabel: "PagoPA S.p.A.",
         title: "PagoPA S.p.A.",
-      }} loggedUser={loggedUser} onDocumentationClick={() => window.open(import.meta.env.VITE_EIE_MANUAL || '', '_blank')} onAssistanceClick={() => { }} onLogin={() => { }} onLogout={() => { keycloak.logout()}}
+      }} loggedUser={loggedUser} onDocumentationClick={() => window.open(import.meta.env.VITE_MANUAL_LINK || '', '_blank')} onAssistanceClick={() => { }} onLogin={() => { }} onLogout={() => { keycloak.logout()}}
       />
 
       <HeaderProduct
