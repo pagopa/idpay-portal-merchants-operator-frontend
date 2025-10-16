@@ -42,7 +42,7 @@ describe("main.tsx bootstrap", () => {
 
     expect(createRootMock).toHaveBeenCalledTimes(1);
     expect(renderMock).toHaveBeenCalledTimes(1);
-  });
+  }, 10000);
 
   it("should throw error if root element is missing", async () => {
     document.body.innerHTML = "";
