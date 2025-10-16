@@ -9,6 +9,7 @@ variables:
   basePath: esercente
   VITE_API_TIMEOUT_MS: 10000
   VITE_PAGINATION_SIZE: 10
+  VITE_EIE_MANUAL: $(react_app_url_fe_eie_manual)
 
 
   # global variables
