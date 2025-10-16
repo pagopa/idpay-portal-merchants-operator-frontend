@@ -15,14 +15,9 @@ on:
 jobs:
   sonarcloud:
     runs-on: ubuntu-latest
-    permissions:
-      # Required to checkout the code
-      contents: read
-      # Required to put a comment into the pull-request
-      pull-requests: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -31,18 +26,20 @@ jobs:
           corepack enable
           yarn install --immutable --check-cache || yarn install --force
 
-      - name: 'Run Vitest with Coverage'
-        run: yarn test:coverage
+      - name: Genera client API
+        run: yarn generate
 
-      - name: 'Report Coverage'
-        # Set if: always() to also generate the report if tests are failing
-        # Only works if you set `reportOnFailure: true` in your vite config as specified above
-        if: always()
-        uses:  davelosert/vitest-coverage-report-action@8ab049ff5a2c6e78f78af446329379b318544a1a # v2.8.3
+      - name: Jest Coverage Report
+        uses: ArtiomTr/jest-coverage-report-action@v2.0-rc.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          test-script: yarn test:coverage
+          threshold: 90
+          annotations: none
+          package-manager: yarn
 
       - name: SonarCloud Scan
-        if: always()
-        uses: SonarSource/sonarqube-scan-action@8c71dc039c2dd71d3821e89a2b58ecc7fee6ced9 # v5.3.0
+        uses: SonarSource/sonarcloud-github-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -51,6 +48,3 @@ jobs:
             -Dsonar.organization=${{ vars.SONARCLOUD_ORG }}
             -Dsonar.projectKey=${{ vars.SONARCLOUD_PROJECT_KEY }}
             -Dsonar.projectName="${{ vars.SONARCLOUD_PROJECT_NAME }}"
-            -Dsonar.javascript.lcov.reportPaths='./coverage/lcov.info'
-            -Dsonar.exclusions=**/**.test.*,**/__mocks__/**,**/openApi/**,**/src/api/generated/**,**/src/contexts/**,src/utils/constants.ts,src/utils/types.ts,**/src/config/**
-            -Dsonar.typescript.tsconfigPath=tsconfig.json
