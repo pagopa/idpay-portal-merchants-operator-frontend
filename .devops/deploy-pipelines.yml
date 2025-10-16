@@ -9,7 +9,6 @@ variables:
   basePath: esercente
   VITE_API_TIMEOUT_MS: 10000
   VITE_PAGINATION_SIZE: 10
-  VITE_MANUAL_LINK: $(VITE_MANUAL_LINK)
 
 
   # global variables
@@ -31,7 +30,8 @@ variables:
     react_app_url_fe_pre_login: '$(UAT_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(UAT_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
-
+    
+    vite_manual_link: $(UAT_VITE_MANUAL_LINK)
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -61,6 +61,7 @@ variables:
     react_app_url_fe_auth: '$(PROD_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
 
+    vite_manual_link: $(PROD_VITE_MANUAL_LINK)
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
@@ -88,6 +89,8 @@ variables:
     react_app_url_cdn: '$(DEV_REACT_APP_URL_CDN)'
 
     react_app_url_storage: '$(DEV_REACT_APP_URL_STORAGE)'
+
+    vite_manual_link: $(DEV_VITE_MANUAL_LINK)
 
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
@@ -204,6 +207,8 @@ stages:
               VITE_KEYCLOAK_REALM: '$(vite_keycloak_realm)'
               VITE_KEYCLOAK_CLIENT_ID: '$(vite_keycloak_client_id)'
               VITE_KEYCLOAK_REDIRECT_URI: '$(vite_keycloak_redirect_uri)'
+
+              VITE_MANUAL_LINK: $(vite_manual_link)
 
 
           - bash: |
