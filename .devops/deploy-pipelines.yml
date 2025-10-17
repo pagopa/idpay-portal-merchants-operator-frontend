@@ -31,7 +31,7 @@ variables:
     react_app_url_fe_auth: '$(UAT_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
     
-    vite_manual_link: $(UAT_VITE_MANUAL_LINK)
+    vite_manual_link: 'https://developer.pagopa.it/app-io/guides'
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -61,7 +61,7 @@ variables:
     react_app_url_fe_auth: '$(PROD_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
 
-    vite_manual_link: $(PROD_VITE_MANUAL_LINK)
+    vite_manual_link: 'https://developer.pagopa.it/app-io/guides'
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
@@ -90,7 +90,7 @@ variables:
 
     react_app_url_storage: '$(DEV_REACT_APP_URL_STORAGE)'
 
-    vite_manual_link: $(DEV_VITE_MANUAL_LINK)
+    vite_manual_link: 'https://developer.pagopa.it/app-io/guides'
 
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
