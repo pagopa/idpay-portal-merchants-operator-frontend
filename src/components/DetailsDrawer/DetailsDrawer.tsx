@@ -1,4 +1,12 @@
-import { Divider, Grid, Typography, Box, Drawer, Button, CircularProgress } from "@mui/material";
+import {
+  Divider,
+  Grid,
+  Typography,
+  Box,
+  Drawer,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { theme } from "@pagopa/mui-italia";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
@@ -13,7 +21,7 @@ type ButtonProps = {
 type Props = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  isLoading?: boolean
+  isLoading?: boolean;
   title: string;
   subtitle?: string;
   item: unknown;
@@ -31,7 +39,7 @@ export const DetailsDrawer = ({
   item,
   primaryButton,
   secondaryButton,
-  onFileDownloadCallback
+  onFileDownloadCallback,
 }: Props) => {
   const itemsEntries = Object.entries(item).reduce(
     (acc, [key, value]) => [
@@ -63,6 +71,7 @@ export const DetailsDrawer = ({
         >
           <CloseIcon
             sx={{ color: "#5C6F82" }}
+            data-testid="close-details-drawer-button"
             onClick={() => setIsOpen(false)}
           />
         </Box>
@@ -85,34 +94,53 @@ export const DetailsDrawer = ({
           </>
         )}
 
-        <Grid container spacing={2} data-testId='item-test'>
+        <Grid container spacing={2} data-testId="item-test">
           {itemsEntries.map(([key, value], index) => {
-            const isDownload = (key === 'Fattura' || key === 'Nota di credito')
+            const isDownload = key === "Fattura" || key === "Nota di credito";
 
-            return key !== 'id' && key !== 'cancelled' && (
-              <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: theme.typography.fontWeightRegular,
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  {key}
-                </Typography>
-                {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
-                   <Button sx={{ padding: "0" }} onClick={() => {if(onFileDownloadCallback) onFileDownloadCallback()}}>
-                    {isLoading ? <CircularProgress color="inherit" size={20} /> : <><DescriptionOutlinedIcon /> {value}</>}
-                  </Button>
-                ) : (
+            return (
+              key !== "id" &&
+              key !== "cancelled" && (
+                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
+                    sx={{
+                      fontWeight: theme.typography.fontWeightRegular,
+                      color: theme.palette.text.secondary,
+                    }}
                   >
-                    {value}
+                    {key}
                   </Typography>
-                )}
-              </Grid>
+                  {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
+                    <Button
+                      data-testid="btn-test"
+                      sx={{ padding: "0" }}
+                      onClick={() => {
+                        if (onFileDownloadCallback) onFileDownloadCallback();
+                      }}
+                    >
+                      {isLoading ? (
+                        <CircularProgress
+                          color="inherit"
+                          size={20}
+                          data-testid="item-loader"
+                        />
+                      ) : (
+                        <>
+                          <DescriptionOutlinedIcon /> {value}
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: theme.typography.fontWeightMedium }}
+                    >
+                      {value}
+                    </Typography>
+                  )}
+                </Grid>
+              )
             );
           })}
         </Grid>

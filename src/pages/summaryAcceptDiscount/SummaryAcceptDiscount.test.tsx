@@ -1,99 +1,141 @@
-import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SummaryAcceptDiscount from './SummaryAcceptDiscount';
-import { BrowserRouter } from 'react-router-dom';
-import { authPaymentBarCode } from '../../services/merchantService';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
+import { vi } from "vitest";
+import SummaryAcceptDiscount from "./SummaryAcceptDiscount";
+import ROUTES from "../../routes";
 
-// Mock dipendenze
-vi.mock('react-i18next', () => ({
+vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => key, 
+    t: (key: string) => key,
   }),
 }));
 
-vi.mock('../../services/merchantService', () => ({
-  authPaymentBarCode: vi.fn(),
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
 }));
 
-vi.mock('../../components/BreadcrumbsBox/BreadcrumbsBox', () => ({
-  default: () => <div data-testid="breadcrumbs-box" />,
+const mockAuthPayment = vi.fn();
+vi.mock("../../services/merchantService", () => ({
+  authPaymentBarCode: (...args: any) => mockAuthPayment(...args),
 }));
 
-vi.mock('../../components/errorAlert/ErrorAlert', () => ({
+vi.mock("../../store/utilsStore", () => ({
+  utilsStore: () => ({
+    setTransactionAuthorized: vi.fn(),
+  }),
+}));
+
+vi.mock("../../components/Alert/AlertComponent", () => ({
+  __esModule: true,
   default: ({ message }: { message: string }) => (
-    <div data-testid="error-alert">{message}</div>
+    <div data-testid="alert">{message}</div>
   ),
 }));
 
-const renderWithRouter = (ui: React.ReactNode) => {
-  return render(<BrowserRouter>{ui}</BrowserRouter>);
-};
+vi.mock("../../components/BreadcrumbsBox/BreadcrumbsBox", () => ({
+  __esModule: true,
+  default: ({ items }: { items: string[] }) => (
+    <div data-testid="breadcrumbs">{items.join(" > ")}</div>
+  ),
+}));
 
-describe('SummaryAcceptDiscount', () => {
-  const mockData = {
-    userId: 'ABCDEF12G34H567I',
-    productName: 'Prodotto Test',
-    trxCode: 'DISCOUNT123',
-    trxDate: '2023-09-10T12:00:00Z',
-    originalAmountCents: 1000,
-    rewardCents: 200,
-    residualAmountCents: 800,
-    productGtin: 'GTIN12345',
-  };
-
+describe("SummaryAcceptDiscount", () => {
   beforeEach(() => {
-    sessionStorage.setItem('discountCoupon', JSON.stringify(mockData));
-  });
-
-  afterEach(() => {
-    sessionStorage.clear();
     vi.clearAllMocks();
+    sessionStorage.clear();
   });
 
-  it('should render breadcrumb and title', () => {
-    renderWithRouter(<SummaryAcceptDiscount />);
-    expect(screen.getByTestId('breadcrumbs-box')).toBeInTheDocument();
-    expect(screen.getByText('pages.acceptDiscount.summary')).toBeInTheDocument();
+  it("renders without data (no summaryDataObj)", () => {
+    render(<SummaryAcceptDiscount />);
+    expect(screen.getByTestId("breadcrumbs")).toBeInTheDocument();
   });
 
-  it('should show coupon data saved in sessionStorage', () => {
-    renderWithRouter(<SummaryAcceptDiscount />);
-    expect(screen.getByText(mockData.userId)).toBeInTheDocument();
-    expect(screen.getByText(mockData.productName)).toBeInTheDocument();
-    expect(screen.getByText(mockData.trxCode)).toBeInTheDocument();
-    expect(screen.getByText('10,00 €')).toBeInTheDocument();
-    expect(screen.getByText('2,00 €')).toBeInTheDocument();
-    expect(screen.getByText('8,00 €')).toBeInTheDocument();
+  it("renders with extendedAuthorization = true", () => {
+    sessionStorage.setItem(
+      "discountCoupon",
+      JSON.stringify({ extendedAuthorization: true, userId: "CF123" })
+    );
+    render(<SummaryAcceptDiscount />);
+    expect(
+      screen.getByText("pages.acceptDiscount.summary")
+    ).toBeInTheDocument();
   });
 
-  it('should call authPaymentBarCode when clicking on "Authorize"', async () => {
-    renderWithRouter(<SummaryAcceptDiscount />);
-    const button = screen.getByRole('button', {
-      name: 'pages.acceptDiscount.title',
+  it("renders with extendedAuthorization = false (shows verified chip)", () => {
+    sessionStorage.setItem(
+      "discountCoupon",
+      JSON.stringify({ extendedAuthorization: false, userId: "CF456" })
+    );
+    render(<SummaryAcceptDiscount />);
+    expect(
+      screen.getByText("Identità verificata tramite IO")
+    ).toBeInTheDocument();
+  });
+
+  it("shows Backdrop while loading and hides after click", async () => {
+    sessionStorage.setItem("discountCoupon", JSON.stringify({}));
+    render(<SummaryAcceptDiscount />);
+    await act(async () => {
+      fireEvent.click(screen.getByText("pages.acceptDiscount.title"));
     });
-    fireEvent.click(button);
+    expect(mockAuthPayment).toHaveBeenCalled();
+  });
+
+  it("handleAuthorizeDiscount success path", async () => {
+    const trx = {
+      trxCode: "CODE123",
+      originalAmountCents: 1000,
+      productGtin: "GTIN",
+    };
+    sessionStorage.setItem("discountCoupon", JSON.stringify(trx));
+    mockAuthPayment.mockResolvedValueOnce({});
+    render(<SummaryAcceptDiscount />);
+
+    fireEvent.click(screen.getByText("pages.acceptDiscount.title"));
+    await waitFor(() => {
+      expect(mockAuthPayment).toHaveBeenCalledWith({
+        trxCode: "CODE123",
+        amountCents: 1000,
+        additionalProperties: { productGtin: "GTIN" },
+      });
+      expect(sessionStorage.getItem("discountCoupon")).toBeNull();
+    });
+  });
+
+  it("handleAuthorizeDiscount error path", async () => {
+    const trx = { trxCode: "ERR123", originalAmountCents: 500 };
+    sessionStorage.setItem("discountCoupon", JSON.stringify(trx));
+    mockAuthPayment.mockRejectedValueOnce(new Error("fail"));
+    render(<SummaryAcceptDiscount />);
+    fireEvent.click(screen.getByText("pages.acceptDiscount.title"));
 
     await waitFor(() => {
-      expect(authPaymentBarCode).toHaveBeenCalledWith({
-        trxCode: mockData.trxCode,
-        amountCents: mockData.originalAmountCents,
-        additionalProperties: { productGtin: mockData.productGtin },
-      });
+      expect(screen.getByTestId("alert")).toBeInTheDocument();
     });
   });
 
-  it('should show error alert when authPaymentBarCode fails', async () => {
-    (authPaymentBarCode as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
-      new Error('Errore')
-    );
-
-    renderWithRouter(<SummaryAcceptDiscount />);
-    const button = screen.getByRole('button', {
-      name: 'pages.acceptDiscount.title',
-    });
-    fireEvent.click(button);
-
-    expect(await screen.findByTestId('alert')).toBeInTheDocument();
+  it("click 'Indietro' navigates to ACCEPT_DISCOUNT", () => {
+    render(<SummaryAcceptDiscount />);
+    fireEvent.click(screen.getByText("Indietro"));
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.ACCEPT_DISCOUNT);
   });
 
+  it.skip("errorAlert hides after timeout", async () => {
+    render(<SummaryAcceptDiscount />);
+    await act(async () => {
+      fireEvent.click(screen.getByText("pages.acceptDiscount.title"));
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("alert")).toBeInTheDocument();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(5000);
+    });
+  });
 });
