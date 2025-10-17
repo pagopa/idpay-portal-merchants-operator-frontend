@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid } from "@mui/material";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useTranslation } from "react-i18next";
 import DetailsCard from "../../components/DetailsCard/DetailsCard";
@@ -29,11 +29,11 @@ const fetchDetails = async ({ setLoading, setErrorAlert, token, user }) => {
 
 const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user }) => {
   const response = await fetchDetails({ setLoading, setErrorAlert, token, user });
-
+  
   const mappedResponse = [
     {
       "ID univoco": response?.id ?? "",
-      "Indirizzo": `${response?.address ?? ""} - ${response?.zipCode ?? ""}, ${response?.city ?? ""}, ${response?.province ?? ""} `,
+      "Indirizzo": (response?.address && response?.zipCode && response?.city && response?.province && `${response.address} - ${response.zipCode}, ${response.city}, ${response.province}`) ?? "",
       "Telefono": response?.channelPhone ?? "",
       "Email": response?.channelEmail ?? "",
     },
@@ -98,14 +98,13 @@ const Profile = () => {
           }}
         >
           <CircularProgress />
-        </Box>) : details && !errorAlert ? (
+        </Box>) : details && (
         <Grid data-testid='details-cards' container flexWrap="nowrap" flexDirection="row" spacing={2}>
           <DetailsCard title="Dati punto vendita" item={details[0]} />
           <DetailsCard title="Dati referente" item={details[1]} />
         </Grid>
-      ) : (
-        <Typography variant="body2">Nessun elemento trovato</Typography>
-      )} 
+      )
+      } 
       
       {errorAlert && <AlertComponent error={true} message={t('pages.profile.errorAlert')} />}
     </Box>

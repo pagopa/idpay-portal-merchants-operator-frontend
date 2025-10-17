@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: IDPAY ITN Merchant Operator Portal API
   description: IDPAY ITN Merchant Operator Portal API
-  version: '1.0'
+  version: "1.0"
   contact:
     name: PagoPA S.p.A.
     email: cstar@pagopa.it
@@ -31,114 +31,114 @@ paths:
       parameters:
         - name: trxCode
           in: path
-          description: 'ENG: The transaction''s code - IT: Codice della transazione'
+          description: "ENG: The transaction's code - IT: Codice della transazione"
           required: true
           schema:
             type: string
             maxLength: 24
-            pattern: '^[a-zA-Z0-9]+$'
+            pattern: "^[a-zA-Z0-9]+$"
       responses:
-        '200':
+        "200":
           description: Ok
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionBarCodeResponse'
-        '400':
+                $ref: "#/components/schemas/TransactionBarCodeResponse"
+        "400":
           description: Bad request
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_INVALID_REQUEST"
                 message: "Something went wrong handling the request"
-        '401':
+        "401":
           description: Authentication failed
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDTO'
-        '404':
+                $ref: "#/components/schemas/ErrorDTO"
+        "404":
           description: The requested resource was not found
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
                 message: "Cannot find transaction with transactionCode [%s]"
-        '429':
+        "429":
           description: Too many requests
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             Retry-After:
-              $ref: '#/components/headers/Retry-After'
+              $ref: "#/components/headers/Retry-After"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_TOO_MANY_REQUESTS"
                 message: "Too many requests"
-        '500':
+        "500":
           description: Generic error
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_GENERIC_ERROR"
                 message: "Application error"
@@ -146,65 +146,65 @@ paths:
     put:
       tags:
         - transaction
-      summary: 'ENG: Preview Payment - IT: Anteprima pagamento'
+      summary: "ENG: Preview Payment - IT: Anteprima pagamento"
       description: Preview payment
       operationId: previewPayment
       parameters:
         - name: trxCode
           in: path
-          description: 'ENG: The transaction''s code - IT: Codice della transazione'
+          description: "ENG: The transaction's code - IT: Codice della transazione"
           required: true
           schema:
             type: string
             maxLength: 24
-            pattern: '^[a-zA-Z0-9]+$'
+            pattern: "^[a-zA-Z0-9]+$"
       requestBody:
-        description: 'ENG: trxCode - IT: Identificativo della transizione'
+        description: "ENG: trxCode - IT: Identificativo della transizione"
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PreviewPaymentRequestDTO'
+              $ref: "#/components/schemas/PreviewPaymentRequestDTO"
       responses:
-        '200':
-          $ref: '#/components/responses/PUT_preview_payment_200_Response'
-        '400':
-          $ref: '#/components/responses/PUT_preview_payment_400_Response'
-        '401':
-          $ref: '#/components/responses/PUT_preview_payment_401_Response'
-        '429':
-          $ref: '#/components/responses/PUT_preview_payment_429_Response'
-        '500':
-          $ref: '#/components/responses/PUT_preview_payment_500_Response'
+        "200":
+          $ref: "#/components/responses/PUT_preview_payment_200_Response"
+        "400":
+          $ref: "#/components/responses/PUT_preview_payment_400_Response"
+        "401":
+          $ref: "#/components/responses/PUT_preview_payment_401_Response"
+        "429":
+          $ref: "#/components/responses/PUT_preview_payment_429_Response"
+        "500":
+          $ref: "#/components/responses/PUT_preview_payment_500_Response"
   /products:
     get:
       tags:
         - products
       summary: Returns the products list
-      description: 'ENG: Returns product list <br> IT: Lista prodotti'
+      description: "ENG: Returns product list <br> IT: Lista prodotti"
       operationId: getProducts
       parameters:
-        - $ref: '#/components/parameters/page_query'
-        - $ref: '#/components/parameters/size_query'
-        - $ref: '#/components/parameters/sort_query'
-        - $ref: '#/components/parameters/category_query'
-        - $ref: '#/components/parameters/eprelCode_query'
-        - $ref: '#/components/parameters/gtinCode_query'
-        - $ref: '#/components/parameters/productFileId_query'
-        - $ref: '#/components/parameters/productName_query'
-        - $ref: '#/components/parameters/status_query'
-        - $ref: '#/components/parameters/organizationId_query'
+        - $ref: "#/components/parameters/page_query"
+        - $ref: "#/components/parameters/size_query"
+        - $ref: "#/components/parameters/sort_query"
+        - $ref: "#/components/parameters/category_query"
+        - $ref: "#/components/parameters/eprelCode_query"
+        - $ref: "#/components/parameters/gtinCode_query"
+        - $ref: "#/components/parameters/productFileId_query"
+        - $ref: "#/components/parameters/productName_query"
+        - $ref: "#/components/parameters/status_query"
+        - $ref: "#/components/parameters/organizationId_query"
       responses:
-        '200':
-          $ref: '#/components/responses/GET_products_200_Response'
-        '400':
-          $ref: '#/components/responses/GET_products_400_Response'
-        '401':
-          $ref: '#/components/responses/GET_products_401_Response'
-        '429':
-          $ref: '#/components/responses/GET_products_429_Response'
-        '500':
-          $ref: '#/components/responses/GET_products_500_Response'
+        "200":
+          $ref: "#/components/responses/GET_products_200_Response"
+        "400":
+          $ref: "#/components/responses/GET_products_400_Response"
+        "401":
+          $ref: "#/components/responses/GET_products_401_Response"
+        "429":
+          $ref: "#/components/responses/GET_products_429_Response"
+        "500":
+          $ref: "#/components/responses/GET_products_500_Response"
   /transactions/bar-code/{trxCode}/authorize:
     put:
       tags:
@@ -220,7 +220,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: '^[a-zA-Z0-9]+$'
+            pattern: "^[a-zA-Z0-9]+$"
       requestBody:
         description: Request about auth bar-code trx
         content:
@@ -232,13 +232,13 @@ paths:
           description: Ok
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -247,13 +247,13 @@ paths:
           description: Bad request
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -265,13 +265,13 @@ paths:
           description: Authentication failed
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -280,13 +280,13 @@ paths:
           description: Forbidden
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -298,13 +298,13 @@ paths:
           description: The requested resource was not found
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -324,15 +324,15 @@ paths:
           description: Too many requests
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
             Retry-After:
-              $ref: '#/components/headers/Retry-After'
+              $ref: "#/components/headers/Retry-After"
           content:
             application/json:
               schema:
@@ -357,27 +357,27 @@ paths:
       description: "ENG: Returns the list of processed transactions associated to a point of sale - IT: Ritorna la lista delle transazioni processate associate ad un punto vendita"
       operationId: getPointOfSaleTransactionsProcessed
       parameters:
-        - $ref: '#/components/parameters/page_query'
-        - $ref: '#/components/parameters/size_query'
-        - $ref: '#/components/parameters/sort_trx_processed_query'
-        - $ref: '#/components/parameters/fiscalCode_query'
-        - $ref: '#/components/parameters/status_trx_processed_query'
-        - $ref: '#/components/parameters/productGtin_query'
-        - $ref: '#/components/parameters/initiativeId_path'
-        - $ref: '#/components/parameters/pointOfSaleId_path'
+        - $ref: "#/components/parameters/page_query"
+        - $ref: "#/components/parameters/size_query"
+        - $ref: "#/components/parameters/sort_trx_processed_query"
+        - $ref: "#/components/parameters/fiscalCode_query"
+        - $ref: "#/components/parameters/status_trx_processed_query"
+        - $ref: "#/components/parameters/productGtin_query"
+        - $ref: "#/components/parameters/initiativeId_path"
+        - $ref: "#/components/parameters/pointOfSaleId_path"
       responses:
-        '200':
-          $ref: '#/components/responses/GET_transactions_processed_200_Response'
-        '400':
-          $ref: '#/components/responses/GET_transactions_processed_400_Response'
-        '401':
-          $ref: '#/components/responses/GET_transactions_processed_401_Response'
-        '404':
-          $ref: '#/components/responses/GET_transactions_processed_404_Response'
-        '429':
-          $ref: '#/components/responses/GET_transactions_processed_429_Response'
-        '500':
-          $ref: '#/components/responses/GET_transactions_processed_500_Response'
+        "200":
+          $ref: "#/components/responses/GET_transactions_processed_200_Response"
+        "400":
+          $ref: "#/components/responses/GET_transactions_processed_400_Response"
+        "401":
+          $ref: "#/components/responses/GET_transactions_processed_401_Response"
+        "404":
+          $ref: "#/components/responses/GET_transactions_processed_404_Response"
+        "429":
+          $ref: "#/components/responses/GET_transactions_processed_429_Response"
+        "500":
+          $ref: "#/components/responses/GET_transactions_processed_500_Response"
   /initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions:
     get:
       tags:
@@ -386,27 +386,49 @@ paths:
       description: "ENG: Returns the list of in progress transactions associated to a point of sale - IT: Ritorna la lista delle transazioni in corso associate ad un punto vendita"
       operationId: getPointOfSaleTransactions
       parameters:
-        - $ref: '#/components/parameters/page_query'
-        - $ref: '#/components/parameters/size_query'
-        - $ref: '#/components/parameters/sort_trx_in_progress_query'
-        - $ref: '#/components/parameters/fiscalCode_query'
-        - $ref: '#/components/parameters/status_trx_in_progress_query'
-        - $ref: '#/components/parameters/productGtin_query'
-        - $ref: '#/components/parameters/initiativeId_path'
-        - $ref: '#/components/parameters/pointOfSaleId_path'
+        - $ref: "#/components/parameters/page_query"
+        - $ref: "#/components/parameters/size_query"
+        - $ref: "#/components/parameters/sort_trx_in_progress_query"
+        - $ref: "#/components/parameters/fiscalCode_query"
+        - $ref: "#/components/parameters/status_trx_in_progress_query"
+        - $ref: "#/components/parameters/productGtin_query"
+        - $ref: "#/components/parameters/initiativeId_path"
+        - $ref: "#/components/parameters/pointOfSaleId_path"
       responses:
-        '200':
-          $ref: '#/components/responses/GET_transactions_in_progress_200_Response'
-        '400':
-          $ref: '#/components/responses/GET_transactions_in_progress_400_Response'
-        '401':
-          $ref: '#/components/responses/GET_transactions_in_progress_401_Response'
-        '404':
-          $ref: '#/components/responses/GET_transactions_in_progress_404_Response'
-        '429':
-          $ref: '#/components/responses/GET_transactions_in_progress_429_Response'
-        '500':
-          $ref: '#/components/responses/GET_transactions_in_progress_500_Response'
+        "200":
+          $ref: "#/components/responses/GET_transactions_in_progress_200_Response"
+        "400":
+          $ref: "#/components/responses/GET_transactions_in_progress_400_Response"
+        "401":
+          $ref: "#/components/responses/GET_transactions_in_progress_401_Response"
+        "404":
+          $ref: "#/components/responses/GET_transactions_in_progress_404_Response"
+        "429":
+          $ref: "#/components/responses/GET_transactions_in_progress_429_Response"
+        "500":
+          $ref: "#/components/responses/GET_transactions_in_progress_500_Response"
+  /{pointOfSaleId}/transactions/{transactionId}/download:
+    get:
+      tags:
+        - transaction
+      summary: "ENG: Download invoice file - IT: Scarica il file della fattura"
+      description: "ENG: Download the invoice file of the transaction<br>
+        IT: Scarica il file della fattura della transazione"
+      operationId: downloadInvoiceFile
+      parameters:
+        - $ref: "#/components/parameters/pointOfSaleId_path"
+        - $ref: "#/components/parameters/transactionId_path"
+      responses:
+        "200":
+          $ref: "#/components/responses/GET_download_invoice_file_200_Response"
+        "400":
+          $ref: "#/components/responses/GET_download_invoice_file_400_Response"
+        "401":
+          $ref: "#/components/responses/GET_download_invoice_file_401_Response"
+        "429":
+          $ref: "#/components/responses/GET_download_invoice_file_429_Response"
+        "500":
+          $ref: "#/components/responses/GET_download_invoice_file_500_Response"
   /transactions/{transactionId}:
     delete:
       tags:
@@ -422,110 +444,110 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: '^[a-zA-Z0-9]+$'
+            pattern: "^[a-zA-Z0-9]+$"
       responses:
-        '200':
+        "200":
           description: Ok
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
-        '400':
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "400":
           description: Bad request
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_INVALID_REQUEST"
                 message: "Something went wrong handling the request"
-        '401':
+        "401":
           description: Authentication failed
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
-        '403':
-          description: 'Forbidden'
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "403":
+          description: "Forbidden"
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT"
                 message: "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
-        '404':
+        "404":
           description: The requested resource was not found
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
                 message: "Cannot find transaction with transactionId [%s]"
-        '429':
+        "429":
           description: Too many requests
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
             Retry-After:
-              $ref: '#/components/headers/Retry-After'
+              $ref: "#/components/headers/Retry-After"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_TOO_MANY_REQUESTS"
                 message: "Too many requests"
-        '500':
+        "500":
           description: Generic error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionErrorDTO'
+                $ref: "#/components/schemas/TransactionErrorDTO"
               example:
                 code: "PAYMENT_GENERIC_ERROR"
                 message: "Application error"
@@ -545,7 +567,7 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: '^[a-zA-Z0-9]+$'
+            pattern: "^[a-zA-Z0-9]+$"
         - name: pointOfSaleId
           in: path
           description: The point of sale ID
@@ -553,19 +575,19 @@ paths:
           schema:
             type: string
             maxLength: 255
-            pattern: '^[a-zA-Z0-9]+$'
+            pattern: "^[a-zA-Z0-9]+$"
       responses:
         "200":
           description: Successful response with point of sale detail
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -574,13 +596,13 @@ paths:
           description: Bad request - Invalid query parameters
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -592,24 +614,24 @@ paths:
           description: Unauthorized - Authentication Failed
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
         "404":
           description: Not Found
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
           content:
             application/json:
               schema:
@@ -621,15 +643,15 @@ paths:
           description: Too many Request - Rate limit exceeded
           headers:
             Access-Control-Allow-Origin:
-              $ref: '#/components/headers/Access-Control-Allow-Origin'
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
             X-RateLimit-Limit:
-              $ref: '#/components/headers/X-RateLimit-Limit'
+              $ref: "#/components/headers/X-RateLimit-Limit"
             X-RateLimit-Remaining:
-              $ref: '#/components/headers/X-RateLimit-Remaining'
+              $ref: "#/components/headers/X-RateLimit-Remaining"
             X-RateLimit-Reset:
-              $ref: '#/components/headers/X-RateLimit-Reset'
+              $ref: "#/components/headers/X-RateLimit-Reset"
             Retry-After:
-              $ref: '#/components/headers/Retry-After'
+              $ref: "#/components/headers/Retry-After"
           content:
             application/json:
               schema:
@@ -646,6 +668,260 @@ paths:
               example:
                 code: POINT_OF_SALE_GENERIC_ERROR
                 message: An error occurred during file reading
+  /transactions/{transactionId}/reversal:
+    post:
+      tags:
+        - transaction
+      summary: Point of sales reversal transaction
+      description: "ENG: Point of sales reversal transaction <br> IT: Storno di una transazione da parte di un Punto Vendita"
+      operationId: reversalTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: The transaction ID
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: "^[a-zA-Z0-9]+$"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ReversalInvoiceDTO"
+      responses:
+        "204":
+          description: Ok - no content
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "400":
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_INVALID_REQUEST"
+                message: "Something went wrong handling the request"
+        "401":
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "403":
+          description: "Forbidden"
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT"
+                message: "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+        "404":
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                message: "Cannot find transaction with transactionId [%s]"
+        "429":
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+            Retry-After:
+              $ref: "#/components/headers/Retry-After"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_TOO_MANY_REQUESTS"
+                message: "Too many requests"
+        "500":
+          description: Generic error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_GENERIC_ERROR"
+                message: "Application error"
+  /transactions/{transactionId}/reward:
+    post:
+      tags:
+        - transaction
+      summary: Point of sales reward transaction
+      description: "ENG: Point of sales reward transaction <br> IT: Riconoscimento di una transazione da parte di un Punto Vendita"
+      operationId: rewardTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: The transaction ID
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: "^[a-zA-Z0-9]+$"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RewardInvoiceDTO"
+      responses:
+        "204":
+          description: Ok - no content
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "400":
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_INVALID_REQUEST"
+                message: "Something went wrong handling the request"
+        "401":
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "403":
+          description: "Forbidden"
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT"
+                message: "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+        "404":
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                message: "Cannot find transaction with transactionId [%s]"
+        "429":
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+            Retry-After:
+              $ref: "#/components/headers/Retry-After"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_TOO_MANY_REQUESTS"
+                message: "Too many requests"
+        "500":
+          description: Generic error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_GENERIC_ERROR"
+                message: "Application error"
 components:
   headers:
     X-RateLimit-Limit:
@@ -676,7 +952,8 @@ components:
         maxLength: 255
         pattern: .*
     Retry-After:
-      description: Indicates how long the user agent should wait before making a follow-up
+      description:
+        Indicates how long the user agent should wait before making a follow-up
         request
       schema:
         type: integer
@@ -698,28 +975,28 @@ components:
       properties:
         id:
           type: string
-          description: 'ENG: Transaction ID <br> IT: ID della transazione'
+          description: "ENG: Transaction ID <br> IT: ID della transazione"
           maxLength: 64
           pattern: .*
         trxCode:
           type: string
-          description: 'ENG: Transaction code - IT: Codice della transazione (codice sconto)'
+          description: "ENG: Transaction code - IT: Codice della transazione (codice sconto)"
           maxLength: 24
-          pattern: '^[a-zA-Z0-9]+$'
+          pattern: "^[a-zA-Z0-9]+$"
         initiativeId:
           type: string
           description: "ENG: Id of the initiative - IT: Identificativo dell'iniziativa"
           maxLength: 100
-          pattern: '^[A-Za-z0-9_-]+$'
+          pattern: "^[A-Za-z0-9_-]+$"
         initiativeName:
           type: string
           description: "ENG: Name of the initiative - IT: Nome della iniziativa"
           maxLength: 1000
-          pattern: '.*'
+          pattern: ".*"
         trxDate:
           type: string
           format: date-time
-          description: 'ENG: Transaction date - IT: Data della transazione'
+          description: "ENG: Transaction date - IT: Data della transazione"
           maxLength: 255
         status:
           type: string
@@ -743,12 +1020,12 @@ components:
       properties:
         productName:
           type: string
-          description: 'ENG: prodcut name - IT: il nome del prodotto'
+          description: "ENG: prodcut name - IT: il nome del prodotto"
           maxLength: 255
           pattern: .*
         productGtin:
           type: string
-          description: 'ENG: prodcut GTIN - IT: il codice GTIN del prodotto'
+          description: "ENG: prodcut GTIN - IT: il codice GTIN del prodotto"
           maxLength: 14
           pattern: ^[a-zA-Z0-9]{1,14}$
         amountCents:
@@ -756,7 +1033,7 @@ components:
           format: int64
           minimum: 0
           maximum: 1000000000
-          description: 'ENG: amount in cents - IT: importo totale della spesa in centesimi'
+          description: "ENG: amount in cents - IT: importo totale della spesa in centesimi"
       required:
         - productName
         - productGtin
@@ -766,13 +1043,13 @@ components:
       properties:
         trxCode:
           type: string
-          description: 'ENG: Transaction code - IT: Codice della transazione (codice sconto)'
+          description: "ENG: Transaction code - IT: Codice della transazione (codice sconto)"
           maxLength: 24
-          pattern: '^[a-zA-Z0-9]+$'
+          pattern: "^[a-zA-Z0-9]+$"
         trxDate:
           type: string
           format: date-time
-          description: 'ENG: Transaction date - IT: Data della transazione'
+          description: "ENG: Transaction date - IT: Data della transazione"
           maxLength: 255
         status:
           type: string
@@ -790,72 +1067,75 @@ components:
         originalAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Original amount cents - IT: Importo originale da pagare in centesimi'
+          description: "ENG: Original amount cents - IT: Importo originale da pagare in centesimi"
           minimum: 0
           maximum: 1000000000
         rewardCents:
           type: integer
           format: int64
-          description: 'ENG: Reward - IT: sconto generato'
+          description: "ENG: Reward - IT: sconto generato"
           minimum: 0
           maximum: 1000000000
         residualAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Residual amount to pay - IT: Importo residuo da pagare dopo lo sconto'
+          description: "ENG: Residual amount to pay - IT: Importo residuo da pagare dopo lo sconto"
           minimum: 0
           maximum: 1000000000
         userId:
           type: string
-          description: 'ENG: user fiscal code - IT: codice fiscale utente'
+          description: "ENG: user fiscal code - IT: codice fiscale utente"
           maxLength: 16
           pattern: .*
         productName:
           type: string
-          description: 'ENG: prodcut name - IT: il nome del prodotto'
+          description: "ENG: prodcut name - IT: il nome del prodotto"
           maxLength: 255
           pattern: .*
         productGtin:
           type: string
-          description: 'ENG: prodcut GTIN - IT: il codice GTIN del prodotto'
+          description: "ENG: prodcut GTIN - IT: il codice GTIN del prodotto"
           maxLength: 14
           pattern: ^[a-zA-Z0-9]{1,14}$
         extendedAuthorization:
           type: boolean
-          description: 'ENG: True, if extended authorization - IT: True, se l''autorizzazione è estesa'
+          description: "ENG: True, if extended authorization - IT: True, se l'autorizzazione è estesa"
     ProductListDTO:
       type: object
       properties:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/ProductDTO'
+            $ref: "#/components/schemas/ProductDTO"
           maxItems: 1000
         pageNo:
           type: integer
           format: int32
-          description: 'ENG: The number of the page <br> IT: Il numero della pagina'
+          description: "ENG: The number of the page <br> IT: Il numero della pagina"
           minimum: 0
           maximum: 1000000
         pageSize:
           type: integer
           format: int32
-          description: 'ENG: The element size for page <br> IT: Il numero di elementi
-            per pagina'
+          description:
+            "ENG: The element size for page <br> IT: Il numero di elementi
+            per pagina"
           minimum: 0
           maximum: 1000000
         totalElements:
           type: integer
           format: int32
-          description: 'ENG: The total number of the elements <br> IT: Il numero totale
-            degli elementi'
+          description:
+            "ENG: The total number of the elements <br> IT: Il numero totale
+            degli elementi"
           minimum: 0
           maximum: 1000000
         totalPages:
           type: integer
           format: int32
-          description: 'ENG: The total number of the pages <br> IT: Il numero totale
-            delle pagine'
+          description:
+            "ENG: The total number of the pages <br> IT: Il numero totale
+            delle pagine"
           minimum: 0
           maximum: 1000000
     ProductDTO:
@@ -863,35 +1143,36 @@ components:
       properties:
         organizationId:
           type: string
-          description: 'ENG: The name of organization <br> IT: Id del produttore'
+          description: "ENG: The name of organization <br> IT: Id del produttore"
           maxLength: 36
           pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$
         registrationDate:
           type: string
           format: date-time
-          description: 'ENG: Timestamps of insert (after EPREL checks) <br> IT: Data
-            caricamento prodotto (dopo la verifica EPREL)'
+          description:
+            "ENG: Timestamps of insert (after EPREL checks) <br> IT: Data
+            caricamento prodotto (dopo la verifica EPREL)"
           maxLength: 255
         status:
           type: string
-          description: 'ENG: The status of the product <br> IT: Lo stato del prodotto'
+          description: "ENG: The status of the product <br> IT: Lo stato del prodotto"
           enum:
             - APPROVED
             - REJECTED
             - SUPERVISIONED
         model:
           type: string
-          description: 'ENG: The mode of the product <br> IT: il modello del prodotto'
+          description: "ENG: The mode of the product <br> IT: il modello del prodotto"
           maxLength: 100
           pattern: ^.{1,100}$
         productGroup:
           type: string
-          description: 'ENG: The EPREL category <br> IT: categoria EPREL'
+          description: "ENG: The EPREL category <br> IT: categoria EPREL"
           maxLength: 255
           pattern: .*
         category:
           type: string
-          description: 'ENG: The category of the product <br> IT: categoria del prodotto'
+          description: "ENG: The category of the product <br> IT: categoria del prodotto"
           enum:
             - Lavatrice
             - Lavasciuga
@@ -903,61 +1184,66 @@ components:
             - Forno
         brand:
           type: string
-          description: 'ENG: The brand of the product <br> IT: brand del prodotto'
+          description: "ENG: The brand of the product <br> IT: brand del prodotto"
           maxLength: 100
           pattern: ^.{1,100}$
         eprelCode:
           type: string
-          description: 'ENG: The EPREL code of the product <br> IT: Il code EPREL
-            del prodotto'
+          description:
+            "ENG: The EPREL code of the product <br> IT: Il code EPREL
+            del prodotto"
           maxLength: 50
           pattern: ^\\d+$
         gtinCode:
           type: string
-          description: 'ENG: The GTIN code of the product <br> IT: Il code GTIN del
-            prodotto'
+          description:
+            "ENG: The GTIN code of the product <br> IT: Il code GTIN del
+            prodotto"
           maxLength: 14
           pattern: ^[a-zA-Z0-9]{1,14}$
         productCode:
           type: string
-          description: 'ENG: The product code <br> IT: Il codice prodotto'
+          description: "ENG: The product code <br> IT: Il codice prodotto"
           maxLength: 100
           pattern: ^[a-zA-Z0-9 ]{0,100}$
           nullable: true
         energyClass:
           type: string
-          description: 'ENG: The product energy class <br> IT: La classe energetica
-            del prodotto'
+          description:
+            "ENG: The product energy class <br> IT: La classe energetica
+            del prodotto"
           maxLength: 4
           pattern: ^(A\\+\\+\\+|A\\+\\+|A\\+|A|B|C|D|E|F|G)$
           nullable: true
         countryOfProduction:
           type: string
-          description: 'ENG: The production country of the product <br> IT: il paese
-            di produzione del prodotto'
+          description:
+            "ENG: The production country of the product <br> IT: il paese
+            di produzione del prodotto"
           maxLength: 2
           pattern: ^[A-Z]{2}$
         batchName:
           type: string
-          description: 'ENG: The batch name the product <br> IT: il nomelotto del
-            prodotto'
+          description:
+            "ENG: The batch name the product <br> IT: il nomelotto del
+            prodotto"
           pattern: ^(Apparecchi_di_refrigerazione|Cappe_Da_Cucina|Lavatrici|Lavastoviglie|Piani_Cottura|Forni|Lavasciuga|Asciugatrici)_[a-fA-F0-9]{24}\\.csv$
           maxLength: 255
         linkEprel:
           type: string
-          description: 'ENG: The EPREL product link <br> IT: Il link EPREL del prodotto'
+          description: "ENG: The EPREL product link <br> IT: Il link EPREL del prodotto"
           maxLength: 255
           format: uri
           nullable: true
         capacity:
           type: string
-          description: 'ENG: The capacity of the product <br> IT: Capacità del  prodotto'
+          description: "ENG: The capacity of the product <br> IT: Capacità del  prodotto"
           maxLength: 255
           pattern: .*
           nullable: true
         productName:
           type: string
-          description: 'ENG: The name of the product  <br> IT: Nome del prodotto'
+          description: "ENG: The name of the product  <br> IT: Nome del prodotto"
           maxLength: 255
           pattern: .*
         motivation:
@@ -970,30 +1256,30 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/PointOfSaleTransactionProcessedDTO'
+            $ref: "#/components/schemas/PointOfSaleTransactionProcessedDTO"
           maxItems: 1000
         pageNo:
           type: integer
           format: int32
-          description: 'ENG: The number of the page <br> IT: Il numero della pagina'
+          description: "ENG: The number of the page <br> IT: Il numero della pagina"
           minimum: 0
           maximum: 1000000
         pageSize:
           type: integer
           format: int32
-          description: 'ENG: The element size for page <br> IT: Il numero di elementi per pagina'
+          description: "ENG: The element size for page <br> IT: Il numero di elementi per pagina"
           minimum: 0
           maximum: 1000000
         totalElements:
           type: integer
           format: int32
-          description: 'ENG: The total number of the elements <br> IT: Il numero totale degli elementi'
+          description: "ENG: The total number of the elements <br> IT: Il numero totale degli elementi"
           minimum: 0
           maximum: 1000000
         totalPages:
           type: integer
           format: int32
-          description: 'ENG: The total number of the pages <br> IT: Il numero totale delle pagine'
+          description: "ENG: The total number of the pages <br> IT: Il numero totale delle pagine"
           minimum: 0
           maximum: 1000000
     PointOfSaleTransactionProcessedDTO:
@@ -1002,47 +1288,53 @@ components:
       properties:
         id:
           type: string
-          description: 'ENG: Transaction ID <br> IT: ID della transazione'
+          description: "ENG: Transaction ID <br> IT: ID della transazione"
           maxLength: 64
           pattern: .*
         fiscalCode:
           type: string
-          description: 'ENG: Citizen fiscal code - IT: Codice fiscale del cittadino'
+          description: "ENG: Citizen fiscal code - IT: Codice fiscale del cittadino"
           minLength: 16
           maxLength: 16
-          pattern: '^[A-Z0-9]+$'
+          pattern: "^[A-Z0-9]+$"
         effectiveAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Transaction amount in cents - IT: Importo della transazione in centesimi'
+          description: "ENG: Transaction amount in cents - IT: Importo della transazione in centesimi"
           minimum: 0
           maximum: 1000000000
         rewardAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Reward amount in cents - IT: Premio generato in centesimi'
+          description: "ENG: Reward amount in cents - IT: Premio generato in centesimi"
+          minimum: 0
+          maximum: 1000000000
+        authorizedAmountCents:
+          type: integer
+          format: int64
+          description: "ENG: Authorized amount in cents - IT: Importo autorizzato in centesimi"
           minimum: 0
           maximum: 1000000000
         trxDate:
           type: string
           format: date-time
-          description: 'ENG: The date of the transaction - IT: La data della transazione'
+          description: "ENG: The date of the transaction - IT: La data della transazione"
           maxLength: 255
         updateDate:
           type: string
           format: date-time
-          description: 'ENG: The date of the transaction update - IT: La data di aggiornamento della transazione'
+          description: "ENG: The date of the transaction update - IT: La data di aggiornamento della transazione"
           maxLength: 255
         status:
           type: string
-          description: 'ENG: The status of the transaction - IT: Lo stato della transazione'
+          description: "ENG: The status of the transaction - IT: Lo stato della transazione"
           enum:
             - REWARDED
             - CANCELLED
             - REFUNDED
         channel:
           type: string
-          description: 'ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione'
+          description: "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione"
           maxLength: 24
           enum:
             - BARCODE
@@ -1053,37 +1345,45 @@ components:
           additionalProperties:
             type: string
             maxLength: 255
-            pattern: '.*'
+            pattern: ".*"
+        invoiceFile:
+          $ref: "#/components/schemas/InvoiceFileDTO"
+    InvoiceFileDTO:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: "ENG: The name of the invoice file <br> IT: Il nome del file della fattura"
     PointOfSaleTransactionsListDTO:
       type: object
       properties:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/PointOfSaleTransactionDTO'
+            $ref: "#/components/schemas/PointOfSaleTransactionDTO"
           maxItems: 1000
         pageNo:
           type: integer
           format: int32
-          description: 'ENG: The number of the page <br> IT: Il numero della pagina'
+          description: "ENG: The number of the page <br> IT: Il numero della pagina"
           minimum: 0
           maximum: 1000000
         pageSize:
           type: integer
           format: int32
-          description: 'ENG: The element size for page <br> IT: Il numero di elementi per pagina'
+          description: "ENG: The element size for page <br> IT: Il numero di elementi per pagina"
           minimum: 0
           maximum: 1000000
         totalElements:
           type: integer
           format: int32
-          description: 'ENG: The total number of the elements <br> IT: Il numero totale degli elementi'
+          description: "ENG: The total number of the elements <br> IT: Il numero totale degli elementi"
           minimum: 0
           maximum: 1000000
         totalPages:
           type: integer
           format: int32
-          description: 'ENG: The total number of the pages <br> IT: Il numero totale delle pagine'
+          description: "ENG: The total number of the pages <br> IT: Il numero totale delle pagine"
           minimum: 0
           maximum: 1000000
     PointOfSaleTransactionDTO:
@@ -1092,36 +1392,36 @@ components:
       properties:
         id:
           type: string
-          description: 'ENG: Transaction ID <br> IT: ID della transazione'
+          description: "ENG: Transaction ID <br> IT: ID della transazione"
           maxLength: 64
           pattern: .*
         trxCode:
           type: string
-          description: 'ENG: Transaction code - IT: Il codice della transazione'
+          description: "ENG: Transaction code - IT: Il codice della transazione"
           maxLength: 100
-          pattern: '^[a-zA-Z0-9]+$'
+          pattern: "^[a-zA-Z0-9]+$"
         fiscalCode:
           type: string
-          description: 'ENG: Citizen fiscal code - IT: Codice fiscale del cittadino'
+          description: "ENG: Citizen fiscal code - IT: Codice fiscale del cittadino"
           minLength: 16
           maxLength: 16
-          pattern: '^[A-Z0-9]+$'
+          pattern: "^[A-Z0-9]+$"
         effectiveAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Transaction amount in cents - IT: Importo della transazione in centesimi'
+          description: "ENG: Transaction amount in cents - IT: Importo della transazione in centesimi"
           minimum: 0
           maximum: 1000000000
         rewardAmountCents:
           type: integer
           format: int64
-          description: 'ENG: Reward amount in cents - IT: Premio generato in centesimi'
+          description: "ENG: Reward amount in cents - IT: Premio generato in centesimi"
           minimum: 0
           maximum: 1000000000
         trxDate:
           type: string
           format: date-time
-          description: 'ENG: The date of the transaction - IT: La data della transazione'
+          description: "ENG: The date of the transaction - IT: La data della transazione"
           maxLength: 255
         trxExpirationSeconds:
           type: number
@@ -1130,11 +1430,11 @@ components:
         updateDate:
           type: string
           format: date-time
-          description: 'ENG: The date of the transaction update - IT: La data di aggiornamento della transazione'
+          description: "ENG: The date of the transaction update - IT: La data di aggiornamento della transazione"
           maxLength: 255
         status:
           type: string
-          description: 'ENG: The status of the transaction - IT: Lo stato della transazione'
+          description: "ENG: The status of the transaction - IT: Lo stato della transazione"
           enum:
             - AUTHORIZED
             - CAPTURED
@@ -1149,7 +1449,7 @@ components:
           maximum: 1000000000
         channel:
           type: string
-          description: 'ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione'
+          description: "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione"
           maxLength: 24
           enum:
             - BARCODE
@@ -1170,7 +1470,7 @@ components:
           additionalProperties:
             type: string
             maxLength: 255
-            pattern: '.*'
+            pattern: ".*"
     PointOfSaleDTO:
       type: object
       properties:
@@ -1212,7 +1512,7 @@ components:
           type: string
           description: "ENG: The street number of the point of sale <br> IT: Il numero civico del punto vendita"
           maxLength: 255
-        webSite:
+        website:
           type: string
           description: "ENG: The website of the point of sale <br> IT: Il sito web del punto vendita"
           maxLength: 255
@@ -1301,7 +1601,7 @@ components:
           additionalProperties:
             type: string
             maxLength: 255
-            pattern: '.*'
+            pattern: ".*"
     AuthPaymentResponseDTO:
       type: object
       required:
@@ -1320,7 +1620,7 @@ components:
           type: string
           description: "ENG: Transaction code - IT: Codice della transazione"
           maxLength: 100
-          pattern: '^[a-zA-Z0-9]+$'
+          pattern: "^[a-zA-Z0-9]+$"
         trxDate:
           type: string
           format: date-time
@@ -1330,17 +1630,17 @@ components:
           type: string
           description: "ENG: Id of the initiative - IT: Identificativo dell'iniziativa"
           maxLength: 100
-          pattern: '^[A-Za-z0-9_-]+$'
+          pattern: "^[A-Za-z0-9_-]+$"
         initiativeName:
           type: string
           description: "ENG: Name of the initiative - IT: Nome della iniziativa"
           maxLength: 1000
-          pattern: '.*'
+          pattern: ".*"
         businessName:
           type: string
           description: "ENG: Business name - IT: Nome dell'esercente"
           maxLength: 1000
-          pattern: '.*'
+          pattern: ".*"
         status:
           type: string
           enum:
@@ -1376,6 +1676,14 @@ components:
           minimum: 0
           maximum: 1000000
           description: "ENG: Remaining amount to be paid if the authorized sum is less than the requested sum - IT: Importo restante da pagare nel caso in cui la somma autorizzata sia inferiore alla somma richiesta."
+    DownloadInvoiceResponseDTO:
+      type: object
+      properties:
+        invoiceUrl:
+          type: string
+          description: "ENG: URL to download the invoice file - IT: URL per scaricare il file della fattura"
+      required:
+        - invoiceUrl
     TransactionErrorDTO:
       type: object
       required:
@@ -1417,7 +1725,23 @@ components:
           type: string
           description: "ENG: Error message- IT: Messaggio di errore"
           maxLength: 1000
-          pattern: '.*'
+          pattern: ".*"
+    ReversalInvoiceDTO:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+    RewardInvoiceDTO:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
   securitySchemes:
     Bearer:
       type: apiKey
@@ -1428,316 +1752,396 @@ components:
       description: Ok
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/PreviewPaymentDTO'
+            $ref: "#/components/schemas/PreviewPaymentDTO"
     PUT_preview_payment_400_Response:
       description: Bad request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     PUT_preview_payment_401_Response:
       description: Authentication failed
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     PUT_preview_payment_429_Response:
       description: Too many Request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         Retry-After:
-          $ref: '#/components/headers/Retry-After'
+          $ref: "#/components/headers/Retry-After"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     PUT_preview_payment_500_Response:
       description: Server ERROR
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
     GET_products_200_Response:
       description: Ok
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProductListDTO'
+            $ref: "#/components/schemas/ProductListDTO"
     GET_products_400_Response:
       description: Bad request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_products_401_Response:
       description: Authentication failed
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_products_429_Response:
       description: Too many Request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         Retry-After:
-          $ref: '#/components/headers/Retry-After'
+          $ref: "#/components/headers/Retry-After"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_products_500_Response:
       description: Server ERROR
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
     GET_transactions_processed_200_Response:
       description: Ok
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/PointOfSaleTransactionsProcessedListDTO'
+            $ref: "#/components/schemas/PointOfSaleTransactionsProcessedListDTO"
     GET_transactions_processed_400_Response:
       description: Bad request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_processed_401_Response:
       description: Authentication failed
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_processed_404_Response:
       description: The requested resource was not found
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_processed_429_Response:
       description: Too many Request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         Retry-After:
-          $ref: '#/components/headers/Retry-After'
+          $ref: "#/components/headers/Retry-After"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_processed_500_Response:
       description: Generic error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
     GET_transactions_in_progress_200_Response:
       description: Ok
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/PointOfSaleTransactionsListDTO'
+            $ref: "#/components/schemas/PointOfSaleTransactionsListDTO"
     GET_transactions_in_progress_400_Response:
       description: Bad request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_in_progress_401_Response:
       description: Authentication failed
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_in_progress_404_Response:
       description: The requested resource was not found
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_in_progress_429_Response:
       description: Too many Request
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
         Retry-After:
-          $ref: '#/components/headers/Retry-After'
+          $ref: "#/components/headers/Retry-After"
         X-RateLimit-Limit:
-          $ref: '#/components/headers/X-RateLimit-Limit'
+          $ref: "#/components/headers/X-RateLimit-Limit"
         X-RateLimit-Remaining:
-          $ref: '#/components/headers/X-RateLimit-Remaining'
+          $ref: "#/components/headers/X-RateLimit-Remaining"
         X-RateLimit-Reset:
-          $ref: '#/components/headers/X-RateLimit-Reset'
+          $ref: "#/components/headers/X-RateLimit-Reset"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
     GET_transactions_in_progress_500_Response:
       description: Generic error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorDTO'
+            $ref: "#/components/schemas/ErrorDTO"
       headers:
         Access-Control-Allow-Origin:
-          $ref: '#/components/headers/Access-Control-Allow-Origin'
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
+    GET_download_invoice_file_200_Response:
+      description: Ok
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
+        X-RateLimit-Limit:
+          $ref: "#/components/headers/X-RateLimit-Limit"
+        X-RateLimit-Remaining:
+          $ref: "#/components/headers/X-RateLimit-Remaining"
+        X-RateLimit-Reset:
+          $ref: "#/components/headers/X-RateLimit-Reset"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DownloadInvoiceResponseDTO"
+    GET_download_invoice_file_400_Response:
+      description: Bad request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
+        X-RateLimit-Limit:
+          $ref: "#/components/headers/X-RateLimit-Limit"
+        X-RateLimit-Remaining:
+          $ref: "#/components/headers/X-RateLimit-Remaining"
+        X-RateLimit-Reset:
+          $ref: "#/components/headers/X-RateLimit-Reset"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TransactionErrorDTO"
+          example:
+            code: INVALID_REQUEST
+            message: Something went wrong handling request
+    GET_download_invoice_file_401_Response:
+      description: Authentication failed
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
+        X-RateLimit-Limit:
+          $ref: "#/components/headers/X-RateLimit-Limit"
+        X-RateLimit-Remaining:
+          $ref: "#/components/headers/X-RateLimit-Remaining"
+        X-RateLimit-Reset:
+          $ref: "#/components/headers/X-RateLimit-Reset"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TransactionErrorDTO"
+    GET_download_invoice_file_429_Response:
+      description: Too many Request
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
+        Retry-After:
+          $ref: "#/components/headers/Retry-After"
+        X-RateLimit-Limit:
+          $ref: "#/components/headers/X-RateLimit-Limit"
+        X-RateLimit-Remaining:
+          $ref: "#/components/headers/X-RateLimit-Remaining"
+        X-RateLimit-Reset:
+          $ref: "#/components/headers/X-RateLimit-Reset"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TransactionErrorDTO"
+          example:
+            code: TOO_MANY_REQUESTS
+            message: Too many requests
+    GET_download_invoice_file_500_Response:
+      description: Server ERROR
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: "#/components/headers/Access-Control-Allow-Origin"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TransactionErrorDTO"
+          example:
+            code: GENERIC_ERROR
+            message: An error occurred during file reading
   parameters:
     category_query:
       name: category
@@ -1850,7 +2254,7 @@ components:
         type: string
         minLength: 16
         maxLength: 16
-        pattern: '^[A-Z0-9]+$'
+        pattern: "^[A-Z0-9]+$"
     status_trx_processed_query:
       name: status
       in: query
@@ -1919,6 +2323,15 @@ components:
       name: pointOfSaleId
       in: path
       description: The point of sale ID
+      required: true
+      schema:
+        type: string
+        maxLength: 36
+        pattern: .*
+    transactionId_path:
+      name: transactionId
+      in: path
+      description: The transaction ID
       required: true
       schema:
         type: string

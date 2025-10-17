@@ -59,7 +59,7 @@ describe('SideMenu Component', () => {
   });
 
   it('should render both menu items', () => {
-    render(<SideMenu />);
+    render(<SideMenu isOpen={true} setIsOpen={() => {}}/>);
 
     expect(screen.getByText('sideMenu.purchaseManagement')).toBeInTheDocument();
     expect(screen.getByText('sideMenu.refundManagement')).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe('SideMenu Component', () => {
 
   it('should navigate to purchase management on click', async () => {
     const user = userEvent.setup();
-    render(<SideMenu />);
+    render(<SideMenu isOpen={true} setIsOpen={() => {}}/>);
 
     const purchaseItem = screen.getByText('sideMenu.purchaseManagement');
     await user.click(purchaseItem);
@@ -79,7 +79,7 @@ describe('SideMenu Component', () => {
 
   it('should navigate to refund management on click', async () => {
     const user = userEvent.setup();
-    render(<SideMenu />);
+    render(<SideMenu isOpen={true} setIsOpen={() => {}}/>);
     
     const refundItem = screen.getByText('sideMenu.refundManagement');
     await user.click(refundItem);
@@ -90,12 +90,24 @@ describe('SideMenu Component', () => {
 
   it('should navigate to profile on click', async () => {
     const user = userEvent.setup();
-    render(<SideMenu />);
+    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
 
     const profileItem = screen.getByText('sideMenu.profile');
     await user.click(profileItem);
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.PROFILE, { replace: true });
+  });
+
+  it('should toggle menu on click', async () => {
+    const user = userEvent.setup();
+    const setIsOpen = vi.fn();
+    render(<SideMenu isOpen={true} setIsOpen={setIsOpen} />);
+
+    const toggleButton = screen.getByTestId('MenuIcon');
+    await user.click(toggleButton);
+
+    expect(setIsOpen).toHaveBeenCalledTimes(1);
+    expect(setIsOpen).toHaveBeenCalledWith(false);
   });
 });

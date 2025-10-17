@@ -10,6 +10,7 @@ interface Props<T = any> {
   onFiltersApplied?: (values: T) => void;
   onFiltersReset?: () => void;
   filtersApplied?: boolean;
+  filtersAppliedOnce?: boolean;
 }
 
 const FiltersForm = <T extends Record<string, any>>({
@@ -17,7 +18,8 @@ const FiltersForm = <T extends Record<string, any>>({
   formik,
   onFiltersApplied,
   onFiltersReset,
-  filtersApplied
+  filtersApplied,
+  filtersAppliedOnce
 }: Props<T>) => {
   const { t } = useTranslation();
 
@@ -84,7 +86,7 @@ const FiltersForm = <T extends Record<string, any>>({
           gridColumn: 'span 1'
         }}
         onClick={handleResetFilters}
-        disabled={formik.isSubmitting || !filtersApplied }
+        disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce) }
         data-testid="reset-filters-test"
       >
         {t('commons.removeFiltersBtn')}

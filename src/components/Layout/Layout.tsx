@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { Footer } from '@pagopa/selfcare-common-frontend/lib';
 import { useLocation, matchPath } from 'react-router-dom';
 
@@ -9,8 +9,10 @@ type Props = {
 //components
 import Header from '../Header/Header';
 import SideMenu from '../SideMenu/SideMenu';
+import { useState } from 'react';
 
 const Layout = ({ children }: Props) => {
+  const [isOpen, setIsOpen] = useState(true)
   const location = useLocation();
 
   const match = (paths) => {
@@ -31,39 +33,29 @@ const Layout = ({ children }: Props) => {
   ]);
 
   return (
-    <Box
-      display="grid"
-      gridTemplateColumns="1fr"
-      gridTemplateRows="auto 1fr auto"
-      gridTemplateAreas={`"header"
-                          "body"
-                          "footer"`}
-      minHeight="100vh"
-    >
-      <Box gridArea="header">
+    <Box display="flex" flexDirection="column" width="100%" minHeight="100vh">
+      <Box width="100%">
         <Header />
       </Box>
       {isMatched ? (
-        <Box gridArea="body" display="grid" gridTemplateColumns="minmax(300px, 2fr) 10fr">
-          <Box gridColumn="auto" sx={{ backgroundColor: 'background.paper' }}>
-            <SideMenu />
+        <Grid container flexDirection="row" flexWrap="nowrap" flexGrow="1">
+          <Box width={isOpen ? '300px' : 'min-content'}>
+            <SideMenu isOpen={isOpen} setIsOpen={setIsOpen} />
           </Box>
-          <Box
-            gridColumn="auto"
-            sx={{ backgroundColor: '#F5F5F5' }}
-            display="grid"
-            justifyContent="center"
+          <Grid
+            container
+            width="100%"
+            sx={{ backgroundColor: '#F5F5F5', '&>div': {width: '100%'}}}
             pb={16}
             pt={2}
             px={2}
-            gridTemplateColumns="1fr"
           >
             {children}
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
       ) : (
         <Box
-          gridArea="body"
+          width="100%"
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
           justifyContent="center"
@@ -85,7 +77,7 @@ const Layout = ({ children }: Props) => {
           </Box>
         </Box>
       )}
-      <Box gridArea="footer">
+      <Box width="100%">
         <Footer onExit={() =>{}} loggedUser={true} />
       </Box>
     </Box>

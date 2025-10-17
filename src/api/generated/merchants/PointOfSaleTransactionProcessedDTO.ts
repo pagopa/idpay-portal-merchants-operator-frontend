@@ -4,13 +4,14 @@
  */
 /* eslint-disable  */
 
+import { InvoiceFileDTO } from "./InvoiceFileDTO";
 import * as t from "io-ts";
 import { PatternString } from "@pagopa/ts-commons/lib/strings";
-import { enumType } from "@pagopa/ts-commons/lib/types";
 import {
   IWithinRangeIntegerTag,
   WithinRangeInteger
 } from "@pagopa/ts-commons/lib/numbers";
+import { enumType } from "@pagopa/ts-commons/lib/types";
 import { UTCISODateFromString } from "@pagopa/ts-commons/lib/dates";
 
 export enum ChannelEnum {
@@ -50,6 +51,14 @@ const PointOfSaleTransactionProcessedDTOR = t.interface({});
 const PointOfSaleTransactionProcessedDTOO = t.partial({
   additionalProperties: PointOfSaleTransactionProcessedDTOAdditionalProperties,
 
+  authorizedAmountCents: t.union([
+    WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(
+      0,
+      1000000000
+    ),
+    t.literal(1000000000)
+  ]),
+
   channel: enumType<ChannelEnum>(ChannelEnum, "channel"),
 
   effectiveAmountCents: t.union([
@@ -63,6 +72,8 @@ const PointOfSaleTransactionProcessedDTOO = t.partial({
   fiscalCode: PatternString("^[A-Z0-9]+$"),
 
   id: PatternString(".*"),
+
+  invoiceFile: InvoiceFileDTO,
 
   rewardAmountCents: t.union([
     WithinRangeInteger<0, 1000000000, IWithinRangeIntegerTag<0, 1000000000>>(

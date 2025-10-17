@@ -1,128 +1,156 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { describe, it, expect, vi, beforeEach, afterEach} from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import Profile from "./Profile";
-import { AuthProvider } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { authStore } from "../../store/authStore";
+import { getPointOfSaleDetails } from "../../services/merchantService";
+import { jwtDecode } from "jwt-decode";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        "pages.profile.title": "Profilo",
-        "pages.profile.subtitle": "Consulta i dati identificativi dell'azienda",
-        "pages.profile.errorAlert":
-          "Non è stato possibile recuperare i dati. Riprova.",
-      };
-      return translations[key] || key;
-    },
+    t: (key) => key,
   }),
 }));
 
-vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
-  TitleBox: ({ title, subTitle }: { title: string; subTitle: string }) => (
-    <div data-testid="title-box">
-      <h1>{title}</h1>
-      <p>{subTitle}</p>
+vi.mock("../../contexts/AuthContext");
+vi.mock("../../store/authStore");
+vi.mock("../../services/merchantService");
+vi.mock("jwt-decode");
+
+vi.mock("../../components/DetailsCard/DetailsCard", () => ({
+  default: ({ title, item }) => (
+    <div
+      data-testid={`details-card-${title.toLowerCase().replace(/\s/g, "-")}`}
+    >
+      <h3>{title}</h3>
+      <pre>{JSON.stringify(item)}</pre>
     </div>
   ),
 }));
 
-vi.mock("../../components/errorAlert/ErrorAlert", () => ({
-  default: ({ message }: { message: string }) => (
-    <div data-testid="error-alert">{message}</div>
-  ),
+vi.mock("../../components/Alert/AlertComponent", () => ({
+  default: ({ message }) => <div data-testid="alert-component">{message}</div>,
 }));
 
-//api service mock
-const mockGetPointOfSaleDetails = vi.fn();
-vi.mock("../../services/merchantService", () => ({
-  getPointOfSaleDetails: () => mockGetPointOfSaleDetails(),
-}));
+const mockToken = "mock-jwt-token";
+const mockUserId = "merchant-123";
+const mockPointOfSaleId = "pos-456";
 
-vi.mock("jwt-decode", () => ({
-  jwtDecode: () => ({ point_of_sale_id: "pos-456" }),
-}));
-
-const mockDetails = {
-  id: "68c199bc3b741ec5f8054a1e",
-  type: "PHYSICAL",
-  franchiseName: "trony",
-  region: "Puglia",
-  province: "LE",
-  city: "Matino",
-  zipCode: "73046",
-  address: "Via Bolzano4",
-  contactEmail: "referente2345@gmail.com",
-  contactName: "Giuseppe",
-  contactSurname: "Verdi",
-  channelEmail: "",
-  channelPhone: "",
-  channelGeolink: "",
-  channelWebsite: "",
+const mockDecodedToken = {
+  point_of_sale_id: mockPointOfSaleId,
 };
 
-const mockApiResponse = { content: mockDetails };
-
-const renderComponent = () => {
-  const theme = createTheme();
-  return render(
-    <AuthProvider>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <Profile />
-        </ThemeProvider>
-      </BrowserRouter>
-    </AuthProvider>
-  );
+const mockUserDetails = {
+  user: {
+    merchant_id: mockUserId,
+  },
 };
 
-describe("Profile", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+const mockResponse = {
+  id: "POS123",
+  address: "Via Test 1",
+  zipCode: "00100",
+  city: "Roma",
+  province: "RM",
+  channelPhone: "06123456",
+  channelEmail: "vendita@test.it",
+  contactName: "Mario",
+  contactSurname: "Rossi",
+  contactEmail: "contatto@test.it",
+};
+
+beforeEach(() => {
+  vi.useRealTimers();
+
+  useAuth.mockReturnValue(mockUserDetails);
+  authStore.getState.mockReturnValue({ token: mockToken });
+  jwtDecode.mockReturnValue(mockDecodedToken);
+  getPointOfSaleDetails.mockResolvedValue(mockResponse);
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+describe("Profile Component (Vitest)", () => {
+  it("should show loading spinner", () => {
+    render(<Profile />);
+    expect(screen.getByTestId("loading")).toBeInTheDocument();
   });
 
-    it('should show loading spinner', () => {
-      mockGetPointOfSaleDetails.mockReturnValue(new Promise(() => {}));
-      
-      renderComponent();
-      
-      screen.findByTestId('loading');
+  it("should call API, map data and show DetailsCards", async () => {
+    render(<Profile />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("details-cards")).toBeInTheDocument();
     });
 
-  it("should show data", async () => {
-    renderComponent();
-
-    screen.findByTestId("details-cards");
-    expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
-  });
-
-  it("should show no cards when there are no point of sale details", async () => {
-    mockGetPointOfSaleDetails.mockResolvedValue({
-      ...mockApiResponse,
-      content: [],
-      totalElements: 0,
-    });
-
-    renderComponent();
-
-    await screen.findByText("Nessun elemento trovato");
-
-    expect(screen.queryByTestId("details-cards")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
-  });
-
-  it("should show error alert in case of error in data fetch", async () => {
-    mockGetPointOfSaleDetails.mockRejectedValue(new Error("API Failure"));
-
-    renderComponent();
-
-    await screen.findByTestId("alert");
+    expect(jwtDecode).toHaveBeenCalledWith(mockToken);
+    expect(getPointOfSaleDetails).toHaveBeenCalledWith(
+      mockUserId,
+      mockPointOfSaleId
+    );
 
     expect(
-      screen.getByText("Non è stato possibile recuperare i dati. Riprova.")
+      screen.getByTestId("details-card-dati-punto-vendita")
     ).toBeInTheDocument();
-    expect(screen.queryByTestId("details-cards")).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId("details-card-dati-referente")
+    ).toBeInTheDocument();
+
     expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("alert-component")).not.toBeInTheDocument();
+  });
+
+  it("should show AlertComponent in case of API error", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const mockError = new Error("API Error Test");
+    getPointOfSaleDetails.mockRejectedValue(mockError);
+
+    render(<Profile />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("pages.profile.errorAlert")).toBeInTheDocument();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error fetching details:",
+      mockError
+    );
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("should handle API returning empty fields", async () => {
+    const emptyResponse = {
+      id: null,
+      address: null,
+      zipCode: null,
+      city: null,
+      province: null,
+      channelPhone: null,
+      channelEmail: null,
+      contactName: null,
+      contactSurname: null,
+      contactEmail: null,
+    };
+    getPointOfSaleDetails.mockResolvedValue(emptyResponse);
+
+    render(<Profile />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId("details-cards")).toBeInTheDocument()
+    );
+
+    const firstCard = screen.getByTestId("details-card-dati-punto-vendita");
+    expect(firstCard).toHaveTextContent('ID univoco":""');
+
+    const secondCard = screen.getByTestId("details-card-dati-referente");
+    expect(secondCard).toHaveTextContent('Nome":""');
+    expect(secondCard).toHaveTextContent('Cognome":""');
+    expect(secondCard).toHaveTextContent('Email":""');
   });
 });

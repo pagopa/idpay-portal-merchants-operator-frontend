@@ -1,0 +1,9 @@
+.sideMenuItem {
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.sideMenuBurger{
+    padding: 0px 16px !important;
+
+}

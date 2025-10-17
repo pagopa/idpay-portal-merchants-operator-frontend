@@ -84,6 +84,9 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
           sx={{ marginTop: 2 }}
           InputProps={{
             ...params.InputProps,
+            sx: {
+              paddingRight: '0px !important',
+            },
             endAdornment: (
               <>
                 {loading ? <CircularProgress color="inherit" size={20} /> : null}
@@ -114,7 +117,7 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
             },
             '& .MuiAutocomplete-noOptions': {
               fontWeight: '600',
-            },
+            }
           },
         },
         listbox: {
