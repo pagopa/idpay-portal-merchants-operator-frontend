@@ -1,39 +1,45 @@
 import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
-import type { LoggedUser } from '../../utils/types';
+import type {DecodedJwtToken, LoggedUser} from '../../utils/types';
 import {useAuth} from "../../contexts/AuthContext";
 // import type { JwtUser } from '../../utils/types';
 import keycloak from '../../config/keycloak';
+import {jwtDecode} from "jwt-decode";
+import {getPointOfSaleDetails} from "../../services/merchantService.ts";
+import {useEffect, useState} from "react";
+import {authStore} from "../../store/authStore.ts";
 
 interface HeaderProps {
-  userProps?: any;
+    userProps?: LoggedUser & { merchant_id?: string };
 }
 
 const Header = ({userProps}: HeaderProps) => {
-
-  const { user } = userProps ? userProps : useAuth();
-  // const user: JwtUser = {
-  //   id: "12345",
-  //   username: "mattia.rossi",
-  //   firstName: "Mattia",
-  //   lastName: "Rossi",
-  //   email: "mattia.rossi@example.com",
-  //   emailVerified: true,
-  //   userProfileMetadata: {
-  //     role: "admin",
-  //     permissions: ["READ", "WRITE", "DELETE"],
-  //     lastLogin: "2025-08-29T14:35:00Z",
-  //     language: "it"
-  //   }
-  // };
+    const { user } = userProps ? { user: userProps } : useAuth();
+    const token = authStore.getState().token;
+    const [franchiseName, setFranchiseName] = useState<string>('');
 
   const loggedUser: LoggedUser = {
     id: userProps ? userProps.id : user.id,
-    name: userProps ? userProps.firstName : user.firstName,
     email: userProps ? userProps.email : user.email,
-    surname: userProps ? userProps.lastName : user.lastName,
   }
+    const fetchDetails = async (user: any) => {
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
+        try {
+            const response = await getPointOfSaleDetails(
+                user.merchant_id,
+                decodeToken?.point_of_sale_id
+            );
+            setFranchiseName(response?.franchiseName || '');
+        } catch (err) {
+            console.error('Error:', err);
+        }
+    };
 
+    useEffect(() => {
+        if (user && token) {
+            fetchDetails(user);
+        }
+    }, [user, token]);
 
 
   const welfareProduct: ProductEntity = {
@@ -72,7 +78,7 @@ const Header = ({userProps}: HeaderProps) => {
         }))}
         partyList={[{
           id: 'party-idpay-merchants',
-          name: 'Comet S.P.A.',
+          name: franchiseName,
           logoUrl: 'https://www.pagopa.it/it/img/logo-pagopa.svg',
           productRole: "Operatore",
         }
