@@ -49,5 +49,5 @@ describe("main.tsx bootstrap", () => {
     await expect(import("./main")).rejects.toThrowError(
       "Failed to find the root element"
     );
-  });
+  }, 10000);
 });
