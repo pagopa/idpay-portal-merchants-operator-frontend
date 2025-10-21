@@ -1,5 +1,5 @@
 import { Box, Grid } from '@mui/material';
-import { Footer } from '@pagopa/selfcare-common-frontend/lib';
+
 import { useLocation, matchPath } from 'react-router-dom';
 
 import ROUTES from '../../routes';
@@ -10,6 +10,8 @@ type Props = {
 import Header from '../Header/Header';
 import SideMenu from '../SideMenu/SideMenu';
 import { useState } from 'react';
+import {CustomFooter} from "../Footer/CustomFooter.tsx";
+
 
 const Layout = ({ children }: Props) => {
   const [isOpen, setIsOpen] = useState(true)
@@ -78,7 +80,7 @@ const Layout = ({ children }: Props) => {
         </Box>
       )}
       <Box width="100%">
-        <Footer onExit={() =>{}} loggedUser={true} />
+        <CustomFooter />
       </Box>
     </Box>
   );

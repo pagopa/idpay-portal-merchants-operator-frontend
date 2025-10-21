@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
+import {afterEach, vi } from "vitest";
 import Layout from "./Layout";
 import ROUTES from "../../routes";
 import { useLocation } from "react-router-dom";
@@ -22,19 +22,9 @@ vi.mock("../SideMenu/SideMenu", () => ({
     </div>
   ),
 }));
-vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
-  Footer: ({
-    onExit,
-    loggedUser,
-  }: {
-    onExit: () => void;
-    loggedUser: boolean;
-  }) => (
-    <div data-testid="footer">
-      MockFooter logged={String(loggedUser)}
-      <button onClick={onExit}>Exit</button>
-    </div>
-  ),
+
+vi.mock("../Footer/CustomFooter", () => ({
+  CustomFooter: () => <div data-testid="footer">MockCustomFooter</div>,
 }));
 
 vi.mock("react-router-dom", async (importOriginal) => {
@@ -119,17 +109,6 @@ describe("Layout component", () => {
 
     expect(sideMenuContainer).toHaveStyle("width: min-content");
     expect(screen.getByText("SideMenu is closed")).toBeInTheDocument();
-  });
-
-  it("should cover the onExit function from Footer", async () => {
-    (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.HOME });
-    const user = userEvent.setup();
-
-    render(<Layout />);
-
-    const exitButton = screen.getByRole("button", { name: /exit/i });
-
-    await user.click(exitButton);
   });
 
   it("applies default maxWidth for other non-matching routes", () => {
