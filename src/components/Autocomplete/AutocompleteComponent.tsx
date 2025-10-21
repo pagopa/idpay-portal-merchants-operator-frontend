@@ -1,23 +1,40 @@
-import { useState, useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import CircularProgress from '@mui/material/CircularProgress';
-import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
-import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { useState, useEffect } from "react";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
+import { ProductDTO } from "../../api/generated/merchants/ProductDTO";
+import { REQUIRED_FIELD_ERROR } from "../../utils/constants";
 import { useTranslation } from "react-i18next";
 
-
-export default function AutocompleteComponent({ options, onChangeDebounce, inputError, onChange, value }: { options: ProductDTO[], onChangeDebounce?: (value: string) => void, inputError?: boolean, onChange?: (value: ProductDTO) => void, value?: ProductDTO }) {
+export default function AutocompleteComponent({
+  options,
+  onChangeDebounce,
+  inputError,
+  onChange,
+  value,
+  width,
+}: {
+  options: ProductDTO[];
+  onChangeDebounce?: (value: string) => void;
+  inputError?: boolean;
+  onChange?: (value: ProductDTO) => void;
+  value?: ProductDTO;
+  width?: string | number;
+}) {
   // const [currentValue, setCurrentValue] = useState(value);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [optionValue, setOptionValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [optionValue, setOptionValue] = useState("");
   const { t } = useTranslation();
 
   useEffect(() => {
     // If input is less than 5 characters, clear options and do nothing.
-    if (inputValue.length < 5 || inputValue.trim().length === 0 || optionValue === inputValue) {
+    if (
+      inputValue.length < 5 ||
+      inputValue.trim().length === 0 ||
+      optionValue === inputValue
+    ) {
       setLoading(false);
       return;
     }
@@ -34,7 +51,7 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
     return () => {
       clearTimeout(timer);
     };
-  }, [inputValue]);
+  }, [inputValue, onChangeDebounce, optionValue]);
 
   useEffect(() => {
     setLoading(false);
@@ -44,9 +61,9 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
     <Autocomplete
       id="server-side-autocomplete"
       sx={{
-        width: '50%',
-        '& .MuiFormLabel-root.Mui-error': {
-          color: '#5C6E82 !important',
+        width: width,
+        "& .MuiFormLabel-root.Mui-error": {
+          color: "#5C6E82 !important",
         },
       }}
       open={open}
@@ -57,13 +74,18 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
         setOpen(false);
       }}
       // Determine if two options are equal
-      isOptionEqualToValue={(option, value) => option?.productName === value?.productName}
+      isOptionEqualToValue={(option, value) =>
+        option?.fullProductName === value?.fullProductName
+      }
       // Extract the label from the option
-      getOptionLabel={(option) => {setOptionValue(option?.productName); return option?.productName}}
+      getOptionLabel={(option) => {
+        setOptionValue(option?.fullProductName);
+        return option?.fullProductName;
+      }}
       options={options}
       loading={loading}
-      noOptionsText={t('pages.acceptDiscount.noOptionsText')}
-      loadingText={t('pages.acceptDiscount.loadingText')}
+      noOptionsText={t("pages.acceptDiscount.noOptionsText")}
+      loadingText={t("pages.acceptDiscount.loadingText")}
       value={value}
       onChange={(_, value) => {
         if (onChange) {
@@ -71,25 +93,27 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
         }
       }}
       onInputChange={(_, newInputValue) => {
-        setInputValue(newInputValue); 
+        setInputValue(newInputValue);
       }}
       filterOptions={(x) => x}
       renderInput={(params) => (
         <TextField
           {...params}
           label="Cerca"
-          size='small'
+          size="small"
           error={inputError}
           helperText={inputError ? REQUIRED_FIELD_ERROR : ""}
           sx={{ marginTop: 2 }}
           InputProps={{
             ...params.InputProps,
             sx: {
-              paddingRight: '0px !important',
+              paddingRight: "0px !important",
             },
             endAdornment: (
               <>
-                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {loading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : null}
               </>
             ),
           }}
@@ -99,45 +123,46 @@ export default function AutocompleteComponent({ options, onChangeDebounce, input
         popper: {
           modifiers: [
             {
-              name: 'offset',
+              name: "offset",
               options: {
-                offset: [0, 8], 
+                offset: [0, 8],
               },
             },
           ],
           sx: {
-             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15), 0px 0px 2px rgba(0, 0, 0, 0.05)',
-             borderRadius: '4px',
-            '& .MuiAutocomplete-option': {
-              '&:hover': {
-                backgroundColor: '#0073E614 !important',
-                color: '#0073E6 !important',
-                fontWeight: '600 !important',
+            boxShadow:
+              "0px 4px 8px rgba(0, 0, 0, 0.15), 0px 0px 2px rgba(0, 0, 0, 0.05)",
+            borderRadius: "4px",
+            "& .MuiAutocomplete-option": {
+              "&:hover": {
+                backgroundColor: "#0073E614 !important",
+                color: "#0073E6 !important",
+                fontWeight: "600 !important",
               },
             },
-            '& .MuiAutocomplete-noOptions': {
-              fontWeight: '600',
-            }
+            "& .MuiAutocomplete-noOptions": {
+              fontWeight: "600",
+            },
           },
         },
         listbox: {
           sx: {
-            '&::-webkit-scrollbar': {
-              width: '6px',
+            "&::-webkit-scrollbar": {
+              width: "6px",
             },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#0073E6',
-              borderRadius: '4px',
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#0073E6",
+              borderRadius: "4px",
             },
-            '&::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: '#005BB5',
+            "&::-webkit-scrollbar-thumb:hover": {
+              backgroundColor: "#005BB5",
             },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: '#f1f1f1',
-              borderRadius: '4px',
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#f1f1f1",
+              borderRadius: "4px",
             },
           },
-        }
+        },
       }}
     />
   );

@@ -192,6 +192,7 @@ paths:
         - $ref: "#/components/parameters/gtinCode_query"
         - $ref: "#/components/parameters/productFileId_query"
         - $ref: "#/components/parameters/productName_query"
+        - $ref: '#/components/parameters/fullProductName_query'
         - $ref: "#/components/parameters/status_query"
         - $ref: "#/components/parameters/organizationId_query"
       responses:
@@ -1246,6 +1247,11 @@ components:
           description: "ENG: The name of the product  <br> IT: Nome del prodotto"
           maxLength: 255
           pattern: .*
+        fullProductName:
+          type: string
+          description: 'ENG: The name of the product with GTIN (for merchant)  <br> IT: Nome del prodotto con GTIN (per esercenti)'
+          maxLength: 255
+          pattern: .*
         motivation:
           type: string
           maxLength: 200
@@ -2240,6 +2246,14 @@ components:
           - SUPERVISIONED
     productName_query:
       name: productName
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 255
+        pattern: .*
+    fullProductName_query:
+      name: fullProductName
       in: query
       required: false
       schema:

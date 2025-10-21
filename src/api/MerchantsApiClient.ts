@@ -66,7 +66,8 @@ export const MerchantApi = {
     eprelCode?: string, 
     gtinCode?: string, 
     productFileId?: string, 
-    productName?: string, 
+    productName?: string,
+    fullProductName?:string, 
     organizationId?: string
    }
   ): Promise<ProductListDTO> => {
