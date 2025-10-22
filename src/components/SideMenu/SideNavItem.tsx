@@ -1,5 +1,6 @@
-import { ListItemButton, ListItemText, ListItemIcon, Icon } from '@mui/material';
+import { ListItemButton, ListItemText, ListItemIcon, Icon, Tooltip } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
+import styles from './SideMenu.module.css';
     
 type Props = {
   handleClick: () => void;
@@ -8,6 +9,7 @@ type Props = {
   icon: SvgIconComponent;
   level: number;
   disabled?: boolean;
+  hideLabels?: boolean;
 };
 
 export default function SideNavItem({
@@ -17,13 +19,20 @@ export default function SideNavItem({
   icon,
   level,
   disabled = false,
+  hideLabels = false
 }: Props) {
   return (
-    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick}>
+    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick} className={hideLabels ? styles.sideMenuItem : ''}>
       <ListItemIcon sx={{ ml: level }}>
-        <Icon component={icon} />
+        {
+          hideLabels ? (
+            <Tooltip title={title}>
+              <Icon component={icon} />
+            </Tooltip>
+          ) : (<Icon component={icon} />)
+        }
       </ListItemIcon>
-      <ListItemText
+      {!hideLabels && <ListItemText
         primary={title}
         sx={{
           wordWrap: 'break-word',
@@ -32,7 +41,7 @@ export default function SideNavItem({
           textAlign: 'left',
           display: 'block',
         }}
-      />
+      />}
     </ListItemButton>
   );
 }

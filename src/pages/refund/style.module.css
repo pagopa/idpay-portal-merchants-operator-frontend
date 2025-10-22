@@ -1,0 +1,18 @@
+
+.uploadFileContainer {
+
+    button {
+        button{
+            background-color: #EEF4FD !important;
+            color: #0073E6 !important;
+            padding: 0 !important;
+
+            &:hover {
+                background-color: #EEF4FD !important;
+                color: #0073E6 !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+
+}

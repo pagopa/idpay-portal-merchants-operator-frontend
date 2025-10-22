@@ -210,6 +210,66 @@ export const MerchantApi = {
     }
   },
 
+  downloadInvoiceFileApi: async (pointOfSaleId: string,trxId: string): Promise<{ invoiceUrl: string }> => {
+    try {
+      const response = await axiosInstance.get(`${pointOfSaleId}/transactions/${trxId}/download`);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in downloadInvoiceFile:', error);
+      throw error;
+    }
+  },
+
+  reverseTransactionApi: async (
+    trxId: string, 
+    file: File
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await axiosInstance.post(
+        `/transactions/${trxId}/reversal`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in reverseTransaction:', error);
+      throw error;
+    }
+  },
+
+  rewardTransactionApi: async (
+    trxId: string, 
+    file: File
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await axiosInstance.post(
+        `/transactions/${trxId}/reward`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in rewardTransaction:', error);
+      throw error;
+    }
+  },
+
 };
 
 

@@ -30,7 +30,13 @@ variables:
     react_app_url_fe_pre_login: '$(UAT_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(UAT_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(UAT_REACT_APP_URL_FE_LANDING)'
-
+    
+    vite_manual_link: 'https://developer.pagopa.it/pari/guides/manuale-tecnico-venditore'
+    vite_assistance: 'https://developer.pagopa.it/pari/guides/manuale-tecnico-venditore/contatti'
+    vite_accessibility: 'https://form.agid.gov.it/view/87f46790-9798-11f0-b583-8b5f76942354'
+    vite_protection_of_personal_data: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8'
+    vite_terms_and_conditions: ''
+    vite_privacy: ''
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -60,6 +66,12 @@ variables:
     react_app_url_fe_auth: '$(PROD_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(PROD_REACT_APP_URL_FE_LANDING)'
 
+    vite_manual_link: 'https://developer.pagopa.it/pari/guides/manuale-tecnico-venditore'
+    vite_assistance: 'https://developer.pagopa.it/pari/guides/manuale-tecnico-venditore/contatti'
+    vite_accessibility: 'https://form.agid.gov.it/view/87f46790-9798-11f0-b583-8b5f76942354'
+    vite_protection_of_personal_data: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8'
+    vite_terms_and_conditions: ''
+    vite_privacy: ''
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
@@ -87,6 +99,13 @@ variables:
     react_app_url_cdn: '$(DEV_REACT_APP_URL_CDN)'
 
     react_app_url_storage: '$(DEV_REACT_APP_URL_STORAGE)'
+
+    vite_manual_link: 'https://developer.pagopa.it/pari/guides/manuale-tecnico-venditore'
+    vite_assistance: 'https://developer.pagopa.it/pari/guides/manuale-tecnico-venditore/contatti'
+    vite_accessibility: 'https://form.agid.gov.it/view/87f46790-9798-11f0-b583-8b5f76942354'
+    vite_protection_of_personal_data: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8'
+    vite_terms_and_conditions: ''
+    vite_privacy: ''
 
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
@@ -204,6 +223,14 @@ stages:
               VITE_KEYCLOAK_CLIENT_ID: '$(vite_keycloak_client_id)'
               VITE_KEYCLOAK_REDIRECT_URI: '$(vite_keycloak_redirect_uri)'
 
+              VITE_MANUAL_LINK: $(vite_manual_link)
+              VITE_PROTECTIONOFPERSONALDATA: $(vite_protection_of_personal_data)
+              VITE_TERMSANDCONDITIONS: $(vite_terms_and_conditions)
+              VITE_PRIVACY: $(vite_privacy)
+              VITE_ASSISTANCE: $(vite_assistance)
+              VITE_ACCESSIBILITY: $(vite_accessibility)
+
+              
 
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
