@@ -228,7 +228,9 @@
         "cancellPayment": "Annulla transazione",
         "requestRefund": "Richiedi rimborso",
         "refund": "Storna",
-        "householdAppliance": "Elettrodomestico"
+        "householdAppliance": "Elettrodomestico",
+        "document": "Documento di pre-autorizzazione",
+        "transactionId": "ID transazione"
       },
       "cancelTransactionModal": {
         "title": "Vuoi annullare la transazione?",
