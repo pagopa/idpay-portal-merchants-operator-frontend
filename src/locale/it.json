@@ -84,7 +84,7 @@
       "title":"Richiedi rimborso",
       "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
       "creditNote": "Carica la fattura",
-      "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. <Assicurati che il documento sia in formato .xml o .pdf> e <conforme agli standard della fatturazione elettronica.>",
+      "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica.",
       "replaceFile":"Sostituisci",
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
