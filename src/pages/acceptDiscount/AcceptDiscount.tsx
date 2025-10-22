@@ -173,7 +173,7 @@ const AcceptDiscount = () => {
         return;
       }
 
-      console.log("VAL", typeof newValue);
+      // console.log("VAL", typeof newValue);
 
       setFormData((prev) => ({
         ...prev,
