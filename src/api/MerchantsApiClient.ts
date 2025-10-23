@@ -270,6 +270,18 @@ export const MerchantApi = {
     }
   },
 
+  getPreviewPdf: async (trxId: string): Promise<{ data: string }> => {
+    try {
+      const response = await axiosInstance.get(`/transactions/${trxId}/preview-pdf`);
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in getPreviewPdf:', error);
+      throw error;
+    }
+  },
+
+
 };
 
 

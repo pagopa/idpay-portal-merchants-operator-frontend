@@ -1,5 +1,5 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-
 import {
   render,
   screen,
@@ -15,8 +15,10 @@ import {
   getInProgressTransactions,
   deleteTransactionInProgress,
   capturePayment,
+  getPreviewPdf
 } from "../../services/merchantService";
 import PurchaseManagement from "./PurchaseManagement";
+import { downloadFileFromBase64 } from "../../utils/helpers";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -30,6 +32,12 @@ vi.mock("react-i18next", () => ({
       return translations[key] || key;
     },
   }),
+}));
+
+vi.mock("../../utils/helpers", () => ({
+  getStatusChip: vi.fn((t, status) => status),
+  formatEuro: vi.fn((cents) => `€${(cents / 100).toFixed(2)}`),
+  downloadFileFromBase64: vi.fn(), // Aggiungi questo
 }));
 
 // Mock di react-router-dom per la navigazione
@@ -52,58 +60,66 @@ vi.mock("../../services/merchantService");
 vi.mock("../../store/utilsStore");
 vi.mock("../../store/authStore");
 
+vi.mock("../../utils/constants", () => ({
+  MISSING_DATA_PLACEHOLDER: "--",
+}));
+
 const onClick = {
   click: () => {}
 }
-const onClickSpy = vi.spyOn(onClick, 'click')
+const onClickSpy = vi.spyOn(onClick, 'click');
+
+let capturedColumns = [];
 
 // Mock dei componenti figli
 vi.mock("../../components/DataTable/DataTable", () => ({
   default: ({
     rows,
-    columns,
+    columns, // Le colonne sono qui
     onPaginationPageChange,
     onSortModelChange,
     handleRowAction,
     paginationModel,
     sortModel,
-  }) => (
-    <div data-testid="data-table">
-      <div data-testid="table-rows">{rows.length} rows</div>
-      <button
-        data-testid="pagination-change"
-        onClick={() =>
-          onPaginationPageChange({
-            page: paginationModel.page + 1,
-            pageSize: paginationModel.pageSize,
-          })
-        }
-      />
-      <button
-        data-testid="sort-change-name-desc"
-        onClick={() => {
-          onClick.click()
-          onSortModelChange([{ field: "additionalProperties", sort: "desc" }])
-        }}
-      />
-      <button
-        data-testid="sort-change-date-asc"
-        onClick={() => {
-          onClick.click()
-          onSortModelChange([{ field: "updateDate", sort: "asc" }])
-        }
-        }
-      />
-      <button
-        data-testid="row-action"
-        onClick={() => {
-          onClick.click()
-          handleRowAction(rows[0])
-        }}
-      />
-      <div data-testid="sort-model">{JSON.stringify(sortModel)}</div>
-    </div>
-  ),
+  }) => {
+    capturedColumns = columns; // <-- Catturiamo le colonne
+    return (
+      <div data-testid="data-table">
+        <div data-testid="table-rows">{rows.length} rows</div>
+        <button
+          data-testid="pagination-change"
+          onClick={() =>
+            onPaginationPageChange({
+              page: paginationModel.page + 1,
+              pageSize: paginationModel.pageSize,
+            })
+          }
+        />
+        <button
+          data-testid="sort-change-name-desc"
+          onClick={() => {
+            onClick.click();
+            onSortModelChange([{ field: "additionalProperties", sort: "desc" }]);
+          }}
+        />
+        <button
+          data-testid="sort-change-date-asc"
+          onClick={() => {
+            onClick.click();
+            onSortModelChange([{ field: "updateDate", sort: "asc" }]);
+          }}
+        />
+        <button
+          data-testid="row-action"
+          onClick={() => {
+            onClick.click();
+            handleRowAction(rows[0]);
+          }}
+        />
+        <div data-testid="sort-model">{JSON.stringify(sortModel)}</div>
+      </div>
+    );
+  },
 }));
 
 vi.mock("../../components/FiltersForm/FiltersForm", () => ({
@@ -191,6 +207,8 @@ beforeEach(() => {
     VITE_PAGINATION_SIZE: mockPageSize,
   });
 
+  capturedColumns = [];
+
   authStore.getState.mockReturnValue({ token: mockToken });
   jwtDecode.mockReturnValue(mockDecodedToken);
   utilsStore.mockReturnValue(false);
@@ -198,6 +216,8 @@ beforeEach(() => {
   getInProgressTransactions.mockResolvedValue(mockAPIResponse);
   deleteTransactionInProgress.mockResolvedValue({});
   capturePayment.mockResolvedValue({});
+  getPreviewPdf.mockResolvedValue({ data: "base64MockData" });
+
 });
 
 afterEach(() => {
@@ -656,4 +676,181 @@ describe("PurchaseManagement Component", () => {
     vi.useRealTimers();
     consoleErrorSpy.mockRestore();
   };
+
+  describe("Column RenderCell Logic (additionalProperties)", () => {
+    let productNameRenderCell;
+
+
+    beforeEach(async () => {
+      render(<PurchaseManagement />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("data-table")).toBeInTheDocument();
+      });
+
+
+      const productColumn = capturedColumns.find(
+        (col) => col.field === "additionalProperties"
+      );
+      expect(productColumn).toBeDefined();
+      expect(productColumn.renderCell).toBeInstanceOf(Function);
+      productNameRenderCell = productColumn.renderCell;
+
+    });
+
+    it("dovrebbe renderizzare il placeholder '--' se 'value' è nullo", () => {
+      const params = { value: null };
+      const result = productNameRenderCell(params);
+
+      expect(result).toBe("--");
+    });
+
+    it("dovrebbe renderizzare il placeholder '--' se 'productName' è assente", () => {
+      const params = { value: { otherProp: "data" } }; 
+      const result = productNameRenderCell(params);
+      expect(result).toBe("--");
+    });
+
+    it("dovrebbe renderizzare il placeholder '--' se 'productName' è nullo", () => {
+      const params = { value: { productName: null } };
+      const result = productNameRenderCell(params);
+      expect(result).toBe("--");
+    });
+  });
+
+  describe("handleRequestRefund", () => {
+    it("dovrebbe navigare alla pagina di richiesta rimborso quando viene cliccato il bottone RequestRefund", async () => {
+      getInProgressTransactions.mockResolvedValue({
+        ...mockAPIResponse,
+        content: [mockTransaction("CAPTURED", "trx456")],
+      });
+      
+      render(<PurchaseManagement />);
+      
+
+      await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+      
+
+      expect(
+        screen.getByText("pages.purchaseManagement.drawer.requestRefund")
+      ).toBeInTheDocument();
+      
+      fireEvent.click(
+        screen.getByText("pages.purchaseManagement.drawer.requestRefund")
+      );
+      
+
+      expect(mockNavigate).toHaveBeenCalledWith("/richiedi-rimborso/trx456");
+    });
+  });
+
+  describe("handlePreviewPdf", () => {
+    it("dovrebbe scaricare il PDF con successo quando viene cliccato il bottone", async () => {
+      getInProgressTransactions.mockResolvedValue({
+        ...mockAPIResponse,
+        content: [mockTransaction("AUTHORIZED", "trx789")],
+      });
+      
+      render(<PurchaseManagement />);
+      
+
+      await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+      
+
+      const pdfButton = screen.getByTestId("btn-test");
+      expect(pdfButton).toBeInTheDocument();
+      
+
+      expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+      
+      fireEvent.click(pdfButton);
+      
+ 
+      await waitFor(() => {
+        expect(screen.getByTestId("item-loader")).toBeInTheDocument();
+      });
+      
+
+      await waitFor(() => {
+        expect(getPreviewPdf).toHaveBeenCalledWith("trx789");
+        expect(downloadFileFromBase64).toHaveBeenCalledWith(
+          "base64MockData",
+          "CODE-trx789_preautorizzazione.pdf"
+        );
+      });
+      
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+      });
+      
+
+      expect(screen.queryByTestId("alert-error")).not.toBeInTheDocument();
+    });
+  });
+
+  it("dovrebbe mostrare un alert di errore se il download del PDF fallisce", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED", "trx999")],
+    });
+    
+    getPreviewPdf.mockRejectedValue(new Error("PDF Download Failed"));
+    
+    render(<PurchaseManagement />);
+    
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+    
+    const pdfButton = screen.getByTestId("btn-test");
+    fireEvent.click(pdfButton);
+    
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error getting preview PDF:",
+        expect.any(Error)
+      );
+    });
+    
+    await waitFor(() => {
+      expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+    });
+    
+    expect(screen.getByTestId("alert-error")).toHaveTextContent(
+      "pages.purchaseManagement.errorPreviewPdf"
+    );
+    
+    expect(downloadFileFromBase64).not.toHaveBeenCalled();
+    
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("dovrebbe chiudere la modal di Cancel e non riaprire il drawer quando si clicca su Close Modal", async () => {
+    getInProgressTransactions.mockResolvedValue({
+      ...mockAPIResponse,
+      content: [mockTransaction("AUTHORIZED")],
+    });
+    
+    render(<PurchaseManagement />);
+    
+    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+    fireEvent.click(
+      screen.getByText("pages.purchaseManagement.drawer.cancellPayment")
+    );
+    
+    expect(screen.getByTestId("modal-component")).toBeInTheDocument();
+    expect(
+      screen.getByText("pages.purchaseManagement.cancelTransactionModal.title")
+    ).toBeInTheDocument();
+    
+    fireEvent.click(screen.getByTestId("modal-close"));
+    
+    await waitFor(() => {
+      expect(screen.queryByTestId("modal-component")).not.toBeInTheDocument();
+    });
+    
+  });
 });

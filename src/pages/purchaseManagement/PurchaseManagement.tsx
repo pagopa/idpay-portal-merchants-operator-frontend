@@ -1,20 +1,21 @@
-import { Box, Button, Tooltip, Drawer, Typography, Grid } from "@mui/material";
+import { Box, Button, Tooltip, Drawer, Typography, Grid, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect, useRef } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
-import { getInProgressTransactions, deleteTransactionInProgress, capturePayment } from "../../services/merchantService";
+import { getInProgressTransactions, deleteTransactionInProgress, capturePayment, getPreviewPdf } from "../../services/merchantService";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { transactionInProgreessDTO } from "../../utils/types";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from './purchaseManagement.module.css';
-import { getStatusChip, formatEuro } from "../../utils/helpers";
+import { getStatusChip, formatEuro, downloadFileFromBase64 } from "../../utils/helpers";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const PurchaseManagement = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -27,6 +28,8 @@ const PurchaseManagement = () => {
     const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const [refundTransactionModal, setRefundTransactionModal] = useState(false);
+    const [errorPreviewPdf, setErrorPreviewPdf] = useState(false);
+    const [isPreviewPdfLoading, setIsPreviewPdfLoading] = useState(false);
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
     const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
 
@@ -210,7 +213,7 @@ const PurchaseManagement = () => {
     const checkHeight = () => {
         if (gridRef.current) {
             const gridHeight = gridRef.current.scrollHeight;
-            const maxHeight = window.innerHeight - 206;
+            const maxHeight = window.innerHeight - 300;
             setIsScrollable(gridHeight > maxHeight);
         }
     };
@@ -267,6 +270,19 @@ const PurchaseManagement = () => {
         navigate("/richiedi-rimborso/" + selectedTransaction?.id);
     };
 
+    const handlePreviewPdf = async () => {
+        setIsPreviewPdfLoading(true);
+        try {
+            const response = await getPreviewPdf(selectedTransaction?.id);
+            downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
+        } catch (error) {
+            console.error('Error getting preview PDF:', error);
+            setErrorPreviewPdf(true);
+        } finally {
+            setIsPreviewPdfLoading(false);
+        }
+    };
+
     return (
         <>
             <TransactionsLayout
@@ -285,14 +301,16 @@ const PurchaseManagement = () => {
                     [errorDeleteTransaction, setErrorDeleteTransaction],
                     [errorCaptureTransaction, setErrorCaptureTransaction],
                     [transactionCaptured, setTransactionCaptured],
-                    [transactionAuthorized, () => utilsStore.setState({ transactionAuthorized: false })]
+                    [transactionAuthorized, () => utilsStore.setState({ transactionAuthorized: false })],
+                    [errorPreviewPdf, setErrorPreviewPdf]
                 ]}
                 alertMessages={{
                     error: t('pages.refundManagement.errorAlert'),
                     transactionAuthorized: t('pages.purchaseManagement.alertSuccess'),
                     transactionCaptured: t('pages.purchaseManagement.paymentSuccess'),
                     errorDeleteTransaction: t('pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction'),
-                    errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')
+                    errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction'),
+                    errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf')
                 }}
                 noDataMessage={t('pages.refundManagement.noTransactions')}
                 triggerFetchTransactions={triggerFetchTransactions}
@@ -395,16 +413,35 @@ const PurchaseManagement = () => {
                                         {selectedTransaction?.status ? getStatusChip(t, selectedTransaction?.status) : MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
-                                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                                    <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
-                                        {t('pages.purchaseManagement.drawer.document')}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
-                                        {selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined
-                                            ? formatEuro(selectedTransaction?.rewardAmountCents)
-                                            : MISSING_DATA_PLACEHOLDER}
-                                    </Typography>
-                                </Grid>
+                                {
+                                    selectedTransaction?.status === 'AUTHORIZED' && (
+                                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                            <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary, margin: 0 }}>
+                                                {t('pages.purchaseManagement.drawer.document')}
+                                            </Typography>
+                                            <Button
+                                                data-testid="btn-test"
+                                                sx={{ padding: "0", fontWeight: theme.typography.fontWeightMedium, fontSize: '18px' }}
+                                                onClick={handlePreviewPdf}
+                                            >
+
+
+                                                {isPreviewPdfLoading ? (
+                                                    <CircularProgress
+                                                        color="inherit"
+                                                        size={20}
+                                                        data-testid="item-loader"
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <DescriptionIcon />
+                                                        <span style={{ marginLeft: '8px' }}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</span>
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </Grid> 
+                                    )
+                                }
                             </Grid>
                             <Box sx={{ position: 'absolute', bottom: 0, display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
                                 <Box sx={{ width: '100%' }}>
@@ -438,7 +475,8 @@ const PurchaseManagement = () => {
                     transactionAuthorized,
                     transactionCaptured,
                     errorDeleteTransaction,
-                    errorCaptureTransaction
+                    errorCaptureTransaction,
+                    errorPreviewPdf
                 }}
             />
 
