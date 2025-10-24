@@ -258,4 +258,8 @@ describe("fileUploadAction component test", () => {
 
     inputClickSpy.mockRestore();
   });
+    it("open manual link when link is clicked", () => {
+    render(<FileUploadAction {...baseProps} apiCall={vi.fn()}/>);
+    fireEvent.click(screen.getByText('blockKeyTest.manualLink'));
+  });
 });
