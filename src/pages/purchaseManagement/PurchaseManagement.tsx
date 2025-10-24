@@ -213,7 +213,7 @@ const PurchaseManagement = () => {
     const checkHeight = () => {
         if (gridRef.current) {
             const gridHeight = gridRef.current.scrollHeight;
-            const maxHeight = window.innerHeight - 300;
+            const maxHeight = window.innerHeight - 280;
             setIsScrollable(gridHeight > maxHeight);
         }
     };
