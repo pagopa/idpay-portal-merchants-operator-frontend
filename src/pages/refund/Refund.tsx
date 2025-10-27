@@ -14,7 +14,7 @@ const Refund = () => {
             apiCall={rewardTransactionApi} 
             successStateKey="refundUploadSuccess" 
             breadcrumbsLabelKey={t('routes.refund')}
-            manualLink="#" 
+            manualLink={import.meta.env.VITE_MANUAL_LINK} 
             styleClass={styles.uploadFileContainer} 
         />
     );
