@@ -470,6 +470,7 @@ const Products = () => {
                                     fullWidth
                                     value={formik.values.gtinCode}
                                     onChange={(e) => handleGtinChange(e)}
+                                    onBlur={() => setGtinError('')}
                                     inputProps={{ maxLength: 14 }}
                                     error={!!gtinError}
                                     helperText={gtinError}

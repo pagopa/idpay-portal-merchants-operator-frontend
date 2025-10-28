@@ -357,6 +357,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                 fullWidth
                 value={formik.values.productGtin}
                 onChange={(e) => handleGtinChange(e)}
+                onBlur={() => setGtinError('')}
                 error={!!gtinError}
                 helperText={gtinError}
               />
