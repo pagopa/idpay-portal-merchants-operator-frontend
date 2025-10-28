@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { getStatusChip, formatEuro } from "./helpers";
+import { getStatusChip, formatEuro, handleGtinChange } from "./helpers";
+
+const mockEvent = {target: {value: '+'}}
 
 describe("getStatusChip", () => {
   const mockT = (key: string) => key;
@@ -57,5 +59,9 @@ describe("formatEuro", () => {
 
   it("dovrebbe formattare correttamente un importo grande", () => {
     expect(formatEuro(987654321)).toBe("9.876.543,21€");
+  });
+
+  it("dovrebbe mostrare l'errore", () => {
+    expect(handleGtinChange(mockEvent, '')).toBe("Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.");
   });
 });
