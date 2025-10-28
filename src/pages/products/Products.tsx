@@ -21,6 +21,7 @@ import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
 
 
 const Products = () => {
+    const [gtinError, setGtinError] = useState<string>("");
     const [productsList, setProductsList] = useState([]);
     const [productsListIsLoading, setProductsListIsLoading] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -289,6 +290,26 @@ const Products = () => {
         return formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0;
     };
 
+    const handleGtinChange = (event: any) => {
+    const value = event.target.value;
+
+    if (value.includes(" ") || value.length > 14) {
+      return;
+    }
+
+    const alphanumericRegex = /^[a-zA-Z0-9]*$/;
+
+    if (!alphanumericRegex.test(value)) {
+      setGtinError(
+        "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici."
+      );
+      return;
+    }
+
+    setGtinError("");
+    formik.handleChange(event);
+  };
+
 
     return (
         <Box>
@@ -388,7 +409,10 @@ const Products = () => {
                                     size="small"
                                     fullWidth
                                     value={formik.values.gtinCode}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => handleGtinChange(e)}
+                                    inputProps={{ maxLength: 14 }}
+                                    error={!!gtinError}
+                                    helperText={gtinError}
                                 />
                             </Grid>
 
