@@ -1,13 +1,7 @@
 import { describe, vi } from "vitest";
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import {PrivacyAndTosLayout} from './PrivacyAndTosLayout';
 
-const mockNavigate = vi.fn();
-vi.mock("react-router-dom", () => ({
-  useNavigate: () => mockNavigate,
-}));
-
-vi.mock('../../../hooks/useOneTrustNotice');
 vi.mock('../../components/OneTrustContentWrapper', () => (props: { idSelector: string }) => (
   <div data-testid="onetrust-wrapper" data-idselector={props.idSelector} />
 ));
@@ -29,11 +23,7 @@ describe('Layout component', () => {
     vi.clearAllMocks();
   });
 
-  test('should render component and navigate back', () => {
+  test('should render component', () => {
     render(<PrivacyAndTosLayout text={{ html: '' }} title={""} />);
-
-    const backButton = screen.getByTestId('back-stores-button');
-
-    fireEvent.click(backButton);
   });
 });

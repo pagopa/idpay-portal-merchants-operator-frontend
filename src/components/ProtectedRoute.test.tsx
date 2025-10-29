@@ -15,10 +15,11 @@ describe("ProtectedRoute", () => {
     mockUseAuth = vi.fn();
   });
 
-  const setupMock = (isAuthenticated: boolean, loading: boolean) => {
+  const setupMock = (isAuthenticated: boolean, loading: boolean, login: () => void) => {
     mockUseAuth.mockReturnValue({
       isAuthenticated,
       loading,
+      login,
     });
   };
 
@@ -27,7 +28,7 @@ describe("ProtectedRoute", () => {
   });
 
   it("render CircularProgress when loading is true", () => {
-    setupMock(false, true);
+    setupMock(false, true, () => {});
 
     render(
       <ProtectedRoute>
@@ -39,7 +40,7 @@ describe("ProtectedRoute", () => {
   });
 
   it("render redirect message if isAuthenticated eq false and loading eq true", () => {
-    setupMock(false, false);
+    setupMock(false, false, () => {});
 
     render(
       <ProtectedRoute>
@@ -53,7 +54,7 @@ describe("ProtectedRoute", () => {
   });
 
   it("render children if isAuthenticated = true and loading = false", () => {
-    setupMock(true, false);
+    setupMock(true, false, () => {});
 
     render(
       <ProtectedRoute>
