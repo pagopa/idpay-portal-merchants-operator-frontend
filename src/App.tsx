@@ -11,6 +11,8 @@ import Profile from './pages/profile/Profile.tsx';
 import Products from "./pages/products/Products.tsx";
 import Reverse from "./pages/reverse/Reverse.tsx";
 import Refund from "./pages/refund/Refund.tsx";
+import TOS from './pages/tos/TOS.tsx';
+import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy.tsx';
 
 function App() {
 
@@ -28,6 +30,8 @@ function App() {
             <Route path={ROUTES.PRODUCTS} element={<Products />} />
             <Route path={ROUTES.REVERSE} element={<Reverse />} />
             <Route path={ROUTES.REFUND} element={<Refund />} />
+            <Route path={ROUTES.TOS} element={<TOS />}/>
+            <Route path={ROUTES.PRIVACY_POLICY} element={<PrivacyPolicy />}/>
           </Routes>
         </Layout>
       </ProtectedRoute>

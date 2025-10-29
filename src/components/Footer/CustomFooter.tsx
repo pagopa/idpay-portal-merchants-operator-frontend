@@ -1,11 +1,14 @@
 import {Trans, useTranslation} from 'react-i18next';
 import { FooterPostLogin, FooterLegal } from '@pagopa/mui-italia';
 import {CONFIG} from "@pagopa/selfcare-common-frontend/lib/config/env";
+import ROUTES from '../../routes';
+import { useNavigate } from 'react-router-dom';
 
 
 const openExternalLink = (url: string) => window.open(url, '_blank')?.focus();
 
 export const CustomFooter = () => {
+  const navigate = useNavigate()
   const { t } = useTranslation();
 
   const companyLegalInfo = (
@@ -28,9 +31,9 @@ export const CustomFooter = () => {
               {
                 label: t('common.footer.postLoginLinks.privacyPolicy'),
                 ariaLabel: t('common.footer.postLoginLinks.privacyPolicy'),
-                href:import.meta.env.VITE_PROTECTIONOFPERSONALDATA,
-                linkType: 'external',
-                onClick: () => openExternalLink(import.meta.env.VITE_PROTECTIONOFPERSONALDATA || '')
+                href: `/esercente${ROUTES.PRIVACY_POLICY}`,
+                linkType: 'internal',
+                onClick: () => navigate(ROUTES.PRIVACY_POLICY)
               },
               {
                 label: t('common.footer.postLoginLinks.protectionofpersonaldata'),
@@ -42,9 +45,9 @@ export const CustomFooter = () => {
               {
                 label: t('common.footer.postLoginLinks.termsandconditions'),
                 ariaLabel: t('common.footer.postLoginLinks.termsandconditions'),
-                href: import.meta.env.VITE_PROTECTIONOFPERSONALDATA,
-                linkType: 'external',
-                onClick: () => openExternalLink(import.meta.env.VITE_PROTECTIONOFPERSONALDATA || '')
+                href: `/esercente${ROUTES.TOS}`,
+                linkType: 'internal',
+                onClick: () => navigate(ROUTES.TOS)
               },
               {
                 label: t('common.footer.postLoginLinks.accessibility'),
