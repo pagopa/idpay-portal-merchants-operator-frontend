@@ -1,17 +1,18 @@
-import React from 'react';
+import { describe, vi } from "vitest";
 import { fireEvent, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import TOS from '../TOS';
-import { useOneTrustNotice } from '../../../hooks/useOneTrustNotice';
-import { ENV } from '../../../utils/env';
-import routes from '../../../routes';
+import TOS from './TOS';
 
-jest.mock('../../../hooks/useOneTrustNotice');
-jest.mock('../../components/OneTrustContentWrapper', () => (props: { idSelector: string }) => (
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+}));
+
+vi.mock('../../../hooks/useOneTrustNotice');
+vi.mock('../../components/OneTrustContentWrapper', () => (props: { idSelector: string }) => (
   <div data-testid="onetrust-wrapper" data-idselector={props.idSelector} />
 ));
 
-jest.mock('../../../utils/env', () => ({
+vi.mock('../../../utils/env', () => ({
   ENV: {
     ONE_TRUST: {
       TOS_JSON_URL: 'mock-tos-json-url',
@@ -19,13 +20,13 @@ jest.mock('../../../utils/env', () => ({
     },
   },
 }));
-jest.mock('../../../routes', () => ({
+vi.mock('../../../routes', () => ({
   TOS: '/mock-tos-route',
 }));
 
 describe('TOS component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('should render component and navigate back', () => {
