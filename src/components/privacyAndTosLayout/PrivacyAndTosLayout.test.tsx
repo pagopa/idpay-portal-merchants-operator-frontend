@@ -24,13 +24,13 @@ vi.mock('../../../routes', () => ({
   TOS: '/mock-tos-route',
 }));
 
-describe('TOS component', () => {
+describe('Layout component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test('should render component and navigate back', () => {
-    render(<PrivacyAndTosLayout text={{html: ''}} />);
+    render(<PrivacyAndTosLayout text={{ html: '' }} title={""} />);
 
     const backButton = screen.getByTestId('back-stores-button');
 

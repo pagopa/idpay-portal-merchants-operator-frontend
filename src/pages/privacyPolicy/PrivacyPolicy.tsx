@@ -1,11 +1,11 @@
 
 import privacyHTML from './privacyHTML.json';
-import { PrivacyAndTosLayout } from '../privacyAndTosLayout/PrivacyAndTosLayout';
-
-// import routes from '../../routes';
-// import OneTrustContentWrapper from '../components/OneTrustContentWrapper';
+import { PrivacyAndTosLayout } from '../../components/privacyAndTosLayout/PrivacyAndTosLayout';
+import { useTranslation } from 'react-i18next';
 
 const PrivacyPolicy = () => {
-  return <PrivacyAndTosLayout text={privacyHTML} />
+  const { t } = useTranslation();
+  return <PrivacyAndTosLayout text={privacyHTML} title={t('pages.privacyPolicyStatic.title')} />
 };
-export default PrivacyPolicy;
+
+export default PrivacyPolicy

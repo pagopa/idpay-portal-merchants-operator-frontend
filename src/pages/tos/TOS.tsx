@@ -1,7 +1,10 @@
 import tosHTML from './tosHTML.json';
-import { PrivacyAndTosLayout } from '../privacyAndTosLayout/PrivacyAndTosLayout';
+import { PrivacyAndTosLayout } from '../../components/privacyAndTosLayout/PrivacyAndTosLayout';
+import { useTranslation } from 'react-i18next';
 
 const TOS = () => {
-  return <PrivacyAndTosLayout text={tosHTML} />
+  const { t } = useTranslation();
+  return <PrivacyAndTosLayout text={tosHTML} title={t('pages.tosStatic.title')} />
 };
-export default TOS;
+
+export default TOS

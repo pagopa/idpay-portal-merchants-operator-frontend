@@ -1,11 +1,11 @@
 import { Box, Button, Grid, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import DOMPurify from 'dompurify';
-import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
+import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { useNavigate } from 'react-router-dom';
 
-export const PrivacyAndTosLayout = ({text}: {text: Record<string, string>}) => {
+export const PrivacyAndTosLayout = ({text, title}: {text: Record<string, string>, title: string}) => {
   const { t } = useTranslation();
     const navigate = useNavigate()
   return (
@@ -15,7 +15,7 @@ export const PrivacyAndTosLayout = ({text}: {text: Record<string, string>}) => {
           <Box mt={2} sx={{ display: 'grid', gridColumn: 'span 8' }}>
             <BreadcrumbsBox backLabel={t('commons.backBtn')} items={[]} active />
             <TitleBox
-              title={t('pages.tosStatic.title')}
+              title={title}
               mbTitle={2}
               mtTitle={2}
               variantTitle="h4"
