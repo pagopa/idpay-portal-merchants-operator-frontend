@@ -16,11 +16,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import style from '../purchaseManagement/purchaseManagement.module.css';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
+import { handleGtinChange } from "../../utils/helpers";
 
 
 
 
 const Products = () => {
+    const [gtinError, setGtinError] = useState<string>('')
     const [productsList, setProductsList] = useState([]);
     const [productsListIsLoading, setProductsListIsLoading] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -388,7 +390,10 @@ const Products = () => {
                                     size="small"
                                     fullWidth
                                     value={formik.values.gtinCode}
-                                    onChange={formik.handleChange}
+                                    onChange={(e) => setGtinError(handleGtinChange(e, formik))}
+                                    onBlur={() => setGtinError('')}
+                                    error={!!gtinError}
+                                    helperText={gtinError}
                                 />
                             </Grid>
 

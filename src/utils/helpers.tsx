@@ -71,3 +71,17 @@ export function downloadFileFromBase64(base64: string, fileName: string) {
     a.remove();
     URL.revokeObjectURL(url);
   }
+
+  export const handleGtinChange = (event, formik) => {
+  const {value} = event.target;
+  const alphanumericRegex = /^[a-zA-Z0-9]*$/;
+
+  if (!(value.includes(" ") || value.length > 14)) {
+    if (!alphanumericRegex.test(value)) {
+      return "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.";
+    }
+
+    formik.handleChange(event);
+    return "";
+  }
+};
