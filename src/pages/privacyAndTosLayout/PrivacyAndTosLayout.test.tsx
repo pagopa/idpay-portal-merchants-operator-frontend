@@ -1,6 +1,6 @@
 import { describe, vi } from "vitest";
 import { fireEvent, render, screen } from '@testing-library/react';
-import TOS from './TOS';
+import {PrivacyAndTosLayout} from './PrivacyAndTosLayout';
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", () => ({
@@ -30,7 +30,7 @@ describe('TOS component', () => {
   });
 
   test('should render component and navigate back', () => {
-    render(<TOS />);
+    render(<PrivacyAndTosLayout text={{html: ''}} />);
 
     const backButton = screen.getByTestId('back-stores-button');
 
