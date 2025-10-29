@@ -1,7 +1,7 @@
 import { Box, Grid, Paper } from '@mui/material';
 import DOMPurify from 'dompurify';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import { HeaderAccount } from '@pagopa/mui-italia';
+import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import { CustomFooter } from '../Footer/CustomFooter';
 
 export const PrivacyAndTosLayout = ({ text, title }: { text: Record<string, string>, title: string }) => {
@@ -15,6 +15,18 @@ export const PrivacyAndTosLayout = ({ text, title }: { text: Record<string, stri
         ariaLabel: "PagoPA S.p.A.",
         title: "PagoPA S.p.A.",
       }} enableLogin={false} onAssistanceClick={() => window.open(import.meta.env.VITE_ASSISTANCE || '', '_blank')} />
+
+      <HeaderProduct
+        productsList={[
+          {
+            id: 'prod-idpay-merchants',
+            title: 'Bonus Elettrodomestici',
+            productUrl: 'test',
+            linkType: 'internal',
+            icon: '',
+          }
+        ]}
+      />
       <Box sx={{ width: '100%', padding: '20px' }}>
 
         <Box>
@@ -40,7 +52,7 @@ export const PrivacyAndTosLayout = ({ text, title }: { text: Record<string, stri
             </Grid>
           </Box>
         </Paper>
-        
+
 
       </Box>
       <CustomFooter />
