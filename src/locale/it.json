@@ -52,6 +52,12 @@
     "validationDescription": "Verifica che i dati inseriti siano corretti"
   },
   "pages": {
+    "tosStatic": {
+      "title": "Termini e Condizioni"
+    },
+    "privacyPolicyStatic": {
+      "title": "Privacy Policy"
+    },
     "acceptNewDiscount": {
       "discountAccepted": "Buono sconto accettato",
       "discountCodeLabel": "Codice sconto",

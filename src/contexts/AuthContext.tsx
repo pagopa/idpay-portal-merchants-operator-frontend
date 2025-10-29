@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initKeycloak = async () => {
       try {
         const authenticated = await keycloak.init({
-          onLoad: 'login-required',
+          onLoad: 'check-sso',
           checkLoginIframe: false,
           pkceMethod: 'S256'
         });
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(response.data);
           } catch (error) {
             console.error('Errore inizializzazione Keycloak:', error);
-            // keycloak.logout(); 
+            keycloak.logout(); 
           }
         }
       } catch (error) {
@@ -66,16 +66,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initKeycloak();
 
     // Automatic refresh token
-    const refreshToken = () => {
-      keycloak.updateToken(70).then((refreshed) => {
-        if (refreshed) {
-          setToken(keycloak.token || null);
-          console.log('Token aggiornato');
-        }
-      }).catch(() => {
-        console.log('Impossibile aggiornare il token');
-        logout();
-      });
+     const refreshToken = () => {
+      if (keycloak.authenticated) {
+        keycloak.updateToken(70).then((refreshed) => {
+          if (refreshed) {
+            setToken(keycloak.token || null);
+            console.log('Token aggiornato');
+          }
+        }).catch(() => {
+          console.log('Impossibile aggiornare il token');
+          logout();
+        });
+      }
     };
 
     const interval = setInterval(refreshToken, 60000);
