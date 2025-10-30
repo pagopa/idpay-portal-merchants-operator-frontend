@@ -143,7 +143,7 @@ const AcceptDiscount = () => {
                 return;
             }
 
-            if(newValue === '0' && newValue?.length === 1) {
+            if((newValue === '0' && newValue?.length === 1) || (newValue === ',' && newValue?.length === 1)) {
                 return;
             }
         
