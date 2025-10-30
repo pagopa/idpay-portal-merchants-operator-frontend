@@ -143,7 +143,6 @@ vi.mock("../../store/authStore", () => ({
   },
 }));
 
-// Mock data
 const mockTransactions = [
   {
     trxId: "1",
@@ -356,5 +355,344 @@ describe("RefundManagement", () => {
     renderComponent();
     await screen.findByTestId("data-table");
     fireEvent.click(screen.getByTestId("sort-change-name-desc"));
+  });
+});
+
+import { MemoryRouter } from "react-router-dom";
+
+async function loadRefundManagementWithHarness(routeState?: any) {
+  vi.resetModules();
+
+  const downloadInvoiceFileApi = vi.fn();
+  const getProcessedTransactions = vi.fn();
+
+  const anchorClick = vi.fn();
+  const anchor: any = { href: "", download: "", click: anchorClick };
+
+  const realCreateElement = document.createElement.bind(document);
+  const createElementSpy = vi
+      .spyOn(document, "createElement")
+      .mockImplementation((tagName: any, ...args: any[]) => {
+        if (typeof tagName === "string" && tagName.toLowerCase() === "a") {
+          return anchor;
+        }
+        return realCreateElement(tagName, ...args);
+      });
+
+  vi.doMock("react-i18next", () => ({
+    useTranslation: () => ({
+      t: (key: string) => {
+        const map: Record<string, string> = {
+          "pages.refundManagement.title": "Gestione Rimborsi",
+          "pages.refundManagement.subtitle":
+              "Gestisci le transazioni elaborate e i rimborsi",
+          "pages.refundManagement.tableTitle": "Transazioni",
+          "pages.refundManagement.noTransactions": "Nessuna transazione trovata.",
+          "pages.refundManagement.errorAlert": "Si è verificato un errore.",
+          "pages.refundManagement.refundSuccessUpload": "Rimborso caricato",
+          "pages.refundManagement.reverseSuccessUpload": "Storno caricato",
+          "pages.refundManagement.errorDownloadAlert":
+              "Errore durante il download",
+          "pages.purchaseManagement.drawer.title": "Dettagli transazione",
+          "commons.fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
+          "commons.gtiInFilterPlaceholer": "Cerca per GTIN",
+          "commons.statusFilterPlaceholer": "Cerca per stato",
+        };
+        return map[key] ?? key;
+      },
+    }),
+  }));
+
+  vi.doMock("../../utils/constants", () => ({
+    MISSING_DATA_PLACEHOLDER: "—",
+  }));
+
+  vi.doMock("../../utils/helpers", () => ({
+    formatEuro: (cents?: number) =>
+        typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN",
+    getStatusChip: (_t: any, value: string) => (
+        <span data-testid="status-chip">{value}</span>
+    ),
+  }));
+
+  vi.doMock("../../services/merchantService", () => ({
+    getProcessedTransactions: (...args: any[]) =>
+        getProcessedTransactions(...args),
+    downloadInvoiceFileApi: (...args: any[]) => downloadInvoiceFileApi(...args),
+  }));
+
+  vi.doMock("../../store/authStore", () => ({
+    authStore: {
+      getState: () => ({ token: "fake-jwt" }),
+    },
+  }));
+  vi.doMock("jwt-decode", () => ({
+    jwtDecode: () => ({ point_of_sale_id: "pos-456" }),
+  }));
+
+  vi.doMock("../../components/DetailsDrawer/DetailsDrawer", () => ({
+    DetailsDrawer: ({
+                      isOpen,
+                      isLoading,
+                      item,
+                      setIsOpen,
+                      onFileDownloadCallback,
+                    }: any) => (
+        <div data-testid="drawer">
+          <div data-testid="drawer-open">{String(isOpen)}</div>
+          <div data-testid="drawer-loading">{String(isLoading)}</div>
+          <button
+              data-testid="close-drawer"
+              onClick={() => setIsOpen(false)}
+          ></button>
+          <button
+              data-testid="trigger-download"
+              onClick={onFileDownloadCallback}
+          ></button>
+          <pre data-testid="drawer-item">
+          {item ? JSON.stringify(item) : ""}
+        </pre>
+        </div>
+    ),
+  }));
+
+  vi.doMock("../../components/TransactionsLayout/TransactionsLayout", () => ({
+    default: ({
+                columns,
+                onRowAction,
+                DrawerComponent,
+                externalState,
+              }: any) => {
+      const refundedTx = {
+        updateDate: "2025-09-22T14:00:00.000Z",
+        additionalProperties: { productName: "Frigorifero EcoFrost" },
+        fiscalCode: "BBBBBB22C33D444E",
+        id: "trx-refunded",
+        effectiveAmountCents: 8000,
+        rewardAmountCents: 800,
+        status: "REFUNDED",
+        invoiceFile: { filename: "nota.pdf" },
+      };
+      const cancelledTx = {
+        ...refundedTx,
+        id: "trx-cancelled",
+        status: "CANCELLED",
+        invoiceFile: { filename: "annullata.pdf" },
+      };
+      const rewardedTx = {
+        ...refundedTx,
+        id: "trx-rewarded",
+        status: "REWARDED",
+        invoiceFile: undefined,
+      };
+
+      return (
+          <div>
+            <button
+                data-testid="open-refunded"
+                onClick={() => onRowAction(refundedTx)}
+            />
+            <button
+                data-testid="open-cancelled"
+                onClick={() => onRowAction(cancelledTx)}
+            />
+            <button
+                data-testid="open-rewarded"
+                onClick={() => onRowAction(rewardedTx)}
+            />
+
+            <div data-testid="col-additional-has">
+              {columns[0].renderCell({
+                value: { productName: "Lavatrice Ultra" },
+              })}
+            </div>
+            <div data-testid="col-additional-missing">
+              {columns[0].renderCell({ value: undefined })}
+            </div>
+
+            <div data-testid="col-date-has">
+              {columns[1].renderCell({ value: "2025-10-01T10:20:00.000Z" })}
+            </div>
+            <div data-testid="col-date-missing">
+              {columns[1].renderCell({ value: undefined })}
+            </div>
+
+            <div data-testid="col-fiscal-missing">
+              {columns[2].renderCell({ value: undefined })}
+            </div>
+
+            <div data-testid="col-total-zero">
+              {columns[3].renderCell({ value: 0 })}
+            </div>
+            <div data-testid="col-total-missing">
+              {columns[3].renderCell({ value: undefined })}
+            </div>
+
+            <div data-testid="col-reward-zero">
+              {columns[4].renderCell({ value: 0 })}
+            </div>
+            <div data-testid="col-reward-missing">
+              {columns[4].renderCell({ value: undefined })}
+            </div>
+
+            <div data-testid="col-authorized-has">
+              {columns[5].renderCell({ value: 1500 })}
+            </div>
+            <div data-testid="col-authorized-missing">
+              {columns[5].renderCell({ value: undefined })}
+            </div>
+
+            <div data-testid="col-status">
+              {columns[6].renderCell({ value: "REWARDED" })}
+            </div>
+
+            <div data-testid="state-refund">
+              {String(externalState?.transactionRefundSuccess)}
+            </div>
+            <div data-testid="state-reverse">
+              {String(externalState?.transactionReverseSuccess)}
+            </div>
+            <div data-testid="state-error">
+              {String(externalState?.errorDownloadAlert)}
+            </div>
+
+            {DrawerComponent}
+          </div>
+      );
+    },
+  }));
+
+  const { default: RefundManagement } = await import("./RefundManagement");
+
+  const theme = createTheme();
+  render(
+      <MemoryRouter
+          initialEntries={[{ pathname: "/refund", state: routeState }]}
+      >
+        <ThemeProvider theme={theme}>
+          <RefundManagement />
+        </ThemeProvider>
+      </MemoryRouter>
+  );
+
+  return {
+    downloadInvoiceFileApi,
+    getProcessedTransactions,
+    anchor,
+    anchorClick,
+    createElementSpy,
+  };
+}
+
+afterEach(() => {
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
+});
+
+describe("RefundManagement – extra coverage harness", () => {
+  it("maps the REFUNDED transaction correctly and downloads with provided filename", async () => {
+    const {
+      downloadInvoiceFileApi,
+      anchor,
+      anchorClick,
+    } = await loadRefundManagementWithHarness();
+
+    let resolve!: (v: any) => void;
+    const deferred = new Promise((r) => (resolve = r));
+    downloadInvoiceFileApi.mockReturnValueOnce(
+        deferred.then(() => ({ invoiceUrl: "https://example.com/invoice.pdf" }))
+    );
+
+    fireEvent.click(screen.getByTestId("open-refunded"));
+
+    expect(screen.getByTestId("drawer-open")).toHaveTextContent("true");
+
+    const item = screen.getByTestId("drawer-item").textContent!;
+    expect(item).toContain('"ID transazione":"trx-refunded"');
+    expect(item).toContain('"Totale della spesa":"€80.00"');
+    expect(item).toContain('"Sconto applicato":"€8.00"');
+    expect(item).toContain('"Importo autorizzato":"€72.00"');
+    expect(item).toContain('"Nota di credito":"nota.pdf"');
+
+    fireEvent.click(screen.getByTestId("trigger-download"));
+    expect(screen.getByTestId("drawer-loading")).toHaveTextContent("true");
+
+    resolve(null);
+
+    await waitFor(() => {
+      expect(anchorClick).toHaveBeenCalledTimes(1);
+      expect(anchor.download).toBe("fattura.pdf");
+      expect(typeof anchor.href).toBe("string");
+      expect(screen.getByTestId("drawer-loading")).toHaveTextContent("false");
+    });
+
+    expect(downloadInvoiceFileApi).toHaveBeenCalledWith(
+        "pos-456",
+        "trx-refunded"
+    );
+  });
+
+  it("handles CANCELLED invoice label and the fallback filename on REWARDED", async () => {
+    const { downloadInvoiceFileApi, anchor } =
+        await loadRefundManagementWithHarness();
+
+    fireEvent.click(screen.getByTestId("open-cancelled"));
+    let item = screen.getByTestId("drawer-item").textContent!;
+    expect(item).toContain('"cancelled":"annullata.pdf"');
+
+    downloadInvoiceFileApi.mockResolvedValueOnce({
+      invoiceUrl: "https://example.com/f.pdf",
+    });
+    fireEvent.click(screen.getByTestId("open-rewarded"));
+    fireEvent.click(screen.getByTestId("trigger-download"));
+
+    await waitFor(() => {
+      expect(anchor.download).toBe("fattura.pdf");
+    });
+  });
+
+  it("sets error flag when download fails and can close the drawer", async () => {
+    const { downloadInvoiceFileApi } =
+        await loadRefundManagementWithHarness();
+
+    downloadInvoiceFileApi.mockRejectedValueOnce(new Error("Boom"));
+
+    fireEvent.click(screen.getByTestId("open-refunded"));
+    fireEvent.click(screen.getByTestId("trigger-download"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("state-error")).toHaveTextContent("true");
+      expect(screen.getByTestId("drawer-loading")).toHaveTextContent("false");
+    });
+
+    fireEvent.click(screen.getByTestId("close-drawer"));
+    expect(screen.getByTestId("drawer-open")).toHaveTextContent("false");
+  });
+
+  it("covers all column render branches, including placeholders and zero values", async () => {
+    await loadRefundManagementWithHarness();
+
+    expect(
+        screen.getByTestId("col-additional-has").textContent
+    ).toContain("Lavatrice Ultra");
+    expect(screen.getByTestId("col-additional-missing")).toHaveTextContent("—");
+
+    expect(screen.getByTestId("col-date-missing")).toHaveTextContent("—");
+
+    expect(screen.getByTestId("col-fiscal-missing")).toHaveTextContent("—");
+
+    expect(screen.getByTestId("col-total-zero")).toHaveTextContent("€0.00");
+    expect(screen.getByTestId("col-total-missing")).toHaveTextContent("—");
+
+    expect(screen.getByTestId("col-reward-zero")).toHaveTextContent("€0.00");
+    expect(screen.getByTestId("col-reward-missing")).toHaveTextContent("—");
+
+    expect(screen.getByTestId("col-authorized-has")).toHaveTextContent(
+        "€15.00"
+    );
+    expect(screen.getByTestId("col-authorized-missing")).toHaveTextContent("—");
+
+    expect(screen.getByTestId("col-status").querySelector("[data-testid='status-chip']"))
+        .toHaveTextContent("REWARDED");
   });
 });
