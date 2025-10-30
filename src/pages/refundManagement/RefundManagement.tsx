@@ -49,6 +49,7 @@ const RefundManagement = () => {
             }).replace(',', ''),
             'Elettrodomestico': transaction?.additionalProperties.productName,
             'Codice Fiscale': transaction?.fiscalCode,
+            'ID transazione': transaction?.id,
             'Totale della spesa': transaction?.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents),
             'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
             'Importo autorizzato': transaction?.rewardAmountCents && transaction.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
