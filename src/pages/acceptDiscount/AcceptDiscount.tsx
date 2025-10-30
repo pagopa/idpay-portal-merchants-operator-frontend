@@ -115,7 +115,7 @@ const AcceptDiscount = () => {
         return isValid;
     };
 
-    const handleFieldChange = (field: keyof FormData, value: any) => {
+    const handleFieldChange = (field: keyof FormData, value: string) => {
         const newValue = value;
         if (field === 'totalAmount') {
             if (newValue === '') {
@@ -139,11 +139,13 @@ const AcceptDiscount = () => {
                 return;
             }
         
-            if (decimalPart.length > 2 || decimalPart.split('').some(ch => ch < '0' || ch > '9')) {
+            if (decimalPart.length > 2 || decimalPart.split('').some(ch => ch < '0' || ch > '9') || integerPart?.length > 5) {
                 return;
             }
 
-            console.log("VAL", typeof(newValue))
+            if(newValue === '0' && newValue?.length === 1) {
+                return;
+            }
         
             setFormData(prev => ({
                 ...prev,
