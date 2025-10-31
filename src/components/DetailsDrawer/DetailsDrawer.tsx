@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { theme } from "@pagopa/mui-italia";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import { ReceiptLong } from "@mui/icons-material";
 
 type ButtonProps = {
   label: string;
@@ -127,7 +127,7 @@ export const DetailsDrawer = ({
                         />
                       ) : (
                         <>
-                          <DescriptionOutlinedIcon /> {value}
+                          <ReceiptLong /> {value}
                         </>
                       )}
                     </Button>
