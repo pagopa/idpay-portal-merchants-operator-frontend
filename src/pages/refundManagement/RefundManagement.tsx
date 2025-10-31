@@ -1,4 +1,4 @@
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect } from "react";
 import { getProcessedTransactions, downloadInvoiceFileApi } from "../../services/merchantService";
@@ -6,14 +6,17 @@ import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import { getStatusChip, formatEuro } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
 import { authStore } from "../../store/authStore";
 import { DecodedJwtToken } from "../../utils/types";
 import { jwtDecode } from 'jwt-decode';
+import ModalComponent from "../../components/Modal/ModalComponent";
 
 const RefundManagement = () => {
+    const navigate = useNavigate();
+    const [openModal, setOpenModal] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<PointOfSaleTransactionProcessedDTO>({});
     const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
@@ -236,42 +239,68 @@ const RefundManagement = () => {
     ];
 
     return (
-        <TransactionsLayout
-            title={t('pages.refundManagement.title')}
-            subtitle={t('pages.refundManagement.subtitle')}
-            tableTitle={t('pages.refundManagement.tableTitle')}
-            fetchTransactionsApi={getProcessedTransactions}
-            columns={columns}
-            statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED']}
-            alerts={[
-                [transactionReverseSuccess, setTransactionReverseSuccess],
-                [transactionRefundSuccess, setTransactionRefundSuccess],
-                [errorDownloadAlert, setErrorDownloadAlert]
-            ]}
-            alertMessages={{
-                error: t('pages.refundManagement.errorAlert'),
-                transactionRefundSuccess: t('pages.refundManagement.refundSuccessUpload'),
-                transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload'),
-                errorDownloadAlert: t('pages.refundManagement.errorDownloadAlert')
-            }}
-            noDataMessage={t('pages.refundManagement.noTransactions')}
-            onRowAction={handleRowAction}
-            DrawerComponent={
-                <DetailsDrawer
-                    isLoading={downloadInProgress}
-                    setIsOpen={() => setIsOpen(false)}
-                    isOpen={isOpen}
-                    title={t('pages.purchaseManagement.drawer.title')}
-                    item={selectedTransaction}
-                    onFileDownloadCallback={downloadInvoiceFile}
-                />
-            }
-            externalState={{
-                transactionRefundSuccess,
-                transactionReverseSuccess,
-                errorDownloadAlert
-            }}
-        />
+        <>
+            <TransactionsLayout
+                title={t('pages.refundManagement.title')}
+                subtitle={t('pages.refundManagement.subtitle')}
+                tableTitle={t('pages.refundManagement.tableTitle')}
+                fetchTransactionsApi={getProcessedTransactions}
+                columns={columns}
+                statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED', 'WAITREWARD']}
+                alerts={[
+                    [transactionReverseSuccess, setTransactionReverseSuccess],
+                    [transactionRefundSuccess, setTransactionRefundSuccess],
+                    [errorDownloadAlert, setErrorDownloadAlert]
+                ]}
+                alertMessages={{
+                    error: t('pages.refundManagement.errorAlert'),
+                    transactionRefundSuccess: t('pages.refundManagement.refundSuccessUpload'),
+                    transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload'),
+                    errorDownloadAlert: t('pages.refundManagement.errorDownloadAlert')
+                }}
+                noDataMessage={t('pages.refundManagement.noTransactions')}
+                onRowAction={handleRowAction}
+                DrawerComponent={
+                    <DetailsDrawer
+                        isLoading={downloadInProgress}
+                        setIsOpen={() => setIsOpen(false)}
+                        isOpen={isOpen}
+                        title={t('pages.purchaseManagement.drawer.title')}
+                        item={selectedTransaction}
+                        onFileDownloadCallback={downloadInvoiceFile}
+                        primaryButton={ selectedTransaction.status === 'WAITREWARD' && {label: t('pages.purchaseManagement.drawer.refund'), onClick: () => {
+                            setOpenModal(true)
+                            setIsOpen(false)
+                        }}}
+                    />
+                }
+                externalState={{
+                    transactionRefundSuccess,
+                    transactionReverseSuccess,
+                    errorDownloadAlert
+                }}
+            />
+            <ModalComponent open={openModal} onClose={() => setOpenModal(false)}>
+                <Box display={'flex'} flexDirection={'column'} gap={2}>
+                    <Typography variant="h6">{t('pages.purchaseManagement.refundTransactionModal.title')}</Typography>
+                    <Typography variant="body1">{t('pages.purchaseManagement.refundTransactionModal.description')}</Typography>
+                </Box>
+                <Box display={'flex'} justifyContent={'flex-end'} gap={2} mt={4}>
+                    <Button variant="outlined" onClick={() => {
+                        setOpenModal(false)
+                        setIsOpen(true)
+                        }}>
+                        Indietro
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => navigate('/storna-transazione/' + selectedTransaction?.id)}
+                    >
+                        Storna
+                    </Button>
+                </Box>
+            </ModalComponent>
+        </>
     );
 };
 

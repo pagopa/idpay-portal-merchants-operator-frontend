@@ -28,6 +28,12 @@ export function getStatusChip(t: any, status: string) {
                 size="small"
                 sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }}
             />
+        case 'WAITREWARD':
+            return <Chip
+                label={t('pages.refundManagement.waitReward')}
+                size="small"
+                sx={{ backgroundColor: '#E1F5FE !important', color: '#215C76 !important' }}
+            />
         case 'REWARDED':
             return <Chip
                 label={t('pages.refundManagement.rewarded')}

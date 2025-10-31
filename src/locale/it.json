@@ -264,6 +264,7 @@
       "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
       "cancelled": "Annullato",
       "refunded": "Stornato",
+      "waitReward": "In attesa di rimborso",
       "rewarded": "Rimborso richiesto",
       "authorized": "Da autorizzare",
       "captured": "Da rimborsare",
