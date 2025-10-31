@@ -9,7 +9,7 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        "pages.refundManagement.title": "Gestione Rimborsi",
+        "pages.refundManagement.title": "Storico rimborsi",
         "pages.refundManagement.subtitle":
           "Gestisci le transazioni elaborate e i rimborsi",
         "pages.refundManagement.noTransactions": "Nessuna transazione trovata.",

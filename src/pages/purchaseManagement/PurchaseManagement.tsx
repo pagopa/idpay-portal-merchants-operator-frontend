@@ -1,6 +1,6 @@
 import { Box, Button, Tooltip, Drawer, Typography, Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from "react-router-dom";
 import ROUTES from "../../routes";
@@ -15,6 +15,7 @@ import { getStatusChip, formatEuro } from "../../utils/helpers";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
+// import DescriptionIcon from '@mui/icons-material/Description';
 
 const PurchaseManagement = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -27,8 +28,14 @@ const PurchaseManagement = () => {
     const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const [refundTransactionModal, setRefundTransactionModal] = useState(false);
+    const [errorPreviewPdf, setErrorPreviewPdf] = useState(false);
+    // const [isPreviewPdfLoading, setIsPreviewPdfLoading] = useState(false);
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
     const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
+
+    const gridRef = useRef(null);
+
+    const [isScrollable, setIsScrollable] = useState(false);
 
     useEffect(() => {
         if (transactionAuthorized) {
@@ -37,14 +44,21 @@ const PurchaseManagement = () => {
             }, 5000);
             return () => clearTimeout(timer);
         }
-        if(triggerFetchTransactions){
+        if (triggerFetchTransactions) {
             const timer = setTimeout(() => {
                 setTriggerFetchTransactions(false);
-            },3000);
+            }, 3000);
 
-        return () => clearTimeout(timer);
+            return () => clearTimeout(timer);
         }
     }, [transactionAuthorized, triggerFetchTransactions]);
+
+    useEffect(() => {
+        if (openDrawer) setTimeout(() => {
+            checkHeight();
+        }, 100);
+
+    }, [openDrawer]);
 
     const columns = [
         {
@@ -196,6 +210,14 @@ const PurchaseManagement = () => {
         },
     ];
 
+    const checkHeight = () => {
+        if (gridRef.current) {
+            const gridHeight = gridRef.current.scrollHeight;
+            const maxHeight = window.innerHeight - 280;
+            setIsScrollable(gridHeight > maxHeight);
+        }
+    };
+
     const handleRowAction = useCallback((row: transactionInProgreessDTO) => {
         setOpenDrawer(true);
         setSelectedTransaction(row);
@@ -248,6 +270,19 @@ const PurchaseManagement = () => {
         navigate("/richiedi-rimborso/" + selectedTransaction?.id);
     };
 
+    // const handlePreviewPdf = async () => {
+    //     setIsPreviewPdfLoading(true);
+    //     try {
+    //         const response = await getPreviewPdf(selectedTransaction?.id);
+    //         downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
+    //     } catch (error) {
+    //         console.error('Error getting preview PDF:', error);
+    //         setErrorPreviewPdf(true);
+    //     } finally {
+    //         setIsPreviewPdfLoading(false);
+    //     }
+    // };
+
     return (
         <>
             <TransactionsLayout
@@ -266,14 +301,16 @@ const PurchaseManagement = () => {
                     [errorDeleteTransaction, setErrorDeleteTransaction],
                     [errorCaptureTransaction, setErrorCaptureTransaction],
                     [transactionCaptured, setTransactionCaptured],
-                    [transactionAuthorized, () => utilsStore.setState({ transactionAuthorized: false })]
+                    [transactionAuthorized, () => utilsStore.setState({ transactionAuthorized: false })],
+                    [errorPreviewPdf, setErrorPreviewPdf]
                 ]}
                 alertMessages={{
                     error: t('pages.refundManagement.errorAlert'),
                     transactionAuthorized: t('pages.purchaseManagement.alertSuccess'),
                     transactionCaptured: t('pages.purchaseManagement.paymentSuccess'),
                     errorDeleteTransaction: t('pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction'),
-                    errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction')
+                    errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction'),
+                    errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf')
                 }}
                 noDataMessage={t('pages.refundManagement.noTransactions')}
                 triggerFetchTransactions={triggerFetchTransactions}
@@ -287,16 +324,19 @@ const PurchaseManagement = () => {
                             '& .MuiDrawer-paper': {
                                 width: 375,
                                 boxSizing: 'border-box',
-                                p: 2
+                                p: 3
                             },
                         }}
                     >
-                        <Box p={1} sx={{ position: 'relative', height: '100%' }}>
+                        <Box sx={{ position: 'relative', height: '100%' }}>
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mb={4} className={style.cursorPointer}>
                                 <CloseIcon sx={{ color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
                             </Box>
-                            <Typography variant="h6" mb={4}>{t('pages.purchaseManagement.drawer.title')}</Typography>
-                            <Grid container spacing={2}>
+                            <Typography variant="h6" mb={3}>{t('pages.purchaseManagement.drawer.title')}</Typography>
+                            <Grid container ref={gridRef} spacing={2} sx={{
+                                overflowY: isScrollable ? 'auto' : 'visible',
+                                maxHeight: isScrollable ? 'calc(100vh - 300px)' : 'none'
+                            }}>
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.trxDate')}
@@ -327,13 +367,21 @@ const PurchaseManagement = () => {
                                         {selectedTransaction?.fiscalCode ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
+                                {/* <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
+                                        {t('pages.purchaseManagement.drawer.transactionId')}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
+                                        {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
+                                    </Typography>
+                                </Grid> */}
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.totalAmount')}
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
-                                        {selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined 
-                                            ? formatEuro(selectedTransaction?.effectiveAmountCents) 
+                                        {selectedTransaction?.effectiveAmountCents !== null && selectedTransaction?.effectiveAmountCents !== undefined
+                                            ? formatEuro(selectedTransaction?.effectiveAmountCents)
                                             : MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
@@ -342,8 +390,8 @@ const PurchaseManagement = () => {
                                         {t('pages.purchaseManagement.drawer.rewardAmount')}
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
-                                        {selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined 
-                                            ? formatEuro(selectedTransaction?.rewardAmountCents) 
+                                        {selectedTransaction?.rewardAmountCents !== null && selectedTransaction?.rewardAmountCents !== undefined
+                                            ? formatEuro(selectedTransaction?.rewardAmountCents)
                                             : MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
@@ -352,8 +400,8 @@ const PurchaseManagement = () => {
                                         {t('pages.purchaseManagement.drawer.authorizedAmount')}
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
-                                        {selectedTransaction?.residualAmountCents !== null && selectedTransaction?.residualAmountCents !== undefined 
-                                            ? formatEuro(selectedTransaction?.residualAmountCents) 
+                                        {selectedTransaction?.residualAmountCents !== null && selectedTransaction?.residualAmountCents !== undefined
+                                            ? formatEuro(selectedTransaction?.residualAmountCents)
                                             : MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
@@ -365,27 +413,58 @@ const PurchaseManagement = () => {
                                         {selectedTransaction?.status ? getStatusChip(t, selectedTransaction?.status) : MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
+                                {/* {
+                                    selectedTransaction?.status === 'AUTHORIZED' && (
+                                        <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                                            <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary, margin: 0 }}>
+                                                {t('pages.purchaseManagement.drawer.document')}
+                                            </Typography>
+                                            <Button
+                                                data-testid="btn-test"
+                                                sx={{ padding: "0", fontWeight: theme.typography.fontWeightMedium, fontSize: '18px' }}
+                                                onClick={handlePreviewPdf}
+                                            >
+
+
+                                                {isPreviewPdfLoading ? (
+                                                    <CircularProgress
+                                                        color="inherit"
+                                                        size={20}
+                                                        data-testid="item-loader"
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <DescriptionIcon />
+                                                        <span style={{ marginLeft: '8px' }}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</span>
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </Grid> 
+                                    )
+                                } */}
                             </Grid>
-                            <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                <Button 
-                                    variant="contained" 
-                                    fullWidth 
-                                    onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCaptureTransaction : handleRequestRefund}
-                                >
-                                    {selectedTransaction?.status === 'AUTHORIZED' 
-                                        ? t('pages.purchaseManagement.drawer.confirmPayment') 
-                                        : t('pages.purchaseManagement.drawer.requestRefund')}
-                                </Button>
-                                <Button 
-                                    fullWidth 
-                                    onClick={selectedTransaction?.status === 'AUTHORIZED' 
-                                        ? handleCancelTransaction 
+                            <Box sx={{ position: 'absolute', bottom: 0, display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
+                                <Box sx={{ width: '100%' }}>
+                                    <Button
+                                        variant="contained"
+                                        fullWidth
+                                        onClick={selectedTransaction?.status === 'AUTHORIZED' ? handleCaptureTransaction : handleRequestRefund}
+                                    >
+                                        {selectedTransaction?.status === 'AUTHORIZED'
+                                            ? t('pages.purchaseManagement.drawer.confirmPayment')
+                                            : t('pages.purchaseManagement.drawer.requestRefund')}
+                                    </Button>
+                                </Box>
+                                <Button
+                                    fullWidth
+                                    onClick={selectedTransaction?.status === 'AUTHORIZED'
+                                        ? handleCancelTransaction
                                         : () => { setRefundTransactionModal(true); setOpenDrawer(false); }
-                                    } 
+                                    }
                                     sx={{ color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#' }}
                                 >
-                                    {selectedTransaction?.status === 'AUTHORIZED' 
-                                        ? t('pages.purchaseManagement.drawer.cancellPayment') 
+                                    {selectedTransaction?.status === 'AUTHORIZED'
+                                        ? t('pages.purchaseManagement.drawer.cancellPayment')
                                         : t('pages.purchaseManagement.drawer.refund')}
                                 </Button>
                             </Box>
@@ -396,7 +475,8 @@ const PurchaseManagement = () => {
                     transactionAuthorized,
                     transactionCaptured,
                     errorDeleteTransaction,
-                    errorCaptureTransaction
+                    errorCaptureTransaction,
+                    errorPreviewPdf
                 }}
             />
 
@@ -406,22 +486,22 @@ const PurchaseManagement = () => {
             }}>
                 <Box display={'flex'} flexDirection={'column'} gap={2}>
                     <Typography variant="h6">
-                        {captureTransactionModal 
-                            ? t('pages.purchaseManagement.captureTransactionModal.title') 
+                        {captureTransactionModal
+                            ? t('pages.purchaseManagement.captureTransactionModal.title')
                             : t('pages.purchaseManagement.cancelTransactionModal.title')}
                     </Typography>
                     <Typography variant="body1">
-                        {captureTransactionModal 
+                        {captureTransactionModal
                             ? `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.residualAmountCents)}
                                 ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
-                                ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Da Rimborsare"`
+                                ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Fattura da caricare"`
                             : t('pages.purchaseManagement.cancelTransactionModal.description')}.
                     </Typography>
                 </Box>
                 <Box display={'flex'} justifyContent={'flex-end'} gap={2} mt={4}>
-                    <Button variant="outlined" onClick={() => { 
-                        setCaptureTransactionModal(false); 
-                        setCancelTransactionModal(false); 
+                    <Button variant="outlined" onClick={() => {
+                        setCaptureTransactionModal(false);
+                        setCancelTransactionModal(false);
                         setOpenDrawer(true);
                     }}>
                         {captureTransactionModal ? 'Indietro' : 'Esci'}
@@ -441,8 +521,8 @@ const PurchaseManagement = () => {
                     <Typography variant="body1">{t('pages.purchaseManagement.refundTransactionModal.description')}</Typography>
                 </Box>
                 <Box display={'flex'} justifyContent={'flex-end'} gap={2} mt={4}>
-                    <Button variant="outlined" onClick={() => { 
-                        setRefundTransactionModal(false); 
+                    <Button variant="outlined" onClick={() => {
+                        setRefundTransactionModal(false);
                         setOpenDrawer(true);
                     }}>
                         Indietro
