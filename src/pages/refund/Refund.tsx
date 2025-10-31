@@ -9,7 +9,7 @@ const Refund = () => {
     return (
         <FileUploadAction
             titleKey="pages.refund.title"
-            subtitleKey="pages.refund.subtitle"
+            subtitleKey=""
             i18nBlockKey="pages.refund"
             apiCall={rewardTransactionApi} 
             successStateKey="refundUploadSuccess" 
