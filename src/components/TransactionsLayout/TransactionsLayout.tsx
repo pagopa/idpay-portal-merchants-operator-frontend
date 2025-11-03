@@ -155,14 +155,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
                 sort: 'productName,' + sortModel[0].sort,
-                page: paginationModel.page,
+                page: 0,
                 size: paginationModel.pageSize,
                 ...filtersObj
             });
         } else {
             fetchTransactions({
                 sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-                page: paginationModel.page,
+                page: 0,
                 size: paginationModel.pageSize,
                 ...filtersObj
             });
