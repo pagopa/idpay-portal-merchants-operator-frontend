@@ -13,6 +13,16 @@ vi.mock("react-i18next", () => ({
         "pages.products.subtitle": "Visualizza i prodotti approvati",
         "pages.products.noProducts": "Nessun prodotto trovato.",
         "pages.products.errorAlert": "Errore nel recupero dei prodotti.",
+        "pages.products.drawer.subTitle": "Dettagli Prodotto",
+        "pages.products.drawer.eprelCode": "Codice EPREL",
+        "pages.products.drawer.gtinCode": "Codice GTIN/EAN",
+        "pages.products.drawer.productCode": "Codice Prodotto",
+        "pages.products.drawer.category": "Categoria",
+        "pages.products.drawer.brand": "Marca",
+        "pages.products.drawer.model": "Modello",
+        "pages.products.drawer.capacity": "Capacità",
+        "pages.products.drawer.energyClass": "Classe Energetica",
+        "pages.products.drawer.productionCountry": "Paese di Produzione",
       };
       return translations[key] || key;
     },
@@ -40,12 +50,14 @@ vi.mock("../../components/FiltersForm/FiltersForm", () => ({
       />
       <button
         data-testid="apply-filters-button"
+        type="button"
         onClick={() => onFiltersApplied(formik.values)}
       >
         Applica
       </button>
       <button
         data-testid="reset-filters-button"
+        type="button"
         onClick={() => onFiltersReset()}
       >
         Resetta
@@ -78,8 +90,16 @@ vi.mock("../../components/DataTable/DataTable", () => ({
           onClick={() => onPaginationPageChange({ page: 1, pageSize: 10 })}
         />
         <button
+          data-testid="trigger-pagination-same"
+          onClick={() => onPaginationPageChange({ page: 0, pageSize: 10 })}
+        />
+        <button
           data-testid="trigger-sort"
           onClick={() => onSortModelChange([{ field: "brand", sort: "asc" }])}
+        />
+        <button
+          data-testid="trigger-sort-empty"
+          onClick={() => onSortModelChange([])}
         />
 
         {rows.map((row: any) => (
@@ -88,6 +108,9 @@ vi.mock("../../components/DataTable/DataTable", () => ({
             data-testid={`row-${row.gtinCode}`}
             onClick={() => handleRowAction(row)}
           >
+            <div data-testid={`cell-category-${row.gtinCode}`}>
+              {renderCellForField(row, "category")}
+            </div>
             <div data-testid={`cell-brand-${row.gtinCode}`}>
               {renderCellForField(row, "brand")}
             </div>
@@ -97,7 +120,7 @@ vi.mock("../../components/DataTable/DataTable", () => ({
             <div data-testid={`cell-gtin-${row.gtinCode}`}>
               {renderCellForField(row, "gtinCode")}
             </div>
-            <div data-testid={`cell-gtin-${row.eprelCode}`}>
+            <div data-testid={`cell-eprel-${row.gtinCode}`}>
               {renderCellForField(row, "eprelCode")}
             </div>
           </div>
@@ -111,6 +134,21 @@ vi.mock("../../components/Alert/AlertComponent", () => ({
   default: ({ message }: { message: string }) => (
     <div data-testid="alert-component">{message}</div>
   ),
+}));
+
+vi.mock("../../hooks/useAutoResetBanner", () => ({
+  useAutoResetBanner: vi.fn(),
+}));
+
+vi.mock("../../utils/helpers", () => ({
+  handleGtinChange: vi.fn((event, formik) => {
+    const { value } = event.target;
+    if (value.includes("+")) {
+      return "Errore GTIN";
+    }
+    formik.handleChange(event);
+    return "";
+  }),
 }));
 
 vi.stubEnv("VITE_PAGINATION_SIZE", "10");
@@ -127,7 +165,12 @@ const mockProducts = [
     model: "Model X",
     gtinCode: "12345",
     eprelCode: "EPREL1",
+    linkEprel: "https://example.com/eprel1",
     productName: "Lavatrice Brand A",
+    productCode: "PC001",
+    capacity: "8kg",
+    energyClass: "A+++",
+    countryOfProduction: "Italy",
   },
   {
     category: "OVENS",
@@ -135,12 +178,18 @@ const mockProducts = [
     model: "Model Y",
     gtinCode: "67890",
     eprelCode: "EPREL2",
+    linkEprel: "https://example.com/eprel2",
     productName: "Forno Brand B",
+    productCode: "PC002",
+    capacity: "70L",
+    energyClass: "A++",
+    countryOfProduction: "Germany",
   },
 ];
+
 const mockApiResponse = {
   content: mockProducts,
-  page: 0,
+  pageNo: 0,
   pageSize: 10,
   totalElements: 2,
 };
@@ -258,6 +307,21 @@ describe("Products Component", () => {
     });
   });
 
+  it("should not call fetchProducts if pagination model is the same", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    const initialCallCount = mockGetProductsList.mock.calls.length;
+
+    const paginationButton = screen.getByTestId("trigger-pagination-same");
+    fireEvent.click(paginationButton);
+
+    await waitFor(() => {
+      expect(mockGetProductsList).toHaveBeenCalledTimes(initialCallCount);
+    });
+  });
+
   it("should call fetchProducts with proper sort when sorting by a column", async () => {
     mockGetProductsList.mockResolvedValue(mockApiResponse);
     renderComponent();
@@ -273,6 +337,21 @@ describe("Products Component", () => {
           sort: "brand,asc",
         })
       );
+    });
+  });
+
+  it("should not call fetchProducts if sort model is empty", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    const initialCallCount = mockGetProductsList.mock.calls.length;
+
+    const sortButton = screen.getByTestId("trigger-sort-empty");
+    fireEvent.click(sortButton);
+
+    await waitFor(() => {
+      expect(mockGetProductsList).toHaveBeenCalledTimes(initialCallCount);
     });
   });
 
@@ -293,6 +372,41 @@ describe("Products Component", () => {
       expect(mockGetProductsList).toHaveBeenLastCalledWith(
         expect.objectContaining({
           brand: "Test Brand",
+          page: 0,
+        })
+      );
+    });
+  });
+
+  it("should filter out empty values when applying filters", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    const applyButton = screen.getByTestId("apply-filters-button");
+    fireEvent.click(applyButton);
+
+    await waitFor(() => {
+      const lastCall =
+        mockGetProductsList.mock.calls[mockGetProductsList.mock.calls.length - 1][0];
+      expect(lastCall).not.toHaveProperty("category");
+      expect(lastCall).not.toHaveProperty("brand");
+    });
+  });
+
+  it("should reset filters and fetch products without filters", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    const resetButton = screen.getByTestId("reset-filters-button");
+    fireEvent.click(resetButton);
+
+    await waitFor(() => {
+      expect(mockGetProductsList).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          size: "10",
+          status: "APPROVED",
         })
       );
     });
@@ -308,6 +422,10 @@ describe("Products Component", () => {
     await user.click(firstRow);
 
     await screen.findByText("Lavatrice Brand A");
+    expect(screen.getByText("PC001")).toBeInTheDocument();
+    expect(screen.getByText("8kg")).toBeInTheDocument();
+    expect(screen.getByText("A+++")).toBeInTheDocument();
+    expect(screen.getByText("Italy")).toBeInTheDocument();
 
     const closeButton = screen.getByTestId("CloseIcon");
     await user.click(closeButton);
@@ -316,88 +434,40 @@ describe("Products Component", () => {
       expect(screen.queryByText("Lavatrice Brand A")).not.toBeInTheDocument();
     });
   });
-});
 
-describe("Products Component", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("should not call fetchProducts if new pagination model is the same as current", async () => {
-    mockGetProductsList.mockResolvedValue(mockApiResponse);
+  it("should render placeholders for missing data in table cells", async () => {
+    const productWithMissingData = {
+      category: null,
+      brand: null,
+      model: null,
+      gtinCode: "55555",
+      eprelCode: null,
+      productName: "Prodotto Incompleto",
+    };
+    mockGetProductsList.mockResolvedValue({
+      content: [productWithMissingData],
+      pageNo: 0,
+      pageSize: 10,
+      totalElements: 1,
+    });
     renderComponent();
+
     await screen.findByTestId("data-table");
 
-    fireEvent.click(screen.getByTestId("trigger-pagination"));
-    await waitFor(() => {
-      expect(mockGetProductsList).toHaveBeenCalledTimes(2);
-    });
+    const categoryCell = screen.getByTestId("cell-category-55555");
+    expect(categoryCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
+
+    const brandCell = screen.getByTestId("cell-brand-55555");
+    expect(brandCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
+
+    const modelCell = screen.getByTestId("cell-model-55555");
+    expect(modelCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
+
+    const eprelCell = screen.getByTestId("cell-eprel-55555");
+    expect(eprelCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
   });
 
-  it("should call fetchProducts if new pagination model is different", async () => {
-    mockGetProductsList.mockResolvedValue(mockApiResponse);
-    renderComponent();
-    await screen.findByTestId("data-table");
-
-    const paginationButton = screen.getByTestId("trigger-pagination");
-    fireEvent.click(paginationButton);
-
-    await waitFor(() => {
-      expect(mockGetProductsList).toHaveBeenCalled();
-    });
-  });
-
-  it("should not call fetchProducts if sort model is empty", async () => {
-    mockGetProductsList.mockResolvedValue(mockApiResponse);
-    renderComponent();
-    await screen.findByTestId("data-table");
-
-    fireEvent.click(screen.getByTestId("trigger-sort"));
-
-    await waitFor(() => {
-      expect(mockGetProductsList).toHaveBeenCalled();
-    });
-  });
-
-  it("should call fetchProducts with correct params when sort model has items", async () => {
-    mockGetProductsList.mockResolvedValue(mockApiResponse);
-    renderComponent();
-    await screen.findByTestId("data-table");
-
-    const sortButton = screen.getByTestId("trigger-sort");
-    fireEvent.click(sortButton);
-
-    await waitFor(() => {
-      expect(mockGetProductsList).toHaveBeenCalled();
-    });
-  });
-
-  it("should call fetchProducts with empty object if no filters are applied", async () => {
-    mockGetProductsList.mockResolvedValue(mockApiResponse);
-    renderComponent();
-    await screen.findByTestId("data-table");
-
-    const resetFiltersButton = screen.getByTestId("reset-filters-button");
-    fireEvent.click(resetFiltersButton);
-
-    await waitFor(() => {
-      expect(mockGetProductsList).toHaveBeenCalledWith(
-        expect.objectContaining({
-          size: "10",
-          status: "APPROVED",
-        })
-      );
-    });
-  });
-  it("should return false for areFiltersApplied if all formik values are empty", async () => {
-    renderComponent();
-    await screen.findByTestId("filters-form");
-
-    const applyButton = screen.getByTestId("apply-filters-button");
-    expect(applyButton).toBeInTheDocument();
-  });
-
-  it("should render placeholders for missing data in table and drawer", async () => {
+  it("should render placeholders for missing data in drawer", async () => {
     const productWithMissingData = {
       category: null,
       brand: "Brand C",
@@ -405,9 +475,15 @@ describe("Products Component", () => {
       gtinCode: "55555",
       eprelCode: null,
       productName: "Prodotto Incompleto",
+      productCode: null,
+      capacity: null,
+      energyClass: null,
+      countryOfProduction: null,
     };
     mockGetProductsList.mockResolvedValue({
       content: [productWithMissingData],
+      pageNo: 0,
+      pageSize: 10,
       totalElements: 1,
     });
     const user = userEvent.setup();
@@ -419,6 +495,88 @@ describe("Products Component", () => {
 
     await screen.findByText("Prodotto Incompleto");
     const placeholders = screen.getAllByText(MISSING_DATA_PLACEHOLDER);
-    expect(placeholders.length).toBeGreaterThan(2);
+    expect(placeholders.length).toBeGreaterThan(3);
+  });
+
+  it("should render link for eprelCode when value exists", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+
+    await screen.findByTestId("data-table");
+
+    const eprelCell = screen.getByTestId("cell-eprel-12345");
+    const link = eprelCell.querySelector("a");
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", "https://example.com/eprel1");
+    expect(link).toHaveAttribute("target", "_blank");
+  });
+
+  it("should show filters form when products exist", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+
+    await screen.findByTestId("data-table");
+    expect(screen.getByTestId("filters-form")).toBeInTheDocument();
+  });
+
+  it("should handle GTIN code change with error", async () => {
+    const { handleGtinChange } = await import("../../utils/helpers");
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    const user = userEvent.setup();
+    renderComponent();
+
+    await screen.findByTestId("filters-form");
+
+    const gtinInput = screen.getByLabelText("Codice GTIN/EAN");
+    await user.type(gtinInput, "+");
+
+    expect(handleGtinChange).toHaveBeenCalled();
+  });
+
+  it("should handle GTIN code blur event", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    const user = userEvent.setup();
+    renderComponent();
+
+    await screen.findByTestId("filters-form");
+
+    const gtinInput = screen.getByLabelText("Codice GTIN/EAN");
+    await user.click(gtinInput);
+    await user.tab();
+
+    expect(gtinInput).not.toHaveFocus();
+  });
+
+  it("should handle all category options in select", async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    const user = userEvent.setup();
+    renderComponent();
+
+    await screen.findByTestId("filters-form");
+
+    const categorySelect = screen.getByLabelText("Categoria");
+    await user.click(categorySelect);
+
+    expect(screen.getByText("Lavatrici")).toBeInTheDocument();
+    expect(screen.getByText("Asciugatrici")).toBeInTheDocument();
+    expect(screen.getByText("Forni")).toBeInTheDocument();
+    expect(screen.getByText("Lavastoviglie")).toBeInTheDocument();
+    expect(screen.getByText("Lavasciuga")).toBeInTheDocument();
+    expect(screen.getByText("Frigoriferi e congelatori")).toBeInTheDocument();
+    expect(screen.getByText("Cappe da cucina")).toBeInTheDocument();
+    expect(screen.getByText("Piani cottura")).toBeInTheDocument();
+  });
+
+  it("should handle formik submit", async () => {
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+
+    await screen.findByTestId("filters-form");
+
+    const form = screen.getByTestId("filters-form");
+    fireEvent.submit(form);
+
+    consoleSpy.mockRestore();
   });
 });
