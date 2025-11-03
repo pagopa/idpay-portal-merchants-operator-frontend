@@ -265,7 +265,7 @@
       "cancelled": "Annullato",
       "refunded": "Stornato",
       "rewarded": "Rimborso richiesto",
-      "invoiced": "In attesa di rimborso",
+      "invoiced": "Preso in carico",
       "authorized": "Da autorizzare",
       "captured": "Fattura da caricare",
       "tableTitle": "Transazioni",
