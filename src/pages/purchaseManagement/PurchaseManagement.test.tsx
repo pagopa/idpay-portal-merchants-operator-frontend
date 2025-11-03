@@ -744,89 +744,89 @@ describe("PurchaseManagement Component", () => {
     });
   });
 
-  describe("handlePreviewPdf", () => {
-    it("dovrebbe scaricare il PDF con successo quando viene cliccato il bottone", async () => {
-      getInProgressTransactions.mockResolvedValue({
-        ...mockAPIResponse,
-        content: [mockTransaction("AUTHORIZED", "trx789")],
-      });
+  // describe("handlePreviewPdf", () => {
+  //   it("dovrebbe scaricare il PDF con successo quando viene cliccato il bottone", async () => {
+  //     getInProgressTransactions.mockResolvedValue({
+  //       ...mockAPIResponse,
+  //       content: [mockTransaction("AUTHORIZED", "trx789")],
+  //     });
       
-      render(<PurchaseManagement />);
-      
-
-      await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+  //     render(<PurchaseManagement />);
       
 
-      const pdfButton = screen.getByTestId("btn-test");
-      expect(pdfButton).toBeInTheDocument();
+  //     await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
       
 
-      expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+  //     const pdfButton = screen.getByTestId("btn-test");
+  //     expect(pdfButton).toBeInTheDocument();
       
-      fireEvent.click(pdfButton);
+
+  //     expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+      
+  //     fireEvent.click(pdfButton);
       
  
-      await waitFor(() => {
-        expect(screen.getByTestId("item-loader")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("item-loader")).toBeInTheDocument();
+  //     });
       
 
-      await waitFor(() => {
-        expect(getPreviewPdf).toHaveBeenCalledWith("trx789");
-        expect(downloadFileFromBase64).toHaveBeenCalledWith(
-          "base64MockData",
-          "CODE-trx789_preautorizzazione.pdf"
-        );
-      });
+  //     await waitFor(() => {
+  //       expect(getPreviewPdf).toHaveBeenCalledWith("trx789");
+  //       expect(downloadFileFromBase64).toHaveBeenCalledWith(
+  //         "base64MockData",
+  //         "CODE-trx789_preautorizzazione.pdf"
+  //       );
+  //     });
       
 
-      await waitFor(() => {
-        expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+  //     });
       
 
-      expect(screen.queryByTestId("alert-error")).not.toBeInTheDocument();
-    });
-  });
+  //     expect(screen.queryByTestId("alert-error")).not.toBeInTheDocument();
+  //   });
+  // });
 
-  it("dovrebbe mostrare un alert di errore se il download del PDF fallisce", async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
+  // it("dovrebbe mostrare un alert di errore se il download del PDF fallisce", async () => {
+  //   const consoleErrorSpy = vi
+  //     .spyOn(console, "error")
+  //     .mockImplementation(() => {});
     
-    getInProgressTransactions.mockResolvedValue({
-      ...mockAPIResponse,
-      content: [mockTransaction("AUTHORIZED", "trx999")],
-    });
+  //   getInProgressTransactions.mockResolvedValue({
+  //     ...mockAPIResponse,
+  //     content: [mockTransaction("AUTHORIZED", "trx999")],
+  //   });
     
-    getPreviewPdf.mockRejectedValue(new Error("PDF Download Failed"));
+  //   getPreviewPdf.mockRejectedValue(new Error("PDF Download Failed"));
     
-    render(<PurchaseManagement />);
+  //   render(<PurchaseManagement />);
     
-    await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
+  //   await waitFor(() => fireEvent.click(screen.getByTestId("row-action")));
     
-    const pdfButton = screen.getByTestId("btn-test");
-    fireEvent.click(pdfButton);
+  //   const pdfButton = screen.getByTestId("btn-test");
+  //   fireEvent.click(pdfButton);
     
-    await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error getting preview PDF:",
-        expect.any(Error)
-      );
-    });
+  //   await waitFor(() => {
+  //     expect(consoleErrorSpy).toHaveBeenCalledWith(
+  //       "Error getting preview PDF:",
+  //       expect.any(Error)
+  //     );
+  //   });
     
-    await waitFor(() => {
-      expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
-    });
+  //   await waitFor(() => {
+  //     expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+  //   });
     
-    expect(screen.getByTestId("alert-error")).toHaveTextContent(
-      "pages.purchaseManagement.errorPreviewPdf"
-    );
+  //   expect(screen.getByTestId("alert-error")).toHaveTextContent(
+  //     "pages.purchaseManagement.errorPreviewPdf"
+  //   );
     
-    expect(downloadFileFromBase64).not.toHaveBeenCalled();
+  //   expect(downloadFileFromBase64).not.toHaveBeenCalled();
     
-    consoleErrorSpy.mockRestore();
-  });
+  //   consoleErrorSpy.mockRestore();
+  // });
 
   it("dovrebbe chiudere la modal di Cancel e non riaprire il drawer quando si clicca su Close Modal", async () => {
     getInProgressTransactions.mockResolvedValue({

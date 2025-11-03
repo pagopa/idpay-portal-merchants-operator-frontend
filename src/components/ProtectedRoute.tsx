@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { CircularProgress } from '@mui/material';
 import type { ReactNode } from 'react';
@@ -8,7 +8,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, login } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      login();
+    }
+  },[loading, isAuthenticated,  login])
 
   if (loading) {
     return (

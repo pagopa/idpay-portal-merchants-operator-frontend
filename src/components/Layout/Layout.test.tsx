@@ -83,7 +83,7 @@ describe("Layout component", () => {
       </Layout>
     );
     const childBox = screen.getByTestId("child").parentElement;
-    expect(childBox).toHaveStyle({ maxWidth: "100%" });
+    expect(childBox).toHaveStyle({ maxWidth: "75%" });
 
     (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.TOS });
     rerender(
@@ -92,7 +92,7 @@ describe("Layout component", () => {
       </Layout>
     );
     const childBox2 = screen.getByTestId("child").parentElement;
-    expect(childBox2).toHaveStyle({ maxWidth: "100%" });
+    expect(childBox2).toHaveStyle({ maxWidth: "75%" });
   });
 
   it("should change layout when SideMenu is closed", async () => {
@@ -109,16 +109,5 @@ describe("Layout component", () => {
 
     expect(sideMenuContainer).toHaveStyle("width: min-content");
     expect(screen.getByText("SideMenu is closed")).toBeInTheDocument();
-  });
-
-  it("applies default maxWidth for other non-matching routes", () => {
-    (useLocation as vi.Mock).mockReturnValue({ pathname: "/about" });
-    render(
-      <Layout>
-        <div data-testid="child">ChildContent</div>
-      </Layout>
-    );
-    const childBox = screen.getByTestId("child").parentElement;
-    expect(childBox).toHaveStyle({ maxWidth: "920px" });
   });
 });

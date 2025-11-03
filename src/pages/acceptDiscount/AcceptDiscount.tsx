@@ -115,9 +115,9 @@ const AcceptDiscount = () => {
         return isValid;
     };
 
-    const handleFieldChange = (field: keyof FormData, value: any) => {
+    const handleFieldChange = (field: keyof FormData, value: string | ProductDTO): void => {
         const newValue = value;
-        if (field === 'totalAmount') {
+        if (field === 'totalAmount' && typeof newValue === 'string') {
             if (newValue === '') {
                 setFormData(prev => ({
                     ...prev,
@@ -139,11 +139,13 @@ const AcceptDiscount = () => {
                 return;
             }
         
-            if (decimalPart.length > 2 || decimalPart.split('').some(ch => ch < '0' || ch > '9')) {
+            if (decimalPart.length > 2 || decimalPart.split('').some(ch => ch < '0' || ch > '9') || integerPart?.length > 5) {
                 return;
             }
 
-            console.log("VAL", typeof(newValue))
+            if((newValue === '0' && newValue?.length === 1) || (newValue === ',' && newValue?.length === 1)) {
+                return;
+            }
         
             setFormData(prev => ({
                 ...prev,
