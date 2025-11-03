@@ -32,7 +32,13 @@ export function getStatusChip(t: any, status: string) {
             return <Chip
                 label={t('pages.refundManagement.rewarded')}
                 size="small"
-                sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
+                sx={{ backgroundColor: '#E1F4E1 !important', color: '#224021 !important' }}
+            />
+        case 'INVOICED':
+            return <Chip
+                label={t('pages.refundManagement.invoiced')}
+                size="small"
+                sx={{ backgroundColor: '#E1F5FE !important', color: '#215C76 !important' }}
             />
         default:
             return <Chip

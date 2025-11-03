@@ -1,4 +1,4 @@
-import { Box, Button, Tooltip, Drawer, Typography, Grid } from "@mui/material";
+import { Box, Button, Tooltip, Drawer, Typography, Grid, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect, useRef } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -15,7 +15,10 @@ import { getStatusChip, formatEuro } from "../../utils/helpers";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
-// import DescriptionIcon from '@mui/icons-material/Description';
+import DescriptionIcon from '@mui/icons-material/Description';
+import { getPreviewPdf } from "../../services/merchantService";
+import { downloadFileFromBase64 } from "../../utils/helpers";
+
 
 const PurchaseManagement = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -29,7 +32,7 @@ const PurchaseManagement = () => {
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const [refundTransactionModal, setRefundTransactionModal] = useState(false);
     const [errorPreviewPdf, setErrorPreviewPdf] = useState(false);
-    // const [isPreviewPdfLoading, setIsPreviewPdfLoading] = useState(false);
+    const [isPreviewPdfLoading, setIsPreviewPdfLoading] = useState(false);
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
     const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
 
@@ -213,7 +216,7 @@ const PurchaseManagement = () => {
     const checkHeight = () => {
         if (gridRef.current) {
             const gridHeight = gridRef.current.scrollHeight;
-            const maxHeight = window.innerHeight - 280;
+            const maxHeight = window.innerHeight - 290;
             setIsScrollable(gridHeight > maxHeight);
         }
     };
@@ -270,18 +273,18 @@ const PurchaseManagement = () => {
         navigate("/richiedi-rimborso/" + selectedTransaction?.id);
     };
 
-    // const handlePreviewPdf = async () => {
-    //     setIsPreviewPdfLoading(true);
-    //     try {
-    //         const response = await getPreviewPdf(selectedTransaction?.id);
-    //         downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
-    //     } catch (error) {
-    //         console.error('Error getting preview PDF:', error);
-    //         setErrorPreviewPdf(true);
-    //     } finally {
-    //         setIsPreviewPdfLoading(false);
-    //     }
-    // };
+    const handlePreviewPdf = async () => {
+        setIsPreviewPdfLoading(true);
+        try {
+            const response = await getPreviewPdf(selectedTransaction?.id);
+            downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
+        } catch (error) {
+            console.error('Error getting preview PDF:', error);
+            setErrorPreviewPdf(true);
+        } finally {
+            setIsPreviewPdfLoading(false);
+        }
+    };
 
     return (
         <>
@@ -413,7 +416,7 @@ const PurchaseManagement = () => {
                                         {selectedTransaction?.status ? getStatusChip(t, selectedTransaction?.status) : MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
-                                {/* {
+                                {
                                     selectedTransaction?.status === 'AUTHORIZED' && (
                                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary, margin: 0 }}>
@@ -433,17 +436,17 @@ const PurchaseManagement = () => {
                                                         data-testid="item-loader"
                                                     />
                                                 ) : (
-                                                    <>
+                                                    <Box sx={{ display: 'flex', gap: 0, alignItems: 'start'}}>
                                                         <DescriptionIcon />
-                                                        <span style={{ marginLeft: '8px' }}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</span>
-                                                    </>
+                                                        <div style={{ marginLeft: '8px', wordBreak: 'break-all'}}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</div>
+                                                    </Box>
                                                 )}
                                             </Button>
                                         </Grid> 
                                     )
-                                } */}
+                                }
                             </Grid>
-                            <Box sx={{ position: 'absolute', bottom: 0, display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
+                            <Box sx={{ position: 'absolute', bottom: 0, display: 'flex', flexDirection: 'column', width: '100%' }}>
                                 <Box sx={{ width: '100%' }}>
                                     <Button
                                         variant="contained"

@@ -265,11 +265,12 @@
       "cancelled": "Annullato",
       "refunded": "Stornato",
       "rewarded": "Rimborso richiesto",
+      "invoiced": "In attesa di rimborso",
       "authorized": "Da autorizzare",
       "captured": "Fattura da caricare",
       "tableTitle": "Transazioni",
-      "refundSuccessUpload": "La richiesta di rimborso è stata inviata.",
-      "reverseSuccessUpload": "La richiesta di storno è stata inviata.",
+      "refundSuccessUpload": "Richiesta inviata correttamente",
+      "reverseSuccessUpload": "Richiesta inviata correttamente",
       "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova."
 
     },

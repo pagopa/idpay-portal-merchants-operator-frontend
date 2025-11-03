@@ -246,7 +246,7 @@ export const MerchantApi = {
     }
   },
 
-  rewardTransactionApi: async (
+ invoiceTransactionApi: async (
     trxId: string, 
     file: File
   ): Promise<void> => {
@@ -254,7 +254,7 @@ export const MerchantApi = {
       const formData = new FormData();
       formData.append('file', file);
       const response = await axiosInstance.post(
-        `/transactions/${trxId}/reward`, 
+        `/transactions/${trxId}/invoice`, 
         formData,
         {
           headers: {
@@ -265,7 +265,7 @@ export const MerchantApi = {
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
-      console.error('Error in rewardTransaction:', error);
+      console.error('Error in invoiceTransaction:', error);
       throw error;
     }
   },

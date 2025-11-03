@@ -242,7 +242,7 @@ const RefundManagement = () => {
             tableTitle={t('pages.refundManagement.tableTitle')}
             fetchTransactionsApi={getProcessedTransactions}
             columns={columns}
-            statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED']}
+            statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED', 'INVOICED']}
             alerts={[
                 [transactionReverseSuccess, setTransactionReverseSuccess],
                 [transactionRefundSuccess, setTransactionRefundSuccess],
