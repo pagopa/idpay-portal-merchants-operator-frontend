@@ -115,9 +115,9 @@ const AcceptDiscount = () => {
         return isValid;
     };
 
-    const handleFieldChange = (field: keyof FormData, value: string) => {
+    const handleFieldChange = (field: keyof FormData, value: string | ProductDTO): void => {
         const newValue = value;
-        if (field === 'totalAmount') {
+        if (field === 'totalAmount' && typeof newValue === 'string') {
             if (newValue === '') {
                 setFormData(prev => ({
                     ...prev,
