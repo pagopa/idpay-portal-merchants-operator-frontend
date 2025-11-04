@@ -244,6 +244,7 @@ const Products = () => {
             page: newPaginationModel.page,
             size: newPaginationModel.pageSize,
             sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...formik.values
         });
     };
 
