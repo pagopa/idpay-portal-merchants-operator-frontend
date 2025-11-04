@@ -27,11 +27,13 @@ import { PreviewPaymentRequestDTO } from "./PreviewPaymentRequestDTO";
 
 import { PreviewPaymentDTO } from "./PreviewPaymentDTO";
 
-import { DownloadInvoiceResponseDTO } from "./DownloadInvoiceResponseDTO";
+import { ReportDTO } from "./ReportDTO";
 
 import { PointOfSaleDTO } from "./PointOfSaleDTO";
 
 import { PointOfSaleErrorDTO } from "./PointOfSaleErrorDTO";
+
+import { DownloadInvoiceResponseDTO } from "./DownloadInvoiceResponseDTO";
 
 /****************************************************************
  * getPointOfSaleTransactions
@@ -1868,7 +1870,7 @@ export type PreviewPaymentT = r.IPutApiRequestType<
     >
   | r.IResponseType<
       400,
-      ErrorDTO,
+      TransactionErrorDTO,
       | "Access-Control-Allow-Origin"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
@@ -1876,7 +1878,23 @@ export type PreviewPaymentT = r.IPutApiRequestType<
     >
   | r.IResponseType<
       401,
-      ErrorDTO,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      403,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      TransactionErrorDTO,
       | "Access-Control-Allow-Origin"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
@@ -1884,57 +1902,86 @@ export type PreviewPaymentT = r.IPutApiRequestType<
     >
   | r.IResponseType<
       429,
-      ErrorDTO,
+      TransactionErrorDTO,
       | "Access-Control-Allow-Origin"
       | "Retry-After"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
       | "X-RateLimit-Reset"
     >
-  | r.IResponseType<500, ErrorDTO, "Access-Control-Allow-Origin">
+  | r.IResponseType<500, TransactionErrorDTO, never>
 >;
 
 export const previewPaymentDefaultResponses = {
   200: PreviewPaymentDTO,
-  400: ErrorDTO,
-  401: ErrorDTO,
-  429: ErrorDTO,
-  500: ErrorDTO
+  400: TransactionErrorDTO,
+  401: TransactionErrorDTO,
+  403: TransactionErrorDTO,
+  404: TransactionErrorDTO,
+  429: TransactionErrorDTO,
+  500: TransactionErrorDTO
 };
 
 export type PreviewPaymentResponsesT<
   A0 = PreviewPaymentDTO,
   C0 = PreviewPaymentDTO,
-  A1 = ErrorDTO,
-  C1 = ErrorDTO,
-  A2 = ErrorDTO,
-  C2 = ErrorDTO,
-  A3 = ErrorDTO,
-  C3 = ErrorDTO,
-  A4 = ErrorDTO,
-  C4 = ErrorDTO
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO,
+  A5 = TransactionErrorDTO,
+  C5 = TransactionErrorDTO,
+  A6 = TransactionErrorDTO,
+  C6 = TransactionErrorDTO
 > = {
   200: t.Type<A0, C0>;
   400: t.Type<A1, C1>;
   401: t.Type<A2, C2>;
-  429: t.Type<A3, C3>;
-  500: t.Type<A4, C4>;
+  403: t.Type<A3, C3>;
+  404: t.Type<A4, C4>;
+  429: t.Type<A5, C5>;
+  500: t.Type<A6, C6>;
 };
 
 export function previewPaymentDecoder<
   A0 = PreviewPaymentDTO,
   C0 = PreviewPaymentDTO,
-  A1 = ErrorDTO,
-  C1 = ErrorDTO,
-  A2 = ErrorDTO,
-  C2 = ErrorDTO,
-  A3 = ErrorDTO,
-  C3 = ErrorDTO,
-  A4 = ErrorDTO,
-  C4 = ErrorDTO
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO,
+  A5 = TransactionErrorDTO,
+  C5 = TransactionErrorDTO,
+  A6 = TransactionErrorDTO,
+  C6 = TransactionErrorDTO
 >(
   overrideTypes:
-    | Partial<PreviewPaymentResponsesT<A0, C0, A1, C1, A2, C2, A3, C3, A4, C4>>
+    | Partial<
+        PreviewPaymentResponsesT<
+          A0,
+          C0,
+          A1,
+          C1,
+          A2,
+          C2,
+          A3,
+          C3,
+          A4,
+          C4,
+          A5,
+          C5,
+          A6,
+          C6
+        >
+      >
     | t.Type<A0, C0>
     | undefined = {}
 ): r.ResponseDecoder<
@@ -1963,15 +2010,31 @@ export function previewPaymentDecoder<
       | "X-RateLimit-Reset"
     >
   | r.IResponseType<
-      429,
+      403,
       A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      A5,
       | "Access-Control-Allow-Origin"
       | "Retry-After"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
       | "X-RateLimit-Reset"
     >
-  | r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+  | r.IResponseType<500, A6, never>
 > {
   const isDecoder = (d: any): d is t.Type<A0, C0> =>
     typeof d["_A"] !== "undefined";
@@ -1987,7 +2050,11 @@ export function previewPaymentDecoder<
       A3,
       C3,
       A4,
-      C4
+      C4,
+      A5,
+      C5,
+      A6,
+      C6
     >),
     ...(isDecoder(overrideTypes) ? { 200: overrideTypes } : overrideTypes)
   };
@@ -2076,6 +2143,62 @@ export function previewPaymentDecoder<
     >
   >;
 
+  const d403 = (type[403].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        403,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(403, undefined)
+    : r.ioResponseDecoder<
+        403,
+        typeof type[403]["_A"],
+        typeof type[403]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(403, type[403])) as r.ResponseDecoder<
+    r.IResponseType<
+      403,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d404 = (type[404].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        404,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, undefined)
+    : r.ioResponseDecoder<
+        404,
+        typeof type[404]["_A"],
+        typeof type[404]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, type[404])) as r.ResponseDecoder<
+    r.IResponseType<
+      404,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
   const d429 = (type[429].name === "undefined"
     ? r.constantResponseDecoder<
         undefined,
@@ -2098,7 +2221,7 @@ export function previewPaymentDecoder<
       >(429, type[429])) as r.ResponseDecoder<
     r.IResponseType<
       429,
-      A3,
+      A5,
       | "Access-Control-Allow-Origin"
       | "Retry-After"
       | "X-RateLimit-Limit"
@@ -2108,22 +2231,26 @@ export function previewPaymentDecoder<
   >;
 
   const d500 = (type[500].name === "undefined"
-    ? r.constantResponseDecoder<undefined, 500, "Access-Control-Allow-Origin">(
-        500,
-        undefined
-      )
+    ? r.constantResponseDecoder<undefined, 500, never>(500, undefined)
     : r.ioResponseDecoder<
         500,
         typeof type[500]["_A"],
         typeof type[500]["_O"],
-        "Access-Control-Allow-Origin"
-      >(500, type[500])) as r.ResponseDecoder<
-    r.IResponseType<500, A4, "Access-Control-Allow-Origin">
-  >;
+        never
+      >(500, type[500])) as r.ResponseDecoder<r.IResponseType<500, A6, never>>;
 
   return r.composeResponseDecoders(
     r.composeResponseDecoders(
-      r.composeResponseDecoders(r.composeResponseDecoders(d200, d400), d401),
+      r.composeResponseDecoders(
+        r.composeResponseDecoders(
+          r.composeResponseDecoders(
+            r.composeResponseDecoders(d200, d400),
+            d401
+          ),
+          d403
+        ),
+        d404
+      ),
       d429
     ),
     d500
@@ -2543,21 +2670,21 @@ export function deleteTransactionDecoder<
 export const deleteTransactionDefaultDecoder = () => deleteTransactionDecoder();
 
 /****************************************************************
- * downloadInvoiceFile
+ * getTransactionPreviewPdf
  */
 
 // Request type definition
-export type DownloadInvoiceFileT = r.IGetApiRequestType<
+export type GetTransactionPreviewPdfT = r.IGetApiRequestType<
   { readonly Bearer: string; readonly transactionId: string },
   "Authorization",
   never,
   | r.IResponseType<
       200,
-      DownloadInvoiceResponseDTO,
+      ReportDTO,
       | "Access-Control-Allow-Origin"
+      | "Retry-After"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
-      | "X-RateLimit-Reset"
     >
   | r.IResponseType<
       400,
@@ -2569,6 +2696,22 @@ export type DownloadInvoiceFileT = r.IGetApiRequestType<
     >
   | r.IResponseType<
       401,
+      undefined,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      403,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
       TransactionErrorDTO,
       | "Access-Control-Allow-Origin"
       | "X-RateLimit-Limit"
@@ -2584,51 +2727,85 @@ export type DownloadInvoiceFileT = r.IGetApiRequestType<
       | "X-RateLimit-Remaining"
       | "X-RateLimit-Reset"
     >
-  | r.IResponseType<500, TransactionErrorDTO, "Access-Control-Allow-Origin">
+  | r.IResponseType<
+      500,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "RateLimit-Limit"
+      | "RateLimit-Reset"
+      | "Retry-After"
+    >
 >;
 
-export const downloadInvoiceFileDefaultResponses = {
-  200: DownloadInvoiceResponseDTO,
+export const getTransactionPreviewPdfDefaultResponses = {
+  200: ReportDTO,
   400: TransactionErrorDTO,
-  401: TransactionErrorDTO,
+  401: t.undefined,
+  403: TransactionErrorDTO,
+  404: TransactionErrorDTO,
   429: TransactionErrorDTO,
   500: TransactionErrorDTO
 };
 
-export type DownloadInvoiceFileResponsesT<
-  A0 = DownloadInvoiceResponseDTO,
-  C0 = DownloadInvoiceResponseDTO,
+export type GetTransactionPreviewPdfResponsesT<
+  A0 = ReportDTO,
+  C0 = ReportDTO,
   A1 = TransactionErrorDTO,
   C1 = TransactionErrorDTO,
-  A2 = TransactionErrorDTO,
-  C2 = TransactionErrorDTO,
+  A2 = undefined,
+  C2 = undefined,
   A3 = TransactionErrorDTO,
   C3 = TransactionErrorDTO,
   A4 = TransactionErrorDTO,
-  C4 = TransactionErrorDTO
+  C4 = TransactionErrorDTO,
+  A5 = TransactionErrorDTO,
+  C5 = TransactionErrorDTO,
+  A6 = TransactionErrorDTO,
+  C6 = TransactionErrorDTO
 > = {
   200: t.Type<A0, C0>;
   400: t.Type<A1, C1>;
   401: t.Type<A2, C2>;
-  429: t.Type<A3, C3>;
-  500: t.Type<A4, C4>;
+  403: t.Type<A3, C3>;
+  404: t.Type<A4, C4>;
+  429: t.Type<A5, C5>;
+  500: t.Type<A6, C6>;
 };
 
-export function downloadInvoiceFileDecoder<
-  A0 = DownloadInvoiceResponseDTO,
-  C0 = DownloadInvoiceResponseDTO,
+export function getTransactionPreviewPdfDecoder<
+  A0 = ReportDTO,
+  C0 = ReportDTO,
   A1 = TransactionErrorDTO,
   C1 = TransactionErrorDTO,
-  A2 = TransactionErrorDTO,
-  C2 = TransactionErrorDTO,
+  A2 = undefined,
+  C2 = undefined,
   A3 = TransactionErrorDTO,
   C3 = TransactionErrorDTO,
   A4 = TransactionErrorDTO,
-  C4 = TransactionErrorDTO
+  C4 = TransactionErrorDTO,
+  A5 = TransactionErrorDTO,
+  C5 = TransactionErrorDTO,
+  A6 = TransactionErrorDTO,
+  C6 = TransactionErrorDTO
 >(
   overrideTypes:
     | Partial<
-        DownloadInvoiceFileResponsesT<A0, C0, A1, C1, A2, C2, A3, C3, A4, C4>
+        GetTransactionPreviewPdfResponsesT<
+          A0,
+          C0,
+          A1,
+          C1,
+          A2,
+          C2,
+          A3,
+          C3,
+          A4,
+          C4,
+          A5,
+          C5,
+          A6,
+          C6
+        >
       >
     | t.Type<A0, C0>
     | undefined = {}
@@ -2637,9 +2814,9 @@ export function downloadInvoiceFileDecoder<
       200,
       A0,
       | "Access-Control-Allow-Origin"
+      | "Retry-After"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
-      | "X-RateLimit-Reset"
     >
   | r.IResponseType<
       400,
@@ -2658,21 +2835,44 @@ export function downloadInvoiceFileDecoder<
       | "X-RateLimit-Reset"
     >
   | r.IResponseType<
-      429,
+      403,
       A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      404,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      A5,
       | "Access-Control-Allow-Origin"
       | "Retry-After"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
       | "X-RateLimit-Reset"
     >
-  | r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+  | r.IResponseType<
+      500,
+      A6,
+      | "Access-Control-Allow-Origin"
+      | "RateLimit-Limit"
+      | "RateLimit-Reset"
+      | "Retry-After"
+    >
 > {
   const isDecoder = (d: any): d is t.Type<A0, C0> =>
     typeof d["_A"] !== "undefined";
 
   const type = {
-    ...((downloadInvoiceFileDefaultResponses as unknown) as DownloadInvoiceFileResponsesT<
+    ...((getTransactionPreviewPdfDefaultResponses as unknown) as GetTransactionPreviewPdfResponsesT<
       A0,
       C0,
       A1,
@@ -2682,7 +2882,11 @@ export function downloadInvoiceFileDecoder<
       A3,
       C3,
       A4,
-      C4
+      C4,
+      A5,
+      C5,
+      A6,
+      C6
     >),
     ...(isDecoder(overrideTypes) ? { 200: overrideTypes } : overrideTypes)
   };
@@ -2692,26 +2896,26 @@ export function downloadInvoiceFileDecoder<
         undefined,
         200,
         | "Access-Control-Allow-Origin"
+        | "Retry-After"
         | "X-RateLimit-Limit"
         | "X-RateLimit-Remaining"
-        | "X-RateLimit-Reset"
       >(200, undefined)
     : r.ioResponseDecoder<
         200,
         typeof type[200]["_A"],
         typeof type[200]["_O"],
         | "Access-Control-Allow-Origin"
+        | "Retry-After"
         | "X-RateLimit-Limit"
         | "X-RateLimit-Remaining"
-        | "X-RateLimit-Reset"
       >(200, type[200])) as r.ResponseDecoder<
     r.IResponseType<
       200,
       A0,
       | "Access-Control-Allow-Origin"
+      | "Retry-After"
       | "X-RateLimit-Limit"
       | "X-RateLimit-Remaining"
-      | "X-RateLimit-Reset"
     >
   >;
 
@@ -2771,6 +2975,62 @@ export function downloadInvoiceFileDecoder<
     >
   >;
 
+  const d403 = (type[403].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        403,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(403, undefined)
+    : r.ioResponseDecoder<
+        403,
+        typeof type[403]["_A"],
+        typeof type[403]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(403, type[403])) as r.ResponseDecoder<
+    r.IResponseType<
+      403,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d404 = (type[404].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        404,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, undefined)
+    : r.ioResponseDecoder<
+        404,
+        typeof type[404]["_A"],
+        typeof type[404]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(404, type[404])) as r.ResponseDecoder<
+    r.IResponseType<
+      404,
+      A4,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
   const d429 = (type[429].name === "undefined"
     ? r.constantResponseDecoder<
         undefined,
@@ -2793,7 +3053,7 @@ export function downloadInvoiceFileDecoder<
       >(429, type[429])) as r.ResponseDecoder<
     r.IResponseType<
       429,
-      A3,
+      A5,
       | "Access-Control-Allow-Origin"
       | "Retry-After"
       | "X-RateLimit-Limit"
@@ -2803,22 +3063,45 @@ export function downloadInvoiceFileDecoder<
   >;
 
   const d500 = (type[500].name === "undefined"
-    ? r.constantResponseDecoder<undefined, 500, "Access-Control-Allow-Origin">(
+    ? r.constantResponseDecoder<
+        undefined,
         500,
-        undefined
-      )
+        | "Access-Control-Allow-Origin"
+        | "RateLimit-Limit"
+        | "RateLimit-Reset"
+        | "Retry-After"
+      >(500, undefined)
     : r.ioResponseDecoder<
         500,
         typeof type[500]["_A"],
         typeof type[500]["_O"],
-        "Access-Control-Allow-Origin"
+        | "Access-Control-Allow-Origin"
+        | "RateLimit-Limit"
+        | "RateLimit-Reset"
+        | "Retry-After"
       >(500, type[500])) as r.ResponseDecoder<
-    r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+    r.IResponseType<
+      500,
+      A6,
+      | "Access-Control-Allow-Origin"
+      | "RateLimit-Limit"
+      | "RateLimit-Reset"
+      | "Retry-After"
+    >
   >;
 
   return r.composeResponseDecoders(
     r.composeResponseDecoders(
-      r.composeResponseDecoders(r.composeResponseDecoders(d200, d400), d401),
+      r.composeResponseDecoders(
+        r.composeResponseDecoders(
+          r.composeResponseDecoders(
+            r.composeResponseDecoders(d200, d400),
+            d401
+          ),
+          d403
+        ),
+        d404
+      ),
       d429
     ),
     d500
@@ -2826,8 +3109,8 @@ export function downloadInvoiceFileDecoder<
 }
 
 // Decodes the success response with the type defined in the specs
-export const downloadInvoiceFileDefaultDecoder = () =>
-  downloadInvoiceFileDecoder();
+export const getTransactionPreviewPdfDefaultDecoder = () =>
+  getTransactionPreviewPdfDecoder();
 
 /****************************************************************
  * reversalTransaction
@@ -3995,3 +4278,294 @@ export function getPointOfSaleDecoder<
 
 // Decodes the success response with the type defined in the specs
 export const getPointOfSaleDefaultDecoder = () => getPointOfSaleDecoder();
+
+/****************************************************************
+ * downloadInvoiceFile
+ */
+
+// Request type definition
+export type DownloadInvoiceFileT = r.IGetApiRequestType<
+  {
+    readonly Bearer: string;
+    readonly pointOfSaleId: string;
+    readonly transactionId: string;
+  },
+  "Authorization",
+  never,
+  | r.IResponseType<
+      200,
+      DownloadInvoiceResponseDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      TransactionErrorDTO,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, TransactionErrorDTO, "Access-Control-Allow-Origin">
+>;
+
+export const downloadInvoiceFileDefaultResponses = {
+  200: DownloadInvoiceResponseDTO,
+  400: TransactionErrorDTO,
+  401: TransactionErrorDTO,
+  429: TransactionErrorDTO,
+  500: TransactionErrorDTO
+};
+
+export type DownloadInvoiceFileResponsesT<
+  A0 = DownloadInvoiceResponseDTO,
+  C0 = DownloadInvoiceResponseDTO,
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO
+> = {
+  200: t.Type<A0, C0>;
+  400: t.Type<A1, C1>;
+  401: t.Type<A2, C2>;
+  429: t.Type<A3, C3>;
+  500: t.Type<A4, C4>;
+};
+
+export function downloadInvoiceFileDecoder<
+  A0 = DownloadInvoiceResponseDTO,
+  C0 = DownloadInvoiceResponseDTO,
+  A1 = TransactionErrorDTO,
+  C1 = TransactionErrorDTO,
+  A2 = TransactionErrorDTO,
+  C2 = TransactionErrorDTO,
+  A3 = TransactionErrorDTO,
+  C3 = TransactionErrorDTO,
+  A4 = TransactionErrorDTO,
+  C4 = TransactionErrorDTO
+>(
+  overrideTypes:
+    | Partial<
+        DownloadInvoiceFileResponsesT<A0, C0, A1, C1, A2, C2, A3, C3, A4, C4>
+      >
+    | t.Type<A0, C0>
+    | undefined = {}
+): r.ResponseDecoder<
+  | r.IResponseType<
+      200,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<
+      429,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  | r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+> {
+  const isDecoder = (d: any): d is t.Type<A0, C0> =>
+    typeof d["_A"] !== "undefined";
+
+  const type = {
+    ...((downloadInvoiceFileDefaultResponses as unknown) as DownloadInvoiceFileResponsesT<
+      A0,
+      C0,
+      A1,
+      C1,
+      A2,
+      C2,
+      A3,
+      C3,
+      A4,
+      C4
+    >),
+    ...(isDecoder(overrideTypes) ? { 200: overrideTypes } : overrideTypes)
+  };
+
+  const d200 = (type[200].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        200,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(200, undefined)
+    : r.ioResponseDecoder<
+        200,
+        typeof type[200]["_A"],
+        typeof type[200]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(200, type[200])) as r.ResponseDecoder<
+    r.IResponseType<
+      200,
+      A0,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d400 = (type[400].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        400,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, undefined)
+    : r.ioResponseDecoder<
+        400,
+        typeof type[400]["_A"],
+        typeof type[400]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(400, type[400])) as r.ResponseDecoder<
+    r.IResponseType<
+      400,
+      A1,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d401 = (type[401].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        401,
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, undefined)
+    : r.ioResponseDecoder<
+        401,
+        typeof type[401]["_A"],
+        typeof type[401]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(401, type[401])) as r.ResponseDecoder<
+    r.IResponseType<
+      401,
+      A2,
+      | "Access-Control-Allow-Origin"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d429 = (type[429].name === "undefined"
+    ? r.constantResponseDecoder<
+        undefined,
+        429,
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, undefined)
+    : r.ioResponseDecoder<
+        429,
+        typeof type[429]["_A"],
+        typeof type[429]["_O"],
+        | "Access-Control-Allow-Origin"
+        | "Retry-After"
+        | "X-RateLimit-Limit"
+        | "X-RateLimit-Remaining"
+        | "X-RateLimit-Reset"
+      >(429, type[429])) as r.ResponseDecoder<
+    r.IResponseType<
+      429,
+      A3,
+      | "Access-Control-Allow-Origin"
+      | "Retry-After"
+      | "X-RateLimit-Limit"
+      | "X-RateLimit-Remaining"
+      | "X-RateLimit-Reset"
+    >
+  >;
+
+  const d500 = (type[500].name === "undefined"
+    ? r.constantResponseDecoder<undefined, 500, "Access-Control-Allow-Origin">(
+        500,
+        undefined
+      )
+    : r.ioResponseDecoder<
+        500,
+        typeof type[500]["_A"],
+        typeof type[500]["_O"],
+        "Access-Control-Allow-Origin"
+      >(500, type[500])) as r.ResponseDecoder<
+    r.IResponseType<500, A4, "Access-Control-Allow-Origin">
+  >;
+
+  return r.composeResponseDecoders(
+    r.composeResponseDecoders(
+      r.composeResponseDecoders(r.composeResponseDecoders(d200, d400), d401),
+      d429
+    ),
+    d500
+  );
+}
+
+// Decodes the success response with the type defined in the specs
+export const downloadInvoiceFileDefaultDecoder = () =>
+  downloadInvoiceFileDecoder();

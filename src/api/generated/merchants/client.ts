@@ -29,14 +29,16 @@ import {
   previewPaymentDefaultDecoder,
   DeleteTransactionT,
   deleteTransactionDefaultDecoder,
-  DownloadInvoiceFileT,
-  downloadInvoiceFileDefaultDecoder,
+  GetTransactionPreviewPdfT,
+  getTransactionPreviewPdfDefaultDecoder,
   ReversalTransactionT,
   reversalTransactionDefaultDecoder,
   RewardTransactionT,
   rewardTransactionDefaultDecoder,
   GetPointOfSaleT,
-  getPointOfSaleDefaultDecoder
+  getPointOfSaleDefaultDecoder,
+  DownloadInvoiceFileT,
+  downloadInvoiceFileDefaultDecoder
 } from "./requestTypes";
 
 // This is a placeholder for undefined when dealing with object keys
@@ -52,10 +54,11 @@ export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsT> &
   TypeofApiCall<CapturePaymentT> &
   TypeofApiCall<PreviewPaymentT> &
   TypeofApiCall<DeleteTransactionT> &
-  TypeofApiCall<DownloadInvoiceFileT> &
+  TypeofApiCall<GetTransactionPreviewPdfT> &
   TypeofApiCall<ReversalTransactionT> &
   TypeofApiCall<RewardTransactionT> &
-  TypeofApiCall<GetPointOfSaleT>;
+  TypeofApiCall<GetPointOfSaleT> &
+  TypeofApiCall<DownloadInvoiceFileT>;
 
 export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
   TypeofApiParams<GetPointOfSaleTransactionsProcessedT> &
@@ -64,10 +67,11 @@ export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
   TypeofApiParams<CapturePaymentT> &
   TypeofApiParams<PreviewPaymentT> &
   TypeofApiParams<DeleteTransactionT> &
-  TypeofApiParams<DownloadInvoiceFileT> &
+  TypeofApiParams<GetTransactionPreviewPdfT> &
   TypeofApiParams<ReversalTransactionT> &
   TypeofApiParams<RewardTransactionT> &
-  TypeofApiParams<GetPointOfSaleT>);
+  TypeofApiParams<GetPointOfSaleT> &
+  TypeofApiParams<DownloadInvoiceFileT>);
 
 /**
  * Defines an adapter for TypeofApiCall which omit one or more parameters in the signature
@@ -98,10 +102,11 @@ export type WithDefaultsT<
   | CapturePaymentT
   | PreviewPaymentT
   | DeleteTransactionT
-  | DownloadInvoiceFileT
+  | GetTransactionPreviewPdfT
   | ReversalTransactionT
   | RewardTransactionT
-  | GetPointOfSaleT,
+  | GetPointOfSaleT
+  | DownloadInvoiceFileT,
   K
 >;
 
@@ -131,13 +136,17 @@ export type Client<
 
       readonly deleteTransaction: TypeofApiCall<DeleteTransactionT>;
 
-      readonly downloadInvoiceFile: TypeofApiCall<DownloadInvoiceFileT>;
+      readonly getTransactionPreviewPdf: TypeofApiCall<
+        GetTransactionPreviewPdfT
+      >;
 
       readonly reversalTransaction: TypeofApiCall<ReversalTransactionT>;
 
       readonly rewardTransaction: TypeofApiCall<RewardTransactionT>;
 
       readonly getPointOfSale: TypeofApiCall<GetPointOfSaleT>;
+
+      readonly downloadInvoiceFile: TypeofApiCall<DownloadInvoiceFileT>;
     }
   : {
       readonly getPointOfSaleTransactions: TypeofApiCall<
@@ -186,10 +195,10 @@ export type Client<
         >
       >;
 
-      readonly downloadInvoiceFile: TypeofApiCall<
+      readonly getTransactionPreviewPdf: TypeofApiCall<
         ReplaceRequestParams<
-          DownloadInvoiceFileT,
-          Omit<RequestParams<DownloadInvoiceFileT>, K>
+          GetTransactionPreviewPdfT,
+          Omit<RequestParams<GetTransactionPreviewPdfT>, K>
         >
       >;
 
@@ -211,6 +220,13 @@ export type Client<
         ReplaceRequestParams<
           GetPointOfSaleT,
           Omit<RequestParams<GetPointOfSaleT>, K>
+        >
+      >;
+
+      readonly downloadInvoiceFile: TypeofApiCall<
+        ReplaceRequestParams<
+          DownloadInvoiceFileT,
+          Omit<RequestParams<DownloadInvoiceFileT>, K>
         >
       >;
     };
@@ -480,23 +496,23 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
-  const downloadInvoiceFileT: ReplaceRequestParams<
-    DownloadInvoiceFileT,
-    RequestParams<DownloadInvoiceFileT>
+  const getTransactionPreviewPdfT: ReplaceRequestParams<
+    GetTransactionPreviewPdfT,
+    RequestParams<GetTransactionPreviewPdfT>
   > = {
     method: "get",
 
     headers: ({ ["Bearer"]: Bearer }) => ({
       Authorization: Bearer
     }),
-    response_decoder: downloadInvoiceFileDefaultDecoder(),
+    response_decoder: getTransactionPreviewPdfDefaultDecoder(),
     url: ({ ["transactionId"]: transactionId }) =>
-      `${basePath}/transactions/${transactionId}/download`,
+      `${basePath}/transactions/${transactionId}/preview-pdf`,
 
     query: () => withoutUndefinedValues({})
   };
-  const downloadInvoiceFile: TypeofApiCall<DownloadInvoiceFileT> = createFetchRequestForApi(
-    downloadInvoiceFileT,
+  const getTransactionPreviewPdf: TypeofApiCall<GetTransactionPreviewPdfT> = createFetchRequestForApi(
+    getTransactionPreviewPdfT,
     options
   );
 
@@ -588,6 +604,28 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const downloadInvoiceFileT: ReplaceRequestParams<
+    DownloadInvoiceFileT,
+    RequestParams<DownloadInvoiceFileT>
+  > = {
+    method: "get",
+
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: downloadInvoiceFileDefaultDecoder(),
+    url: ({
+      ["pointOfSaleId"]: pointOfSaleId,
+      ["transactionId"]: transactionId
+    }) => `${basePath}/${pointOfSaleId}/transactions/${transactionId}/download`,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const downloadInvoiceFile: TypeofApiCall<DownloadInvoiceFileT> = createFetchRequestForApi(
+    downloadInvoiceFileT,
+    options
+  );
+
   return {
     getPointOfSaleTransactions: (withDefaults || identity)(
       getPointOfSaleTransactions
@@ -600,9 +638,12 @@ export function createClient<K extends ParamKeys>({
     capturePayment: (withDefaults || identity)(capturePayment),
     previewPayment: (withDefaults || identity)(previewPayment),
     deleteTransaction: (withDefaults || identity)(deleteTransaction),
-    downloadInvoiceFile: (withDefaults || identity)(downloadInvoiceFile),
+    getTransactionPreviewPdf: (withDefaults || identity)(
+      getTransactionPreviewPdf
+    ),
     reversalTransaction: (withDefaults || identity)(reversalTransaction),
     rewardTransaction: (withDefaults || identity)(rewardTransaction),
-    getPointOfSale: (withDefaults || identity)(getPointOfSale)
+    getPointOfSale: (withDefaults || identity)(getPointOfSale),
+    downloadInvoiceFile: (withDefaults || identity)(downloadInvoiceFile)
   };
 }
