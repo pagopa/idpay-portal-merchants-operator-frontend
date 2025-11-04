@@ -59,7 +59,7 @@ vi.mock("../../components/Autocomplete/AutocompleteComponent", () => ({
       <input
         data-testid="Autocomplete"
         data-error={inputError}
-        value={value?.productName || ""}
+        value={value?.fullProductName || ""}
         onChange={(e) => onChangeDebounce(e.target.value)}
         onBlur={() => {
           if (options.length > 0) {
@@ -104,8 +104,8 @@ const mockSessionStorage = (() => {
 Object.defineProperty(window, "sessionStorage", { value: mockSessionStorage });
 
 const mockProducts: ProductDTO[] = [
-  { gtinCode: "123", productName: "Prodotto Test 1" } as ProductDTO,
-  { gtinCode: "456", productName: "Prodotto Test 2" } as ProductDTO,
+  { gtinCode: "123", fullProductName: "Prodotto Test 1" } as ProductDTO,
+  { gtinCode: "456", fullProductName: "Prodotto Test 2" } as ProductDTO,
 ];
 
 const mockDiscountCoupon = {
@@ -151,7 +151,7 @@ describe("AcceptDiscount Component", () => {
 
     await waitFor(() => {
       expect(getProductAutocomplete()).toHaveValue(
-        mockDiscountCoupon.product.productName
+        mockDiscountCoupon.product.fullProductName
       );
       expect(getTotalAmountInput()).toHaveValue("100");
       expect(getDiscountCodeInput()).toHaveValue(mockDiscountCoupon.trxCode);
@@ -273,7 +273,7 @@ describe("AcceptDiscount Component", () => {
 
     await waitFor(() => {
       expect(getProductsList).toHaveBeenCalledWith({
-        productName: "ProdottoX",
+        fullProductName: "ProdottoX",
         size: 50,
       });
     });
@@ -289,7 +289,7 @@ describe("AcceptDiscount Component", () => {
 
     await waitFor(() => {
       expect(getProductsList).toHaveBeenCalledWith({
-        productName: "Prodotto",
+        fullProductName: "Prodotto",
         size: 50,
       });
     });
@@ -317,7 +317,7 @@ describe("AcceptDiscount Component", () => {
       }
     );
     fireEvent.change(screen.getByTestId("Autocomplete"), {
-      target: { value: { gtinCode: "123", productName: "Prodotto" } },
+      target: { value: { gtinCode: "123", fullProductName: "Prodotto" } },
     });
 
     fireEvent.click(screen.getByText("commons.continueBtn"));
@@ -350,7 +350,7 @@ describe("AcceptDiscount try/catch coverage", () => {
       }
     );
     fireEvent.change(screen.getByTestId("Autocomplete"), {
-      target: { value: { gtinCode: "123", productName: "Prodotto" } },
+      target: { value: { gtinCode: "123", fullProductName: "Prodotto" } },
     });
   };
 
