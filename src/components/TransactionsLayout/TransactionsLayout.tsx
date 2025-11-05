@@ -93,7 +93,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     useEffect(() => {
         setSortModel([
             {
-                field: 'updateDate',
+                field: 'trxChargeDate',
                 sort: 'desc'
             }
         ]);
@@ -127,7 +127,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                 import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
-                    sort: 'updateDate,desc',
+                    sort: 'trxChargeDate,desc',
                     page: paginationModel.page,
                     size: paginationModel.pageSize
                 }

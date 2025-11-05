@@ -1557,6 +1557,11 @@ components:
           format: date-time
           description: "ENG: The date of the transaction - IT: La data della transazione"
           maxLength: 255
+        trxChargeDate:
+          type: string
+          format: date-time
+          description: "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento"
+          maxLength: 255
         updateDate:
           type: string
           format: date-time
@@ -1569,6 +1574,7 @@ components:
             - REWARDED
             - CANCELLED
             - REFUNDED
+            - INVOICED
         channel:
           type: string
           description: "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione"
@@ -1660,6 +1666,11 @@ components:
           type: string
           format: date-time
           description: "ENG: The date of the transaction - IT: La data della transazione"
+          maxLength: 255
+        trxChargeDate:
+          type: string
+          format: date-time
+          description: "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento"
           maxLength: 255
         trxExpirationSeconds:
           type: number
@@ -2466,6 +2477,7 @@ components:
           - REWARDED
           - CANCELLED
           - REFUNDED
+          - INVOICED
     sort_trx_processed_query:
       name: sort
       in: query
@@ -2473,10 +2485,10 @@ components:
       schema:
         type: string
         enum:
-          - updateDate, desc
+          - trxChargeDate, desc
           - status, desc
           - productName, desc
-          - updateDate, asc
+          - trxChargeDate, asc
           - status, asc
           - productName, asc
     status_trx_in_progress_query:
@@ -2504,10 +2516,10 @@ components:
       schema:
         type: string
         enum:
-          - updateDate, desc
+          - trxChargeDate, desc
           - status, desc
           - productName, desc
-          - updateDate, asc
+          - trxChargeDate, asc
           - status, asc
           - productName, asc
     initiativeId_path:

@@ -36,11 +36,12 @@ const RefundManagement = () => {
     }, [location.state]);
 
     const handleRowAction = useCallback((transaction) => {
+        console.log("handleRowAction", transaction);
         setIsOpen(true);
         const invoiceLabel = transaction?.status === 'REFUNDED' ? 'Nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Fattura'
 
         const mappedTransaction = {
-            'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {
+            'Data e ora': new Date(transaction?.trxChargeDate).toLocaleDateString('it-IT', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -112,7 +113,7 @@ const RefundManagement = () => {
             },
         },
         {
-            field: 'updateDate',
+            field: 'trxChargeDate',
             headerName: 'Data e ora',
             flex: 1.5,
             disableColumnMenu: true,

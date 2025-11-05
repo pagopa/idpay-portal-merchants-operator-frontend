@@ -92,7 +92,7 @@ const PurchaseManagement = () => {
             },
         },
         {
-            field: 'updateDate',
+            field: 'trxChargeDate',
             headerName: 'Data e ora',
             flex: 1.5,
             disableColumnMenu: true,
@@ -345,7 +345,7 @@ const PurchaseManagement = () => {
                                         {t('pages.purchaseManagement.drawer.trxDate')}
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
-                                        {new Date(selectedTransaction?.updateDate).toLocaleDateString('it-IT', {
+                                        {new Date(selectedTransaction?.trxChargeDate).toLocaleDateString('it-IT', {
                                             day: '2-digit',
                                             month: '2-digit',
                                             year: 'numeric',

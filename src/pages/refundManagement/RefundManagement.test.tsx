@@ -247,7 +247,7 @@ describe("RefundManagement", () => {
           productGtin: "",
           status: "",
           size: 10,
-          sort: "updateDate,desc",
+          sort: "trxChargeDate,desc",
         })
       );
     });
