@@ -14,6 +14,8 @@ variables:
   # global variables
   react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
   REACT_APP_ONE_TRUST_BASE_URL_GLOBAL: https://cdn.cookielaw.org
+  REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL: https://privacyportalde-cdn.onetrust.com/privacy-notice-scripts/otnotice-1.0.min.js
+  REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS: eyJjYWxsYmFja1VybCI6Imh0dHBzOi8vcHJpdmFjeXBvcnRhbC1kZS5vbmV0cnVzdC5jb20vcmVxdWVzdC92MS9wcml2YWN5Tm90aWNlcy9zdGF0cy92aWV3cyJ9
 
 
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
@@ -41,8 +43,8 @@ variables:
 
     react_app_one_trust_base_url: '$(REACT_APP_ONE_TRUST_BASE_URL_GLOBAL)'
     react_app_onetrust_domain_id: 019a1699-a13c-76c5-8e5b-dd0b116385d3
-    react_app_one_trust_otnotice_cdn_url: $(UAT_REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
-    react_app_one_trust_otnotice_cdn_settings: $(UAT_REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
+    react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
+    react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -81,8 +83,8 @@ variables:
 
     react_app_one_trust_base_url: '$(REACT_APP_ONE_TRUST_BASE_URL_GLOBAL)'
     react_app_onetrust_domain_id: 019a1694-149f-728f-a2fb-5ed5d0220e00
-    react_app_one_trust_otnotice_cdn_url: $(PROD_REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
-    react_app_one_trust_otnotice_cdn_settings: $(PROD_REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
+    react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
+    react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
@@ -120,8 +122,8 @@ variables:
 
     react_app_one_trust_base_url: '$(REACT_APP_ONE_TRUST_BASE_URL_GLOBAL)'
     react_app_onetrust_domain_id: 019a1699-a13c-76c5-8e5b-dd0b116385d3
-    react_app_one_trust_otnotice_cdn_url: $(DEV_REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
-    react_app_one_trust_otnotice_cdn_settings: $(DEV_REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
+    react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL)
+    react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS)
 
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
