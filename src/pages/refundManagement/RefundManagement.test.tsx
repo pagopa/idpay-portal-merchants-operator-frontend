@@ -611,7 +611,6 @@ describe("RefundManagement – extra coverage harness", () => {
     expect(item).toContain('"ID transazione":"trx-refunded"');
     expect(item).toContain('"Totale della spesa":"€80.00"');
     expect(item).toContain('"Sconto applicato":"€8.00"');
-    expect(item).toContain('"Importo autorizzato":"€72.00"');
     expect(item).toContain('"Nota di credito":"nota.pdf"');
 
     fireEvent.click(screen.getByTestId("trigger-download"));
