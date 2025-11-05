@@ -1930,8 +1930,8 @@ components:
       properties:
         invoiceUrl:
           type: string
+          maxLength: 10000
           description: "ENG: URL to download the invoice file - IT: URL per scaricare il file della fattura"
-          maxLength: 255
       required:
         - invoiceUrl
     TransactionErrorDTO:
@@ -1984,8 +1984,8 @@ components:
       properties:
         file:
           type: string
+          maxLength: 41943040
           format: binary
-          maxLength: 255
     InvoiceDTO:
       type: object
       required:
@@ -1993,8 +1993,8 @@ components:
       properties:
         file:
           type: string
+          maxLength: 41943040
           format: binary
-          maxLength: 255
     ReportDTO:
       title: ReportDTO
       type: object
