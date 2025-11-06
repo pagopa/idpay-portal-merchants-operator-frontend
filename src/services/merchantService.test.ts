@@ -11,6 +11,7 @@ import {
   downloadInvoiceFileApi,
   reverseTransactionApi,
   rewardTransactionApi,
+  getPreviewPdf,
 } from "./merchantService";
 import { MerchantApi } from "../api/MerchantsApiClient";
 
@@ -28,6 +29,7 @@ vi.mock("../api/MerchantsApiClient", () => ({
     downloadInvoiceFileApi: vi.fn(),
     reverseTransactionApi: vi.fn(),
     rewardTransactionApi: vi.fn(),
+    getPreviewPdf: vi.fn(),
   },
 }));
 
@@ -656,4 +658,42 @@ describe("Merchant Service Functions", () => {
       expect(mockDeleteTransactionInProgress).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe("getPreviewPdf", () => {
+  const trxId = "TRX_PREVIEW_001";
+
+  it("should call MerchantApi.getPreviewPdf with correct trxId and return data", async () => {
+    const mockResponse = { data: "base64pdfdata" };
+
+    vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue(mockResponse);
+
+    const result = await getPreviewPdf(trxId);
+
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith(trxId);
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should handle empty trxId", async () => {
+    const mockResponse = { data: "" };
+
+    vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue(mockResponse);
+
+    const result = await getPreviewPdf("");
+
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith("");
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should propagate errors from MerchantApi.getPreviewPdf", async () => {
+    const mockError = new Error("PDF not found");
+
+    vi.mocked(MerchantApi.getPreviewPdf).mockRejectedValue(mockError);
+
+    await expect(getPreviewPdf(trxId)).rejects.toThrow("PDF not found");
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith(trxId);
+  });
+});
+
+  
 });

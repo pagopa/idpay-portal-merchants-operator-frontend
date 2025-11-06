@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { MerchantApi } from "./MerchantsApiClient";
 
+
 // Create mock functions directly in the vi.mock factory
 vi.mock("axios", () => {
   const mockGet = vi.fn();
@@ -394,4 +395,39 @@ describe("MerchantApi", () => {
       );
     });
   });
+  describe("getPreviewPdf", () => {
+  const trxId = "TRX_PREVIEW_001";
+
+  it("should call GET /transactions/:trxId/preview-pdf and return correct data", async () => {
+    const mockResponse = { data: "base64pdfdata" };
+    mockAxiosInstance.get.mockResolvedValue(mockResponse);
+
+    const result = await MerchantApi.getPreviewPdf(trxId);
+
+    expect(mockAxiosInstance.get).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
+    expect(mockAxiosInstance.get).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(mockResponse.data);
+  });
+
+  it("should handle empty trxId gracefully", async () => {
+    const mockResponse = { data: "" };
+    mockAxiosInstance.get.mockResolvedValue(mockResponse);
+
+    const result = await MerchantApi.getPreviewPdf("");
+
+    expect(mockAxiosInstance.get).toHaveBeenCalledWith(`/transactions//preview-pdf`);
+    expect(result).toEqual(mockResponse.data);
+  });
+
+  it("should throw an error if API call fails", async () => {
+    const apiError = new Error("PDF not found");
+    mockAxiosInstance.get.mockRejectedValue(apiError);
+
+    await expect(MerchantApi.getPreviewPdf(trxId)).rejects.toThrow("PDF not found");
+    expect(mockAxiosInstance.get).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
+    expect(mockAxiosInstance.get).toHaveBeenCalledTimes(1);
+  });
+});
+
+
 });

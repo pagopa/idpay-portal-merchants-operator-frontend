@@ -1267,6 +1267,12 @@
           },
           "400": {
             "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_AMOUNT_NOT_VALID",
+                "message": "Cannot preview transaction with invalid amount [%s]"
+              }
+            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "CORS header to allow cross-origin requests",
@@ -1289,7 +1295,7 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/ErrorDTO"
+              "$ref": "#/definitions/TransactionErrorDTO"
             }
           },
           "401": {
@@ -1316,11 +1322,83 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/ErrorDTO"
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS",
+                "message": "Transaction with trxCode [%s] is not allowed for this operation"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_FOUND_OR_EXPIRED",
+                "message": "Cannot find transaction with trxCode [%s]"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
             }
           },
           "429": {
-            "description": "Too many Request",
+            "description": "Too many requests",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_TOO_MANY_REQUESTS",
+                "message": "Too many requests on the ms reward calculator"
+              }
+            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "CORS header to allow cross-origin requests",
@@ -1348,19 +1426,19 @@
               }
             },
             "schema": {
-              "$ref": "#/definitions/ErrorDTO"
+              "$ref": "#/definitions/TransactionErrorDTO"
             }
           },
           "500": {
-            "description": "Server ERROR",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "CORS header to allow cross-origin requests",
-                "type": "string"
+            "description": "Generic error",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_GENERIC_ERROR",
+                "message": "A generic error occurred"
               }
             },
             "schema": {
-              "$ref": "#/definitions/ErrorDTO"
+              "$ref": "#/definitions/TransactionErrorDTO"
             }
           }
         },
@@ -1595,29 +1673,34 @@
         "summary": "Point of sales delete transaction"
       }
     },
-    "/transactions/{transactionId}/download": {
+    "/transactions/{transactionId}/preview-pdf": {
       "get": {
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "description": "The transaction ID",
+            "description": "ENG: The transaction's id - IT: Id della transazione",
             "in": "path",
-            "maxLength": 36,
+            "maxLength": 255,
             "name": "transactionId",
-            "pattern": ".*",
+            "pattern": "^[a-zA-Z0-9]+$",
             "required": true,
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "Ok",
+            "description": "OK",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "CORS header to allow cross-origin requests",
                 "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
               },
               "X-RateLimit-Limit": {
                 "description": "The maximum number of requests allowed in the current period",
@@ -1628,23 +1711,18 @@
                 "description": "The number of requests remaining in the current period",
                 "format": "int64",
                 "type": "integer"
-              },
-              "X-RateLimit-Reset": {
-                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
-                "format": "int64",
-                "type": "integer"
               }
             },
             "schema": {
-              "$ref": "#/definitions/DownloadInvoiceResponseDTO"
+              "$ref": "#/definitions/ReportDTO"
             }
           },
           "400": {
             "description": "Bad request",
             "examples": {
               "application/json": {
-                "code": "INVALID_REQUEST",
-                "message": "Something went wrong handling request"
+                "code": "PAYMENT_INVALID_REQUEST",
+                "message": "Something went wrong handling the request"
               }
             },
             "headers": {
@@ -1694,16 +1772,79 @@
                 "format": "int64",
                 "type": "integer"
               }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT",
+                "message": "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_NOT_FOUND_OR_EXPIRED",
+                "message": "Cannot find transaction with transactionId [%s]"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
             },
             "schema": {
               "$ref": "#/definitions/TransactionErrorDTO"
             }
           },
           "429": {
-            "description": "Too many Request",
+            "description": "Too many requests",
             "examples": {
               "application/json": {
-                "code": "TOO_MANY_REQUESTS",
+                "code": "PAYMENT_TOO_MANY_REQUESTS",
                 "message": "Too many requests"
               }
             },
@@ -1738,17 +1879,32 @@
             }
           },
           "500": {
-            "description": "Server ERROR",
+            "description": "Generic error",
             "examples": {
               "application/json": {
-                "code": "GENERIC_ERROR",
-                "message": "An error occurred during file reading"
+                "code": "PAYMENT_GENERIC_ERROR",
+                "message": "Application error"
               }
             },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "CORS header to allow cross-origin requests",
                 "type": "string"
+              },
+              "RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
               }
             },
             "schema": {
@@ -1757,11 +1913,11 @@
           }
         },
         "tags": [
-          "transaction"
+          "payment"
         ],
-        "description": "ENG: Download the invoice file of the transaction<br> IT: Scarica il file della fattura della transazione",
-        "operationId": "downloadInvoiceFile",
-        "summary": "ENG: Download invoice file - IT: Scarica il file della fattura"
+        "description": "Generate transaction preview pdf",
+        "operationId": "getTransactionPreviewPdf",
+        "summary": "ENG: Generate a transaction preview pdf - IT: Genera un pdf della preview transazione"
       }
     },
     "/transactions/{transactionId}/reversal": {
@@ -1785,6 +1941,7 @@
           {
             "format": "binary",
             "in": "formData",
+            "maxLength": 255,
             "name": "file",
             "required": true,
             "type": "string"
@@ -2018,6 +2175,7 @@
           {
             "format": "binary",
             "in": "formData",
+            "maxLength": 255,
             "name": "file",
             "required": true,
             "type": "string"
@@ -2431,6 +2589,184 @@
         "operationId": "getPointOfSale",
         "summary": "Retrieve a point of sale"
       }
+    },
+    "/{pointOfSaleId}/transactions/{transactionId}/download": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "description": "The point of sale ID",
+            "in": "path",
+            "maxLength": 36,
+            "name": "pointOfSaleId",
+            "pattern": ".*",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "The transaction ID",
+            "in": "path",
+            "maxLength": 36,
+            "name": "transactionId",
+            "pattern": ".*",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/DownloadInvoiceResponseDTO"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_INVALID_REQUEST",
+                "message": "Something went wrong handling request"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "429": {
+            "description": "Too many Request",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_TOO_MANY_REQUESTS",
+                "message": "Too many requests"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Indicates how long the user agent should wait before making a follow-up request",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Limit": {
+                "description": "The maximum number of requests allowed in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Remaining": {
+                "description": "The number of requests remaining in the current period",
+                "format": "int64",
+                "type": "integer"
+              },
+              "X-RateLimit-Reset": {
+                "description": "The time at which the rate limit resets (in UTC epoch seconds)",
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          },
+          "500": {
+            "description": "Server ERROR",
+            "examples": {
+              "application/json": {
+                "code": "PAYMENT_GENERIC_ERROR",
+                "message": "An error occurred during file reading"
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "CORS header to allow cross-origin requests",
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/TransactionErrorDTO"
+            }
+          }
+        },
+        "tags": [
+          "transaction"
+        ],
+        "description": "ENG: Download the invoice file of the transaction<br> IT: Scarica il file della fattura della transazione",
+        "operationId": "downloadInvoiceFile",
+        "summary": "ENG: Download invoice file - IT: Scarica il file della fattura"
+      }
     }
   },
   "definitions" : {"STRINGWrapper":{"type": "string"},"STRINGArray":{"type": "array", "items": {"type": "string"}},
@@ -2559,6 +2895,7 @@
       "properties": {
         "invoiceUrl": {
           "description": "ENG: URL to download the invoice file - IT: URL per scaricare il file della fattura",
+          "maxLength": 255,
           "type": "string"
         }
       },
@@ -2590,6 +2927,7 @@
       "properties": {
         "filename": {
           "description": "ENG: The name of the invoice file <br> IT: Il nome del file della fattura",
+          "maxLength": 255,
           "type": "string"
         }
       },
@@ -3241,10 +3579,22 @@
       },
       "type": "object"
     },
+    "ReportDTO": {
+      "properties": {
+        "data": {
+          "format": "binary",
+          "maxLength": 1048576,
+          "type": "string"
+        }
+      },
+      "title": "ReportDTO",
+      "type": "object"
+    },
     "ReversalInvoiceDTO": {
       "properties": {
         "file": {
           "format": "binary",
+          "maxLength": 255,
           "type": "string"
         }
       },
@@ -3257,6 +3607,7 @@
       "properties": {
         "file": {
           "format": "binary",
+          "maxLength": 255,
           "type": "string"
         }
       },
@@ -3608,6 +3959,15 @@
         "pattern": ".*",
         "required": true,
         "type": "string"
+      },
+      "trx_id_path": {
+        "description": "ENG: The transaction's id - IT: Id della transazione",
+        "in": "path",
+        "maxLength": 255,
+        "name": "transactionId",
+        "pattern": "^[a-zA-Z0-9]+$",
+        "required": true,
+        "type": "string"
       }
     },
     "responses": {
@@ -3639,7 +3999,7 @@
         "content": {
           "application/json": {
             "example": {
-              "code": "INVALID_REQUEST",
+              "code": "PAYMENT_INVALID_REQUEST",
               "message": "Something went wrong handling request"
             },
             "schema": {
@@ -3691,7 +4051,7 @@
         "content": {
           "application/json": {
             "example": {
-              "code": "TOO_MANY_REQUESTS",
+              "code": "PAYMENT_TOO_MANY_REQUESTS",
               "message": "Too many requests"
             },
             "schema": {
@@ -3722,7 +4082,7 @@
         "content": {
           "application/json": {
             "example": {
-              "code": "GENERIC_ERROR",
+              "code": "PAYMENT_GENERIC_ERROR",
               "message": "An error occurred during file reading"
             },
             "schema": {
@@ -4121,120 +4481,6 @@
           }
         },
         "description": "Generic error",
-        "headers": {
-          "Access-Control-Allow-Origin": {
-            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
-          }
-        }
-      },
-      "PUT_preview_payment_200_Response": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/PreviewPaymentDTO"
-            }
-          }
-        },
-        "description": "Ok",
-        "headers": {
-          "Access-Control-Allow-Origin": {
-            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
-          },
-          "X-RateLimit-Limit": {
-            "$ref": "#/x-components/headers/X-RateLimit-Limit"
-          },
-          "X-RateLimit-Remaining": {
-            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
-          },
-          "X-RateLimit-Reset": {
-            "$ref": "#/x-components/headers/X-RateLimit-Reset"
-          }
-        }
-      },
-      "PUT_preview_payment_400_Response": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/ErrorDTO"
-            }
-          }
-        },
-        "description": "Bad request",
-        "headers": {
-          "Access-Control-Allow-Origin": {
-            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
-          },
-          "X-RateLimit-Limit": {
-            "$ref": "#/x-components/headers/X-RateLimit-Limit"
-          },
-          "X-RateLimit-Remaining": {
-            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
-          },
-          "X-RateLimit-Reset": {
-            "$ref": "#/x-components/headers/X-RateLimit-Reset"
-          }
-        }
-      },
-      "PUT_preview_payment_401_Response": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/ErrorDTO"
-            }
-          }
-        },
-        "description": "Authentication failed",
-        "headers": {
-          "Access-Control-Allow-Origin": {
-            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
-          },
-          "X-RateLimit-Limit": {
-            "$ref": "#/x-components/headers/X-RateLimit-Limit"
-          },
-          "X-RateLimit-Remaining": {
-            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
-          },
-          "X-RateLimit-Reset": {
-            "$ref": "#/x-components/headers/X-RateLimit-Reset"
-          }
-        }
-      },
-      "PUT_preview_payment_429_Response": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/ErrorDTO"
-            }
-          }
-        },
-        "description": "Too many Request",
-        "headers": {
-          "Access-Control-Allow-Origin": {
-            "$ref": "#/x-components/headers/Access-Control-Allow-Origin"
-          },
-          "Retry-After": {
-            "$ref": "#/x-components/headers/Retry-After"
-          },
-          "X-RateLimit-Limit": {
-            "$ref": "#/x-components/headers/X-RateLimit-Limit"
-          },
-          "X-RateLimit-Remaining": {
-            "$ref": "#/x-components/headers/X-RateLimit-Remaining"
-          },
-          "X-RateLimit-Reset": {
-            "$ref": "#/x-components/headers/X-RateLimit-Reset"
-          }
-        }
-      },
-      "PUT_preview_payment_500_Response": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/definitions/ErrorDTO"
-            }
-          }
-        },
-        "description": "Server ERROR",
         "headers": {
           "Access-Control-Allow-Origin": {
             "$ref": "#/x-components/headers/Access-Control-Allow-Origin"

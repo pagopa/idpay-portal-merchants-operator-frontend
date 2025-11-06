@@ -167,15 +167,118 @@ paths:
               $ref: "#/components/schemas/PreviewPaymentRequestDTO"
       responses:
         "200":
-          $ref: "#/components/responses/PUT_preview_payment_200_Response"
+          description: Ok
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PreviewPaymentDTO"
         "400":
-          $ref: "#/components/responses/PUT_preview_payment_400_Response"
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: PAYMENT_AMOUNT_NOT_VALID
+                message: "Cannot preview transaction with invalid amount [%s]"
         "401":
-          $ref: "#/components/responses/PUT_preview_payment_401_Response"
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+        "403":
+          description: Forbidden
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS
+                message: "Transaction with trxCode [%s] is not allowed for this operation"
+        "404":
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: PAYMENT_NOT_FOUND_OR_EXPIRED
+                message: "Cannot find transaction with trxCode [%s]"
         "429":
-          $ref: "#/components/responses/PUT_preview_payment_429_Response"
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+            Retry-After:
+              $ref: "#/components/headers/Retry-After"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: PAYMENT_TOO_MANY_REQUESTS
+                message: "Too many requests on the ms reward calculator"
         "500":
-          $ref: "#/components/responses/PUT_preview_payment_500_Response"
+          description: Generic error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: PAYMENT_GENERIC_ERROR
+                message: "A generic error occurred"
   /products:
     get:
       tags:
@@ -922,6 +1025,135 @@ paths:
               example:
                 code: "PAYMENT_GENERIC_ERROR"
                 message: "Application error"
+  /transactions/{transactionId}/preview-pdf:
+    get:
+      tags:
+        - payment
+      summary: 'ENG: Generate a transaction preview pdf - IT: Genera un pdf della preview transazione'
+      description: Generate transaction preview pdf
+      operationId: getTransactionPreviewPdf
+      parameters:
+        - $ref: '#/components/parameters/trx_id_path'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDTO'
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            Retry-After:
+              $ref: "#/components/headers/Retry-After"
+        "400":
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_INVALID_REQUEST"
+                message: "Something went wrong handling the request"
+        "401":
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "403":
+          description: "Forbidden"
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT"
+                message: "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+        "404":
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                message: "Cannot find transaction with transactionId [%s]"
+        "429":
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+            Retry-After:
+              $ref: "#/components/headers/Retry-After"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_TOO_MANY_REQUESTS"
+                message: "Too many requests"
+        "500":
+          description: Generic error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_GENERIC_ERROR"
+                message: "Application error"
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+            Retry-After:
+              $ref: '#/components/headers/Retry-After'
+
 components:
   headers:
     X-RateLimit-Limit:
@@ -1354,6 +1586,7 @@ components:
         filename:
           type: string
           description: "ENG: The name of the invoice file <br> IT: Il nome del file della fattura"
+          maxLength: 255
     PointOfSaleTransactionsListDTO:
       type: object
       properties:
@@ -1682,6 +1915,7 @@ components:
         invoiceUrl:
           type: string
           description: "ENG: URL to download the invoice file - IT: URL per scaricare il file della fattura"
+          maxLength: 255
       required:
         - invoiceUrl
     TransactionErrorDTO:
@@ -1734,6 +1968,7 @@ components:
         file:
           type: string
           format: binary
+          maxLength: 255
     RewardInvoiceDTO:
       type: object
       required:
@@ -1742,83 +1977,21 @@ components:
         file:
           type: string
           format: binary
+          maxLength: 255
+    ReportDTO:
+      title: ReportDTO
+      type: object
+      properties:
+        data:
+          type: string
+          maxLength: 1048576
+          format: binary
   securitySchemes:
     Bearer:
       type: apiKey
       name: Authorization
       in: header
   responses:
-    PUT_preview_payment_200_Response:
-      description: Ok
-      headers:
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/Access-Control-Allow-Origin"
-        X-RateLimit-Limit:
-          $ref: "#/components/headers/X-RateLimit-Limit"
-        X-RateLimit-Remaining:
-          $ref: "#/components/headers/X-RateLimit-Remaining"
-        X-RateLimit-Reset:
-          $ref: "#/components/headers/X-RateLimit-Reset"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/PreviewPaymentDTO"
-    PUT_preview_payment_400_Response:
-      description: Bad request
-      headers:
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/Access-Control-Allow-Origin"
-        X-RateLimit-Limit:
-          $ref: "#/components/headers/X-RateLimit-Limit"
-        X-RateLimit-Remaining:
-          $ref: "#/components/headers/X-RateLimit-Remaining"
-        X-RateLimit-Reset:
-          $ref: "#/components/headers/X-RateLimit-Reset"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorDTO"
-    PUT_preview_payment_401_Response:
-      description: Authentication failed
-      headers:
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/Access-Control-Allow-Origin"
-        X-RateLimit-Limit:
-          $ref: "#/components/headers/X-RateLimit-Limit"
-        X-RateLimit-Remaining:
-          $ref: "#/components/headers/X-RateLimit-Remaining"
-        X-RateLimit-Reset:
-          $ref: "#/components/headers/X-RateLimit-Reset"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorDTO"
-    PUT_preview_payment_429_Response:
-      description: Too many Request
-      headers:
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/Access-Control-Allow-Origin"
-        Retry-After:
-          $ref: "#/components/headers/Retry-After"
-        X-RateLimit-Limit:
-          $ref: "#/components/headers/X-RateLimit-Limit"
-        X-RateLimit-Remaining:
-          $ref: "#/components/headers/X-RateLimit-Remaining"
-        X-RateLimit-Reset:
-          $ref: "#/components/headers/X-RateLimit-Reset"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorDTO"
-    PUT_preview_payment_500_Response:
-      description: Server ERROR
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorDTO"
-      headers:
-        Access-Control-Allow-Origin:
-          $ref: "#/components/headers/Access-Control-Allow-Origin"
     GET_products_200_Response:
       description: Ok
       headers:
@@ -2093,7 +2266,7 @@ components:
           schema:
             $ref: "#/components/schemas/TransactionErrorDTO"
           example:
-            code: INVALID_REQUEST
+            code: PAYMENT_INVALID_REQUEST
             message: Something went wrong handling request
     GET_download_invoice_file_401_Response:
       description: Authentication failed
@@ -2128,7 +2301,7 @@ components:
           schema:
             $ref: "#/components/schemas/TransactionErrorDTO"
           example:
-            code: TOO_MANY_REQUESTS
+            code: PAYMENT_TOO_MANY_REQUESTS
             message: Too many requests
     GET_download_invoice_file_500_Response:
       description: Server ERROR
@@ -2140,9 +2313,18 @@ components:
           schema:
             $ref: "#/components/schemas/TransactionErrorDTO"
           example:
-            code: GENERIC_ERROR
+            code: PAYMENT_GENERIC_ERROR
             message: An error occurred during file reading
   parameters:
+    trx_id_path:
+      name: transactionId
+      in: path
+      description: 'ENG: The transaction''s id - IT: Id della transazione'
+      required: true
+      schema:
+        type: string
+        maxLength: 255
+        pattern: '^[a-zA-Z0-9]+$'
     category_query:
       name: category
       in: query

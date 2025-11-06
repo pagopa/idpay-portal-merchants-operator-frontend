@@ -20,6 +20,7 @@
     "generate:api-email-notification": "yarn run clean:api-email-notification && mkdirp openApi/generated && api-spec-converter --from=openapi_3 --to=swagger_2 openApi/email-notification.openapi.yml > openApi/generated/email-notification-swagger20.json && node ./node_modules/@pagopa/selfcare-common-frontend/utils/fixSwagger20ArraySchemaDef.js openApi/generated/email-notification-swagger20.json && node ./openApi/scripts/api-email-notification_fixPreGen.js && gen-api-models --api-spec openApi/generated/email-notification-swagger20.json --out-dir src/api/generated/email-notification --no-strict --request-types --response-decoders --client && node openApi/scripts/api-email-notification_fixPostGen.js"
   },
   "dependencies": {
+    "@types/dompurify": "^3.2.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.1",
