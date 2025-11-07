@@ -36,7 +36,7 @@ variables:
     
     vite_manual_link: 'https://developer.pagopa.it/pari/guides/bonuselettrodomestici-manuale-tecnico-venditore'
     vite_assistance: 'https://developer.pagopa.it/pari/guides/bonuselettrodomestici-manuale-tecnico-venditore/contatti'
-    vite_accessibility: 'https://form.agid.gov.it/view/87f46790-9798-11f0-b583-8b5f76942354'
+    vite_accessibility: 'https://form.agid.gov.it/view/9b5c6ed0-bbbb-11f0-a7e5-9bac06d781c9'
     vite_protection_of_personal_data: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8'
     vite_terms_and_conditions: ''
     vite_privacy: ''
@@ -76,7 +76,7 @@ variables:
 
     vite_manual_link: 'https://developer.pagopa.it/pari/guides/bonuselettrodomestici-manuale-tecnico-venditore'
     vite_assistance: 'https://developer.pagopa.it/pari/guides/bonuselettrodomestici-manuale-tecnico-venditore/contatti'
-    vite_accessibility: 'https://form.agid.gov.it/view/87f46790-9798-11f0-b583-8b5f76942354'
+    vite_accessibility: 'https://form.agid.gov.it/view/9b5c6ed0-bbbb-11f0-a7e5-9bac06d781c9'
     vite_protection_of_personal_data: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8'
     vite_terms_and_conditions: ''
     vite_privacy: ''
@@ -115,7 +115,7 @@ variables:
 
     vite_manual_link: 'https://developer.pagopa.it/pari/guides/bonuselettrodomestici-manuale-tecnico-venditore'
     vite_assistance: 'https://developer.pagopa.it/pari/guides/bonuselettrodomestici-manuale-tecnico-venditore/contatti'
-    vite_accessibility: 'https://form.agid.gov.it/view/87f46790-9798-11f0-b583-8b5f76942354'
+    vite_accessibility: 'https://form.agid.gov.it/view/9b5c6ed0-bbbb-11f0-a7e5-9bac06d781c9'
     vite_protection_of_personal_data: 'https://privacyportal-de.onetrust.com/webform/77f17844-04c3-4969-a11d-462ee77acbe1/9ab6533d-be4a-482e-929a-0d8d2ab29df8'
     vite_terms_and_conditions: ''
     vite_privacy: ''
