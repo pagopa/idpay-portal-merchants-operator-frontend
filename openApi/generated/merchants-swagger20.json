@@ -41,10 +41,10 @@
           },
           {
             "enum": [
-              "updateDate, desc",
+              "trxChargeDate, desc",
               "status, desc",
               "productName, desc",
-              "updateDate, asc",
+              "trxChargeDate, asc",
               "status, asc",
               "productName, asc"
             ],
@@ -288,10 +288,10 @@
           },
           {
             "enum": [
-              "updateDate, desc",
+              "trxChargeDate, desc",
               "status, desc",
               "productName, desc",
-              "updateDate, asc",
+              "trxChargeDate, asc",
               "status, asc",
               "productName, asc"
             ],
@@ -314,7 +314,8 @@
             "enum": [
               "REWARDED",
               "CANCELLED",
-              "REFUNDED"
+              "REFUNDED",
+              "INVOICED"
             ],
             "in": "query",
             "name": "status",
@@ -599,6 +600,14 @@
             "in": "query",
             "maxLength": 255,
             "name": "productName",
+            "pattern": ".*",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "maxLength": 255,
+            "name": "fullProductName",
             "pattern": ".*",
             "required": false,
             "type": "string"
@@ -1694,7 +1703,7 @@
           {
             "format": "binary",
             "in": "formData",
-            "maxLength": 255,
+            "maxLength": 41943040,
             "name": "file",
             "required": true,
             "type": "string"
@@ -2175,7 +2184,7 @@
           {
             "format": "binary",
             "in": "formData",
-            "maxLength": 255,
+            "maxLength": 41943040,
             "name": "file",
             "required": true,
             "type": "string"
@@ -2895,7 +2904,7 @@
       "properties": {
         "invoiceUrl": {
           "description": "ENG: URL to download the invoice file - IT: URL per scaricare il file della fattura",
-          "maxLength": 255,
+          "maxLength": 10000,
           "type": "string"
         }
       },
@@ -2927,7 +2936,7 @@
       "properties": {
         "file": {
           "format": "binary",
-          "maxLength": 255,
+          "maxLength": 41943040,
           "type": "string"
         }
       },
@@ -3144,6 +3153,12 @@
           ],
           "type": "string"
         },
+        "trxChargeDate": {
+          "description": "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento",
+          "format": "date-time",
+          "maxLength": 255,
+          "type": "string"
+        },
         "trxCode": {
           "description": "ENG: Transaction code - IT: Il codice della transazione",
           "maxLength": 100,
@@ -3233,8 +3248,15 @@
           "enum": [
             "REWARDED",
             "CANCELLED",
-            "REFUNDED"
+            "REFUNDED",
+            "INVOICED"
           ],
+          "type": "string"
+        },
+        "trxChargeDate": {
+          "description": "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento",
+          "format": "date-time",
+          "maxLength": 255,
           "type": "string"
         },
         "trxDate": {
@@ -3484,6 +3506,12 @@
           "pattern": "^\\\\d+$",
           "type": "string"
         },
+        "fullProductName": {
+          "description": "ENG: The name of the product with GTIN (for merchant)  <br> IT: Nome del prodotto con GTIN (per esercenti)",
+          "maxLength": 255,
+          "pattern": ".*",
+          "type": "string"
+        },
         "gtinCode": {
           "description": "ENG: The GTIN code of the product <br> IT: Il code GTIN del prodotto",
           "maxLength": 14,
@@ -3611,7 +3639,7 @@
       "properties": {
         "file": {
           "format": "binary",
-          "maxLength": 255,
+          "maxLength": 41943040,
           "type": "string"
         }
       },
@@ -3797,6 +3825,14 @@
         "required": false,
         "type": "string"
       },
+      "fullProductName_query": {
+        "in": "query",
+        "maxLength": 255,
+        "name": "fullProductName",
+        "pattern": ".*",
+        "required": false,
+        "type": "string"
+      },
       "gtinCode_query": {
         "in": "query",
         "maxLength": 14,
@@ -3896,10 +3932,10 @@
       },
       "sort_trx_in_progress_query": {
         "enum": [
-          "updateDate, desc",
+          "trxChargeDate, desc",
           "status, desc",
           "productName, desc",
-          "updateDate, asc",
+          "trxChargeDate, asc",
           "status, asc",
           "productName, asc"
         ],
@@ -3910,10 +3946,10 @@
       },
       "sort_trx_processed_query": {
         "enum": [
-          "updateDate, desc",
+          "trxChargeDate, desc",
           "status, desc",
           "productName, desc",
-          "updateDate, asc",
+          "trxChargeDate, asc",
           "status, asc",
           "productName, asc"
         ],
@@ -3949,7 +3985,8 @@
         "enum": [
           "REWARDED",
           "CANCELLED",
-          "REFUNDED"
+          "REFUNDED",
+          "INVOICED"
         ],
         "in": "query",
         "name": "status",

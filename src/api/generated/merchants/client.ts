@@ -369,6 +369,7 @@ export function createClient<K extends ParamKeys>({
       ["gtinCode"]: gtinCode,
       ["productFileId"]: productFileId,
       ["productName"]: productName,
+      ["fullProductName"]: fullProductName,
       ["status"]: status,
       ["organizationId"]: organizationId
     }) =>
@@ -381,6 +382,7 @@ export function createClient<K extends ParamKeys>({
         ["gtinCode"]: gtinCode,
         ["productFileId"]: productFileId,
         ["productName"]: productName,
+        ["fullProductName"]: fullProductName,
         ["status"]: status,
         ["organizationId"]: organizationId
       })

@@ -781,6 +781,7 @@ export type GetProductsT = r.IGetApiRequestType<
     readonly gtinCode?: string;
     readonly productFileId?: string;
     readonly productName?: string;
+    readonly fullProductName?: string;
     readonly status?: string;
     readonly organizationId?: string;
   },

@@ -27,7 +27,9 @@ export enum StatusEnum {
 
   "CANCELLED" = "CANCELLED",
 
-  "REFUNDED" = "REFUNDED"
+  "REFUNDED" = "REFUNDED",
+
+  "INVOICED" = "INVOICED"
 }
 
 // additional attributes
@@ -84,6 +86,8 @@ const PointOfSaleTransactionProcessedDTOO = t.partial({
   ]),
 
   status: enumType<StatusEnum>(StatusEnum, "status"),
+
+  trxChargeDate: UTCISODateFromString,
 
   trxDate: UTCISODateFromString,
 
