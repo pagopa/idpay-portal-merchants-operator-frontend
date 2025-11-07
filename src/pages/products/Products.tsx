@@ -242,6 +242,7 @@ const Products = () => {
             page: newPaginationModel.page,
             size: newPaginationModel.pageSize,
             sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
+            ...formik.values
         });
     };
 
@@ -340,7 +341,7 @@ const Products = () => {
                                             Lavasciuga
                                         </MenuItem>
                                         <MenuItem value="REFRIGERATINGAPPL">
-                                            Frigoriferi e congelatori
+                                            Apparecchi di refrigerazione
                                         </MenuItem>
                                         <MenuItem value="RANGEHOODS">
                                             Cappe da cucina
