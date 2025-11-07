@@ -325,26 +325,26 @@ const Products = () => {
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                     >
-                                        <MenuItem value="WASHINGMACHINES">
-                                            Lavatrici
+                                        <MenuItem value="REFRIGERATINGAPPL">
+                                            Apparecchi di refrigerazione
                                         </MenuItem>
                                         <MenuItem value="TUMBLEDRYERS">
                                             Asciugatrici
                                         </MenuItem>
+                                        <MenuItem value="RANGEHOODS">
+                                            Cappe da cucina
+                                        </MenuItem>
                                         <MenuItem value="OVENS">
                                             Forni
-                                        </MenuItem>
-                                        <MenuItem value="DISHWASHERS">
-                                            Lavastoviglie
                                         </MenuItem>
                                         <MenuItem value="WASHERDRIERS">
                                             Lavasciuga
                                         </MenuItem>
-                                        <MenuItem value="REFRIGERATINGAPPL">
-                                            Apparecchi di refrigerazione
+                                        <MenuItem value="DISHWASHERS">
+                                            Lavastoviglie
                                         </MenuItem>
-                                        <MenuItem value="RANGEHOODS">
-                                            Cappe da cucina
+                                        <MenuItem value="WASHINGMACHINES">
+                                            Lavatrici
                                         </MenuItem>
                                         <MenuItem value="COOKINGHOBS">
                                             Piani cottura
