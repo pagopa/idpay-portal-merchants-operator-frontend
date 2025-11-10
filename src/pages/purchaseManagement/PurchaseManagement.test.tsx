@@ -11,6 +11,7 @@ import userEvent from "@testing-library/user-event";
 import { authStore } from "../../store/authStore";
 import { utilsStore } from "../../store/utilsStore";
 import { jwtDecode } from "jwt-decode";
+import { BrowserRouter } from "react-router-dom";
 import {
   getInProgressTransactions,
   deleteTransactionInProgress,
@@ -44,6 +45,7 @@ vi.mock("../../utils/helpers", () => ({
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
+  useLocation: () => vi.fn()
 }));
 vi.mock("../../routes", () => ({
   default: {
@@ -501,7 +503,7 @@ describe("PurchaseManagement Component", () => {
     });
 
     expect(screen.getByTestId("alert-error")).toHaveTextContent(
-      "pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction"
+      "pages.purchaseManagement.captureTransactionModal.errorCaptureTransaction"
     );
     expect(
       screen.getByText("pages.purchaseManagement.drawer.title")

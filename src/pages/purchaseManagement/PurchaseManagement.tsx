@@ -2,7 +2,7 @@ import { Box, Button, Tooltip, Drawer, Typography, Grid, CircularProgress } from
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect, useRef } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ROUTES from "../../routes";
 import { getInProgressTransactions, deleteTransactionInProgress, capturePayment } from "../../services/merchantService";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
@@ -19,7 +19,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import { getPreviewPdf } from "../../services/merchantService";
 import { downloadFileFromBase64 } from "../../utils/helpers";
 
-
 const PurchaseManagement = () => {
     const [openDrawer, setOpenDrawer] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState(null);
@@ -28,6 +27,7 @@ const PurchaseManagement = () => {
     const [transactionCaptured, setTransactionCaptured] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const location = useLocation();
     const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
     const [captureTransactionModal, setCaptureTransactionModal] = useState(false);
     const [refundTransactionModal, setRefundTransactionModal] = useState(false);
@@ -35,6 +35,9 @@ const PurchaseManagement = () => {
     const [isPreviewPdfLoading, setIsPreviewPdfLoading] = useState(false);
     const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
     const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
+    const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
+    const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
+    
 
     const gridRef = useRef(null);
 
@@ -62,6 +65,19 @@ const PurchaseManagement = () => {
         }, 100);
 
     }, [openDrawer]);
+
+
+    useEffect(() => {
+        if (location.state) {
+            const { refundUploadSuccess, reverseUploadSuccess } = location.state;
+            if (refundUploadSuccess) {
+                setTransactionRefundSuccess(true);
+            } 
+            if (reverseUploadSuccess) {
+                setTransactionReverseSuccess(true);
+            }
+        }
+    }, [location.state]);
 
     const columns = [
         {
@@ -305,15 +321,19 @@ const PurchaseManagement = () => {
                     [errorCaptureTransaction, setErrorCaptureTransaction],
                     [transactionCaptured, setTransactionCaptured],
                     [transactionAuthorized, () => utilsStore.setState({ transactionAuthorized: false })],
-                    [errorPreviewPdf, setErrorPreviewPdf]
+                    [errorPreviewPdf, setErrorPreviewPdf],
+                    [transactionRefundSuccess, setTransactionRefundSuccess],
+                    [transactionReverseSuccess, setTransactionReverseSuccess]
                 ]}
                 alertMessages={{
                     error: t('pages.refundManagement.errorAlert'),
                     transactionAuthorized: t('pages.purchaseManagement.alertSuccess'),
                     transactionCaptured: t('pages.purchaseManagement.paymentSuccess'),
                     errorDeleteTransaction: t('pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction'),
-                    errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorDeleteTransaction'),
-                    errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf')
+                    errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorCaptureTransaction'),
+                    errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf'),
+                    transactionRefundSuccess: t('pages.refundManagement.refundSuccessUpload'),
+                    transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload')
                 }}
                 noDataMessage={t('pages.refundManagement.noTransactions')}
                 triggerFetchTransactions={triggerFetchTransactions}
@@ -374,6 +394,7 @@ const PurchaseManagement = () => {
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.transactionId')}
                                     </Typography>
+
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
                                         {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
@@ -479,7 +500,9 @@ const PurchaseManagement = () => {
                     transactionCaptured,
                     errorDeleteTransaction,
                     errorCaptureTransaction,
-                    errorPreviewPdf
+                    errorPreviewPdf,
+                    transactionRefundSuccess,
+                    transactionReverseSuccess
                 }}
             />
 
