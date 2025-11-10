@@ -21,7 +21,7 @@ function App() {
         {/* Public routes */}
         <Route path={ROUTES.PRIVACY_POLICY} element={<PrivacyPolicy />} />
         <Route path={ROUTES.TOS} element={<TermsOfService />} />
-        
+
         {/* Protected routes */}
         <Route path={ROUTES.HOME} element={
           <ProtectedRoute><Layout><Navigate to={ROUTES.BUY_MANAGEMENT} /></Layout></ProtectedRoute>
@@ -49,6 +49,9 @@ function App() {
         } />
         <Route path={ROUTES.REFUND} element={
           <ProtectedRoute><Layout><Refund /></Layout></ProtectedRoute>
+        } />
+        <Route path="*" element={
+          <ProtectedRoute><Layout><Navigate to={ROUTES.BUY_MANAGEMENT} replace /></Layout></ProtectedRoute>
         } />
       </Routes>
     </div>

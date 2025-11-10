@@ -56,6 +56,8 @@ const ProductDTOO = t.partial({
 
   eprelCode: PatternString("^\\d+$"),
 
+  fullProductName: PatternString(".*"),
+
   gtinCode: PatternString("^[a-zA-Z0-9]{1,14}$"),
 
   linkEprel: t.string,

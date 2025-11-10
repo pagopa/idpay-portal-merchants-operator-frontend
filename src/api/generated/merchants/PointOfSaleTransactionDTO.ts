@@ -87,6 +87,8 @@ const PointOfSaleTransactionDTOO = t.partial({
 
   status: enumType<StatusEnum>(StatusEnum, "status"),
 
+  trxChargeDate: UTCISODateFromString,
+
   trxCode: PatternString("^[a-zA-Z0-9]+$"),
 
   trxDate: UTCISODateFromString,

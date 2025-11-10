@@ -307,8 +307,8 @@ describe("MerchantApi", () => {
     });
   });
 
-  describe("rewardTransactionApi", () => {
-    it("should call POST /transactions/:trxID/reward with correct payload", async () => {
+  describe("invoiceTransactionApi", () => {
+    it("should call POST /transactions/:trxID/invoice with correct payload", async () => {
       const blobPart = [new Blob()];
       const testFile = new File(blobPart, "fileName");
       const trxID = "123456789";
@@ -316,7 +316,7 @@ describe("MerchantApi", () => {
       const mockResponse = { data: {}, status: 204 };
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.rewardTransactionApi(trxID, testFile);
+      const result = await MerchantApi.invoiceTransactionApi(trxID, testFile);
 
       expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse.data);
@@ -331,7 +331,7 @@ describe("MerchantApi", () => {
       mockAxiosInstance.post.mockRejectedValue(apiError);
 
       await expect(
-        MerchantApi.rewardTransactionApi(trxId, testFile)
+        MerchantApi.invoiceTransactionApi(trxId, testFile)
       ).rejects.toThrow("404 Not Found from API");
     });
   });

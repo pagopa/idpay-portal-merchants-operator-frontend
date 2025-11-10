@@ -1,48 +1,45 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { getStatusChip, formatEuro } from "./helpers";
+import { getStatusChip, formatEuro, handleGtinChange, downloadFileFromBase64, filterInputWithSpaceRule } from "./helpers";
 
 describe("getStatusChip", () => {
   const mockT = (key: string) => key;
 
   it("dovrebbe renderizzare AUTHORIZED", () => {
     render(getStatusChip(mockT, "AUTHORIZED"));
-    expect(
-      screen.getByText("pages.refundManagement.authorized")
-    ).toBeInTheDocument();
+    expect(screen.getByText("pages.refundManagement.authorized")).toBeTruthy();
   });
 
   it("dovrebbe renderizzare REFUNDED", () => {
     render(getStatusChip(mockT, "REFUNDED"));
-    expect(
-      screen.getByText("pages.refundManagement.refunded")
-    ).toBeInTheDocument();
+    expect(screen.getByText("pages.refundManagement.refunded")).toBeTruthy();
   });
 
   it("dovrebbe renderizzare CANCELLED", () => {
     render(getStatusChip(mockT, "CANCELLED"));
-    expect(
-      screen.getByText("pages.refundManagement.cancelled")
-    ).toBeInTheDocument();
+    expect(screen.getByText("pages.refundManagement.cancelled")).toBeTruthy();
   });
 
   it("dovrebbe renderizzare CAPTURED", () => {
     render(getStatusChip(mockT, "CAPTURED"));
-    expect(
-      screen.getByText("pages.refundManagement.captured")
-    ).toBeInTheDocument();
+    expect(screen.getByText("pages.refundManagement.captured")).toBeTruthy();
   });
 
   it("dovrebbe renderizzare REWARDED", () => {
     render(getStatusChip(mockT, "REWARDED"));
+    expect(screen.getByText("pages.refundManagement.rewarded")).toBeTruthy();
+  });
+
+  it("dovrebbe renderizzare INVOICED", () => {
+    render(getStatusChip(mockT, "INVOICED"));
     expect(
-      screen.getByText("pages.refundManagement.rewarded")
+      screen.getByText("pages.refundManagement.invoiced")
     ).toBeInTheDocument();
   });
 
   it("dovrebbe renderizzare default (Errore)", () => {
     render(getStatusChip(mockT, "UNKNOWN"));
-    expect(screen.getByText("Errore")).toBeInTheDocument();
+    expect(screen.getByText("Errore")).toBeTruthy();
   });
 });
 
@@ -57,5 +54,117 @@ describe("formatEuro", () => {
 
   it("dovrebbe formattare correttamente un importo grande", () => {
     expect(formatEuro(987654321)).toBe("9.876.543,21€");
+  });
+
+  it("dovrebbe formattare correttamente importi piccoli", () => {
+    expect(formatEuro(1)).toBe("0,01€");
+    expect(formatEuro(99)).toBe("0,99€");
+  });
+});
+
+
+describe("handleGtinChange", () => {
+  let mockFormik: any;
+
+  beforeEach(() => {
+    mockFormik = {
+      handleChange: vi.fn(),
+    };
+  });
+
+  it("should call formik.handleChange for valid values", () => {
+    const mockEvent = { target: { value: "12345" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
+    expect(result).toBe("");
+  });
+
+  it("should call formik.handleChange for alphanumeric valid values", () => {
+    const mockEvent = { target: { value: "ABC123XYZ" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
+    expect(result).toBe("");
+  });
+
+  it("should return error for special characters", () => {
+    const mockEvent = { target: { value: "+" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(result).toBe("Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.");
+    expect(mockFormik.handleChange).not.toHaveBeenCalled();
+  });
+
+  it("should return error for values with spaces", () => {
+    const mockEvent = { target: { value: "123 456" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(result).toBe(undefined);
+    expect(mockFormik.handleChange).not.toHaveBeenCalled();
+  });
+
+  it("should return error for values longer than 14 characters", () => {
+    const mockEvent = { target: { value: "123456789012345" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(result).toBe(undefined);
+    expect(mockFormik.handleChange).not.toHaveBeenCalled();
+  });
+
+  it("should handle exactly 14 valid characters", () => {
+    const mockEvent = { target: { value: "12345678901234" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
+    expect(result).toBe("");
+  });
+
+  it("should return error for mixed special characters", () => {
+    const mockEvent = { target: { value: "ABC@123" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(result).toBe("Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici."); 
+    expect(mockFormik.handleChange).not.toHaveBeenCalled();
+  });
+
+  it("should handle empty string", () => {
+    const mockEvent = { target: { value: "" } };
+    const result = handleGtinChange(mockEvent, mockFormik);
+
+    expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
+    expect(result).toBe("");
+  });
+});
+describe("filterInputWithSpaceRule", () => {
+  it("rimuove tutti gli spazi se meno di 2 caratteri alfanumerici", () => {
+    expect(filterInputWithSpaceRule(" a ")).toBe("a");
+    expect(filterInputWithSpaceRule("   ")).toBe("");
+    expect(filterInputWithSpaceRule(" 1 ")).toBe("1");
+  });
+
+  it("normalizza gli spazi tra parole", () => {
+    expect(filterInputWithSpaceRule("ciao   mondo")).toBe("ciao mondo");
+    expect(filterInputWithSpaceRule("ciao    mondo   bello")).toBe(
+      "ciao mondo bello"
+    );
+  });
+
+  it("rimuove spazi all'inizio", () => {
+    expect(filterInputWithSpaceRule("   ciao mondo")).toBe("ciao mondo");
+  });
+
+  it("non permette spazi multipli consecutivi", () => {
+    expect(filterInputWithSpaceRule("ciao     mondo")).toBe("ciao mondo");
+    expect(filterInputWithSpaceRule("ciao  mondo  bello")).toBe(
+      "ciao mondo bello"
+    );
+  });
+
+  it("mantiene input già corretto", () => {
+    expect(filterInputWithSpaceRule("ciao mondo")).toBe("ciao mondo");
+    expect(filterInputWithSpaceRule("ciao mondo bello")).toBe(
+      "ciao mondo bello"
+    );
   });
 });

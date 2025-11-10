@@ -10,7 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import AlertComponent from "../Alert/AlertComponent";
 import { GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
-import { getStatusChip } from "../../utils/helpers";
+import { getStatusChip, handleGtinChange } from "../../utils/helpers";
 import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
 
 interface TransactionsLayoutProps {
@@ -55,6 +55,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     triggerFetchTransactions,
     externalState = {}
 }) => {
+    const [gtinError, setGtinError] = useState<string>('')
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
@@ -92,7 +93,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     useEffect(() => {
         setSortModel([
             {
-                field: 'updateDate',
+                field: 'trxChargeDate',
                 sort: 'desc'
             }
         ]);
@@ -126,7 +127,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                 import.meta.env.VITE_INITIATIVE_ID,
                 decodeToken?.point_of_sale_id,
                 Object.keys(params).length > 0 ? params : {
-                    sort: 'updateDate,desc',
+                    sort: 'trxChargeDate,desc',
                     page: paginationModel.page,
                     size: paginationModel.pageSize
                 }
@@ -154,14 +155,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
                 sort: 'productName,' + sortModel[0].sort,
-                page: paginationModel.page,
+                page: 0,
                 size: paginationModel.pageSize,
                 ...filtersObj
             });
         } else {
             fetchTransactions({
                 sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-                page: paginationModel.page,
+                page: 0,
                 size: paginationModel.pageSize,
                 ...filtersObj
             });
@@ -277,7 +278,10 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                                 size="small"
                                 fullWidth
                                 value={formik.values.productGtin}
-                                onChange={formik.handleChange}
+                                onChange={(e) => setGtinError(handleGtinChange(e, formik))}
+                                onBlur={() => setGtinError('')}
+                                error={!!gtinError}
+                                helperText={gtinError}
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>

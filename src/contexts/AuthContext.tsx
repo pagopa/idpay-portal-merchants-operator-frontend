@@ -86,11 +86,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = useCallback(() => {
-    keycloak.login();
+    keycloak.login({
+      redirectUri: window.location.origin + '/esercente/', //return to homepage after login
+    });
   },[]);
 
   const logout = useCallback(() => {
-    keycloak.logout();
+    keycloak.logout({
+      redirectUri: window.location.origin + '/esercente/', //return to homepage after logout
+    });
     setIsAuthenticated(false);
     setUser(null);
     setToken(null);

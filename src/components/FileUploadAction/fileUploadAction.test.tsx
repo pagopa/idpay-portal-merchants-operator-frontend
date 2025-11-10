@@ -153,7 +153,7 @@ describe("fileUploadAction component test", () => {
     expect(mockApiCall).toHaveBeenCalledWith("test-transaction-123", file);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT, {
+      expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT, {
         state: {
           [baseProps.successStateKey]: true,
         },
