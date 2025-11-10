@@ -562,7 +562,7 @@ describe("Products Component", () => {
     expect(screen.getByText("Forni")).toBeInTheDocument();
     expect(screen.getByText("Lavastoviglie")).toBeInTheDocument();
     expect(screen.getByText("Lavasciuga")).toBeInTheDocument();
-    expect(screen.getByText("Frigoriferi e congelatori")).toBeInTheDocument();
+    expect(screen.getByText("Apparecchi di refrigerazione")).toBeInTheDocument();
     expect(screen.getByText("Cappe da cucina")).toBeInTheDocument();
     expect(screen.getByText("Piani cottura")).toBeInTheDocument();
   });
