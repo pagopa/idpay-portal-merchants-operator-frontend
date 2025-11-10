@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Reverse from "./Refund";
 import ROUTES from "../../routes";
 import Refund from "./Refund";
 
@@ -37,7 +36,7 @@ vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
 
 describe("Refund component", () => {
   it("renders title with translations", () => {
-    render(<Reverse />);
+    render(<Refund />);
 
     expect(screen.getByText("Esci")).toBeInTheDocument();
     expect(screen.getAllByText("title test")[0]).toBeInTheDocument();
@@ -45,7 +44,6 @@ describe("Refund component", () => {
     expect(
       screen.getByRole("heading", { name: "title test" })
     ).toBeInTheDocument();
-    expect(screen.getByText("subtitle test")).toBeInTheDocument();
   });
 
   it("calls navigate when back button is clicked", () => {

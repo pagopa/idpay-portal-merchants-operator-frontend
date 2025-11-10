@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { rewardTransactionApi } from '../../services/merchantService';
+import { invoiceTransactionApi } from '../../services/merchantService';
 import FileUploadAction from '../../components/FileUploadAction/FileUploadAction';
 import styles from '../reverse/reverse.module.css';   
 
@@ -9,9 +9,9 @@ const Refund = () => {
     return (
         <FileUploadAction
             titleKey="pages.refund.title"
-            subtitleKey="pages.refund.subtitle"
+            subtitleKey=""
             i18nBlockKey="pages.refund"
-            apiCall={rewardTransactionApi} 
+            apiCall={invoiceTransactionApi} 
             successStateKey="refundUploadSuccess" 
             breadcrumbsLabelKey={t('routes.refund')}
             manualLink={import.meta.env.VITE_MANUAL_LINK} 

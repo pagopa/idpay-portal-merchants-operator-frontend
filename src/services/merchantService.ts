@@ -48,8 +48,8 @@ export const capturePayment = async (params: { trxCode: string, additionalProper
     return MerchantApi.reverseTransactionApi(trxId, file);
   }
 
-  export const rewardTransactionApi = async (trxId: string, file: File): Promise<void> => {
-    return MerchantApi.rewardTransactionApi(trxId, file);
+  export const invoiceTransactionApi = async (trxId: string, file: File): Promise<void> => {
+    return MerchantApi.invoiceTransactionApi(trxId, file);
   }
 
   export const getPreviewPdf = async (trxId: string): Promise<{ data: string }> => {

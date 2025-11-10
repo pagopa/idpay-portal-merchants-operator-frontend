@@ -17,6 +17,7 @@ export interface LoggedUser {
 
 export interface GetProductsParams {
     productName?: string;
+    fullProductName?: string;
     status?: string,
     page?: number;
     size?: number;

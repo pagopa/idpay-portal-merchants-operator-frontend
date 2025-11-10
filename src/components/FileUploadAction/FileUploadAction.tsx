@@ -87,7 +87,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             try {
                 await apiCall(trxId, file);
                 setLoadingFile(false);
-                navigate(ROUTES.REFUNDS_MANAGEMENT, {
+                navigate(ROUTES.BUY_MANAGEMENT, {
                     state: {
                         [successStateKey]: true 
                     }

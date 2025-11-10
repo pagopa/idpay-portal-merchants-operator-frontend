@@ -29,12 +29,12 @@ import {
   previewPaymentDefaultDecoder,
   DeleteTransactionT,
   deleteTransactionDefaultDecoder,
+  InvoiceTransactionT,
+  invoiceTransactionDefaultDecoder,
   GetTransactionPreviewPdfT,
   getTransactionPreviewPdfDefaultDecoder,
   ReversalTransactionT,
   reversalTransactionDefaultDecoder,
-  RewardTransactionT,
-  rewardTransactionDefaultDecoder,
   GetPointOfSaleT,
   getPointOfSaleDefaultDecoder,
   DownloadInvoiceFileT,
@@ -54,9 +54,9 @@ export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsT> &
   TypeofApiCall<CapturePaymentT> &
   TypeofApiCall<PreviewPaymentT> &
   TypeofApiCall<DeleteTransactionT> &
+  TypeofApiCall<InvoiceTransactionT> &
   TypeofApiCall<GetTransactionPreviewPdfT> &
   TypeofApiCall<ReversalTransactionT> &
-  TypeofApiCall<RewardTransactionT> &
   TypeofApiCall<GetPointOfSaleT> &
   TypeofApiCall<DownloadInvoiceFileT>;
 
@@ -67,9 +67,9 @@ export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
   TypeofApiParams<CapturePaymentT> &
   TypeofApiParams<PreviewPaymentT> &
   TypeofApiParams<DeleteTransactionT> &
+  TypeofApiParams<InvoiceTransactionT> &
   TypeofApiParams<GetTransactionPreviewPdfT> &
   TypeofApiParams<ReversalTransactionT> &
-  TypeofApiParams<RewardTransactionT> &
   TypeofApiParams<GetPointOfSaleT> &
   TypeofApiParams<DownloadInvoiceFileT>);
 
@@ -102,9 +102,9 @@ export type WithDefaultsT<
   | CapturePaymentT
   | PreviewPaymentT
   | DeleteTransactionT
+  | InvoiceTransactionT
   | GetTransactionPreviewPdfT
   | ReversalTransactionT
-  | RewardTransactionT
   | GetPointOfSaleT
   | DownloadInvoiceFileT,
   K
@@ -136,13 +136,13 @@ export type Client<
 
       readonly deleteTransaction: TypeofApiCall<DeleteTransactionT>;
 
+      readonly invoiceTransaction: TypeofApiCall<InvoiceTransactionT>;
+
       readonly getTransactionPreviewPdf: TypeofApiCall<
         GetTransactionPreviewPdfT
       >;
 
       readonly reversalTransaction: TypeofApiCall<ReversalTransactionT>;
-
-      readonly rewardTransaction: TypeofApiCall<RewardTransactionT>;
 
       readonly getPointOfSale: TypeofApiCall<GetPointOfSaleT>;
 
@@ -195,6 +195,13 @@ export type Client<
         >
       >;
 
+      readonly invoiceTransaction: TypeofApiCall<
+        ReplaceRequestParams<
+          InvoiceTransactionT,
+          Omit<RequestParams<InvoiceTransactionT>, K>
+        >
+      >;
+
       readonly getTransactionPreviewPdf: TypeofApiCall<
         ReplaceRequestParams<
           GetTransactionPreviewPdfT,
@@ -206,13 +213,6 @@ export type Client<
         ReplaceRequestParams<
           ReversalTransactionT,
           Omit<RequestParams<ReversalTransactionT>, K>
-        >
-      >;
-
-      readonly rewardTransaction: TypeofApiCall<
-        ReplaceRequestParams<
-          RewardTransactionT,
-          Omit<RequestParams<RewardTransactionT>, K>
         >
       >;
 
@@ -369,6 +369,7 @@ export function createClient<K extends ParamKeys>({
       ["gtinCode"]: gtinCode,
       ["productFileId"]: productFileId,
       ["productName"]: productName,
+      ["fullProductName"]: fullProductName,
       ["status"]: status,
       ["organizationId"]: organizationId
     }) =>
@@ -381,6 +382,7 @@ export function createClient<K extends ParamKeys>({
         ["gtinCode"]: gtinCode,
         ["productFileId"]: productFileId,
         ["productName"]: productName,
+        ["fullProductName"]: fullProductName,
         ["status"]: status,
         ["organizationId"]: organizationId
       })
@@ -496,6 +498,40 @@ export function createClient<K extends ParamKeys>({
     options
   );
 
+  const invoiceTransactionT: ReplaceRequestParams<
+    InvoiceTransactionT,
+    RequestParams<InvoiceTransactionT>
+  > = {
+    method: "post",
+
+    // There is a well-known issue about fetch and Content-Type header when it comes to add multipart/form-data files.
+    //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
+    // The solution is to skip the Content-Type header and let fetch add it for us.
+    // @ts-ignore as IRequestType would require something
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: invoiceTransactionDefaultDecoder(),
+    url: ({ ["transactionId"]: transactionId }) =>
+      `${basePath}/transactions/${transactionId}/invoice`,
+
+    body: ({ ["file"]: file }) => {
+      if (typeof window === "undefined")
+        throw new Error(
+          "File upload is only support inside a browser runtime envoronment"
+        );
+      const formData = new FormData();
+      formData.append("file", file);
+      return formData;
+    },
+
+    query: () => withoutUndefinedValues({})
+  };
+  const invoiceTransaction: TypeofApiCall<InvoiceTransactionT> = createFetchRequestForApi(
+    invoiceTransactionT,
+    options
+  );
+
   const getTransactionPreviewPdfT: ReplaceRequestParams<
     GetTransactionPreviewPdfT,
     RequestParams<GetTransactionPreviewPdfT>
@@ -547,40 +583,6 @@ export function createClient<K extends ParamKeys>({
   };
   const reversalTransaction: TypeofApiCall<ReversalTransactionT> = createFetchRequestForApi(
     reversalTransactionT,
-    options
-  );
-
-  const rewardTransactionT: ReplaceRequestParams<
-    RewardTransactionT,
-    RequestParams<RewardTransactionT>
-  > = {
-    method: "post",
-
-    // There is a well-known issue about fetch and Content-Type header when it comes to add multipart/form-data files.
-    //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
-    // The solution is to skip the Content-Type header and let fetch add it for us.
-    // @ts-ignore as IRequestType would require something
-    headers: ({ ["Bearer"]: Bearer }) => ({
-      Authorization: Bearer
-    }),
-    response_decoder: rewardTransactionDefaultDecoder(),
-    url: ({ ["transactionId"]: transactionId }) =>
-      `${basePath}/transactions/${transactionId}/reward`,
-
-    body: ({ ["file"]: file }) => {
-      if (typeof window === "undefined")
-        throw new Error(
-          "File upload is only support inside a browser runtime envoronment"
-        );
-      const formData = new FormData();
-      formData.append("file", file);
-      return formData;
-    },
-
-    query: () => withoutUndefinedValues({})
-  };
-  const rewardTransaction: TypeofApiCall<RewardTransactionT> = createFetchRequestForApi(
-    rewardTransactionT,
     options
   );
 
@@ -638,11 +640,11 @@ export function createClient<K extends ParamKeys>({
     capturePayment: (withDefaults || identity)(capturePayment),
     previewPayment: (withDefaults || identity)(previewPayment),
     deleteTransaction: (withDefaults || identity)(deleteTransaction),
+    invoiceTransaction: (withDefaults || identity)(invoiceTransaction),
     getTransactionPreviewPdf: (withDefaults || identity)(
       getTransactionPreviewPdf
     ),
     reversalTransaction: (withDefaults || identity)(reversalTransaction),
-    rewardTransaction: (withDefaults || identity)(rewardTransaction),
     getPointOfSale: (withDefaults || identity)(getPointOfSale),
     downloadInvoiceFile: (withDefaults || identity)(downloadInvoiceFile)
   };

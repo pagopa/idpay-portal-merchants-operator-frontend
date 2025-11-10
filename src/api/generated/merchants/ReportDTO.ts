@@ -5,13 +5,16 @@
 /* eslint-disable  */
 
 import * as t from "io-ts";
+import { PatternString } from "@pagopa/ts-commons/lib/strings";
 
 // required attributes
 const ReportDTOR = t.interface({});
 
 // optional attributes
 const ReportDTOO = t.partial({
-  data: t.string
+  data: t.string,
+
+  trxCode: PatternString("^[a-zA-Z0-9]+$")
 });
 
 export const ReportDTO = t.intersection([ReportDTOR, ReportDTOO], "ReportDTO");

@@ -21,13 +21,13 @@ const PreviewPaymentRequestDTOR = t.interface({
     t.literal(1000000000)
   ]),
 
-  productGtin: PatternString("^[a-zA-Z0-9]{1,14}$"),
-
-  productName: PatternString(".*")
+  productGtin: PatternString("^[a-zA-Z0-9]{1,14}$")
 });
 
 // optional attributes
-const PreviewPaymentRequestDTOO = t.partial({});
+const PreviewPaymentRequestDTOO = t.partial({
+  productName: PatternString(".*")
+});
 
 export const PreviewPaymentRequestDTO = t.intersection(
   [PreviewPaymentRequestDTOR, PreviewPaymentRequestDTOO],
