@@ -239,7 +239,7 @@
         "transactionId": "ID transazione"
       },
       "cancelTransactionModal": {
-        "title": "Vuoi annullare la transazione?",
+        "title": "Annulla transazione",
         "description": "Sei sicuro di voler annullare questa transazione? L’utente potrà continuare a usufruire del buono sconto",
         "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
       },
