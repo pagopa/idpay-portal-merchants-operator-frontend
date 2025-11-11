@@ -520,8 +520,9 @@ const PurchaseManagement = () => {
                         {captureTransactionModal
                             ? `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.residualAmountCents)}
                                 ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
-                                ${t('pages.purchaseManagement.captureTransactionModal.description3')} "Fattura da caricare"`
-                            : t('pages.purchaseManagement.cancelTransactionModal.description')}.
+                                ${t('pages.purchaseManagement.captureTransactionModal.description3')}`
+                            : t('pages.purchaseManagement.cancelTransactionModal.description')}
+                        {captureTransactionModal && <b>"Fattura da caricare"</b>}.
                     </Typography>
                 </Box>
                 <Box display={'flex'} justifyContent={'flex-end'} gap={2} mt={4}>
