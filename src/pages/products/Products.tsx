@@ -3,7 +3,7 @@ import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useTranslation } from "react-i18next";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
-import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import {ELEMENT_PER_PAGE, MISSING_DATA_PLACEHOLDER} from "../../utils/constants";
 import Tooltip from "@mui/material/Tooltip";
 import { useEffect, useState, useCallback } from "react";
 import DataTable from "../../components/DataTable/DataTable";
@@ -424,6 +424,7 @@ const Products = () => {
                                 sortModel={sortModel}
                                 onSortModelChange={handleSortModelChange}
                                 handleRowAction={handleRowAction}
+                                externalPageSizeOptions={ELEMENT_PER_PAGE}
                             />
                         )
                     }
