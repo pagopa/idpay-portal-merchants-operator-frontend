@@ -34,6 +34,7 @@ vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
     <div data-testid="title-box">
       <h1>{title}</h1>
       <p>{subTitle}</p>
+      <button data-testid='csv-button' onClick={()=> {}}>Esporta csv</button>
     </div>
   ),
 }));
@@ -214,7 +215,7 @@ describe("Products Component", () => {
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
-  it("should render title and subtitle", async () => {
+  it("should render title, subtitle and button", async () => {
     mockGetProductsList.mockResolvedValue({
       ...mockApiResponse,
       content: [],
@@ -228,6 +229,7 @@ describe("Products Component", () => {
     expect(
       screen.getByText("Visualizza i prodotti approvati")
     ).toBeInTheDocument();
+    expect(screen.getByTestId("csv-button")).toBeInTheDocument();
   });
 
   it("should fetch and display products correctly in the table", async () => {
@@ -579,4 +581,10 @@ describe("Products Component", () => {
 
     consoleSpy.mockRestore();
   });
+
+  it("should navigate to csv link", () => {
+    renderComponent()
+    const csvButton = screen.getByTestId("csv-button")
+    userEvent.click(csvButton)
+  })
 });

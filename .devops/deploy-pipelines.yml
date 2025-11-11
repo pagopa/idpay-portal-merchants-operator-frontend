@@ -48,6 +48,8 @@ variables:
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
+    react_app_csv_link: https://uat.bonuselettrodomestici.it/elenco-informatico-elettrodomestici
+
     #KEYCLOAK ENV
     vite_keycloak_url: '$(UAT_VITE_KEYCLOAK_URL)' 
     vite_keycloak_realm: '$(UAT_VITE_KEYCLOAK_REALM)'
@@ -87,6 +89,8 @@ variables:
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
 
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
+
+    react_app_csv_link: https://bonuselettrodomestici.it/elenco-informatico-elettrodomestici
 
     #KEYCLOAK ENV
     vite_keycloak_url: '$(PROD_VITE_KEYCLOAK_URL)' 
@@ -128,6 +132,8 @@ variables:
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
     react_app_url_fe_landing: '$(DEV_REACT_APP_URL_FE_LANDING)'
+
+    react_app_csv_link: https://dev.bonuselettrodomestici.it/elenco-informatico-elettrodomestici
 
 
     #KEYCLOAK ENV
@@ -252,6 +258,8 @@ stages:
               VITE_ONE_TRUST_DOMAIN_ID: '$(react_app_one_trust_domain_id)'
               VITE_ONE_TRUST_OTNOTICE_CDN_URL: $(react_app_one_trust_otnotice_cdn_url)
               VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS: $(react_app_one_trust_otnotice_cdn_settings)
+
+              VITE_CSV_LINK: $(react_app_csv_link)
 
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
