@@ -15,6 +15,7 @@ export interface DataTableProps {
   paginationModel?: PaginationExtendedModel;
   loading?: boolean;
   customUniqueField?: string;
+  externalPageSizeOptions?: Array<number>
 }
 
 const DataTable = ({ 
@@ -26,7 +27,8 @@ const DataTable = ({
   paginationModel,
   loading = false,
   customUniqueField,
-  sortModel
+  sortModel,
+  externalPageSizeOptions = [ import.meta.env.VITE_PAGINATION_SIZE]
 }: DataTableProps) => {
   const [finalColumns, setFinalColumns] = useState<Array<GridColDef>>();
   const [sortModelState, setSortModelState] = useState<GridSortModel>([]);
@@ -153,6 +155,7 @@ const DataTable = ({
             loading={loading}
             onSortModelChange={handleSortModelChange}
             sortModel={sortModelState}
+            pageSizeOptions={externalPageSizeOptions}
             paginationModel={{
               page: internalPaginationModel.page || 0,
               pageSize: internalPaginationModel.pageSize || 10
@@ -162,7 +165,7 @@ const DataTable = ({
             localeText={{
                 noRowsLabel: 'Nessun punto vendita da visualizzare.',
                 footerTotalRows: 'Totale righe:',
-                paginationRowsPerPage: 'Righe per pagina:',
+                paginationRowsPerPage: 'Elementi per pagina:',
                 paginationDisplayedRows: ({ from, to, count}) => {
                   return `${from}–${to} di ${count}`;
                 },

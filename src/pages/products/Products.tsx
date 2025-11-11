@@ -1,9 +1,10 @@
-import { Box, CircularProgress, Typography, Paper, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Drawer, Divider, Link } from "@mui/material";
+import { Box, CircularProgress, Typography, Paper, Grid, TextField, Select, MenuItem, FormControl, InputLabel, Drawer, Divider, Link, Button } from "@mui/material";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useTranslation } from "react-i18next";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
-import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import {ELEMENT_PER_PAGE, MISSING_DATA_PLACEHOLDER} from "../../utils/constants";
 import Tooltip from "@mui/material/Tooltip";
 import { useEffect, useState, useCallback } from "react";
 import DataTable from "../../components/DataTable/DataTable";
@@ -292,19 +293,28 @@ const Products = () => {
         return formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0;
     };
 
-
     return (
         <Box>
-            <TitleBox
-                title={t('pages.products.title')}
-                variantTitle="h4"
-                subTitle={t('pages.products.subtitle')}
-                variantSubTitle='body2'
-                mbTitle={2}
-                mtTitle={0}
-                mbSubTitle={2}
-            />
-
+            <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'flex-start'}>
+                <TitleBox
+                    title={t('pages.products.title')}
+                    variantTitle="h4"
+                    subTitle={t('pages.products.subtitle')}
+                    variantSubTitle='body2'
+                    mbTitle={2}
+                    mtTitle={0}
+                    mbSubTitle={2}
+                />
+                <Button 
+                    variant="contained" 
+                    size="small" 
+                    startIcon={<FileDownloadIcon/>} 
+                    sx={{ textWrap: 'nowrap' }} 
+                    onClick={() => window.open(import.meta.env.VITE_CSV_LINK, '_blank')?.focus()}
+                >
+                    Esporta csv
+                </Button>
+            </Box>
             <Box>
                 {
                     ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0)) || filtersAppliedOnce) && (
@@ -424,6 +434,7 @@ const Products = () => {
                                 sortModel={sortModel}
                                 onSortModelChange={handleSortModelChange}
                                 handleRowAction={handleRowAction}
+                                externalPageSizeOptions={ELEMENT_PER_PAGE}
                             />
                         )
                     }
