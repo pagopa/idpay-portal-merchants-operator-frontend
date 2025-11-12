@@ -1,4 +1,4 @@
-import { Box, Typography, Link, Stack, Button, Alert } from '@mui/material';
+import {Box, Typography, Link, Stack, Button, Alert, TextField} from '@mui/material';
 import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox'; 
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
@@ -9,17 +9,21 @@ import { SingleFileInput } from '@pagopa/mui-italia';
 import { useState, useRef, useEffect } from 'react';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AlertComponent from '../Alert/AlertComponent';
+import {REQUIRED_FIELD_ERROR} from "../../utils/constants.ts";
 
 
 interface FileUploadActionProps {
     titleKey: string;   
     subtitleKey: string;    
     i18nBlockKey: string;   
-    apiCall: (trxId: string, file: File) => Promise<any>;   
+    apiCall: (trxId: string, file: File, docNumber: string) => Promise<any>;
     successStateKey: string; 
     breadcrumbsLabelKey: string; 
     manualLink: string; 
-    styleClass: string; 
+    styleClass: string;
+    docNumberTitle: string;
+    docNumberInsert: string;
+    docNumberLabel: string;
 }
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; 
@@ -33,9 +37,14 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     successStateKey,
     breadcrumbsLabelKey,
     manualLink,
+    docNumberTitle,
+    docNumberInsert,
+    docNumberLabel,
     styleClass
 }) => {
     const [file, setFile] = useState<File | null>(null);
+    const [docNumber, setDocNumber] = useState<string>();
+    const [docNumberError, setDocNumberError] = useState<boolean>(false);
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
     const [fileTypeError, setFileTypeError] = useState<boolean>(false);
     const [loadingFile, setLoadingFile] = useState<boolean>(false);
@@ -82,10 +91,10 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     };
 
     const handleAction = async () => {
-        if (file && trxId) {
+        if (file && trxId && !docNumberError) {
             setLoadingFile(true);
             try {
-                await apiCall(trxId, file);
+                await apiCall(trxId, file, docNumber);
                 setLoadingFile(false);
                 navigate(ROUTES.BUY_MANAGEMENT, {
                     state: {
@@ -115,6 +124,47 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 subTitle={t(subtitleKey)}
                 variantSubTitle='body2'
             />
+            <Box mt={3} py={3} px={4} sx={{ backgroundColor: theme.palette.background.paper }} borderRadius={'4px'}>
+                <Box mb={3}>
+                    <Typography
+                        mt={2}
+                        variant="h6"
+                        fontWeight={theme.typography.fontWeightBold}
+                    >
+                        {docNumberTitle}
+                    </Typography>
+                </Box>
+                <Box mt={2}>
+                    <Typography variant="body2" fontWeight={theme.typography.fontWeightBold}>
+                        {docNumberInsert}
+                    </Typography>
+                </Box>
+                <TextField
+                    variant="outlined"
+                    fullWidth
+                    value={docNumber}
+                    onChange={(e) => setDocNumber(e.target.value)}
+                    onBlur={() => {
+                        !docNumber || docNumber === '' || docNumber.length < 2 ? setDocNumberError(true) : setDocNumberError(false);
+                    }}
+                    label={docNumberLabel}
+                    size="small"
+                    sx={{
+                        mt: 2,
+                        "& .MuiFormLabel-root.Mui-error": {
+                            color: "#5C6E82 !important",
+                        },
+                    }}
+                    error={docNumberError}
+                    helperText={docNumberError && docNumber === '' ?
+                        REQUIRED_FIELD_ERROR :
+                        docNumberError && docNumber?.length < 2 ?
+                            'Lunghezza minima 2 caratteri'
+                        : ''}
+
+                />
+
+            </Box>
 
             <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
                 <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t(`${i18nBlockKey}.creditNote`)}</Typography>
