@@ -258,7 +258,8 @@
         "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
         "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
       },
-      "errorPreviewPdf": "Si è verificato un errore nel download del PDF, riprova."
+      "errorPreviewPdf": "Si è verificato un errore nel download del PDF, riprova.",
+      "transactionDeleteSuccess": "La transazione è stata annullata con successo."
     },
     "refundManagement": {
       "title": "Storico rimborsi",
