@@ -41,3 +41,11 @@ export const initializeCookieOneTrust = (): Promise<void> => {
   });
   return cookieInitializationPromise;
 };
+
+/**
+ * This function is only for testing purposes to reset the cookie state between tests.
+ */
+export const __resetCookieStateForTests = () => {
+  cookieInitialized = false;
+  cookieInitializationPromise = null;
+};
