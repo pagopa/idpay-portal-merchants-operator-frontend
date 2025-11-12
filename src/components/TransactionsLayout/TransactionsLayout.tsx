@@ -69,6 +69,11 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const token = authStore.getState().token;
     const isLoadingRef = useRef(false);
     const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
+    const [appliedFilters, setAppliedFilters] = useState<GetProcessedTransactionsFilters>({
+        fiscalCode: '',
+        productGtin: '',
+        status: ''
+    });
 
     const allAlerts = [
         [errorAlert, setErrorAlert],
@@ -105,6 +110,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             fetchTransactions({});
         }
     },[triggerFetchTransactions])
+
 
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
@@ -152,6 +158,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
     const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
         setFiltersAppliedOnce(true);
+        setAppliedFilters(filtersObj);
         if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
             fetchTransactions({
                 sort: 'productName,' + sortModel[0].sort,
@@ -175,14 +182,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                 sort: 'productName,' + sortModel[0].sort,
                 page: model.page,
                 size: model.pageSize,
-                ...formik.values
+                ...appliedFilters
             });
         } else {
             fetchTransactions({
                 sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
                 page: model.page,
                 size: model.pageSize,
-                ...formik.values
+                ...appliedFilters
             });
         }
     };
@@ -195,14 +202,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                     sort: 'productName,' + model[0].sort,
                     page: paginationModel.page,
                     size: paginationModel.pageSize,
-                    ...formik.values
+                    ...appliedFilters
                 });
             } else {
                 fetchTransactions({
                     sort: model[0].field + ',' + model[0].sort,
                     page: paginationModel.page,
                     size: paginationModel.pageSize,
-                    ...formik.values
+                    ...appliedFilters
                 });
             }
         }

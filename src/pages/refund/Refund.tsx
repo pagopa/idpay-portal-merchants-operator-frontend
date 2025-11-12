@@ -11,11 +11,14 @@ const Refund = () => {
             titleKey="pages.refund.title"
             subtitleKey=""
             i18nBlockKey="pages.refund"
-            apiCall={invoiceTransactionApi} 
-            successStateKey="refundUploadSuccess" 
+            apiCall={invoiceTransactionApi}
+            successStateKey="refundUploadSuccess"
             breadcrumbsLabelKey={t('routes.refund')}
-            manualLink={import.meta.env.VITE_MANUAL_LINK} 
-            styleClass={styles.uploadFileContainer} 
+            manualLink={import.meta.env.VITE_MANUAL_LINK}
+            styleClass={styles.uploadFileContainer}
+            docNumberTitle={t("pages.refund.invoiceTitle")}
+            docNumberInsert={t("pages.refund.insertInvoice")}
+            docNumberLabel={t("pages.refund.invoiceLabel")}
         />
     );
 };

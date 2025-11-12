@@ -365,7 +365,6 @@ describe('PurchaseManagement', () => {
         expect(mockDeleteTransactionInProgress).toHaveBeenCalledWith(mockAuthorizedTransaction.id);
       });
 
-      expect(mockedNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT);
       expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
     });
 

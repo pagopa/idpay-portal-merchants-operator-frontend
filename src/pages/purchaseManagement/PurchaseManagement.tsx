@@ -37,6 +37,7 @@ const PurchaseManagement = () => {
     const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
+    const [transactionDeleteSuccess, setTransactionDeleteSuccess] = useState(false);
     
 
     const gridRef = useRef(null);
@@ -257,7 +258,8 @@ const PurchaseManagement = () => {
             await deleteTransactionInProgress(selectedTransaction?.id);
             setOpenDrawer(false);
             setCancelTransactionModal(false);
-            navigate(ROUTES.REFUNDS_MANAGEMENT);
+            setTransactionDeleteSuccess(true);
+            setTriggerFetchTransactions(true);
         } catch (error) {
             console.error('Error deleting transaction:', error);
             setCancelTransactionModal(false);
@@ -323,7 +325,8 @@ const PurchaseManagement = () => {
                     [transactionAuthorized, () => utilsStore.setState({ transactionAuthorized: false })],
                     [errorPreviewPdf, setErrorPreviewPdf],
                     [transactionRefundSuccess, setTransactionRefundSuccess],
-                    [transactionReverseSuccess, setTransactionReverseSuccess]
+                    [transactionReverseSuccess, setTransactionReverseSuccess],
+                    [transactionDeleteSuccess, setTransactionDeleteSuccess]
                 ]}
                 alertMessages={{
                     error: t('pages.refundManagement.errorAlert'),
@@ -333,7 +336,8 @@ const PurchaseManagement = () => {
                     errorCaptureTransaction: t('pages.purchaseManagement.captureTransactionModal.errorCaptureTransaction'),
                     errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf'),
                     transactionRefundSuccess: t('pages.refundManagement.refundSuccessUpload'),
-                    transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload')
+                    transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload'),
+                    transactionDeleteSuccess: t('pages.purchaseManagement.transactionDeleteSuccess')
                 }}
                 noDataMessage={t('pages.refundManagement.noTransactions')}
                 triggerFetchTransactions={triggerFetchTransactions}
@@ -502,7 +506,8 @@ const PurchaseManagement = () => {
                     errorCaptureTransaction,
                     errorPreviewPdf,
                     transactionRefundSuccess,
-                    transactionReverseSuccess
+                    transactionReverseSuccess,
+                    transactionDeleteSuccess
                 }}
             />
 
@@ -521,7 +526,7 @@ const PurchaseManagement = () => {
                             ? `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(selectedTransaction?.residualAmountCents)}
                                 ${t('pages.purchaseManagement.captureTransactionModal.description2')}${selectedTransaction?.additionalProperties?.productName}
                                 ${t('pages.purchaseManagement.captureTransactionModal.description3')}`
-                            : `${t('pages.purchaseManagement.cancelTransactionModal.description')}.`}
+                            : `${t('pages.purchaseManagement.cancelTransactionModal.description')}`}
                         {captureTransactionModal && <Typography display="inline" fontWeight="bold">"Fattura da caricare"</Typography>}.
                     </Typography>
                 </Box>

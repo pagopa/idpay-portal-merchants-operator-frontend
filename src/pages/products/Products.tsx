@@ -4,7 +4,7 @@ import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useTranslation } from "react-i18next";
 import FiltersForm from "../../components/FiltersForm/FiltersForm";
 import { useFormik } from "formik";
-import {ELEMENT_PER_PAGE, MISSING_DATA_PLACEHOLDER} from "../../utils/constants";
+import { ELEMENT_PER_PAGE, MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import Tooltip from "@mui/material/Tooltip";
 import { useEffect, useState, useCallback } from "react";
 import DataTable from "../../components/DataTable/DataTable";
@@ -34,13 +34,6 @@ const Products = () => {
         pageSize: import.meta.env.VITE_PAGINATION_SIZE,
         totalElements: 0
     });
-    const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
-    const [sortModel, setSortModel] = useState<GridSortModel>([]);
-    const { t } = useTranslation();
-    useAutoResetBanner([
-        [errorAlert, setErrorAlert]
-    ])
-
     const initialValues = {
         category: '',
         brand: '',
@@ -48,6 +41,14 @@ const Products = () => {
         eprelCode: '',
         gtinCode: ''
     };
+    const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
+    const [appliedFilters, setAppliedFilters] = useState(initialValues);
+    const [sortModel, setSortModel] = useState<GridSortModel>([]);
+    const { t } = useTranslation();
+    useAutoResetBanner([
+        [errorAlert, setErrorAlert]
+    ])
+
     const formik = useFormik({
         initialValues,
         onSubmit: (values) => {
@@ -245,7 +246,7 @@ const Products = () => {
             page: newPaginationModel.page,
             size: newPaginationModel.pageSize,
             sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-            ...formik.values
+            ...appliedFilters
         });
     };
 
@@ -256,7 +257,7 @@ const Products = () => {
                 sort: model[0].field + ',' + model[0].sort,
                 page: paginationModel.page,
                 size: paginationModel.pageSize,
-                ...formik.values
+                ...appliedFilters
             });
         }
     }
@@ -264,6 +265,7 @@ const Products = () => {
 
     const handleFiltersApplied = (filtersObj: any) => {
         setFiltersAppliedOnce(true);
+        setAppliedFilters(filtersObj);
         const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
             const value = filtersObj[key];
             if (value !== '' && value !== null && value !== undefined) {
@@ -281,6 +283,7 @@ const Products = () => {
 
     const handleFiltersReset = () => {
         setFiltersAppliedOnce(false);
+        setAppliedFilters(initialValues);
         formik.resetForm();
         fetchProducts({});
     };
@@ -305,11 +308,11 @@ const Products = () => {
                     mtTitle={0}
                     mbSubTitle={2}
                 />
-                <Button 
-                    variant="contained" 
-                    size="small" 
-                    startIcon={<FileDownloadIcon/>} 
-                    sx={{ textWrap: 'nowrap' }} 
+                <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<FileDownloadIcon />}
+                    sx={{ textWrap: 'nowrap' }}
                     onClick={() => window.open(import.meta.env.VITE_CSV_LINK, '_blank')?.focus()}
                 >
                     Esporta csv
