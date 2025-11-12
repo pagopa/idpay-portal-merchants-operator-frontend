@@ -224,11 +224,13 @@ export const MerchantApi = {
 
   reverseTransactionApi: async (
     trxId: string, 
-    file: File
+    file: File,
+    docNumber: string
   ): Promise<void> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('docNumber', docNumber);
       
       const response = await axiosInstance.post(
         `/transactions/${trxId}/reversal`, 
@@ -249,11 +251,13 @@ export const MerchantApi = {
 
  invoiceTransactionApi: async (
     trxId: string, 
-    file: File
+    file: File,
+    docNumber: string
   ): Promise<void> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('docNumber', docNumber);
       const response = await axiosInstance.post(
         `/transactions/${trxId}/invoice`, 
         formData,
