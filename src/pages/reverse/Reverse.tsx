@@ -11,11 +11,14 @@ const Reverse = () => {
             titleKey="pages.reverse.title"
             subtitleKey="pages.reverse.subtitle"
             i18nBlockKey="pages.reverse"
-            apiCall={reverseTransactionApi} 
-            successStateKey="reverseUploadSuccess" 
+            apiCall={reverseTransactionApi}
+            successStateKey="reverseUploadSuccess"
             breadcrumbsLabelKey={t('routes.reverse')}
             manualLink={import.meta.env.VITE_MANUAL_LINK}
-            styleClass={styles.uploadFileContainer} 
+            styleClass={styles.uploadFileContainer}
+            docNumberTitle={t("pages.reverse.creditNoteTitle")}
+            docNumberInsert={t("pages.reverse.insertCreditNote")}
+            docNumberLabel={t("pages.reverse.creditNoteLabel")}
         />
     );
 };

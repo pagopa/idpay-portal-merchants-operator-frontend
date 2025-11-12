@@ -101,45 +101,44 @@ export const DetailsDrawer = ({
             return (
               key !== "id" &&
               key !== "cancelled" && (
-                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {key}
-                  </Typography>
-                  {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
-                    <Button
-                      data-testid="btn-test"
-                      sx={{ padding: "0" }}
-                      onClick={() => {
-                        if (onFileDownloadCallback) onFileDownloadCallback();
-                      }}
-                    >
-                      {isLoading ? (
-                        <CircularProgress
-                          color="inherit"
-                          size={20}
-                          data-testid="item-loader"
-                        />
-                      ) : (
-                        <>
-                          <ReceiptLong /> {value}
-                        </>
-                      )}
-                    </Button>
-                  ) : (
+                    <Grid key={index} size={{xs: 12, md: 12, lg: 12}}>
                     <Typography
-                      variant="body2"
-                      sx={{ fontWeight: theme.typography.fontWeightMedium }}
+                        variant="body2"
+                        sx={{
+                          fontWeight: theme.typography.fontWeightRegular,
+                          color: theme.palette.text.secondary,
+                        }}
                     >
-                      {value}
+                      {key}
                     </Typography>
-                  )}
-                </Grid>
+                    {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
+                        <Button
+                            data-testid="btn-test"
+                            sx={{padding: "0"}}
+                            onClick={() => {
+                              if (onFileDownloadCallback) onFileDownloadCallback();
+                            }}
+                        >
+                          {isLoading ? (
+                              <CircularProgress
+                                  color="inherit"
+                                  size={20}
+                                  data-testid="item-loader"/>
+                          ) : (
+                              <>
+                                <ReceiptLong/> {value}
+                              </>
+                          )}
+                        </Button>
+                    ) : (
+                        <Typography
+                            variant="body2"
+                            sx={{fontWeight: theme.typography.fontWeightMedium}}
+                        >
+                          {value}
+                        </Typography>
+                    )}
+                  </Grid>
               )
             );
           })}

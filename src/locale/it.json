@@ -95,7 +95,10 @@
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
       "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
-      "uploadFileButton": "selezionalo dal tuo computer"
+      "uploadFileButton": "selezionalo dal tuo computer",
+      "invoiceTitle": "Qual è il numero il numero della fattura?",
+      "insertInvoice": "Inserisci il numero della fattura",
+      "invoiceLabel": "Numero della fattura"
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
@@ -304,7 +307,10 @@
       "uploadFileButton": "selezionalo dal tuo computer",
       "replaceFile": "Sostituisci",
       "fileSizeError": "Il file supera la dimensione massima di 20MB",
-      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova."
+      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova.",
+      "creditNoteTitle": "Qual è il numero il numero della nota di credito?",
+      "insertCreditNote": "Inserisci il numero della nota di credito",
+      "creditNoteLabel": "Numero della nota di credito"
 
     }
 
