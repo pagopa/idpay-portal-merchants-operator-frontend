@@ -1339,7 +1339,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProductDTO"
-          maxItems: 1000000
+          maxItems: 1000
         pageNo:
           type: integer
           format: int32
@@ -1494,7 +1494,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PointOfSaleTransactionProcessedDTO"
-          maxItems: 1000000
+          maxItems: 1000
         pageNo:
           type: integer
           format: int32
@@ -1598,9 +1598,6 @@ components:
           type: string
           description: "ENG: The name of the invoice file <br> IT: Il nome del file della fattura"
           maxLength: 255
-        docNumber:
-          type: string
-          maxLength: 255
     PointOfSaleTransactionsListDTO:
       type: object
       properties:
@@ -1608,7 +1605,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PointOfSaleTransactionDTO"
-          maxItems: 1000000
+          maxItems: 1000
         pageNo:
           type: integer
           format: int32
@@ -1989,9 +1986,6 @@ components:
           type: string
           maxLength: 41943040
           format: binary
-        docNumber:
-          type: string
-          maxLength: 255
     InvoiceDTO:
       type: object
       required:
@@ -2001,9 +1995,6 @@ components:
           type: string
           maxLength: 41943040
           format: binary
-        docNumber:
-          type: string
-          maxLength: 255
     ReportDTO:
       title: ReportDTO
       type: object
