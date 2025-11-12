@@ -135,7 +135,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     </Typography>
                 </Box>
                 <Box mt={2}>
-                    <Typography variant="body2" fontWeight={theme.typography.fontWeightBold}>
+                    <Typography variant="body2" fontWeight={theme.typography.fontWeightMedium}>
                         {docNumberInsert}
                     </Typography>
                 </Box>
@@ -158,7 +158,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     error={docNumberError}
                     helperText={docNumberError && docNumber === '' ?
                         REQUIRED_FIELD_ERROR :
-                        docNumberError && docNumber?.length < 2 ?
+                        docNumberError && docNumber?.trim().length < 2 ?
                             'Lunghezza minima 2 caratteri'
                         : ''}
 
