@@ -95,8 +95,9 @@
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
       "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
+      "uploadCreditNote": "Trascina qui il file .xml o .pdf della nota di credito da caricare o ",
       "uploadFileButton": "selezionalo dal tuo computer",
-      "invoiceTitle": "Qual è il numero il numero della fattura?",
+      "invoiceTitle": "Qual è il numero  della fattura?",
       "insertInvoice": "Inserisci il numero della fattura",
       "invoiceLabel": "Numero della fattura"
     },
@@ -300,16 +301,16 @@
     "reverse": {
       "title": "Storna transazione",
       "creditNote": "Carica nota di credito",
-      "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
+      "subtitle": "Inserisci il numero della nota di credito e carica la documentazione necessaria per avviare lo storno.  ",
       "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
-      "uploadFile": "Trascina qui il file PDF o XML della fattura da caricare o ",
+      "uploadFile": "Trascina qui il file PDF o XML della nota di credito da caricare o ",
       "uploadFileButton": "selezionalo dal tuo computer",
       "replaceFile": "Sostituisci",
       "fileSizeError": "Il file supera la dimensione massima di 20MB",
       "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova.",
-      "creditNoteTitle": "Qual è il numero il numero della nota di credito?",
+      "creditNoteTitle": "Qual è il numero della nota di credito?",
       "insertCreditNote": "Inserisci il numero della nota di credito",
       "creditNoteLabel": "Numero della nota di credito"
 
