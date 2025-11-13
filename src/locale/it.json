@@ -49,7 +49,8 @@
     "sessionExpiredTitle": "La tua sessione è scaduta",
     "tcDescription": "Non siamo riusciti a recuperare le informazioni sull’accettazione dei termini e condizioni d’uso. Riprova.",
     "tcSave": "Non siamo riusciti a salvare l'accettazione dei Termini e condizioni d’uso. Riprova",
-    "validationDescription": "Verifica che i dati inseriti siano corretti"
+    "validationDescription": "Verifica che i dati inseriti siano corretti",
+    "requiredFileError": "Selezionare un file da caricare"
   },
   "pages": {
     "tosStatic": {

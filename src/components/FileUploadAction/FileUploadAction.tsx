@@ -43,7 +43,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     styleClass
 }) => {
     const [file, setFile] = useState<File | null>(null);
-    const [docNumber, setDocNumber] = useState<string>();
+    const [requiredFileError, setRequiredFileError] = useState<boolean>(false);
+    const [docNumber, setDocNumber] = useState<string>('');
     const [docNumberError, setDocNumberError] = useState<boolean>(false);
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
     const [fileTypeError, setFileTypeError] = useState<boolean>(false);
@@ -64,6 +65,9 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     }, [errorAlert]);
 
     const handleFileSelect = (selectedFile: File) => {
+        if (selectedFile) {
+            setRequiredFileError(false);
+        }
         if(!VALID_MIME_TYPES.includes(selectedFile.type)){
             setFileTypeError(true);
             setFile(null);
@@ -91,7 +95,15 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     };
 
     const handleAction = async () => {
-        if (file && trxId && !docNumberError) {
+        if(!file){
+            setRequiredFileError(true);
+            setFileSizeError(false);
+            setFileTypeError(false);
+        }
+        if(!docNumber || docNumber === '' || docNumber.trim().length < 2){
+            setDocNumberError(true);
+        }
+        if (file && trxId && docNumber.trim() && docNumber.trim().length >= 2 ) {
             setLoadingFile(true);
             try {
                 await apiCall(trxId, file, docNumber);
@@ -145,7 +157,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     value={docNumber}
                     onChange={(e) => setDocNumber(e.target.value)}
                     onBlur={() => {
-                        !docNumber || docNumber === '' || docNumber.length < 2 ? setDocNumberError(true) : setDocNumberError(false);
+                        !docNumber || docNumber === '' || docNumber.trim().length < 2 ? setDocNumberError(true) : setDocNumberError(false);
                     }}
                     label={docNumberLabel}
                     size="small"
@@ -156,7 +168,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                         },
                     }}
                     error={docNumberError}
-                    helperText={docNumberError && docNumber === '' ?
+                    helperText={docNumberError && docNumber === ''  ?
                         REQUIRED_FIELD_ERROR :
                         docNumberError && docNumber?.trim().length < 2 ?
                             'Lunghezza minima 2 caratteri'
@@ -184,6 +196,15 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                         <Box data-testid='alert' mt={2}>
                             <Alert  severity="error">
                                 {t(`${i18nBlockKey}.fileNotSupported`)}
+                            </Alert>
+                        </Box>
+                    )
+                }
+                {
+                    requiredFileError && (
+                        <Box data-testid='alert' mt={2}>
+                            <Alert  severity="error">
+                                {t('errors.requiredFileError')}
                             </Alert>
                         </Box>
                     )
