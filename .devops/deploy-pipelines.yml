@@ -100,6 +100,7 @@ variables:
 
     #API ENV
     vite_api_url: '$(PROD_VITE_API_URL)'
+    vite_initiative_id: '$(PROD_VITE_INITIATIVE_ID)'
 
 
   # every branch different from past will be considered as DEV
