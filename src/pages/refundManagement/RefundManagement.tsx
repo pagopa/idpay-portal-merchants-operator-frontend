@@ -36,11 +36,13 @@ const RefundManagement = () => {
     }, [location.state]);
 
     const handleRowAction = useCallback((transaction) => {
+        console.log("handleRowAction", transaction);
         setIsOpen(true);
         const invoiceLabel = transaction?.status === 'REFUNDED' ? 'Nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Fattura'
+        const docNumberLabel = transaction?.status === 'REFUNDED' ? 'Numero nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Numero fattura'
 
         const mappedTransaction = {
-            'Data e ora': new Date(transaction?.updateDate).toLocaleDateString('it-IT', {
+            'Data e ora': new Date(transaction?.trxChargeDate).toLocaleDateString('it-IT', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -49,10 +51,12 @@ const RefundManagement = () => {
             }).replace(',', ''),
             'Elettrodomestico': transaction?.additionalProperties.productName,
             'Codice Fiscale': transaction?.fiscalCode,
+            'ID transazione': transaction?.id,
             'Totale della spesa': transaction?.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents),
             'Sconto applicato': transaction?.rewardAmountCents && formatEuro(transaction.rewardAmountCents),
-            'Importo autorizzato': transaction?.rewardAmountCents && transaction.effectiveAmountCents && formatEuro(transaction.effectiveAmountCents - transaction.rewardAmountCents),
+            'Importo autorizzato': transaction?.authorizedAmountCents && formatEuro(transaction.authorizedAmountCents),
             'Stato': getStatusChip(t, transaction?.status),
+            [docNumberLabel]: transaction?.invoiceFile?.docNumber,
             [invoiceLabel]: transaction?.invoiceFile?.filename,
             'id': transaction?.id,
         };
@@ -111,7 +115,7 @@ const RefundManagement = () => {
             },
         },
         {
-            field: 'updateDate',
+            field: 'trxChargeDate',
             headerName: 'Data e ora',
             flex: 1.5,
             disableColumnMenu: true,
@@ -242,7 +246,7 @@ const RefundManagement = () => {
             tableTitle={t('pages.refundManagement.tableTitle')}
             fetchTransactionsApi={getProcessedTransactions}
             columns={columns}
-            statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED']}
+            statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED', 'INVOICED']}
             alerts={[
                 [transactionReverseSuccess, setTransactionReverseSuccess],
                 [transactionRefundSuccess, setTransactionRefundSuccess],

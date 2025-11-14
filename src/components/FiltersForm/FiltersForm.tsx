@@ -61,7 +61,7 @@ const FiltersForm = <T extends Record<string, any>>({
   });
 
   return (
-    <Grid sx={{ my: 4, width: '100%' }} container spacing={2} alignItems="center" >
+    <Grid sx={{ my: 4, width: '100%' }} container spacing={2} >
       {enhancedChildren}
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
       <Button
@@ -83,7 +83,8 @@ const FiltersForm = <T extends Record<string, any>>({
           color: 'primary.main',
           fontWeight: 600,
           fontSize: '0.875rem',
-          gridColumn: 'span 1'
+          gridColumn: 'span 1',
+          height: '44.5px'
         }}
         onClick={handleResetFilters}
         disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce) }

@@ -295,6 +295,7 @@ paths:
         - $ref: "#/components/parameters/gtinCode_query"
         - $ref: "#/components/parameters/productFileId_query"
         - $ref: "#/components/parameters/productName_query"
+        - $ref: '#/components/parameters/fullProductName_query'
         - $ref: "#/components/parameters/status_query"
         - $ref: "#/components/parameters/organizationId_query"
       responses:
@@ -898,13 +899,13 @@ paths:
               example:
                 code: "PAYMENT_GENERIC_ERROR"
                 message: "Application error"
-  /transactions/{transactionId}/reward:
+  /transactions/{transactionId}/invoice:
     post:
       tags:
         - transaction
-      summary: Point of sales reward transaction
-      description: "ENG: Point of sales reward transaction <br> IT: Riconoscimento di una transazione da parte di un Punto Vendita"
-      operationId: rewardTransaction
+      summary: Point of sales invoice transaction
+      description: "ENG: Point of sales invoice transaction <br> IT: Inserimento della fattura di una transazione da parte di un Punto Vendita"
+      operationId: invoiceTransaction
       parameters:
         - name: transactionId
           in: path
@@ -918,7 +919,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/RewardInvoiceDTO"
+              $ref: "#/components/schemas/InvoiceDTO"
       responses:
         "204":
           description: Ok - no content
@@ -1028,7 +1029,7 @@ paths:
   /transactions/{transactionId}/preview-pdf:
     get:
       tags:
-        - payment
+        - transaction
       summary: 'ENG: Generate a transaction preview pdf - IT: Genera un pdf della preview transazione'
       description: Generate transaction preview pdf
       operationId: getTransactionPreviewPdf
@@ -1267,7 +1268,6 @@ components:
           maximum: 1000000000
           description: "ENG: amount in cents - IT: importo totale della spesa in centesimi"
       required:
-        - productName
         - productGtin
         - amountCents
     PreviewPaymentDTO:
@@ -1478,6 +1478,11 @@ components:
           description: "ENG: The name of the product  <br> IT: Nome del prodotto"
           maxLength: 255
           pattern: .*
+        fullProductName:
+          type: string
+          description: 'ENG: The name of the product with GTIN (for merchant)  <br> IT: Nome del prodotto con GTIN (per esercenti)'
+          maxLength: 255
+          pattern: .*
         motivation:
           type: string
           maxLength: 200
@@ -1552,6 +1557,11 @@ components:
           format: date-time
           description: "ENG: The date of the transaction - IT: La data della transazione"
           maxLength: 255
+        trxChargeDate:
+          type: string
+          format: date-time
+          description: "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento"
+          maxLength: 255
         updateDate:
           type: string
           format: date-time
@@ -1564,6 +1574,7 @@ components:
             - REWARDED
             - CANCELLED
             - REFUNDED
+            - INVOICED
         channel:
           type: string
           description: "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione"
@@ -1655,6 +1666,11 @@ components:
           type: string
           format: date-time
           description: "ENG: The date of the transaction - IT: La data della transazione"
+          maxLength: 255
+        trxChargeDate:
+          type: string
+          format: date-time
+          description: "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento"
           maxLength: 255
         trxExpirationSeconds:
           type: number
@@ -1914,8 +1930,8 @@ components:
       properties:
         invoiceUrl:
           type: string
+          maxLength: 10000
           description: "ENG: URL to download the invoice file - IT: URL per scaricare il file della fattura"
-          maxLength: 255
       required:
         - invoiceUrl
     TransactionErrorDTO:
@@ -1952,6 +1968,7 @@ components:
             - PAYMENT_MERCHANT_NOT_ONBOARDED
             - PAYMENT_INVALID_REQUEST
             - PAYMENT_STATUS_NOT_VALID
+            - PAYMENT_TOO_RECENT
             - PAYMENT_TRANSACTION_VERSION_PENDING
             - PRODUCT_NOT_FOUND
           description: '"ENG: Error code:<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transaction not found or expired<br> PAYMENT_TRANSACTION_EXPIRED: transaction expired<br> PAYMENT_INITIATIVE_NOT_FOUND: initiative not found<br> PAYMENT_INITIATIVE_INVALID_DATE: initiative invalid date<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: initiative is not of discount type<br> PAYMENT_ALREADY_AUTHORIZED: transaction already authorized<br> PAYMENT_ALREADY_CANCELLED: transaction already cancelled<br> PAYMENT_BUDGET_EXHAUSTED: budget exhausted<br> PAYMENT_GENERIC_REJECTED: generic rejected error (transaction rejected)<br> PAYMENT_TOO_MANY_REQUESTS: too many request, retry<br> PAYMENT_GENERIC_ERROR: application error (connection microservice error)<br> PAYMENT_USER_SUSPENDED: the user has been suspended on the initiative<br> PAYMENT_USER_NOT_ONBOARDED: user not onboarded<br> PAYMENT_USER_UNSUBSCRIBED: user unsubscribed<br> PAYMENT_ALREADY_ASSIGNED:  transaction already assigned<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: operation on transaction not allowed due to status<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: operation on transaction not allowed due to merchant mismatched<br> PAYMENT_USER_NOT_ASSOCIATED: user not associated to the transaction<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: cancellation of transaction not allowed due to status<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: unrelate transaction not allowed due to status<br> PAYMENT_AMOUNT_NOT_VALID: amount of transaction not valid<br> PAYMENT_MERCHANT_NOT_ONBOARDED: the merchant is not onboarded<br> PAYMENT_INVALID_REQUEST: request validation error<br> PAYMENT_STATUS_NOT_VALID: transaction status not valid<br> PAYMENT_TRANSACTION_VERSION_PENDING: The transaction version is actually locked<br> IT: Codice di errore<br> PAYMENT_NOT_FOUND_OR_EXPIRED: transazione non trovata oppure scaduta<br> PAYMENT_TRANSACTION_EXPIRED: transazione scaduta<br> PAYMENT_INITIATIVE_NOT_FOUND: iniziativa non trovata<br> PAYMENT_INITIATIVE_INVALID_DATE: iniziativa con data invalida<br> PAYMENT_INITIATIVE_NOT_DISCOUNT: iniziativa non è di tipo a sconto<br> PAYMENT_ALREADY_AUTHORIZED: transazione già autorizzata<br> PAYMENT_ALREADY_CANCELLED: transazione già cancellata<br> PAYMENT_BUDGET_EXHAUSTED: budget esaurito<br> PAYMENT_GENERIC_REJECTED: errore generico, transazione rigettata<br> PAYMENT_TOO_MANY_REQUESTS: troppe richieste, riprovare<br> PAYMENT_GENERIC_ERROR: errore generico (errore nella connessione ad un microservizio)<br> PAYMENT_USER_SUSPENDED: l''utente è stato sospeso dall''iniziativa<br> PAYMENT_USER_NOT_ONBOARDED: utente non onboardato all''iniziativa<br> PAYMENT_USER_UNSUBSCRIBED: utente disiscritto dall''iniziativa<br> PAYMENT_ALREADY_ASSIGNED:  transazione già assegnata<br> PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: transazione non consentita a causa dello stato della transazione<br> PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT: transazione non consentita a causa della mancata corrispondenza del merchant<br> PAYMENT_USER_NOT_ASSOCIATED: utente non associato alla transazione<br> PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS: annullamento della transazione non consentito a causa dello stato della transazione<br> PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS: disassociazione non consentita a causa dello stato della transazione<br> PAYMENT_AMOUNT_NOT_VALID: importo nella transazione non valido<br> PAYMENT_MERCHANT_NOT_ONBOARDED: il merchant non è onboardato<br> PAYMENT_INVALID_REQUEST: errore di validazione della richiesta<br> PAYMENT_STATUS_NOT_VALID: stato della transazione non valido"<br> PAYMENT_TRANSACTION_VERSION_PENDING: La versione del contatore è attualmente bloccata<br> PRODUCT_NOT_FOUND: Prodotto non trovato o non approvato '
@@ -1967,17 +1984,17 @@ components:
       properties:
         file:
           type: string
+          maxLength: 41943040
           format: binary
-          maxLength: 255
-    RewardInvoiceDTO:
+    InvoiceDTO:
       type: object
       required:
         - file
       properties:
         file:
           type: string
+          maxLength: 41943040
           format: binary
-          maxLength: 255
     ReportDTO:
       title: ReportDTO
       type: object
@@ -1986,6 +2003,10 @@ components:
           type: string
           maxLength: 1048576
           format: binary
+        trxCode:
+          type: string
+          maxLength: 100
+          pattern: "^[a-zA-Z0-9]+$"
   securitySchemes:
     Bearer:
       type: apiKey
@@ -2428,6 +2449,14 @@ components:
         type: string
         maxLength: 255
         pattern: .*
+    fullProductName_query:
+      name: fullProductName
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 255
+        pattern: .*
     fiscalCode_query:
       name: fiscalCode
       in: query
@@ -2448,6 +2477,7 @@ components:
           - REWARDED
           - CANCELLED
           - REFUNDED
+          - INVOICED
     sort_trx_processed_query:
       name: sort
       in: query
@@ -2455,10 +2485,10 @@ components:
       schema:
         type: string
         enum:
-          - updateDate, desc
+          - trxChargeDate, desc
           - status, desc
           - productName, desc
-          - updateDate, asc
+          - trxChargeDate, asc
           - status, asc
           - productName, asc
     status_trx_in_progress_query:
@@ -2486,10 +2516,10 @@ components:
       schema:
         type: string
         enum:
-          - updateDate, desc
+          - trxChargeDate, desc
           - status, desc
           - productName, desc
-          - updateDate, asc
+          - trxChargeDate, asc
           - status, asc
           - productName, asc
     initiativeId_path:

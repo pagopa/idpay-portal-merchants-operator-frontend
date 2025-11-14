@@ -38,7 +38,7 @@
   "sideMenu": {
     "purchaseManagement": "Gestione acquisti",
     "profile": "Profilo",
-    "refundManagement": "Gestione rimborsi",
+    "refundManagement": "Storico rimborsi",
     "products": "Prodotti"
   },
   "errors": {
@@ -49,7 +49,8 @@
     "sessionExpiredTitle": "La tua sessione è scaduta",
     "tcDescription": "Non siamo riusciti a recuperare le informazioni sull’accettazione dei termini e condizioni d’uso. Riprova.",
     "tcSave": "Non siamo riusciti a salvare l'accettazione dei Termini e condizioni d’uso. Riprova",
-    "validationDescription": "Verifica che i dati inseriti siano corretti"
+    "validationDescription": "Verifica che i dati inseriti siano corretti",
+    "requiredFileError": "Selezionare un file da caricare"
   },
   "pages": {
     "tosStatic": {
@@ -82,20 +83,24 @@
         "paymentUserUnsubscribed": "L'utente ha effettuato il recesso dall'iniziativa"
       },
       "exitModalTitle": "Vuoi uscire?",
-      "exitModalBody": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice.",
+      "exitModalBody": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di ripresentare il codice.",
       "title": "Accetta un buono sconto",
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
     "refund":{
-      "title":"Richiedi rimborso",
+      "title":"Carica la fattura",
       "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
-      "creditNote": "Carica la fattura",
-      "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. <Assicurati che il documento sia in formato .xml o .pdf> e <conforme agli standard della fatturazione elettronica.>",
+      "creditNote": "Carica il documento",
+      "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica.",
       "replaceFile":"Sostituisci",
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
-      "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
-      "uploadFileButton": "selezionalo dal tuo computer"
+      "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
+      "uploadCreditNote": "Trascina qui il file .xml o .pdf della nota di credito da caricare o ",
+      "uploadFileButton": "selezionalo dal tuo computer",
+      "invoiceTitle": "Qual è il numero  della fattura?",
+      "insertInvoice": "Inserisci il numero della fattura",
+      "invoiceLabel": "Numero della fattura"
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
@@ -177,7 +182,7 @@
     "acceptDiscount": {
       "title": "Accetta buono sconto",
       "subtitle": "Compila i campi per accettare i buoni sconto ed usufruire dell' iniziativa",
-      "selectProduct": "Seleziona il prodotto soggetto all'iniziativa",
+      "selectProduct": "Seleziona il prodotto a cui applicare lo sconto",
       "selectProductTitle": "Seleziona il prodotto",
       "expenseAmount": "Qual è l'importo totale della spesa?",
       "insertAmount": "Inserisci l'importo totale della spesa, ci servirà per calcolare lo sconto massimo applicabile.",
@@ -202,7 +207,7 @@
       "status": "Stato",
       "toBeAuthorized": "Da autorizzare",
       "modalTitle": "Vuoi uscire?",
-      "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di generare un nuovo codice."
+      "modalDescription": "Tutte le informazioni che hai inserito andranno perse. Se vuoi accettare il buono sconto in un secondo momento, dovrai chiedere al tuo cliente di ripresentare il codice."
     },
     "summaryAcceptDiscount": {
       "alert": "Ricordati di verificare che il Codice Fiscale sul voucher corrisponda a quello riportato sulla tessera sanitaria del richiedente"
@@ -232,15 +237,15 @@
         "category": "Categoria",
         "confirmPayment": "Conferma pagamento",
         "cancellPayment": "Annulla transazione",
-        "requestRefund": "Richiedi rimborso",
+        "requestRefund": "Carica fattura",
         "refund": "Storna",
         "householdAppliance": "Elettrodomestico",
         "document": "Documento di pre-autorizzazione",
         "transactionId": "ID transazione"
       },
       "cancelTransactionModal": {
-        "title": "Vuoi annullare la transazione?",
-        "description": "Sei sicuro di voler annullare questa transazione? <L’utente potrà continuare a usufruire del buono sconto>",
+        "title": "Annulla transazione",
+        "description": "Sei sicuro di voler annullare questa transazione? L’utente potrà continuare a usufruire del buono sconto",
         "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
       },
       "captureTransactionModal": {
@@ -255,21 +260,23 @@
         "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
         "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
       },
-      "errorPreviewPdf": "Si è verificato un errore nel download del PDF, riprova."
+      "errorPreviewPdf": "Si è verificato un errore nel download del PDF, riprova.",
+      "transactionDeleteSuccess": "La transazione è stata annullata con successo."
     },
     "refundManagement": {
-      "title": "Gestione rimborsi",
+      "title": "Storico rimborsi",
       "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Elettrodomestici",
       "noTransactions": "Non ci sono transazioni per questa iniziativa",
       "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
       "cancelled": "Annullato",
       "refunded": "Stornato",
       "rewarded": "Rimborso richiesto",
+      "invoiced": "Preso in carico",
       "authorized": "Da autorizzare",
-      "captured": "Da rimborsare",
+      "captured": "Fattura da caricare",
       "tableTitle": "Transazioni",
-      "refundSuccessUpload": "La richiesta di rimborso è stata inviata.",
-      "reverseSuccessUpload": "La richiesta di storno è stata inviata.",
+      "refundSuccessUpload": "Richiesta inviata correttamente",
+      "reverseSuccessUpload": "Richiesta inviata correttamente",
       "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova."
 
     },
@@ -295,15 +302,18 @@
     "reverse": {
       "title": "Storna transazione",
       "creditNote": "Carica nota di credito",
-      "subtitle": "Carica la documentazione necessaria per avviare lo storno.  ",
+      "subtitle": "Inserisci il numero della nota di credito e carica la documentazione necessaria per avviare lo storno.  ",
       "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
-      "uploadFile": "Trascina qui il file <PDF> o <XML> della fattura da caricare o ",
+      "uploadFile": "Trascina qui il file PDF o XML della nota di credito da caricare o ",
       "uploadFileButton": "selezionalo dal tuo computer",
       "replaceFile": "Sostituisci",
       "fileSizeError": "Il file supera la dimensione massima di 20MB",
-      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova."
+      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova.",
+      "creditNoteTitle": "Qual è il numero della nota di credito?",
+      "insertCreditNote": "Inserisci il numero della nota di credito",
+      "creditNoteLabel": "Numero della nota di credito"
 
     }
 
@@ -323,6 +333,6 @@
   "routes": {
     "buyManagement": "Gestione acquisti",
     "reverse": "Storna transazione",
-    "refund": "Richiedi rimborso"
+    "refund": "Carica la fattura"
   }
 }

@@ -66,7 +66,8 @@ export const MerchantApi = {
     eprelCode?: string, 
     gtinCode?: string, 
     productFileId?: string, 
-    productName?: string, 
+    productName?: string,
+    fullProductName?:string, 
     organizationId?: string
    }
   ): Promise<ProductListDTO> => {
@@ -223,11 +224,13 @@ export const MerchantApi = {
 
   reverseTransactionApi: async (
     trxId: string, 
-    file: File
+    file: File,
+    docNumber: string
   ): Promise<void> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('docNumber', docNumber);
       
       const response = await axiosInstance.post(
         `/transactions/${trxId}/reversal`, 
@@ -246,15 +249,17 @@ export const MerchantApi = {
     }
   },
 
-  rewardTransactionApi: async (
+ invoiceTransactionApi: async (
     trxId: string, 
-    file: File
+    file: File,
+    docNumber: string
   ): Promise<void> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('docNumber', docNumber);
       const response = await axiosInstance.post(
-        `/transactions/${trxId}/reward`, 
+        `/transactions/${trxId}/invoice`, 
         formData,
         {
           headers: {
@@ -265,7 +270,7 @@ export const MerchantApi = {
       const result = handleAxiosResponse(response);
       return result;
     } catch (error) {
-      console.error('Error in rewardTransaction:', error);
+      console.error('Error in invoiceTransaction:', error);
       throw error;
     }
   },
