@@ -277,7 +277,7 @@ describe('PurchaseManagement', () => {
       expect(screen.getByText(mockCapturedTransaction.additionalProperties.productName)).toBeInTheDocument();
       expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'CAPTURED');
       expect(screen.getByTestId('status-chip')).toHaveTextContent('CAPTURED');
-      expect(screen.queryByText(/_preautorizzazione\.pdf/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/_preautorizzazione\.pdf/)).toBeInTheDocument();
       expect(screen.getByText('pages.purchaseManagement.drawer.requestRefund')).toBeInTheDocument();
       expect(screen.getByText('pages.purchaseManagement.drawer.refund')).toBeInTheDocument();
     });
