@@ -442,7 +442,7 @@ const PurchaseManagement = () => {
                                     </Typography>
                                 </Grid>
                                 {
-                                    selectedTransaction?.status === 'AUTHORIZED' && (
+                                    (selectedTransaction?.status === 'AUTHORIZED' || selectedTransaction?.status === 'CAPTURED')  && (
                                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary, margin: 0 }}>
                                                 {t('pages.purchaseManagement.drawer.document')}

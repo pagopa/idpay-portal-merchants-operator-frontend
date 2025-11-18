@@ -62,7 +62,7 @@ const AcceptDiscount = () => {
       );
       setFormData({
         product: discountCoupon.product,
-        totalAmount: (discountCoupon.originalAmountCents / 100).toString(),
+        totalAmount: (discountCoupon.originalAmountCents / 100).toString().replace(".", ","),
         discountCode: discountCoupon.trxCode,
       });
     }
@@ -111,7 +111,7 @@ const AcceptDiscount = () => {
         const response = await previewPayment({
           productGtin: formData.product!.gtinCode!,
           productName: formData.product!.productName!,
-          amountCents: Number(formData.totalAmount.replace(",", ".")) * 100,
+          amountCents: Math.round(Number(formData.totalAmount.replace(",", ".")) * 100),
           discountCode: formData.discountCode.trim()!,
         });
         sessionStorage.setItem(
