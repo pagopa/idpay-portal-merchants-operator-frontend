@@ -62,7 +62,7 @@ const AcceptDiscount = () => {
       );
       setFormData({
         product: discountCoupon.product,
-        totalAmount: (discountCoupon.originalAmountCents / 100).toString(),
+        totalAmount: (discountCoupon.originalAmountCents / 100).toString().replace(".", ","),
         discountCode: discountCoupon.trxCode,
       });
     }
