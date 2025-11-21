@@ -517,14 +517,9 @@ const Products = () => {
                             </Grid>
                         </Box>
                     </Drawer>
-
-                    {
-                        errorAlert && (
-                            <AlertComponent error={true} message={t('pages.products.errorAlert')} />
-                        )
-                    }
                 </>
             </Box>
+            { errorAlert && <AlertComponent error message={t('pages.products.errorAlert')} />}
         </Box>
     );
 };

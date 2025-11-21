@@ -187,11 +187,8 @@ const SummaryAcceptDiscount = () => {
                         {t('pages.acceptDiscount.title')}
                     </Button>
                 </Box>
-                {
-                    errorAlert && <AlertComponent error={true} message={t('pages.acceptDiscount.errorAlert')} />
-                }
-
             </Box>
+            {errorAlert && <AlertComponent error message={t('pages.acceptDiscount.errorAlert')} />}
         </>
     );
 };

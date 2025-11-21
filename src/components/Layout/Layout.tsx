@@ -47,7 +47,7 @@ const Layout = ({ children }: Props) => {
           <Grid
             container
             width="100%"
-            sx={{ backgroundColor: '#F5F5F5', '&>div': {width: '100%'}}}
+            sx={{ backgroundColor: '#F5F5F5', '&>div': {width: '100%'}, '& > div': {display: 'flex', flexDirection: 'column', height: '100%'}}}
             pb={16}
             pt={2}
             px={2}

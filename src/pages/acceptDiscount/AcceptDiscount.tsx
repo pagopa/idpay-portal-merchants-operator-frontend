@@ -348,13 +348,11 @@ const AcceptDiscount = () => {
             </Button>
           </Box>
         </ModalComponent>
-        {errorAlert && (
-          <AlertComponent
-            error={true}
-            message={t("pages.acceptDiscount.errorAlert")}
-          />
-        )}
       </Box>
+      { errorAlert && <AlertComponent
+        error
+        message={t("pages.acceptDiscount.errorAlert")}
+      />}
     </>
   );
 };
