@@ -123,7 +123,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
     return (
     <>
-        <Box p={4}>
+        <Box p={4} maxWidth='75%' justifySelf='center' >
             <BreadcrumbsBox
                 backLabel={t('commons.exitBtn')}
                 items={[{ label: t('routes.buyManagement'), path: ROUTES.BUY_MANAGEMENT }, { label: breadcrumbsLabelKey, path: ROUTES.REVERSE }]}
@@ -256,7 +256,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
             </Stack>
         </Box>
-        { errorAlert && <AlertComponent data-testid='alert-component' error message={t('pages.reverse.errorAlert')} />}
+        { errorAlert && <AlertComponent data-testid='alert-component' error message={t('pages.reverse.errorAlert')} sx={{right: '20px'}} /> }
     </>
     );
 };

@@ -203,6 +203,7 @@ const AcceptDiscount = () => {
 
   return (
     <>
+    <Box maxWidth='75%' justifySelf='center'>
       <Backdrop
         sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
         open={previewIsLoading}
@@ -349,7 +350,9 @@ const AcceptDiscount = () => {
           </Box>
         </ModalComponent>
       </Box>
+    </Box>
       { errorAlert && <AlertComponent
+        sx={{right: '20px'}}
         error
         message={t("pages.acceptDiscount.errorAlert")}
       />}

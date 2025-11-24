@@ -1,20 +1,22 @@
-import { Alert, Box } from '@mui/material';
+import { Alert, Box, SxProps, Theme } from '@mui/material';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 
 interface AlertProps {
     error?: boolean;
     message: string;
+    sx?: SxProps<Theme>
 }
 
-const AlertComponent = ({ error, message }: AlertProps) => {
+const AlertComponent = ({ error, message, sx }: AlertProps) => {
     return (
-        <Box display='flex' height='100%'alignItems='flex-end' justifyContent='flex-end' position='sticky' bottom='128px'>
+        <Box display='flex' height='100%' alignItems='flex-end' justifyContent='flex-end' position='sticky' bottom='128px'>
             <Alert
             data-testid="alert"
             severity={error ? 'error' : 'success'}
             icon={error ? <ErrorOutline /> : <CheckCircleOutline />}
             sx={{
+                ...sx,
                 position: 'absolute',
                 bottom: '-108px',
                 backgroundColor: 'white',

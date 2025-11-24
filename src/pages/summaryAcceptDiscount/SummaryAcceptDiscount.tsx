@@ -56,6 +56,7 @@ const SummaryAcceptDiscount = () => {
 
     return (
         <>
+        <Box maxWidth='75%' justifySelf='center'>
             <Backdrop
                 sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
                 open={authorizeIsLoading}
@@ -188,7 +189,8 @@ const SummaryAcceptDiscount = () => {
                     </Button>
                 </Box>
             </Box>
-            {errorAlert && <AlertComponent error message={t('pages.acceptDiscount.errorAlert')} />}
+        </Box>
+            {errorAlert && <AlertComponent sx={{right: '20px'}} error message={t('pages.acceptDiscount.errorAlert')} />}
         </>
     );
 };

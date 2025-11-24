@@ -64,12 +64,9 @@ const Layout = ({ children }: Props) => {
         >
           <Box
             display="grid"
-            justifyContent="center"
             pb={16}
             pt={2}
             gridColumn="span 12"
-            maxWidth="75%"
-            justifySelf="center"
           >
             {children}
           </Box>
