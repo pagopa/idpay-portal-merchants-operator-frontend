@@ -22,6 +22,7 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   isLoading?: boolean;
+  isInvoiced?: boolean;
   title: string;
   subtitle?: string;
   item: unknown;
@@ -39,7 +40,7 @@ export const DetailsDrawer = ({
   item,
   primaryButton,
   secondaryButton,
-  onFileDownloadCallback,
+  onFileDownloadCallback,isInvoiced
 }: Props) => {
   const itemsEntries = Object.entries(item).reduce(
     (acc, [key, value]) => [
@@ -48,7 +49,6 @@ export const DetailsDrawer = ({
     ],
     []
   );
-
   return (
     <Drawer
       anchor="right"
@@ -154,7 +154,7 @@ export const DetailsDrawer = ({
             boxShadow: "0 9px 46px 8px #002B551A",
           }}
         >
-          {primaryButton && (
+          {primaryButton && isInvoiced  && (
             <Button
               onClick={primaryButton?.onClick}
               href={primaryButton?.url}

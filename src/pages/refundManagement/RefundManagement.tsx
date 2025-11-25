@@ -6,7 +6,7 @@ import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import { getStatusChip, formatEuro } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
 import { authStore } from "../../store/authStore";
@@ -20,9 +20,11 @@ const RefundManagement = () => {
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [downloadInProgress, setDownloadInProgress] = useState(false);
+    const [status, setStatus] = useState<string>();
     const { t } = useTranslation();
     const location = useLocation();
     const token = authStore.getState().token;
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (location.state) {
@@ -36,7 +38,7 @@ const RefundManagement = () => {
     }, [location.state]);
 
     const handleRowAction = useCallback((transaction) => {
-        console.log("handleRowAction", transaction);
+        setStatus(transaction?.status);
         setIsOpen(true);
         const invoiceLabel = transaction?.status === 'REFUNDED' ? 'Nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Fattura'
         const docNumberLabel = transaction?.status === 'REFUNDED' ? 'Numero nota di credito' : transaction?.status === 'CANCELLED' ? 'cancelled' : 'Numero fattura'
@@ -267,6 +269,13 @@ const RefundManagement = () => {
                     isOpen={isOpen}
                     title={t('pages.purchaseManagement.drawer.title')}
                     item={selectedTransaction}
+                    isInvoiced={status === 'INVOICED'}
+                    primaryButton={{
+                        label: 'Modifica documento',
+                        onClick: async () => {
+                            navigate("/modifica-documento/" + selectedTransaction?.id + '/'+ selectedTransaction['Numero fattura']);
+                        }
+                }}
                     onFileDownloadCallback={downloadInvoiceFile}
                 />
             }

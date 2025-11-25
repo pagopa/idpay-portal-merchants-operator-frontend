@@ -362,9 +362,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransactionErrorDTO"
-              example:
-                code: PAYMENT_AMOUNT_NOT_VALID
-                message: "Cannot authorize transaction with invalid amount [%s]"
+              examples:
+                invalidAmount:
+                  summary: Amount not valid
+                  value:
+                    code: PAYMENT_AMOUNT_NOT_VALID
+                    message: "Cannot authorize transaction with invalid amount [%s]"
+                missingAdditionalProperties:
+                  summary: Additional properties not exist
+                  value:
+                    code: TRX_ADDITIONAL_PROPERTIES_NOT_EXIST
+                    message: "Cannot authorize transaction with invalid AdditionalProperties"
         "401":
           description: Authentication failed
           headers:
@@ -906,6 +914,133 @@ paths:
       summary: Point of sales invoice transaction
       description: "ENG: Point of sales invoice transaction <br> IT: Inserimento della fattura di una transazione da parte di un Punto Vendita"
       operationId: invoiceTransaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: The transaction ID
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: "^[a-zA-Z0-9]+$"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/InvoiceDTO"
+      responses:
+        "204":
+          description: Ok - no content
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "400":
+          description: Bad request
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_INVALID_REQUEST"
+                message: "Something went wrong handling the request"
+        "401":
+          description: Authentication failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+        "403":
+          description: "Forbidden"
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_ALLOWED_MISMATCHED_MERCHANT"
+                message: "The merchant with id [%s] associated to the transaction is not equal to the merchant with id [%s]"
+        "404":
+          description: The requested resource was not found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                message: "Cannot find transaction with transactionId [%s]"
+        "429":
+          description: Too many requests
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: "#/components/headers/Access-Control-Allow-Origin"
+            X-RateLimit-Limit:
+              $ref: "#/components/headers/X-RateLimit-Limit"
+            X-RateLimit-Remaining:
+              $ref: "#/components/headers/X-RateLimit-Remaining"
+            X-RateLimit-Reset:
+              $ref: "#/components/headers/X-RateLimit-Reset"
+            Retry-After:
+              $ref: "#/components/headers/Retry-After"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_TOO_MANY_REQUESTS"
+                message: "Too many requests"
+        "500":
+          description: Generic error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionErrorDTO"
+              example:
+                code: "PAYMENT_GENERIC_ERROR"
+                message: "Application error"
+  /transactions/{transactionId}/invoice/update:
+    put:
+      tags:
+        - transaction
+      summary: Point of sales update invoice transaction
+      description: "ENG: Point of sales invoice transaction update <br> IT: Aggiornamento del file e del numero fattura per una transazione da parte di un Punto Vendita"
+      operationId: updateInvoiceTransaction
       parameters:
         - name: transactionId
           in: path
@@ -1598,6 +1733,9 @@ components:
           type: string
           description: "ENG: The name of the invoice file <br> IT: Il nome del file della fattura"
           maxLength: 255
+        docNumber:
+          type: string
+          maxLength: 255
     PointOfSaleTransactionsListDTO:
       type: object
       properties:
@@ -1833,6 +1971,7 @@ components:
       required:
         - amountCents
         - idTrxAcquirer
+        - additionalProperties
       properties:
         amountCents:
           type: integer
@@ -1965,6 +2104,7 @@ components:
             - PAYMENT_DELETE_NOT_ALLOWED_FOR_TRX_STATUS
             - PAYMENT_UNRELATE_NOT_ALLOWED_FOR_TRX_STATUS
             - PAYMENT_AMOUNT_NOT_VALID
+            - TRX_ADDITIONAL_PROPERTIES_NOT_EXIST
             - PAYMENT_MERCHANT_NOT_ONBOARDED
             - PAYMENT_INVALID_REQUEST
             - PAYMENT_STATUS_NOT_VALID
@@ -1986,6 +2126,9 @@ components:
           type: string
           maxLength: 41943040
           format: binary
+        docNumber:
+          type: string
+          maxLength: 255
     InvoiceDTO:
       type: object
       required:
@@ -1995,6 +2138,9 @@ components:
           type: string
           maxLength: 41943040
           format: binary
+        docNumber:
+          type: string
+          maxLength: 255
     ReportDTO:
       title: ReportDTO
       type: object
