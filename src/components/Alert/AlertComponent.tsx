@@ -10,7 +10,7 @@ interface AlertProps {
 
 const AlertComponent = ({ error, message, sx }: AlertProps) => {
     return (
-        <Box display='flex' height='100%' alignItems='flex-end' justifyContent='flex-end' position='sticky' bottom='128px'>
+        <Box display='flex' height='100%' alignItems='flex-end' justifyContent='flex-end' position='sticky' bottom='128px' zIndex='1300'>
             <Alert
             data-testid="alert"
             severity={error ? 'error' : 'success'}
