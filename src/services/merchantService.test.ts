@@ -11,6 +11,7 @@ import {
   downloadInvoiceFileApi,
   reverseTransactionApi,
   invoiceTransactionApi,
+  updateInvoiceTransactionApi,
   getPreviewPdf,
 } from "./merchantService";
 import { MerchantApi } from "../api/MerchantsApiClient";
@@ -28,6 +29,7 @@ vi.mock("../api/MerchantsApiClient", () => ({
     downloadInvoiceFileApi: vi.fn(),
     reverseTransactionApi: vi.fn(),
     invoiceTransactionApi: vi.fn(),
+    updateInvoiceTransactionApi: vi.fn(),
     getPreviewPdf: vi.fn(),
   },
 }));
@@ -73,6 +75,33 @@ describe("Merchant Service Functions", () => {
       const result = await invoiceTransactionApi("trxId", testFile, "DOC456");
       expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC456");
       expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("updateInvoiceTransactionApi", () => {
+    it("should call MerchantApi.updateInvoiceTransactionApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue({} as any);
+      const testFile = new File([new Blob()], "updatedFileName");
+      const result = await updateInvoiceTransactionApi("trxId", testFile, "DOC789");
+      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC789");
+      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+
+    it("should propagate errors from MerchantApi.updateInvoiceTransactionApi", async () => {
+      const testFile = new File([new Blob()], "fileName");
+      const mockError = new Error("Update failed");
+      vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockRejectedValue(mockError);
+      await expect(updateInvoiceTransactionApi("trxId", testFile, "DOC789")).rejects.toThrow("Update failed");
+      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle different file types", async () => {
+      vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue({} as any);
+      const pdfFile = new File([new Blob()], "invoice.pdf", { type: "application/pdf" });
+      const result = await updateInvoiceTransactionApi("trxId123", pdfFile, "DOC999");
+      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith("trxId123", pdfFile, "DOC999");
       expect(result).toEqual({});
     });
   });
