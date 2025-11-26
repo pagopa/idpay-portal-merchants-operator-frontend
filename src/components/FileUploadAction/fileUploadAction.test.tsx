@@ -366,9 +366,5 @@ describe("fileUploadAction component test", () => {
     await waitFor(() => {
       expect(screen.getByTestId("alert-component")).toBeInTheDocument();
     });
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("alert-component")).not.toBeInTheDocument();
-    }, { timeout: 6000 });
   }, 10000);
 });

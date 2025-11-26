@@ -345,10 +345,10 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             )}
 
             {/* Alerts */}
-            {errorAlert && <AlertComponent error={true} message={alertMessages.error || t('pages.refundManagement.errorAlert')} />}
+            <AlertComponent isOpen={errorAlert} error={true} message={alertMessages.error || t('pages.refundManagement.errorAlert')} />
             {Object.entries(externalState).map(([key, value]) => {
                 if (value && alertMessages[key]) {
-                    return <AlertComponent key={key} error={key.includes('error')} message={alertMessages[key]!} />;
+                    return <AlertComponent isOpen={true} key={key} error={key.includes('error')} message={alertMessages[key]!} />;
                 }
                 return null;
             })}

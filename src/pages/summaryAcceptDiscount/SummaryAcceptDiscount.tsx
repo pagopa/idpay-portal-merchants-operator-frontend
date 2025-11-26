@@ -190,7 +190,7 @@ const SummaryAcceptDiscount = () => {
                 </Box>
             </Box>
         </Box>
-            {errorAlert && <AlertComponent sx={{right: '20px'}} error message={t('pages.acceptDiscount.errorAlert')} />}
+            <AlertComponent isOpen={errorAlert} sx={{right: '20px'}} error message={t('pages.acceptDiscount.errorAlert')} />
         </>
     );
 };
