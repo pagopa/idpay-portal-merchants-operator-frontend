@@ -134,6 +134,14 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         }
     }
 
+    const handleBackNavigation = () => {
+        if(fileDocNumber){
+            navigate(ROUTES.REFUNDS_MANAGEMENT)
+        }else{
+            navigate(ROUTES.BUY_MANAGEMENT)
+        }
+    }
+
     return (
         <Box p={4}>
             <BreadcrumbsBox
@@ -264,7 +272,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 }
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
-                <Button data-testid='back-btn-test' variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>{t('commons.backBtn')}</Button>
+                <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
                 <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
             </Stack>
             {

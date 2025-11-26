@@ -150,8 +150,7 @@ export const DetailsDrawer = ({
           sx={{
             display: "flex",
             flexDirection: "column",
-            padding: "1.5rem",
-            boxShadow: "0 9px 46px 8px #002B551A",
+            padding: "1.5rem"
           }}
         >
           {primaryButton && isInvoiced  && (
