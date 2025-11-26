@@ -14,12 +14,12 @@ const AlertComponent = ({ isOpen, error, message, sx }: AlertProps) => {
         <Slide direction="left" in={isOpen} mountOnEnter unmountOnExit>
             <Box sx={{
                 display: 'flex',
-                heigh: '100%',
                 alignItems: 'flex-end',
                 justifyContent: 'flex-end',
                 position: 'sticky',
                 bottom: '128px',
-                zIndex:'1300'
+                zIndex: '1300',
+                height: '100%'
             }}>
                 <Alert
                 data-testid="alert"

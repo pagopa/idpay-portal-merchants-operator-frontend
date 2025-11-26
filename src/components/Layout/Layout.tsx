@@ -47,7 +47,7 @@ const Layout = ({ children }: Props) => {
           <Grid
             container
             width="100%"
-            sx={{ backgroundColor: '#F5F5F5', '&>div': {width: '100%'}, '& > div': {display: 'flex', flexDirection: 'column', height: '100%'}}}
+            sx={{ overflowX: 'clip', backgroundColor: '#F5F5F5', '&>div': {width: '100%'}, '& > div': {display: 'flex', flexDirection: 'column', height: '100%'}}}
             pb={16}
             pt={2}
             px={2}
@@ -63,6 +63,7 @@ const Layout = ({ children }: Props) => {
           justifyContent="center"
         >
           <Box
+            sx={{overflowX: 'clip'}}
             display="grid"
             pb={16}
             pt={2}
