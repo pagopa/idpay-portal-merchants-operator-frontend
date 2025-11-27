@@ -273,7 +273,8 @@ const RefundManagement = () => {
                     primaryButton={{
                         label: 'Modifica documento',
                         onClick: async () => {
-                            navigate("/modifica-documento/" + selectedTransaction?.id + '/'+ selectedTransaction['Numero fattura']);
+                            navigate(`/modifica-documento/${selectedTransaction?.id}/${btoa(selectedTransaction['Numero fattura'])}`);
+
                         }
                 }}
                     onFileDownloadCallback={downloadInvoiceFile}

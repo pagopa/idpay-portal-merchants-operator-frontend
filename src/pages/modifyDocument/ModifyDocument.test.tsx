@@ -13,7 +13,7 @@ vi.mock("react-i18next", () => ({
                 "pages.modifyDocument.insertInvoice": "Inserisci Fattura",
                 "pages.modifyDocument.invoiceLabel": "Numero Fattura",
                 "routes.refund": "Rimborso",
-                "routes.refundManagement": "Gestione Rimborsi",
+                "routes.refundManagement": "Storico Rimborsi",
             };
             return translations[key] || key;
         },

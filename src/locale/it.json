@@ -93,6 +93,7 @@
       "creditNote": "Carica il documento",
       "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica.",
       "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
+      "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
       "manualLink": "Dubbi? Vai sul manuale",
       "uploadFileButton": "selezionalo dal tuo computer",
       "invoiceTitle": "Qual è il numero  della fattura?",
@@ -343,7 +344,7 @@
     "number": "Inserisci un numero"
   },
   "routes": {
-    "refundManagement" : "Gestione rimborsi",
+    "refundManagement": "Storico rimborsi",
     "buyManagement": "Gestione acquisti",
     "reverse": "Storna transazione",
     "refund": "Carica la fattura"
