@@ -13,6 +13,7 @@ import Reverse from "./pages/reverse/Reverse.tsx";
 import Refund from "./pages/refund/Refund.tsx";
 import PrivacyPolicy from "./pages/privacyPolicy/PrivacyPolicy.tsx";
 import TermsOfService from "./pages/tos/TOS.tsx";
+import ModifyDocument from "./pages/modifyDocument/ModifyDocument.tsx";
 
 function App() {
   return (
@@ -49,6 +50,9 @@ function App() {
         } />
         <Route path={ROUTES.REFUND} element={
           <ProtectedRoute><Layout><Refund /></Layout></ProtectedRoute>
+        } />
+        <Route path={ROUTES.MODIFY_DOCUMENT} element={
+          <ProtectedRoute><Layout><ModifyDocument /></Layout></ProtectedRoute>
         } />
         <Route path="*" element={
           <ProtectedRoute><Layout><Navigate to={ROUTES.BUY_MANAGEMENT} replace /></Layout></ProtectedRoute>
