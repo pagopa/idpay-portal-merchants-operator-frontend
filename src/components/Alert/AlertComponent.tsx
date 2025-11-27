@@ -6,10 +6,11 @@ interface AlertProps {
     isOpen?: boolean;
     error?: boolean;
     message: string;
-    sx?: SxProps<Theme>
+    containerStyle?: SxProps<Theme>;
+    contentStyle?: SxProps<Theme>;
 }
 
-const AlertComponent = ({ isOpen, error, message, sx }: AlertProps) => {
+const AlertComponent = ({ isOpen, error, message, containerStyle, contentStyle }: AlertProps) => {
     return (
         <Slide direction="left" in={isOpen} mountOnEnter unmountOnExit>
             <Box sx={{
@@ -19,14 +20,14 @@ const AlertComponent = ({ isOpen, error, message, sx }: AlertProps) => {
                 position: 'sticky',
                 bottom: '128px',
                 zIndex: '1300',
-                height: '100%'
+                height: '100%',
+                ...containerStyle,
             }}>
                 <Alert
                 data-testid="alert"
                 severity={error ? 'error' : 'success'}
                 icon={error ? <ErrorOutline /> : <CheckCircleOutline />}
                 sx={{
-                    ...sx,
                     position: 'absolute',
                     bottom: '-108px',
                     backgroundColor: 'white',
@@ -39,6 +40,7 @@ const AlertComponent = ({ isOpen, error, message, sx }: AlertProps) => {
                     '& .MuiAlert-icon': {
                         color: error ? '#FF5C5C' : '#6CC66A',
                     },
+                    ...contentStyle,
                 }}
                 >
                     {message}
