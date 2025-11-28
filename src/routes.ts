@@ -9,7 +9,8 @@ const ROUTES = {
     REFUNDS_MANAGEMENT:'/gestione-rimborsi',
     PROFILE:'/profilo',
     REVERSE: '/storna-transazione/:trxId',
-    REFUND: '/richiedi-rimborso/:trxId'
+    REFUND: '/richiedi-rimborso/:trxId',
+    MODIFY_DOCUMENT: '/modifica-documento/:trxId/:fileDocNumber'
 };
 
 export default ROUTES;

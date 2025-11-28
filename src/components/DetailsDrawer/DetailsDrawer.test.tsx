@@ -19,50 +19,52 @@ const mockedTransactionDetails = {
 const testTitle = "This is a test title";
 const testSubtitle = "This is a test subtitle";
 const testItem = mockedTransactionDetails;
-const testPrimaryButton = { label: "primary button", url: "/" };
+const testPrimaryButton = { label: "test primary button", url: "/" };
 const testSecondaryButton = { label: "secondary button", url: "/" };
-let testIsLoading = false;
 
 const DetailsDrawerSetup = (
-  item: Record<string, string | number | JSX.Element>,
-  title: string,
-  subtitle?: string,
-  isLoading?: boolean,
-  primaryButton?: typeof testPrimaryButton,
-  secondaryButton?: typeof testSecondaryButton,
-  onFileDownloadCallback?: () => void
+    item: Record<string, string | number | JSX.Element>,
+    title: string,
+    subtitle?: string,
+    isLoading?: boolean,
+    isInvoiced?: boolean,
+    primaryButton?: typeof testPrimaryButton,
+    secondaryButton?: typeof testSecondaryButton,
+    onFileDownloadCallback?: () => void
 ) => {
   render(
-    <DetailsDrawer
-      isOpen
-      isLoading={isLoading}
-      setIsOpen={() => null}
-      title={title}
-      subtitle={subtitle}
-      item={item}
-      primaryButton={primaryButton}
-      secondaryButton={secondaryButton}
-      onFileDownloadCallback={onFileDownloadCallback}
-    />
+      <DetailsDrawer
+          isOpen
+          isLoading={isLoading}
+          setIsOpen={() => null}
+          title={title}
+          subtitle={subtitle}
+          item={item}
+          isInvoiced={isInvoiced}
+          primaryButton={primaryButton}
+          secondaryButton={secondaryButton}
+          onFileDownloadCallback={onFileDownloadCallback}
+      />
   );
 };
 
 describe("DetailsDrawer", () => {
   it("should render the component with full content", () => {
     DetailsDrawerSetup(
-      testItem,
-      testTitle,
-      testSubtitle,
-      testIsLoading,
-      testPrimaryButton,
-      testSecondaryButton
+        testItem,
+        testTitle,
+        testSubtitle,
+        false,
+        true,
+        testPrimaryButton,
+        testSecondaryButton
     );
 
     const drawerTitle = screen.getByText(testTitle);
     const drawerSubtitle = screen.getByText(testSubtitle);
     const drawerItem = screen.getByTestId("item-test");
-    const drawerPrimaryButton = screen.getByText(testPrimaryButton.label);
-    const drawerSecondaryButton = screen.getByText(testSecondaryButton.label);
+    const drawerPrimaryButton = screen.getByText("test primary button");
+    const drawerSecondaryButton = screen.getByText("secondary button");
 
     expect(drawerTitle).toBeInTheDocument();
     expect(drawerSubtitle).toBeInTheDocument();
@@ -81,59 +83,94 @@ describe("DetailsDrawer", () => {
     expect(drawerItem).toBeInTheDocument();
   });
 
-  it("should click file button", async () => {
+  it("should render only secondary button when isInvoiced is false", () => {
     DetailsDrawerSetup(
-      testItem,
-      testTitle,
-      testSubtitle,
-      testIsLoading,
-      testPrimaryButton,
-      testSecondaryButton,
-      () => console.log("button clicked")
+        testItem,
+        testTitle,
+        testSubtitle,
+        false,
+        false,
+        testPrimaryButton,
+        testSecondaryButton
     );
 
-    const onClick = {
-      click: () => {},
-    };
+    const drawerSecondaryButton = screen.getByText("secondary button");
+    expect(drawerSecondaryButton).toBeInTheDocument();
+    expect(screen.queryByText("test primary button")).not.toBeInTheDocument();
+  });
 
-    const onClickSpy = vi.spyOn(onClick, "click");
+  it("should call file download callback when file button is clicked", async () => {
+    const mockCallback = vi.fn();
+
+    DetailsDrawerSetup(
+        testItem,
+        testTitle,
+        testSubtitle,
+        false,
+        false,
+        undefined,
+        undefined,
+        mockCallback
+    );
 
     const button = screen.getByTestId("btn-test");
-    button.addEventListener("click", onClick.click);
     await userEvent.click(button);
 
-    expect(onClickSpy).toBeCalledTimes(1);
+    expect(mockCallback).toHaveBeenCalledTimes(1);
   });
 
-  it("should close drawer", async () => {
-    DetailsDrawerSetup(
-      testItem,
-      testTitle,
-      testSubtitle,
-      testIsLoading,
-      testPrimaryButton,
-      testSecondaryButton
+  it("should close drawer when close button is clicked", async () => {
+    const mockSetIsOpen = vi.fn();
+
+    render(
+        <DetailsDrawer
+            isOpen
+            isLoading={false}
+            setIsOpen={mockSetIsOpen}
+            title={testTitle}
+            item={testItem}
+        />
     );
 
-    const onClick = {
-      click: () => {},
-    };
+    const closeButton = screen.getByTestId("close-details-drawer-button");
+    await userEvent.click(closeButton);
 
-    const onClickSpy = vi.spyOn(onClick, "click");
-
-    const button = screen.getByTestId("close-details-drawer-button");
-    button.addEventListener("click", onClick.click);
-    await userEvent.click(button);
-
-    expect(onClickSpy).toBeCalledTimes(1);
+    expect(mockSetIsOpen).toHaveBeenCalledWith(false);
   });
 
-  it("should show loader", () => {
-    testIsLoading = true;
-    DetailsDrawerSetup(testItem, testTitle, testSubtitle, testIsLoading);
+  it("should show loader when isLoading is true", () => {
+    DetailsDrawerSetup(testItem, testTitle, testSubtitle, true);
 
     const drawerLoader = screen.getByTestId("item-loader");
 
     expect(drawerLoader).toBeInTheDocument();
+  });
+
+  it("should not show loader when isLoading is false", () => {
+    DetailsDrawerSetup(testItem, testTitle, testSubtitle, false);
+
+    expect(screen.queryByTestId("item-loader")).not.toBeInTheDocument();
+  });
+
+  it("should display file button for download fields", () => {
+    DetailsDrawerSetup(testItem, testTitle);
+
+    const fileButton = screen.getByTestId("btn-test");
+
+    expect(fileButton).toBeInTheDocument();
+    expect(fileButton).toHaveTextContent("file");
+  });
+
+  it("should not render id and cancelled fields", () => {
+    const itemWithIdAndCancelled = {
+      ...testItem,
+      id: "123",
+      cancelled: true,
+    };
+
+    DetailsDrawerSetup(itemWithIdAndCancelled, testTitle);
+
+    expect(screen.queryByText("id")).not.toBeInTheDocument();
+    expect(screen.queryByText("cancelled")).not.toBeInTheDocument();
   });
 });
