@@ -20,7 +20,7 @@ const RefundManagement = () => {
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [downloadInProgress, setDownloadInProgress] = useState(false);
-    const [status, setStatus] = useState<string>();
+    const [status, setStatus] = useState<'INVOICED' | 'REWARDED' | 'REFUNDED' | 'CANCELLED'>();
     const { t } = useTranslation();
     const location = useLocation();
     const token = authStore.getState().token;
@@ -269,7 +269,7 @@ const RefundManagement = () => {
                     isOpen={isOpen}
                     title={t('pages.purchaseManagement.drawer.title')}
                     item={selectedTransaction}
-                    isInvoiced={status === 'INVOICED'}
+                    invoiceStatus={status}
                     primaryButton={{
                         label: 'Modifica documento',
                         onClick: async () => {
