@@ -87,6 +87,19 @@
       "title": "Accetta un buono sconto",
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
+    "modifyDocument": {
+      "title":"Carica la fattura",
+      "replaceFile":"Sostituisci",
+      "creditNote": "Carica il documento",
+      "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica.",
+      "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
+      "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
+      "manualLink": "Dubbi? Vai sul manuale",
+      "uploadFileButton": "selezionalo dal tuo computer",
+      "invoiceTitle": "Qual è il numero  della fattura?",
+      "insertInvoice": "Inserisci il numero della fattura",
+      "invoiceLabel": "Numero della fattura"
+    },
     "refund":{
       "title":"Carica la fattura",
       "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
@@ -331,6 +344,7 @@
     "number": "Inserisci un numero"
   },
   "routes": {
+    "refundManagement": "Storico rimborsi",
     "buyManagement": "Gestione acquisti",
     "reverse": "Storna transazione",
     "refund": "Carica la fattura"

@@ -1,5 +1,5 @@
 import {Box, Typography, Link, Stack, Button, Alert, TextField} from '@mui/material';
-import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox'; 
+import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox';
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,22 +11,28 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AlertComponent from '../Alert/AlertComponent';
 import {REQUIRED_FIELD_ERROR} from "../../utils/constants.ts";
 
+interface BreadcrumbsProps {
+    label: string;
+    path: string;
+}
+
 
 interface FileUploadActionProps {
-    titleKey: string;   
-    subtitleKey: string;    
-    i18nBlockKey: string;   
+    titleKey: string;
+    subtitleKey: string;
+    i18nBlockKey: string;
     apiCall: (trxId: string, file: File, docNumber: string) => Promise<any>;
-    successStateKey: string; 
-    breadcrumbsLabelKey: string; 
-    manualLink: string; 
+    successStateKey: string;
+    breadcrumbsLabelKey: string;
+    breadcrumbsProp: BreadcrumbsProps;
+    manualLink: string;
     styleClass: string;
     docNumberTitle: string;
     docNumberInsert: string;
     docNumberLabel: string;
 }
 
-const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; 
+const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
 
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
@@ -36,6 +42,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     apiCall,
     successStateKey,
     breadcrumbsLabelKey,
+    breadcrumbsProp,
     manualLink,
     docNumberTitle,
     docNumberInsert,
@@ -53,7 +60,13 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { trxId } = useParams<{ trxId: string }>();
+    const { trxId , fileDocNumber } = useParams<{ trxId: string,fileDocNumber: string }>();
+
+    useEffect(() => {
+        if(fileDocNumber){
+            setDocNumber(atob(fileDocNumber));
+        }
+    }, []);
 
     useEffect(() => {
         if (errorAlert) {
@@ -86,7 +99,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     const handleRemoveFile = () => {
         setFile(null);
         if (fileInputRef.current) {
-             fileInputRef.current.value = ''; 
+             fileInputRef.current.value = '';
         }
     };
 
@@ -108,9 +121,9 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             try {
                 await apiCall(trxId, file, docNumber);
                 setLoadingFile(false);
-                navigate(ROUTES.BUY_MANAGEMENT, {
+                navigate(breadcrumbsProp?.path, {
                     state: {
-                        [successStateKey]: true 
+                        [successStateKey]: true
                     }
                 });
             } catch (error) {
@@ -121,14 +134,22 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         }
     }
 
+    const handleBackNavigation = () => {
+        if(fileDocNumber){
+            navigate(ROUTES.REFUNDS_MANAGEMENT)
+        }else{
+            navigate(ROUTES.BUY_MANAGEMENT)
+        }
+    }
+
     return (
     <>
         <Box p={4} maxWidth='75%' justifySelf='center' >
             <BreadcrumbsBox
                 backLabel={t('commons.exitBtn')}
-                items={[{ label: t('routes.buyManagement'), path: ROUTES.BUY_MANAGEMENT }, { label: breadcrumbsLabelKey, path: ROUTES.REVERSE }]}
+                items={[{ label: breadcrumbsProp?.label, path: breadcrumbsProp?.path }, { label: breadcrumbsLabelKey, path: ROUTES.REVERSE }]}
                 active={true}
-                onClickBackButton={() => navigate(ROUTES.BUY_MANAGEMENT)}
+                onClickBackButton={() => navigate(breadcrumbsProp?.path)}
             />
             <TitleBox
                 title={t(titleKey)}
@@ -182,7 +203,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
                 <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t(`${i18nBlockKey}.creditNote`)}</Typography>
                 <Typography variant="body2" mt={4} mb={1} sx={{marginTop: '32px !important'}}>{t(`${i18nBlockKey}.creditNoteSubtitle`)}</Typography>
-                <Link  onClick={() => window.open(manualLink || '', '_blank')} sx={{ fontWeight: theme.typography.fontWeightMedium, cursor: 'pointer', fontSize: '14px' }}>{t(`${i18nBlockKey}.manualLink`)}</Link>
+                <Link onClick={() => window.open(manualLink || '', '_blank')} sx={{cursor: 'pointer', fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t(`${i18nBlockKey}.manualLink`)}</Link>
                 {
                     fileSizeError && (
                         <Box mt={2}>
@@ -221,7 +242,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                         loading={loadingFile}
                     />
                 </Box>
-                
+
                 <input
                     type="file"
                     accept='application/pdf, application/xml'
@@ -233,7 +254,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                         if (selectedFile) {
                             handleFileSelect(selectedFile);
                         }
-                        e.target.value = ''; 
+                        e.target.value = '';
                     }}
                 />
 
@@ -252,9 +273,15 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 }
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
-                <Button data-testid='back-btn-test' variant="outlined" onClick={() => navigate(ROUTES.BUY_MANAGEMENT)}>{t('commons.backBtn')}</Button>
+                <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
                 <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
             </Stack>
+            <AlertComponent
+                data-testid='alert-component'
+                error={true}
+                message={t('pages.reverse.errorAlert')}
+                isOpen={errorAlert}
+            />
         </Box>
         <AlertComponent isOpen={errorAlert} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{right: '20px'}} />
     </>

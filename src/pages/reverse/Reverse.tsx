@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { reverseTransactionApi } from '../../services/merchantService';
 import FileUploadAction from '../../components/FileUploadAction/FileUploadAction';
-import styles from './reverse.module.css'; 
+import styles from './reverse.module.css';
+import ROUTES from "../../routes.ts";
 
 const Reverse = () => {
     const { t } = useTranslation();
@@ -14,6 +15,10 @@ const Reverse = () => {
             apiCall={reverseTransactionApi}
             successStateKey="reverseUploadSuccess"
             breadcrumbsLabelKey={t('routes.reverse')}
+            breadcrumbsProp={{
+                label: t('routes.buyManagement'),
+                path: ROUTES.BUY_MANAGEMENT,
+            }}
             manualLink={import.meta.env.VITE_MANUAL_LINK}
             styleClass={styles.uploadFileContainer}
             docNumberTitle={t("pages.reverse.creditNoteTitle")}
