@@ -22,12 +22,12 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   isLoading?: boolean;
-  isInvoiced?: boolean;
   title: string;
   subtitle?: string;
   item: unknown;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
+  invoiceStatus?: 'INVOICED' | 'REWARDED' | 'REFUNDED' | 'CANCELLED';
   onFileDownloadCallback?: () => void;
 };
 
@@ -40,7 +40,7 @@ export const DetailsDrawer = ({
   item,
   primaryButton,
   secondaryButton,
-  onFileDownloadCallback,isInvoiced
+  onFileDownloadCallback, invoiceStatus
 }: Props) => {
   const itemsEntries = Object.entries(item).reduce(
     (acc, [key, value]) => [
@@ -153,11 +153,12 @@ export const DetailsDrawer = ({
             padding: "1.5rem"
           }}
         >
-          {primaryButton && isInvoiced  && (
+          {primaryButton && (invoiceStatus === 'INVOICED' || invoiceStatus === 'REWARDED') && (
             <Button
               onClick={primaryButton?.onClick}
               href={primaryButton?.url}
               variant="contained"
+              disabled={invoiceStatus === 'REWARDED'}
             >
               {primaryButton.label}
             </Button>
