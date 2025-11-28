@@ -218,9 +218,7 @@ describe("RefundManagement", () => {
 
     renderComponent();
 
-    await screen.findByTestId("alert");
-
-    expect(screen.getByText("Si è verificato un errore.")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Si è verificato un errore.")).toBeInTheDocument() );
     expect(screen.queryByTestId("data-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
   });

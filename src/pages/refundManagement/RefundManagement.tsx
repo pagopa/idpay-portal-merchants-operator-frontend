@@ -285,6 +285,7 @@ const RefundManagement = () => {
                 transactionReverseSuccess,
                 errorDownloadAlert
             }}
+            isDrawerOpen={isOpen}
         />
     );
 };

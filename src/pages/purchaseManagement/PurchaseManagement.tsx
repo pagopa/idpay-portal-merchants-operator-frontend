@@ -509,6 +509,7 @@ const PurchaseManagement = () => {
                     transactionReverseSuccess,
                     transactionDeleteSuccess
                 }}
+                isDrawerOpen={openDrawer}
             />
 
             <ModalComponent open={cancelTransactionModal || captureTransactionModal} onClose={() => {

@@ -33,6 +33,7 @@ interface TransactionsLayoutProps {
     noDataMessage: string;
     onRowAction: (row: any) => void;
     DrawerComponent?: React.ReactNode;
+    isDrawerOpen?: boolean;
     externalState?: {
         [key: string]: any;
     };
@@ -53,6 +54,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     onRowAction,
     DrawerComponent,
     triggerFetchTransactions,
+    isDrawerOpen,
     externalState = {}
 }) => {
     const [gtinError, setGtinError] = useState<string>('')
@@ -345,10 +347,12 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             )}
 
             {/* Alerts */}
-            {errorAlert && <AlertComponent error={true} message={alertMessages.error || t('pages.refundManagement.errorAlert')} />}
+            <AlertComponent isOpen={errorAlert} error={true} message={alertMessages.error || t('pages.refundManagement.errorAlert')} />
             {Object.entries(externalState).map(([key, value]) => {
-                if (value && alertMessages[key]) {
-                    return <AlertComponent key={key} error={key.includes('error')} message={alertMessages[key]!} />;
+                const isError = key.includes('error')
+                const isOpen = value && (isError ? isDrawerOpen : !isDrawerOpen)
+                if (alertMessages[key]) {
+                    return <AlertComponent containerStyle={isError && {height: 'fit-content', position: 'fixed', bottom: '20px', right: '20px'}} contentStyle={isError && {position: 'unset', bottom: '0', right: '0'}} isOpen={isOpen} key={key} error={isError} message={alertMessages[key]!} />;
                 }
                 return null;
             })}

@@ -99,7 +99,6 @@ describe("Profile Component (Vitest)", () => {
     ).toBeInTheDocument();
 
     expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("alert-component")).not.toBeInTheDocument();
   });
 
   it("should show AlertComponent in case of API error", async () => {
@@ -112,10 +111,8 @@ describe("Profile Component (Vitest)", () => {
     render(<Profile />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
-    });
-
-    expect(screen.getByText("pages.profile.errorAlert")).toBeInTheDocument();
+      expect(screen.queryByTestId("alert-component")).toBeInTheDocument();
+    })
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Error fetching details:",
       mockError

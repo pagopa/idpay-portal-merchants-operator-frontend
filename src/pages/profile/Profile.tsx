@@ -106,7 +106,7 @@ const Profile = () => {
       )
       } 
       
-      {errorAlert && <AlertComponent error={true} message={t('pages.profile.errorAlert')} />}
+      <AlertComponent data-testid='alert-component' isOpen={errorAlert} error={true} message={t('pages.profile.errorAlert')} />
     </Box>
   );
 };
