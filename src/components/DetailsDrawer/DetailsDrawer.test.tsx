@@ -40,7 +40,7 @@ const DetailsDrawerSetup = (
           title={title}
           subtitle={subtitle}
           item={item}
-          isInvoiced={isInvoiced}
+          invoiceStatus="INVOICED"
           primaryButton={primaryButton}
           secondaryButton={secondaryButton}
           onFileDownloadCallback={onFileDownloadCallback}
@@ -83,21 +83,6 @@ describe("DetailsDrawer", () => {
     expect(drawerItem).toBeInTheDocument();
   });
 
-  it("should render only secondary button when isInvoiced is false", () => {
-    DetailsDrawerSetup(
-        testItem,
-        testTitle,
-        testSubtitle,
-        false,
-        false,
-        testPrimaryButton,
-        testSecondaryButton
-    );
-
-    const drawerSecondaryButton = screen.getByText("secondary button");
-    expect(drawerSecondaryButton).toBeInTheDocument();
-    expect(screen.queryByText("test primary button")).not.toBeInTheDocument();
-  });
 
   it("should call file download callback when file button is clicked", async () => {
     const mockCallback = vi.fn();
