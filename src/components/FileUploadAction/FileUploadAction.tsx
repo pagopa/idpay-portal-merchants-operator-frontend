@@ -143,7 +143,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     }
 
     return (
-        <Box p={4}>
+    <>
+        <Box p={4} maxWidth='75%' justifySelf='center' >
             <BreadcrumbsBox
                 backLabel={t('commons.exitBtn')}
                 items={[{ label: breadcrumbsProp?.label, path: breadcrumbsProp?.path }, { label: breadcrumbsLabelKey, path: ROUTES.REVERSE }]}
@@ -275,16 +276,9 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
                 <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
             </Stack>
-            {
-                errorAlert && (
-                    <AlertComponent
-                        data-testid='alert-component'
-                        error={true}
-                        message={t('pages.reverse.errorAlert')}
-                    />
-                )
-            }
         </Box>
+        <AlertComponent isOpen={errorAlert} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{right: '20px'}} />
+    </>
     );
 };
 
