@@ -288,7 +288,11 @@ const AcceptDiscount = () => {
           <Grid size={{ xs: 12, md: 12, lg: 12 }}>
             <AcceptDiscountCard
               titleBox={t("pages.acceptDiscount.whatDiscountCode")}
-              subTitleBox={t("pages.acceptDiscount.insertDiscountCode")}
+              subTitleBox={
+                t("pages.acceptDiscount.insertDiscountCode")
+                    .split("\n")
+                    .map((line, i) => <div key={i}>{line}</div>)
+              }
               inputTitle={"Inserisci codice sconto"}
             >
               <TextField
