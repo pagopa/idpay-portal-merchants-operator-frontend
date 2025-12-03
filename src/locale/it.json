@@ -203,7 +203,7 @@
       "expenditureAmount": "Importo della spesa",
       "whatDiscountCode": "Qual è il codice sconto?",
       "discountCode": "Codice sconto",
-      "insertDiscountCode": "Inserisci il codice sconto generato dal cliente.",
+      "insertDiscountCode": "Inserisci il codice sconto generato dal cliente. Se il codice viene generato su IO, è dinamico e scade dopo 15 minuti.\nSe è scaduto, chiedi al cliente di generare un nuovo codice dall’app IO.",
       "noOptionsText": "Nessun risultato",
       "loadingText": "Caricamento...",
       "errorAlert": "Non è stato possibile finalizzare l' operazione. Riprova.",
