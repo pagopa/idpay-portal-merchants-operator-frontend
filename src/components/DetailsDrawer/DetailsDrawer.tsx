@@ -48,7 +48,7 @@ export const DetailsDrawer = ({
   const [isScrollable, setIsScrollable] = useState(false);
 
   useEffect(() => {
-    if (isOpen && invoiceStatus === "INVOICED") {
+    if (isOpen && (invoiceStatus === "INVOICED" || invoiceStatus === "REWARDED")) {
       setTimeout(() => {
         checkHeight();
       }, 100);
