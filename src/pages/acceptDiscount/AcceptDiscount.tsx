@@ -203,6 +203,7 @@ const AcceptDiscount = () => {
 
   return (
     <>
+    <Box maxWidth='75%' justifySelf='center'>
       <Backdrop
         sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
         open={previewIsLoading}
@@ -287,7 +288,11 @@ const AcceptDiscount = () => {
           <Grid size={{ xs: 12, md: 12, lg: 12 }}>
             <AcceptDiscountCard
               titleBox={t("pages.acceptDiscount.whatDiscountCode")}
-              subTitleBox={t("pages.acceptDiscount.insertDiscountCode")}
+              subTitleBox={
+                t("pages.acceptDiscount.insertDiscountCode")
+                    .split("\n")
+                    .map((line, i) => <div key={i}>{line}</div>)
+              }
               inputTitle={"Inserisci codice sconto"}
             >
               <TextField
@@ -348,13 +353,9 @@ const AcceptDiscount = () => {
             </Button>
           </Box>
         </ModalComponent>
-        {errorAlert && (
-          <AlertComponent
-            error={true}
-            message={t("pages.acceptDiscount.errorAlert")}
-          />
-        )}
       </Box>
+    </Box>
+      <AlertComponent isOpen={errorAlert} contentStyle={{right: '20px'}} error message={t("pages.acceptDiscount.errorAlert")}/>
     </>
   );
 };

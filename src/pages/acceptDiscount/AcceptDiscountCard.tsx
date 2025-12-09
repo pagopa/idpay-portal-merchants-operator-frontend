@@ -6,7 +6,7 @@ import {TitleBox} from "@pagopa/selfcare-common-frontend/lib";
 interface Props {
     titleBox?: string;
     children?: ReactNode;
-    subTitleBox?: string;
+    subTitleBox?: any;
     inputTitle?: string;
 }
 

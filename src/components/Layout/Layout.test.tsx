@@ -82,8 +82,6 @@ describe("Layout component", () => {
         <div data-testid="child">ChildContent</div>
       </Layout>
     );
-    const childBox = screen.getByTestId("child").parentElement;
-    expect(childBox).toHaveStyle({ maxWidth: "75%" });
 
     (useLocation as vi.Mock).mockReturnValue({ pathname: ROUTES.TOS });
     rerender(
@@ -91,8 +89,6 @@ describe("Layout component", () => {
         <div data-testid="child">ChildContent</div>
       </Layout>
     );
-    const childBox2 = screen.getByTestId("child").parentElement;
-    expect(childBox2).toHaveStyle({ maxWidth: "75%" });
   });
 
   it("should change layout when SideMenu is closed", async () => {
