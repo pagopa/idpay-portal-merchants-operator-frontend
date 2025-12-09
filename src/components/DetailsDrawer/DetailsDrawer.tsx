@@ -48,10 +48,15 @@ export const DetailsDrawer = ({
   const [isScrollable, setIsScrollable] = useState(false);
 
   useEffect(() => {
-    if (isOpen) setTimeout(() => {
-      checkHeight();
-    }, 100);
-  }, [isOpen])
+    if (isOpen && invoiceStatus === "INVOICED") {
+      setTimeout(() => {
+        checkHeight();
+      }, 100);
+    } else {
+      setIsScrollable(false);
+    }
+
+  }, [isOpen, invoiceStatus])
 
   const itemsEntries = Object.entries(item).reduce(
     (acc, [key, value]) => [
@@ -64,7 +69,7 @@ export const DetailsDrawer = ({
   const checkHeight = () => {
     if (gridRef.current) {
       const gridHeight = gridRef.current.scrollHeight;
-      const maxHeight = window.innerHeight - 290;
+      const maxHeight = window.innerHeight - 200;
       setIsScrollable(gridHeight > maxHeight);
     }
   };
@@ -76,11 +81,11 @@ export const DetailsDrawer = ({
       sx={{
         "& .MuiDrawer-paper": {
           width: 375,
-          boxSizing: "border-box",
+          boxSizing: "border-box"
         },
       }}
     >
-      <Box p={"1.5rem"} sx={{ position: "relative", height: "100%" }}>
+      <Box p={"1.5rem"} sx={{ position: "relative" }}>
         <Box
           sx={{
             display: "flex",
@@ -125,7 +130,7 @@ export const DetailsDrawer = ({
             return (
               key !== "id" &&
               key !== "cancelled" && (
-                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }} sx={{wordWrap: 'break-word'}}>
+                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }} sx={{ wordWrap: 'break-word' }}>
                   <Typography
                     variant="body2"
                     sx={{
