@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import {
   Divider,
   Grid,
@@ -40,8 +41,23 @@ export const DetailsDrawer = ({
   item,
   primaryButton,
   secondaryButton,
-  onFileDownloadCallback, invoiceStatus
+  onFileDownloadCallback,
+  invoiceStatus
 }: Props) => {
+  const gridRef = useRef(null);
+  const [isScrollable, setIsScrollable] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && (invoiceStatus === "INVOICED" || invoiceStatus === "REWARDED")) {
+      setTimeout(() => {
+        checkHeight();
+      }, 100);
+    } else {
+      setIsScrollable(false);
+    }
+
+  }, [isOpen, invoiceStatus])
+
   const itemsEntries = Object.entries(item).reduce(
     (acc, [key, value]) => [
       ...acc,
@@ -49,6 +65,15 @@ export const DetailsDrawer = ({
     ],
     []
   );
+
+  const checkHeight = () => {
+    if (gridRef.current) {
+      const gridHeight = gridRef.current.scrollHeight;
+      const maxHeight = window.innerHeight - 200;
+      setIsScrollable(gridHeight > maxHeight);
+    }
+  };
+
   return (
     <Drawer
       anchor="right"
@@ -56,11 +81,11 @@ export const DetailsDrawer = ({
       sx={{
         "& .MuiDrawer-paper": {
           width: 375,
-          boxSizing: "border-box",
+          boxSizing: "border-box"
         },
       }}
     >
-      <Box p={"1.5rem"} sx={{ position: "relative", height: "100%" }}>
+      <Box p={"1.5rem"} sx={{ position: "relative" }}>
         <Box
           sx={{
             display: "flex",
@@ -94,51 +119,55 @@ export const DetailsDrawer = ({
           </>
         )}
 
-        <Grid container spacing={2} data-testId="item-test">
+        <Grid container spacing={2} ref={gridRef} sx={{
+          overflowY: isScrollable ? 'auto' : 'visible',
+          maxHeight: isScrollable ? 'calc(100vh - 200px)' : 'none',
+          maxWidth: '100%'
+        }} data-testId="item-test">
           {itemsEntries.map(([key, value], index) => {
             const isDownload = key === "Fattura" || key === "Nota di credito";
 
             return (
               key !== "id" &&
               key !== "cancelled" && (
-                    <Grid key={index} size={{xs: 12, md: 12, lg: 12}}>
-                    <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: theme.typography.fontWeightRegular,
-                          color: theme.palette.text.secondary,
-                        }}
+                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }} sx={{ wordWrap: 'break-word' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: theme.typography.fontWeightRegular,
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    {key}
+                  </Typography>
+                  {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
+                    <Button
+                      data-testid="btn-test"
+                      sx={{ padding: "0" }}
+                      onClick={() => {
+                        if (onFileDownloadCallback) onFileDownloadCallback();
+                      }}
                     >
-                      {key}
+                      {isLoading ? (
+                        <CircularProgress
+                          color="inherit"
+                          size={20}
+                          data-testid="item-loader" />
+                      ) : (
+                        <>
+                          <ReceiptLong /> {value}
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: theme.typography.fontWeightMedium }}
+                    >
+                      {value}
                     </Typography>
-                    {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
-                        <Button
-                            data-testid="btn-test"
-                            sx={{padding: "0"}}
-                            onClick={() => {
-                              if (onFileDownloadCallback) onFileDownloadCallback();
-                            }}
-                        >
-                          {isLoading ? (
-                              <CircularProgress
-                                  color="inherit"
-                                  size={20}
-                                  data-testid="item-loader"/>
-                          ) : (
-                              <>
-                                <ReceiptLong/> {value}
-                              </>
-                          )}
-                        </Button>
-                    ) : (
-                        <Typography
-                            variant="body2"
-                            sx={{fontWeight: theme.typography.fontWeightMedium}}
-                        >
-                          {value}
-                        </Typography>
-                    )}
-                  </Grid>
+                  )}
+                </Grid>
               )
             );
           })}
@@ -148,6 +177,9 @@ export const DetailsDrawer = ({
       {(primaryButton || secondaryButton) && (
         <Box
           sx={{
+            position: 'absolute',
+            bottom: 0,
+            width: '100%',
             display: "flex",
             flexDirection: "column",
             padding: "1.5rem"
