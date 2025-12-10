@@ -26,7 +26,6 @@ const cmpList = (alertList: AlertProps) => {
                     width: 'auto',
                     maxWidth: '400px',
                     minWidth: '300px',
-                    zIndex: 1300,
                     boxShadow: 3,
                     borderRadius: 1,
                     '& .MuiAlert-icon': {
@@ -49,7 +48,7 @@ const AlertListComponent = ({ alertList, containerStyle, contentStyle }: Props) 
             justifyContent: 'flex-end',
             position: 'sticky',
             bottom: '128px',
-            zIndex: '1300',
+            zIndex: '1150',
             height: '100%',
             ...containerStyle,
         }}>
@@ -60,7 +59,6 @@ const AlertListComponent = ({ alertList, containerStyle, contentStyle }: Props) 
                 position: 'absolute',
                 bottom: '-108px',
                 width: 'fit-content',
-                zIndex: 1300,
                 ...contentStyle,
             }}>
                 {cmpList(alertList)}
