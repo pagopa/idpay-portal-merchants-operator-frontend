@@ -105,6 +105,25 @@ const RefundManagement = () => {
         }
     };
 
+    const checkTooltipValue = (params, key?: string) => {
+         if(key){
+            if (params?.value?.[key]) {
+                return renderCellWithTooltip(params.value?.[key]);
+            }
+        }
+        if (params?.value) {
+            return renderCellWithTooltip(params.value);
+        }
+        return renderMissingDataWithTooltip();
+    };
+
+    const checkEuroTooltip = (params) => {
+        if (params?.value || params?.value === 0) {
+            return renderCellWithTooltip(formatEuro(params.value));
+        }
+        return renderMissingDataWithTooltip();
+    };
+
     const columns = [
         {
             field: 'additionalProperties',
@@ -114,10 +133,7 @@ const RefundManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value?.productName) {
-                    return renderCellWithTooltip(params.value?.productName);
-                }
-                return renderMissingDataWithTooltip();
+                return checkTooltipValue(params, 'productName');
             },
         },
         {
@@ -146,10 +162,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
-                    return renderCellWithTooltip(params.value);
-                }
-                return renderMissingDataWithTooltip();
+                return checkTooltipValue(params);
             },
         },
         {
@@ -162,10 +175,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return renderCellWithTooltip(formatEuro(params.value));
-                }
-                return renderMissingDataWithTooltip();
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -178,10 +188,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return renderCellWithTooltip(formatEuro(params.value));
-                }
-                return renderMissingDataWithTooltip();
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -194,10 +201,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return renderCellWithTooltip(formatEuro(params.value));
-                }
-                return renderMissingDataWithTooltip();
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -209,7 +213,7 @@ const RefundManagement = () => {
             alignVertical: 'center',
             renderCell: (params: GridRenderCellParams) => {
                 return (
-                    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}> 
+                    <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
                         <Tooltip title={getChipLabel(params.value)}>
                             {getStatusChip(t, params.value)}
                         </Tooltip>

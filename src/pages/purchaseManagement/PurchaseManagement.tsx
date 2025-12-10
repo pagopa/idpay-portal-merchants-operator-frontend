@@ -100,16 +100,21 @@ const PurchaseManagement = () => {
         }
     };
 
-    const checkTooltipValue = (params, key) => {
-        if (params?.value?.[key]) {
-            return renderCellWithTooltip(params.value?.[key]);
+    const checkTooltipValue = (params, key?: string) => {
+        if(key){
+            if (params?.value?.[key]) {
+                return renderCellWithTooltip(params.value?.[key]);
+            }
+        }
+        if (params?.value) {
+            return renderCellWithTooltip(params.value);
         }
         return renderMissingDataWithTooltip();
     };
 
-    const checkEuroTooltip = (params, key) => {
-        if (params?.value?.[key] || params?.value?.[key] === 0) {
-            return renderCellWithTooltip(formatEuro(params.value?.[key]));
+    const checkEuroTooltip = (params) => {
+        if (params?.value || params?.value === 0) {
+            return renderCellWithTooltip(formatEuro(params.value));
         }
         return renderMissingDataWithTooltip();
     };
@@ -152,7 +157,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                return checkTooltipValue(params, 'fiscalCode');
+                return checkTooltipValue(params);
             },
         },
         {
@@ -165,7 +170,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                return checkEuroTooltip(params, 'effectiveAmountCents');
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -178,7 +183,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                return checkEuroTooltip(params, 'rewardAmountCents');
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -191,7 +196,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                return checkEuroTooltip(params, 'residualAmountCents');
+                return checkEuroTooltip(params);
             }
         },
         {
