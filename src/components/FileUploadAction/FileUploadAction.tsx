@@ -56,7 +56,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
     const [fileTypeError, setFileTypeError] = useState<boolean>(false);
     const [loadingFile, setLoadingFile] = useState<boolean>(false);
-    const [errorAlert, setErrorAlert] = useState<boolean>(false);
+    const [errorAlert, setErrorAlert] = useState({isOpen: false, message: ""});
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +71,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     useEffect(() => {
         if (errorAlert) {
             const timer = setTimeout(() => {
-                setErrorAlert(false);
+                setErrorAlert({ ...errorAlert, isOpen: false});
             }, 5000);
             return () => clearTimeout(timer);
         }
@@ -127,8 +127,10 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     }
                 });
             } catch (error) {
+                const errorCode = error.response?.data?.code === "REWARD_BATCH_ALREADY_SENT"
+                const errorMessage = errorCode ? t('pages.reverse.alreadySentError') : t('pages.reverse.errorAlert')
                 console.error('API Error:', error);
-                setErrorAlert(true);
+                setErrorAlert({isOpen: true, message: errorMessage});
                 setLoadingFile(false);
             }
         }
@@ -277,7 +279,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
             </Stack>
         </Box>
-        <AlertComponent isOpen={errorAlert} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{right: '20px'}} />
+        <AlertComponent isOpen={errorAlert.isOpen} data-testid='alert-component' error message={errorAlert.message} contentStyle={{right: '20px'}} />
     </>
     );
 };
