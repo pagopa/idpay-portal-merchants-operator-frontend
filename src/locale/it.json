@@ -324,7 +324,7 @@
       "replaceFile": "Sostituisci",
       "fileSizeError": "Il file supera la dimensione massima di 20MB",
       "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova.",
-      "alreadySentError": "Impossibile caricare la fattura: richiesta di rimborso già inoltrata.",
+      "alreadySentError": "Non puoi modificare questo documento perché è già stato inviato per il rimborso.",
       "creditNoteTitle": "Qual è il numero della nota di credito?",
       "insertCreditNote": "Inserisci il numero della nota di credito",
       "creditNoteLabel": "Numero della nota di credito"
