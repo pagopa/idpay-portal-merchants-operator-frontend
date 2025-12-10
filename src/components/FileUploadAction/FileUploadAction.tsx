@@ -127,8 +127,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     }
                 });
             } catch (error) {
-                const errorCode = error.response.data.code
-                const errorMessage = errorCode === "REWARD_BATCH_ALREADY_SENT" ? t('pages.reverse.alreadySentError') : t('pages.reverse.errorAlert')
+                const errorCode = error.response?.data?.code === "REWARD_BATCH_ALREADY_SENT"
+                const errorMessage = errorCode ? t('pages.reverse.alreadySentError') : t('pages.reverse.errorAlert')
                 console.error('API Error:', error);
                 setErrorAlert({isOpen: true, message: errorMessage});
                 setLoadingFile(false);
