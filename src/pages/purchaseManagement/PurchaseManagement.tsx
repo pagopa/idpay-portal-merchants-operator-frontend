@@ -100,6 +100,20 @@ const PurchaseManagement = () => {
         }
     };
 
+    const checkTooltipValue = (params, key) => {
+        if (params?.value?.[key]) {
+            return renderCellWithTooltip(params.value?.[key]);
+        }
+        return renderMissingDataWithTooltip();
+    };
+
+    const checkEuroTooltip = (params, key) => {
+        if (params?.value?.[key] || params?.value?.[key] === 0) {
+            return renderCellWithTooltip(formatEuro(params.value?.[key]));
+        }
+        return renderMissingDataWithTooltip();
+    };
+
     const columns = [
         {
             field: "additionalProperties",
@@ -109,10 +123,7 @@ const PurchaseManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params?.value?.productName) {
-                    return renderCellWithTooltip(params.value?.productName);
-                }
-                return renderMissingDataWithTooltip();
+                return checkTooltipValue(params, 'productName');
             },
         },
         {
@@ -141,10 +152,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
-                    return renderCellWithTooltip(params.value);
-                }
-                return renderMissingDataWithTooltip();
+                return checkTooltipValue(params, 'fiscalCode');
             },
         },
         {
@@ -157,10 +165,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return renderCellWithTooltip(formatEuro(params.value));
-                }
-                return renderMissingDataWithTooltip();
+                return checkEuroTooltip(params, 'effectiveAmountCents');
             }
         },
         {
@@ -173,10 +178,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return renderCellWithTooltip(formatEuro(params.value));
-                }
-                return renderMissingDataWithTooltip();
+                return checkEuroTooltip(params, 'rewardAmountCents');
             }
         },
         {
@@ -189,10 +191,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return renderCellWithTooltip(formatEuro(params.value));
-                }
-                return renderMissingDataWithTooltip();
+                return checkEuroTooltip(params, 'residualAmountCents');
             }
         },
         {
