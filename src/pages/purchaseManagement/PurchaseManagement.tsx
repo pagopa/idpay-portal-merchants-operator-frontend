@@ -99,7 +99,7 @@ const PurchaseManagement = () => {
                 return t('pages.refundManagement.error');
         }
     };
-
+      
     const columns = [
         {
             field: "additionalProperties",
