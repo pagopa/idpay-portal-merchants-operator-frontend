@@ -1,6 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { getStatusChip, formatEuro, handleGtinChange, downloadFileFromBase64, filterInputWithSpaceRule } from "./helpers";
+import { 
+  getStatusChip, 
+  formatEuro, 
+  handleGtinChange, 
+  downloadFileFromBase64, 
+  filterInputWithSpaceRule,
+  renderCellWithTooltip,
+  renderMissingDataWithTooltip,
+  checkTooltipValue,
+  checkEuroTooltip
+} from "./helpers";
+import { MISSING_DATA_PLACEHOLDER } from "./constants";
 
 describe("getStatusChip", () => {
   const mockT = (key: string) => key;
@@ -61,7 +72,6 @@ describe("formatEuro", () => {
     expect(formatEuro(99)).toBe("0,99€");
   });
 });
-
 
 describe("handleGtinChange", () => {
   let mockFormik: any;
@@ -136,11 +146,13 @@ describe("handleGtinChange", () => {
     expect(result).toBe("");
   });
 });
+
 describe("filterInputWithSpaceRule", () => {
-  it("rimuove tutti gli spazi se meno di 2 caratteri alfanumerici", () => {
+  it("rimuove tutti gli spazi se meno di 5 caratteri alfanumerici", () => {
     expect(filterInputWithSpaceRule(" a ")).toBe("a");
     expect(filterInputWithSpaceRule("   ")).toBe("");
     expect(filterInputWithSpaceRule(" 1 ")).toBe("1");
+    expect(filterInputWithSpaceRule("a b c")).toBe("abc");
   });
 
   it("normalizza gli spazi tra parole", () => {
@@ -166,5 +178,87 @@ describe("filterInputWithSpaceRule", () => {
     expect(filterInputWithSpaceRule("ciao mondo bello")).toBe(
       "ciao mondo bello"
     );
+  });
+
+  it("gestisce correttamente il caso con meno di 5 caratteri alfanumerici", () => {
+    expect(filterInputWithSpaceRule("a b")).toBe("ab");
+    expect(filterInputWithSpaceRule("1 2 3")).toBe("123");
+  });
+});
+
+describe("renderCellWithTooltip", () => {
+  it("should render cell with tooltip for valid value", () => {
+    const { container } = render(renderCellWithTooltip("Test Value"));
+    expect(container.textContent).toContain("Test Value");
+  });
+
+  it("should render cell with tooltip for numeric value", () => {
+    const { container } = render(renderCellWithTooltip(123));
+    expect(container.textContent).toContain("123");
+  });
+
+  it("should render cell with tooltip for empty string", () => {
+    const { container } = render(renderCellWithTooltip(""));
+    expect(container).toBeTruthy();
+  });
+});
+
+describe("renderMissingDataWithTooltip", () => {
+  it("should render missing data placeholder", () => {
+    const { container } = render(renderMissingDataWithTooltip());
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+});
+
+describe("checkTooltipValue", () => {
+  it("should render value with tooltip when value exists", () => {
+    const params = { value: "Test" };
+    const { container } = render(checkTooltipValue(params));
+    expect(container.textContent).toContain("Test");
+  });
+
+  it("should render missing data when value is undefined", () => {
+    const params = { value: undefined };
+    const { container } = render(checkTooltipValue(params));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
+  it("should render missing data when value is null", () => {
+    const params = { value: null };
+    const { container } = render(checkTooltipValue(params));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
+});
+
+describe("checkEuroTooltip", () => {
+  it("should render formatted euro value for positive number", () => {
+    const params = { value: 12345 };
+    const { container } = render(checkEuroTooltip(params));
+    expect(container.textContent).toContain("123,45€");
+  });
+
+  it("should render formatted euro value for zero", () => {
+    const params = { value: 0 };
+    const { container } = render(checkEuroTooltip(params));
+    expect(container.textContent).toContain("0,00€");
+  });
+
+  it("should render missing data when value is undefined", () => {
+    const params = { value: undefined };
+    const { container } = render(checkEuroTooltip(params));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
+  it("should render missing data when value is null", () => {
+    const params = { value: null };
+    const { container } = render(checkEuroTooltip(params));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
+  it("should render formatted euro for large numbers", () => {
+    const params = { value: 987654321 };
+    const { container } = render(checkEuroTooltip(params));
+    expect(container.textContent).toContain("9.876.543,21€");
   });
 });

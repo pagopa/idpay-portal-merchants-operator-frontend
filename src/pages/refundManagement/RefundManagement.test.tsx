@@ -357,6 +357,7 @@ describe("RefundManagement", () => {
 });
 
 import { MemoryRouter } from "react-router-dom";
+import { checkEuroTooltip } from "../../utils/helpers";
 
 async function loadRefundManagementWithHarness(routeState?: any) {
   vi.resetModules();
@@ -405,15 +406,33 @@ async function loadRefundManagementWithHarness(routeState?: any) {
     MISSING_DATA_PLACEHOLDER: "—",
   }));
 
-  vi.doMock("../../utils/helpers", () => ({
-    formatEuro: (cents?: number) =>
-      typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN",
-    getStatusChip: (_t: any, value: string) => (
-      <span data-testid="status-chip">{value}</span>
-    ),
-    renderCellWithTooltip: (value: any) => value ?? "—",
-    renderMissingDataWithTooltip: () => "—",
-  }));
+vi.doMock("../../utils/helpers", () => ({
+  formatEuro: (cents?: number) =>
+    typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN",
+  getStatusChip: (_t: any, value: string) => (
+    <span data-testid="status-chip">{value}</span>
+  ),
+  renderCellWithTooltip: (value: any) => value ?? "—",
+  renderMissingDataWithTooltip: () => "—",
+  checkTooltipValue: (params: any, key?: string) => {
+    if (key) {
+      if (params?.value?.[key]) {
+        return params.value[key];
+      }
+    }
+    if (params?.value !== undefined && params?.value !== null) {
+      return params.value;
+    }
+    return "—";
+  },
+  checkEuroTooltip: (params: any) => {
+    if (params?.value !== undefined && params?.value !== null) {
+      const cents = params.value;
+      return typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN";
+    }
+    return "—";
+  },
+}));
 
   vi.doMock("../../services/merchantService", () => ({
     getProcessedTransactions: (...args: any[]) =>
