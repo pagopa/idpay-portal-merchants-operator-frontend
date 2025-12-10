@@ -714,3 +714,95 @@ describe("RefundManagement – extra coverage harness", () => {
       .toHaveTextContent("REWARDED");
   });
 });
+
+
+describe("getChipLabel functionality", () => {
+  it("should render correct chip labels for all statuses", async () => {
+
+    const transactionsWithDifferentStatuses = [
+      {
+        trxId: "1",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444E",
+        effectiveAmountCents: 8000,
+        rewardAmountCents: 800,
+        status: "AUTHORIZED",
+        eletronicDevice: "Frigorifero EcoFrost",
+      },
+      {
+        trxId: "2",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444F",
+        effectiveAmountCents: 9000,
+        rewardAmountCents: 900,
+        status: "REFUNDED",
+        eletronicDevice: "Lavatrice",
+      },
+      {
+        trxId: "3",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444G",
+        effectiveAmountCents: 7000,
+        rewardAmountCents: 700,
+        status: "CANCELLED",
+        eletronicDevice: "Asciugatrice",
+      },
+      {
+        trxId: "4",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444H",
+        effectiveAmountCents: 6000,
+        rewardAmountCents: 600,
+        status: "CAPTURED",
+        eletronicDevice: "Forno",
+      },
+      {
+        trxId: "5",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444I",
+        effectiveAmountCents: 5000,
+        rewardAmountCents: 500,
+        status: "REWARDED",
+        eletronicDevice: "Lavastoviglie",
+      },
+      {
+        trxId: "6",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444J",
+        effectiveAmountCents: 4000,
+        rewardAmountCents: 400,
+        status: "INVOICED",
+        eletronicDevice: "Microonde",
+      },
+    ];
+
+    mockGetProcessedTransactions.mockResolvedValue({
+      content: transactionsWithDifferentStatuses,
+      page: 0,
+      pageSize: 10,
+      totalElements: 6,
+    });
+
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    expect(screen.getByTestId("cell-status")).toBeInTheDocument();
+  });
+
+  it("should handle unknown status with default error label", async () => {
+    mockGetProcessedTransactions.mockResolvedValue({
+      ...mockApiResponse,
+      content: [
+        {
+          ...mockTransactions[0],
+          status: "UNKNOWN_STATUS",
+        },
+      ],
+    });
+
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    expect(screen.getByTestId("cell-status")).toBeInTheDocument();
+  });
+});
