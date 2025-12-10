@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect } from "react";
 import { getProcessedTransactions, downloadInvoiceFileApi } from "../../services/merchantService";
 import { GridRenderCellParams } from '@mui/x-data-grid';
-import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip } from "../../utils/helpers";
+import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip, checkEuroTooltip, checkTooltipValue } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
@@ -105,25 +105,7 @@ const RefundManagement = () => {
         }
     };
 
-    const checkTooltipValue = (params, key?: string) => {
-         if(key){
-            if (params?.value?.[key]) {
-                return renderCellWithTooltip(params.value?.[key]);
-            }
-        }
-        if (params?.value) {
-            return renderCellWithTooltip(params.value);
-        }
-        return renderMissingDataWithTooltip();
-    };
-
-    const checkEuroTooltip = (params) => {
-        if (params?.value || params?.value === 0) {
-            return renderCellWithTooltip(formatEuro(params.value));
-        }
-        return renderMissingDataWithTooltip();
-    };
-
+ 
     const columns = [
         {
             field: 'additionalProperties',

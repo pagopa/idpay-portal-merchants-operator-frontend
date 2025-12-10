@@ -166,3 +166,22 @@ export const renderMissingDataWithTooltip = () => {
     </div>
   )
 }
+
+export const checkTooltipValue = (params, key?: string) => {
+  if (key) {
+    if (params?.value?.[key]) {
+      return renderCellWithTooltip(params.value?.[key]);
+    }
+  }
+  if (params?.value) {
+    return renderCellWithTooltip(params.value);
+  }
+  return renderMissingDataWithTooltip();
+};
+
+export const checkEuroTooltip = (params) => {
+    if (params?.value || params?.value === 0) {
+        return renderCellWithTooltip(formatEuro(params.value));
+    }
+    return renderMissingDataWithTooltip();
+};

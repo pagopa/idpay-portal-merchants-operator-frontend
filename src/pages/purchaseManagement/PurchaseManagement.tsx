@@ -11,7 +11,7 @@ import { GridRenderCellParams } from "@mui/x-data-grid";
 import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from './purchaseManagement.module.css';
-import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip } from "../../utils/helpers";
+import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip, checkEuroTooltip, checkTooltipValue } from "../../utils/helpers";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
@@ -98,25 +98,6 @@ const PurchaseManagement = () => {
             default:
                 return t('pages.refundManagement.error');
         }
-    };
-
-    const checkTooltipValue = (params, key?: string) => {
-        if(key){
-            if (params?.value?.[key]) {
-                return renderCellWithTooltip(params.value?.[key]);
-            }
-        }
-        if (params?.value) {
-            return renderCellWithTooltip(params.value);
-        }
-        return renderMissingDataWithTooltip();
-    };
-
-    const checkEuroTooltip = (params) => {
-        if (params?.value || params?.value === 0) {
-            return renderCellWithTooltip(formatEuro(params.value));
-        }
-        return renderMissingDataWithTooltip();
     };
 
     const columns = [
