@@ -1,4 +1,4 @@
-import {Box, Typography, Link, Stack, Button, Alert, TextField} from '@mui/material';
+import { Box, Typography, Link, Stack, Button, Alert, TextField } from '@mui/material';
 import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox';
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
@@ -9,7 +9,7 @@ import { SingleFileInput } from '@pagopa/mui-italia';
 import { useState, useRef, useEffect } from 'react';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AlertComponent from '../Alert/AlertComponent';
-import {REQUIRED_FIELD_ERROR} from "../../utils/constants.ts";
+import { REQUIRED_FIELD_ERROR } from "../../utils/constants.ts";
 
 interface BreadcrumbsProps {
     label: string;
@@ -60,10 +60,10 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { trxId , fileDocNumber } = useParams<{ trxId: string,fileDocNumber: string }>();
+    const { trxId, fileDocNumber } = useParams<{ trxId: string, fileDocNumber: string }>();
 
     useEffect(() => {
-        if(fileDocNumber){
+        if (fileDocNumber) {
             setDocNumber(atob(fileDocNumber));
         }
     }, []);
@@ -81,7 +81,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         if (selectedFile) {
             setRequiredFileError(false);
         }
-        if(!VALID_MIME_TYPES.includes(selectedFile.type)){
+        if (!VALID_MIME_TYPES.includes(selectedFile.type)) {
             setFileTypeError(true);
             setFile(null);
             return;
@@ -99,7 +99,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     const handleRemoveFile = () => {
         setFile(null);
         if (fileInputRef.current) {
-             fileInputRef.current.value = '';
+            fileInputRef.current.value = '';
         }
     };
 
@@ -108,15 +108,15 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     };
 
     const handleAction = async () => {
-        if(!file){
+        if (!file) {
             setRequiredFileError(true);
             setFileSizeError(false);
             setFileTypeError(false);
         }
-        if(!docNumber || docNumber === '' || docNumber.trim().length < 2){
+        if (!docNumber || docNumber === '' || docNumber.trim().length < 2) {
             setDocNumberError(true);
         }
-        if (file && trxId && docNumber.trim() && docNumber.trim().length >= 2 ) {
+        if (file && trxId && docNumber.trim() && docNumber.trim().length >= 2) {
             setLoadingFile(true);
             try {
                 await apiCall(trxId, file, docNumber);
@@ -137,150 +137,157 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     }
 
     const handleBackNavigation = () => {
-        if(fileDocNumber){
+        if (fileDocNumber) {
             navigate(ROUTES.REFUNDS_MANAGEMENT)
-        }else{
+        } else {
             navigate(ROUTES.BUY_MANAGEMENT)
         }
     }
 
+    const handleDocNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.value.length <= 100) {
+            setDocNumber(event.target.value);
+        }
+
+    };
+
     return (
-    <>
-        <Box p={4} maxWidth='75%' justifySelf='center' >
-            <BreadcrumbsBox
-                backLabel={t('commons.exitBtn')}
-                items={[{ label: breadcrumbsProp?.label, path: breadcrumbsProp?.path }, { label: breadcrumbsLabelKey, path: ROUTES.REVERSE }]}
-                active={true}
-                onClickBackButton={() => navigate(breadcrumbsProp?.path)}
-            />
-            <TitleBox
-                title={t(titleKey)}
-                mtTitle={3}
-                variantTitle="h4"
-                subTitle={t(subtitleKey)}
-                variantSubTitle='body2'
-            />
-            <Box mt={3} py={3} px={4} sx={{ backgroundColor: theme.palette.background.paper }} borderRadius={'4px'}>
-                <Box mb={3}>
-                    <Typography
-                        mt={2}
-                        variant="h6"
-                        fontWeight={theme.typography.fontWeightBold}
-                    >
-                        {docNumberTitle}
-                    </Typography>
-                </Box>
-                <Box mt={2}>
-                    <Typography variant="body2" fontWeight={theme.typography.fontWeightMedium}>
-                        {docNumberInsert}
-                    </Typography>
-                </Box>
-                <TextField
-                    variant="outlined"
-                    fullWidth
-                    value={docNumber}
-                    onChange={(e) => setDocNumber(e.target.value)}
-                    onBlur={() => {
-                        !docNumber || docNumber === '' || docNumber.trim().length < 2 ? setDocNumberError(true) : setDocNumberError(false);
-                    }}
-                    label={docNumberLabel}
-                    size="small"
-                    sx={{
-                        mt: 2,
-                        "& .MuiFormLabel-root.Mui-error": {
-                            color: "#5C6E82 !important",
-                        },
-                    }}
-                    error={docNumberError}
-                    helperText={docNumberError && docNumber === ''  ?
-                        REQUIRED_FIELD_ERROR :
-                        docNumberError && docNumber?.trim().length < 2 ?
-                            'Lunghezza minima 2 caratteri'
-                        : ''}
-
+        <>
+            <Box p={4} maxWidth='75%' justifySelf='center' >
+                <BreadcrumbsBox
+                    backLabel={t('commons.exitBtn')}
+                    items={[{ label: breadcrumbsProp?.label, path: breadcrumbsProp?.path }, { label: breadcrumbsLabelKey, path: ROUTES.REVERSE }]}
+                    active={true}
+                    onClickBackButton={() => navigate(breadcrumbsProp?.path)}
                 />
-
-            </Box>
-
-            <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
-                <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t(`${i18nBlockKey}.creditNote`)}</Typography>
-                <Typography variant="body2" mt={4} mb={1} sx={{marginTop: '32px !important'}}>{t(`${i18nBlockKey}.creditNoteSubtitle`)}</Typography>
-                <Link onClick={() => window.open(manualLink || '', '_blank')} sx={{cursor: 'pointer', fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t(`${i18nBlockKey}.manualLink`)}</Link>
-                {
-                    fileSizeError && (
-                        <Box mt={2}>
-                            <Alert data-testid='alert' severity="error">
-                                {t(`commons.fileSizeError`)}
-                            </Alert>
-                        </Box>
-                    )
-                }
-                {
-                    fileTypeError && (
-                        <Box data-testid='alert' mt={2}>
-                            <Alert  severity="error">
-                                {t(`${i18nBlockKey}.fileNotSupported`)}
-                            </Alert>
-                        </Box>
-                    )
-                }
-                {
-                    requiredFileError && (
-                        <Box data-testid='alert' mt={2}>
-                            <Alert  severity="error">
-                                {t('errors.requiredFileError')}
-                            </Alert>
-                        </Box>
-                    )
-                }
-                <Box mt={1} mb={2}>
-                    <SingleFileInput
-                        onFileSelected={handleFileSelect}
-                        onFileRemoved={handleRemoveFile}
-                        value={file}
-                        dropzoneLabel={t(`${i18nBlockKey}.uploadFile`)}
-                        dropzoneButton={t(`${i18nBlockKey}.uploadFileButton`)}
-                        rejectedLabel={t(`${i18nBlockKey}.fileNotSupported`)}
-                        loading={loadingFile}
-                    />
-                </Box>
-
-                <input
-                    type="file"
-                    accept='application/pdf, application/xml'
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    data-testid="upload-input-test"
-                    onChange={(e) => {
-                        const selectedFile = e.target.files?.[0];
-                        if (selectedFile) {
-                            handleFileSelect(selectedFile);
-                        }
-                        e.target.value = '';
-                    }}
+                <TitleBox
+                    title={t(titleKey)}
+                    mtTitle={3}
+                    variantTitle="h4"
+                    subTitle={t(subtitleKey)}
+                    variantSubTitle='body2'
                 />
-
-                {
-                    file && (
-                        <Button
-                            data-testid='file-btn-test'
-                            variant="naked"
-                            startIcon={<FileUploadIcon />}
-                            onClick={handleButtonClick}
-                            sx={{ fontWeight: 'bold', fontSize: '14px' }}
+                <Box mt={3} py={3} px={4} sx={{ backgroundColor: theme.palette.background.paper }} borderRadius={'4px'}>
+                    <Box mb={3}>
+                        <Typography
+                            mt={2}
+                            variant="h6"
+                            fontWeight={theme.typography.fontWeightBold}
                         >
-                            {t(`${i18nBlockKey}.replaceFile`)}
-                        </Button>
-                    )
-                }
+                            {docNumberTitle}
+                        </Typography>
+                    </Box>
+                    <Box mt={2}>
+                        <Typography variant="body2" fontWeight={theme.typography.fontWeightMedium}>
+                            {docNumberInsert}
+                        </Typography>
+                    </Box>
+                    <TextField
+                        variant="outlined"
+                        fullWidth
+                        value={docNumber}
+                        onChange={handleDocNumberChange}
+                        onBlur={() => {
+                            !docNumber || docNumber === '' || docNumber.trim().length < 2 ? setDocNumberError(true) : setDocNumberError(false);
+                        }}
+                        label={docNumberLabel}
+                        size="small"
+                        sx={{
+                            mt: 2,
+                            "& .MuiFormLabel-root.Mui-error": {
+                                color: "#5C6E82 !important",
+                            },
+                        }}
+                        error={docNumberError}
+                        helperText={docNumberError && docNumber === '' ?
+                            REQUIRED_FIELD_ERROR :
+                            docNumberError && docNumber?.trim().length < 2 ?
+                                'Lunghezza minima 2 caratteri'
+                                : ''}
+
+                    />
+
+                </Box>
+
+                <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
+                    <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t(`${i18nBlockKey}.creditNote`)}</Typography>
+                    <Typography variant="body2" mt={4} mb={1} sx={{ marginTop: '32px !important' }}>{t(`${i18nBlockKey}.creditNoteSubtitle`)}</Typography>
+                    <Link onClick={() => window.open(manualLink || '', '_blank')} sx={{ cursor: 'pointer', fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t(`${i18nBlockKey}.manualLink`)}</Link>
+                    {
+                        fileSizeError && (
+                            <Box mt={2}>
+                                <Alert data-testid='alert' severity="error">
+                                    {t(`commons.fileSizeError`)}
+                                </Alert>
+                            </Box>
+                        )
+                    }
+                    {
+                        fileTypeError && (
+                            <Box data-testid='alert' mt={2}>
+                                <Alert severity="error">
+                                    {t(`${i18nBlockKey}.fileNotSupported`)}
+                                </Alert>
+                            </Box>
+                        )
+                    }
+                    {
+                        requiredFileError && (
+                            <Box data-testid='alert' mt={2}>
+                                <Alert severity="error">
+                                    {t('errors.requiredFileError')}
+                                </Alert>
+                            </Box>
+                        )
+                    }
+                    <Box mt={1} mb={2}>
+                        <SingleFileInput
+                            onFileSelected={handleFileSelect}
+                            onFileRemoved={handleRemoveFile}
+                            value={file}
+                            dropzoneLabel={t(`${i18nBlockKey}.uploadFile`)}
+                            dropzoneButton={t(`${i18nBlockKey}.uploadFileButton`)}
+                            rejectedLabel={t(`${i18nBlockKey}.fileNotSupported`)}
+                            loading={loadingFile}
+                        />
+                    </Box>
+
+                    <input
+                        type="file"
+                        accept='application/pdf, application/xml'
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        data-testid="upload-input-test"
+                        onChange={(e) => {
+                            const selectedFile = e.target.files?.[0];
+                            if (selectedFile) {
+                                handleFileSelect(selectedFile);
+                            }
+                            e.target.value = '';
+                        }}
+                    />
+
+                    {
+                        file && (
+                            <Button
+                                data-testid='file-btn-test'
+                                variant="naked"
+                                startIcon={<FileUploadIcon />}
+                                onClick={handleButtonClick}
+                                sx={{ fontWeight: 'bold', fontSize: '14px' }}
+                            >
+                                {t(`${i18nBlockKey}.replaceFile`)}
+                            </Button>
+                        )
+                    }
+                </Box>
+                <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
+                    <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
+                    <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
+                </Stack>
             </Box>
-            <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
-                <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
-                <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
-            </Stack>
-        </Box>
-        <AlertComponent isOpen={errorAlert.isOpen} data-testid='alert-component' error message={errorAlert.message} contentStyle={{right: '20px'}} />
-    </>
+            <AlertComponent isOpen={errorAlert} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{ right: '20px' }} />
+        </>
     );
 };
 

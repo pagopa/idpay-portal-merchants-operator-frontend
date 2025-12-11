@@ -83,6 +83,48 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         ...alerts
     ];
 
+    //     const fakeData = [
+    //   {
+    //     id: "dd298d78-4cc6-41e0-9883-3a20a5b16987_BARCODE_1764951721096",
+    //     fiscalCode: "CZZCLL82M03X000G",
+    //     effectiveAmountCents: 195600,
+    //     rewardAmountCents: null,
+    //     authorizedAmountCents: 185600,
+    //     trxDate: "2025-12-05T17:22:01.096",
+    //     trxChargeDate: "2025-12-05T17:24:08.232",
+    //     updateDate: "2025-12-05T17:24:15.61",
+    //     status: "REFUNDED",
+    //     channel: "BARCODE",
+    //     additionalProperties: {
+    //       productGtin: "OVENS10",
+    //       productName: "Forno Kenwood KTG606S22 71 l"
+    //     },
+    //     invoiceFile: {
+    //       filename: "nota_di_credito_it (1).pdf",
+    //       docNumber: "rfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4eferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefefe4fefefe"
+    //     }
+    //   },
+    //   {
+    //     id: "6affbcad-d876-4b2d-a298-c645583354a2_BARCODE_1764945247722",
+    //     fiscalCode: "CZZCLL82M03X000F",
+    //     effectiveAmountCents: 42563,
+    //     rewardAmountCents: 10000,
+    //     authorizedAmountCents: 32563,
+    //     trxDate: "2025-12-05T15:34:07.722",
+    //     trxChargeDate: "2025-12-05T15:39:41.539",
+    //     updateDate: "2025-12-05T15:39:47.54",
+    //     status: "INVOICED",
+    //     channel: "BARCODE",
+    //     additionalProperties: {
+    //       productGtin: "OVENS03",
+    //       productName: "Forno KENWOOD CK600DFSL 76 l / 47 l"
+    //     },
+    //     invoiceFile: {
+    //       filename: "nota_di_credito_it.pdf",
+    //       docNumber: "testwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwvvvvvvvtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwvvtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwww"
+    //     }
+    //   },
+    // ];
     const alertsList = Object.entries(externalState).filter(([key]) => !(key.includes('error'))).map(([key, value]) => ({ isOpen: value, message: alertMessages[key] }))
 
     useAutoResetBanner(allAlerts);

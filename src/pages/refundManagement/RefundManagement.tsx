@@ -1,12 +1,11 @@
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect } from "react";
 import { getProcessedTransactions, downloadInvoiceFileApi } from "../../services/merchantService";
-import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 import { GridRenderCellParams } from '@mui/x-data-grid';
-import { getStatusChip, formatEuro } from "../../utils/helpers";
+import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip, checkEuroTooltip, checkTooltipValue } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
 import { authStore } from "../../store/authStore";
@@ -69,7 +68,7 @@ const RefundManagement = () => {
         const decodeToken: DecodedJwtToken = jwtDecode(token);
         setDownloadInProgress(true);
         try {
-            const response = await downloadInvoiceFileApi(decodeToken?.point_of_sale_id,selectedTransaction?.id);
+            const response = await downloadInvoiceFileApi(decodeToken?.point_of_sale_id, selectedTransaction?.id);
             const { invoiceUrl } = response;
 
             const filename = selectedTransaction?.invoiceFile?.filename || "fattura.pdf";
@@ -87,6 +86,26 @@ const RefundManagement = () => {
         }
     };
 
+    const getChipLabel = (status: string) => {
+        switch (status) {
+            case 'AUTHORIZED':
+                return t('pages.refundManagement.authorized');
+            case 'REFUNDED':
+                return t('pages.refundManagement.refunded');
+            case 'CANCELLED':
+                return t('pages.refundManagement.cancelled');
+            case 'CAPTURED':
+                return t('pages.refundManagement.captured');
+            case 'REWARDED':
+                return t('pages.refundManagement.rewarded');
+            case 'INVOICED':
+                return t('pages.refundManagement.invoiced');
+            default:
+                return t('pages.refundManagement.error');
+        }
+    };
+
+ 
     const columns = [
         {
             field: 'additionalProperties',
@@ -96,24 +115,7 @@ const RefundManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value?.productName) {
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={params.value?.productName}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontWeight: '400',
-                                    fontSize: '16px'
-                                }}>
-                                    {params.value?.productName}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkTooltipValue(params, 'productName');
             },
         },
         {
@@ -130,23 +132,9 @@ const RefundManagement = () => {
                         hour: '2-digit',
                         minute: '2-digit',
                     }).replace(',', '');
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={formattedDate}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontWeight: '400',
-                                    fontSize: '16px'
-                                }}>
-                                    {formattedDate}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
+                    return renderCellWithTooltip(formattedDate);
                 }
-                return MISSING_DATA_PLACEHOLDER;
+                return renderMissingDataWithTooltip();
             },
         },
         {
@@ -156,24 +144,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={params.value}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontWeight: '400',
-                                    fontSize: '16px'
-                                }}>
-                                    {params.value}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkTooltipValue(params);
             },
         },
         {
@@ -186,10 +157,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -202,10 +170,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -218,10 +183,7 @@ const RefundManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -234,7 +196,9 @@ const RefundManagement = () => {
             renderCell: (params: GridRenderCellParams) => {
                 return (
                     <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                        {getStatusChip(t, params.value)}
+                        <Tooltip title={getChipLabel(params.value)}>
+                            {getStatusChip(t, params.value)}
+                        </Tooltip>
                     </Box>
                 );
             }
@@ -276,7 +240,7 @@ const RefundManagement = () => {
                             navigate(`/modifica-documento/${selectedTransaction?.id}/${btoa(selectedTransaction['Numero fattura'])}`);
 
                         }
-                }}
+                    }}
                     onFileDownloadCallback={downloadInvoiceFile}
                 />
             }

@@ -11,7 +11,7 @@ import { GridRenderCellParams } from "@mui/x-data-grid";
 import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from './purchaseManagement.module.css';
-import { getStatusChip, formatEuro } from "../../utils/helpers";
+import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip, checkEuroTooltip, checkTooltipValue } from "../../utils/helpers";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
@@ -38,7 +38,7 @@ const PurchaseManagement = () => {
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionDeleteSuccess, setTransactionDeleteSuccess] = useState(false);
-    
+
 
     const gridRef = useRef(null);
 
@@ -73,13 +73,33 @@ const PurchaseManagement = () => {
             const { refundUploadSuccess, reverseUploadSuccess } = location.state;
             if (refundUploadSuccess) {
                 setTransactionRefundSuccess(true);
-            } 
+            }
             if (reverseUploadSuccess) {
                 setTransactionReverseSuccess(true);
             }
         }
     }, [location.state]);
 
+
+    const getChipLabel = (status: string) => {
+        switch (status) {
+            case 'AUTHORIZED':
+                return t('pages.refundManagement.authorized');
+            case 'REFUNDED':
+                return t('pages.refundManagement.refunded');
+            case 'CANCELLED':
+                return t('pages.refundManagement.cancelled');
+            case 'CAPTURED':
+                return t('pages.refundManagement.captured');
+            case 'REWARDED':
+                return t('pages.refundManagement.rewarded');
+            case 'INVOICED':
+                return t('pages.refundManagement.invoiced');
+            default:
+                return t('pages.refundManagement.error');
+        }
+    };
+      
     const columns = [
         {
             field: "additionalProperties",
@@ -89,23 +109,7 @@ const PurchaseManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params?.value?.productName) {
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={params.value?.productName}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '16px'
-                                }}>
-                                    {params.value?.productName}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkTooltipValue(params, 'productName');
             },
         },
         {
@@ -122,22 +126,9 @@ const PurchaseManagement = () => {
                         hour: '2-digit',
                         minute: '2-digit',
                     }).replace(',', '');
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={formattedDate}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '16px'
-                                }}>
-                                    {formattedDate}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
+                    return renderCellWithTooltip(formattedDate);
                 }
-                return MISSING_DATA_PLACEHOLDER;
+                return renderMissingDataWithTooltip();
             },
         },
         {
@@ -147,23 +138,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={params.value}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '16px'
-                                }}>
-                                    {params.value}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkTooltipValue(params);
             },
         },
         {
@@ -176,10 +151,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -192,10 +164,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -208,10 +177,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -223,7 +189,9 @@ const PurchaseManagement = () => {
             renderCell: (params: GridRenderCellParams) => {
                 return (
                     <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                        {getStatusChip(t, params.value)}
+                        <Tooltip title={getChipLabel(params.value)}>
+                            {getStatusChip(t, params.value)}
+                        </Tooltip>
                     </Box>
                 );
             }
@@ -402,7 +370,7 @@ const PurchaseManagement = () => {
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
                                         {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
-                                </Grid> 
+                                </Grid>
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.totalAmount')}
@@ -442,7 +410,7 @@ const PurchaseManagement = () => {
                                     </Typography>
                                 </Grid>
                                 {
-                                    (selectedTransaction?.status === 'AUTHORIZED' || selectedTransaction?.status === 'CAPTURED')  && (
+                                    (selectedTransaction?.status === 'AUTHORIZED' || selectedTransaction?.status === 'CAPTURED') && (
                                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary, margin: 0 }}>
                                                 {t('pages.purchaseManagement.drawer.document')}
@@ -461,13 +429,13 @@ const PurchaseManagement = () => {
                                                         data-testid="item-loader"
                                                     />
                                                 ) : (
-                                                    <Box sx={{ display: 'flex', gap: 0, alignItems: 'start'}}>
+                                                    <Box sx={{ display: 'flex', gap: 0, alignItems: 'start' }}>
                                                         <DescriptionIcon />
-                                                        <div style={{ marginLeft: '8px', wordBreak: 'break-all'}}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</div>
+                                                        <div style={{ marginLeft: '8px', wordBreak: 'break-all' }}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</div>
                                                     </Box>
                                                 )}
                                             </Button>
-                                        </Grid> 
+                                        </Grid>
                                     )
                                 }
                             </Grid>
