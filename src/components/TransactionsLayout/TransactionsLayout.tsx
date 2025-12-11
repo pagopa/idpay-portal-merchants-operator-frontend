@@ -12,6 +12,7 @@ import { GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
 import { getStatusChip, handleGtinChange } from "../../utils/helpers";
 import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
+import AlertListComponent from "../Alert/AlertListComponent";
 
 interface TransactionsLayoutProps {
     title: string;
@@ -81,6 +82,8 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         [errorAlert, setErrorAlert],
         ...alerts
     ];
+
+    const alertsList = Object.entries(externalState).filter(([key]) => !(key.includes('error'))).map(([key, value]) => ({ isOpen: value, message: alertMessages[key] }))
 
     useAutoResetBanner(allAlerts);
 
@@ -233,7 +236,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         <Box>
             <>{console.log("APPLIED", filtersAppliedOnce)}</>
             {DrawerComponent}
-            
+
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox
                     title={title}
@@ -245,11 +248,11 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                     mbSubTitle={2}
                 />
                 {additionalButton && (
-                    <Button 
-                        variant="contained" 
-                        size="small" 
-                        startIcon={additionalButton.icon} 
-                        sx={{ textWrap: 'nowrap' }} 
+                    <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={additionalButton.icon}
+                        sx={{ textWrap: 'nowrap' }}
                         onClick={additionalButton.onClick}
                     >
                         {additionalButton.label}
@@ -347,15 +350,8 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             )}
 
             {/* Alerts */}
-            <AlertComponent isOpen={errorAlert} error={true} message={alertMessages.error || t('pages.refundManagement.errorAlert')} />
-            {Object.entries(externalState).map(([key, value]) => {
-                const isError = key.includes('error')
-                const isOpen = value && (isError ? isDrawerOpen : !isDrawerOpen)
-                if (alertMessages[key]) {
-                    return <AlertComponent containerStyle={isError && {height: 'fit-content', position: 'fixed', bottom: '20px', right: '20px'}} contentStyle={isError && {position: 'unset', bottom: '0', right: '0'}} isOpen={isOpen} key={key} error={isError} message={alertMessages[key]!} />;
-                }
-                return null;
-            })}
+            {Object.entries(externalState).filter(([key]) => key.includes('error')).map(([key, value]) => alertMessages[key] && <AlertComponent containerStyle={{ height: 'fit-content', position: 'fixed', bottom: '20px', right: '20px', zIndex: '1300' }} contentStyle={{ position: 'unset', bottom: '0', right: '0' }} isOpen={value && isDrawerOpen} key={key} error message={alertMessages[key]} />)}
+            <AlertListComponent alertList={[...alertsList, { isOpen: errorAlert, error: true, message: alertMessages.error || t('pages.refundManagement.errorAlert') }]} />
         </Box>
     );
 };
