@@ -151,6 +151,13 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
     };
 
+    const handleDocNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.value.length <= 100) {
+            setDocNumber(event.target.value);
+        }
+
+    };
+
     return (
         <>
             <Box p={4} maxWidth='75%' justifySelf='center' >
@@ -206,7 +213,9 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                                 : ''}
 
                     />
+                    />
 
+                </Box>
                 </Box>
 
                 <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
@@ -251,7 +260,63 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                             loading={loadingFile}
                         />
                     </Box>
+                <Box sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px', minWidth: { lg: '1000px' } }} mt={4} p={3} className={styleClass} >
+                    <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>{t(`${i18nBlockKey}.creditNote`)}</Typography>
+                    <Typography variant="body2" mt={4} mb={1} sx={{ marginTop: '32px !important' }}>{t(`${i18nBlockKey}.creditNoteSubtitle`)}</Typography>
+                    <Link onClick={() => window.open(manualLink || '', '_blank')} sx={{ cursor: 'pointer', fontWeight: theme.typography.fontWeightMedium, fontSize: '14px' }}>{t(`${i18nBlockKey}.manualLink`)}</Link>
+                    {
+                        fileSizeError && (
+                            <Box mt={2}>
+                                <Alert data-testid='alert' severity="error">
+                                    {t(`commons.fileSizeError`)}
+                                </Alert>
+                            </Box>
+                        )
+                    }
+                    {
+                        fileTypeError && (
+                            <Box data-testid='alert' mt={2}>
+                                <Alert severity="error">
+                                    {t(`${i18nBlockKey}.fileNotSupported`)}
+                                </Alert>
+                            </Box>
+                        )
+                    }
+                    {
+                        requiredFileError && (
+                            <Box data-testid='alert' mt={2}>
+                                <Alert severity="error">
+                                    {t('errors.requiredFileError')}
+                                </Alert>
+                            </Box>
+                        )
+                    }
+                    <Box mt={1} mb={2}>
+                        <SingleFileInput
+                            onFileSelected={handleFileSelect}
+                            onFileRemoved={handleRemoveFile}
+                            value={file}
+                            dropzoneLabel={t(`${i18nBlockKey}.uploadFile`)}
+                            dropzoneButton={t(`${i18nBlockKey}.uploadFileButton`)}
+                            rejectedLabel={t(`${i18nBlockKey}.fileNotSupported`)}
+                            loading={loadingFile}
+                        />
+                    </Box>
 
+                    <input
+                        type="file"
+                        accept='application/pdf, application/xml'
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        data-testid="upload-input-test"
+                        onChange={(e) => {
+                            const selectedFile = e.target.files?.[0];
+                            if (selectedFile) {
+                                handleFileSelect(selectedFile);
+                            }
+                            e.target.value = '';
+                        }}
+                    />
                     <input
                         type="file"
                         accept='application/pdf, application/xml'
