@@ -151,13 +151,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
     };
 
-    const handleDocNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.value.length <= 100) {
-            setDocNumber(event.target.value);
-        }
-
-    };
-
     return (
         <>
             <Box p={4} maxWidth='75%' justifySelf='center' >
@@ -212,7 +205,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                                 'Lunghezza minima 2 caratteri'
                                 : ''}
 
-                    />
                     />
 
                 </Box>
