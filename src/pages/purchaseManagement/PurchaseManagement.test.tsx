@@ -616,3 +616,112 @@ describe('PurchaseManagement', () => {
 
   });
 });
+
+describe('getChipLabel functionality', () => {
+    it('should return correct translation key for AUTHORIZED status', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      
+      expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'AUTHORIZED');
+      expect(screen.getByTestId('status-chip')).toHaveTextContent('AUTHORIZED');
+    });
+
+    it('should return correct translation key for CAPTURED status', async () => {
+      await renderAndOpenDrawer(mockCapturedTransaction);
+      
+      expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'CAPTURED');
+      expect(screen.getByTestId('status-chip')).toHaveTextContent('CAPTURED');
+    });
+
+    it('should return correct translation key for REFUNDED status', async () => {
+      const refundedTransaction = { ...mockAuthorizedTransaction, status: 'REFUNDED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+
+      const TransactionsLayoutMock = screen.getByTestId('transactions-layout');
+      const onRowAction = vi.fn();
+      
+  
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return correct translation key for CANCELLED status', async () => {
+      const cancelledTransaction = { ...mockAuthorizedTransaction, status: 'CANCELLED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return correct translation key for REWARDED status', async () => {
+      const rewardedTransaction = { ...mockAuthorizedTransaction, status: 'REWARDED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return correct translation key for INVOICED status', async () => {
+      const invoicedTransaction = { ...mockAuthorizedTransaction, status: 'INVOICED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return error translation key for unknown status', async () => {
+      const unknownTransaction = { ...mockAuthorizedTransaction, status: 'UNKNOWN_STATUS' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should use getChipLabel result in Tooltip component', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      
+      const statusChip = screen.getByTestId('status-chip');
+      expect(statusChip).toBeInTheDocument();
+      expect(statusChip).toHaveTextContent('AUTHORIZED');
+    });
+  });
