@@ -56,7 +56,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     const [fileSizeError, setFileSizeError] = useState<boolean>(false);
     const [fileTypeError, setFileTypeError] = useState<boolean>(false);
     const [loadingFile, setLoadingFile] = useState<boolean>(false);
-    const [errorAlert, setErrorAlert] = useState({isOpen: false, message: ""});
+    const [errorAlert, setErrorAlert] = useState({ isOpen: false, message: "" });
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +71,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     useEffect(() => {
         if (errorAlert) {
             const timer = setTimeout(() => {
-                setErrorAlert({ ...errorAlert, isOpen: false});
+                setErrorAlert({ ...errorAlert, isOpen: false });
             }, 5000);
             return () => clearTimeout(timer);
         }
@@ -130,7 +130,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 const errorCode = error.response?.data?.code === "REWARD_BATCH_ALREADY_SENT"
                 const errorMessage = errorCode ? t('pages.reverse.alreadySentError') : t('pages.reverse.errorAlert')
                 console.error('API Error:', error);
-                setErrorAlert({isOpen: true, message: errorMessage});
+                setErrorAlert({ isOpen: true, message: errorMessage });
                 setLoadingFile(false);
             }
         }
@@ -251,42 +251,43 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                             loading={loadingFile}
                         />
                     </Box>
+                    <Box>
+                        <input
+                            type="file"
+                            accept='application/pdf, application/xml'
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            data-testid="upload-input-test"
+                            onChange={(e) => {
+                                const selectedFile = e.target.files?.[0];
+                                if (selectedFile) {
+                                    handleFileSelect(selectedFile);
+                                }
+                                e.target.value = '';
+                            }}
+                        />
 
-                    <input
-                        type="file"
-                        accept='application/pdf, application/xml'
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        data-testid="upload-input-test"
-                        onChange={(e) => {
-                            const selectedFile = e.target.files?.[0];
-                            if (selectedFile) {
-                                handleFileSelect(selectedFile);
-                            }
-                            e.target.value = '';
-                        }}
-                    />
-
-                    {
-                        file && (
-                            <Button
-                                data-testid='file-btn-test'
-                                variant="naked"
-                                startIcon={<FileUploadIcon />}
-                                onClick={handleButtonClick}
-                                sx={{ fontWeight: 'bold', fontSize: '14px' }}
-                            >
-                                {t(`${i18nBlockKey}.replaceFile`)}
-                            </Button>
-                        )
-                    }
+                        {
+                            file && (
+                                <Button
+                                    data-testid='file-btn-test'
+                                    variant="naked"
+                                    startIcon={<FileUploadIcon />}
+                                    onClick={handleButtonClick}
+                                    sx={{ fontWeight: 'bold', fontSize: '14px' }}
+                                >
+                                    {t(`${i18nBlockKey}.replaceFile`)}
+                                </Button>
+                            )
+                        }
+                    </Box>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
+                        <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
+                        <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
+                    </Stack>
                 </Box>
-                <Stack direction={{ xs: 'column', sm: 'row' }} p={{ xs: 2, sm: 0 }} spacing={2} mt={3} justifyContent="space-between">
-                    <Button data-testid='back-btn-test' variant="outlined" onClick={handleBackNavigation}>{t('commons.backBtn')}</Button>
-                    <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
-                </Stack>
             </Box>
-            <AlertComponent isOpen={errorAlert} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{ right: '20px' }} />
+            <AlertComponent isOpen={errorAlert.isOpen} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{ right: '20px' }} />
         </>
     );
 };

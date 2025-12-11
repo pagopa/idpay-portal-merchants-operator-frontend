@@ -15,8 +15,8 @@ type Props = {
 }
 
 const cmpList = (alertList: AlertProps) => {
-    return alertList.map(({ isOpen, error, message }) => {
-        return <Slide direction="left" in={isOpen} mountOnEnter unmountOnExit>
+    return alertList.map(({ isOpen, error, message }, index) => {
+        return <Slide key={`${message}-${index}`} direction="left" in={isOpen} mountOnEnter unmountOnExit>
             <Alert
                 data-testid="alert"
                 severity={error ? 'error' : 'success'}
