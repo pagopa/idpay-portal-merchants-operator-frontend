@@ -286,7 +286,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                     <Button data-testid='continue-btn-test' variant="contained" onClick={handleAction} >{t('commons.continueBtn')}</Button>
                 </Stack>
             </Box>
-            <AlertComponent isOpen={errorAlert} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{ right: '20px' }} />
+            <AlertComponent isOpen={errorAlert.isOpen} data-testid='alert-component' error message={t('pages.reverse.errorAlert')} contentStyle={{ right: '20px' }} />
         </>
     );
 };
