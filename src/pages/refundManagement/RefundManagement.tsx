@@ -1,4 +1,4 @@
-import { Box, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect } from "react";
 import { getProcessedTransactions, downloadInvoiceFileApi } from "../../services/merchantService";
@@ -86,26 +86,6 @@ const RefundManagement = () => {
         }
     };
 
-    const getChipLabel = (status: string) => {
-        switch (status) {
-            case 'AUTHORIZED':
-                return t('pages.refundManagement.authorized');
-            case 'REFUNDED':
-                return t('pages.refundManagement.refunded');
-            case 'CANCELLED':
-                return t('pages.refundManagement.cancelled');
-            case 'CAPTURED':
-                return t('pages.refundManagement.captured');
-            case 'REWARDED':
-                return t('pages.refundManagement.rewarded');
-            case 'INVOICED':
-                return t('pages.refundManagement.invoiced');
-            default:
-                return t('pages.refundManagement.error');
-        }
-    };
-
- 
     const columns = [
         {
             field: 'additionalProperties',
@@ -196,9 +176,7 @@ const RefundManagement = () => {
             renderCell: (params: GridRenderCellParams) => {
                 return (
                     <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                        <Tooltip title={getChipLabel(params.value)}>
-                            {getStatusChip(t, params.value)}
-                        </Tooltip>
+                        {getStatusChip(t, params.value)}
                     </Box>
                 );
             }

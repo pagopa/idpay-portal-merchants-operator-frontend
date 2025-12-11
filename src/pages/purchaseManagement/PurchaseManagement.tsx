@@ -1,4 +1,4 @@
-import { Box, Button, Tooltip, Drawer, Typography, Grid, CircularProgress } from "@mui/material";
+import { Box, Button, Drawer, Typography, Grid, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect, useRef } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -81,25 +81,6 @@ const PurchaseManagement = () => {
     }, [location.state]);
 
 
-    const getChipLabel = (status: string) => {
-        switch (status) {
-            case 'AUTHORIZED':
-                return t('pages.refundManagement.authorized');
-            case 'REFUNDED':
-                return t('pages.refundManagement.refunded');
-            case 'CANCELLED':
-                return t('pages.refundManagement.cancelled');
-            case 'CAPTURED':
-                return t('pages.refundManagement.captured');
-            case 'REWARDED':
-                return t('pages.refundManagement.rewarded');
-            case 'INVOICED':
-                return t('pages.refundManagement.invoiced');
-            default:
-                return t('pages.refundManagement.error');
-        }
-    };
-      
     const columns = [
         {
             field: "additionalProperties",
@@ -189,9 +170,7 @@ const PurchaseManagement = () => {
             renderCell: (params: GridRenderCellParams) => {
                 return (
                     <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                        <Tooltip title={getChipLabel(params.value)}>
-                            {getStatusChip(t, params.value)}
-                        </Tooltip>
+                        {getStatusChip(t, params.value)}
                     </Box>
                 );
             }
