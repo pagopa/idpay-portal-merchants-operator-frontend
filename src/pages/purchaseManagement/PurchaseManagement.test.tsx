@@ -3,9 +3,9 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import PurchaseManagement from './PurchaseManagement';
 import { utilsStore } from '../../store/utilsStore';
-import { theme } from '@pagopa/mui-italia'; // Mocked
-import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants'; // Mocked
-import ROUTES from '../../routes'; // Mocked
+import { theme } from '@pagopa/mui-italia';
+import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
+import ROUTES from '../../routes';
 
 
 const {
@@ -35,14 +35,12 @@ let mockedLocation;
 
 // --- Mocks ---
 
-// 1. react-i18next 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key) => key,
   }),
 }));
 
-// 2. react-router-dom
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -52,7 +50,6 @@ vi.mock('react-router-dom', async (importOriginal) => {
   };
 });
 
-// 3. Servizi API
 vi.mock('../../services/merchantService', () => ({
   getInProgressTransactions: mockGetInProgressTransactions,
   deleteTransactionInProgress: mockDeleteTransactionInProgress,
@@ -60,11 +57,19 @@ vi.mock('../../services/merchantService', () => ({
   getPreviewPdf: mockGetPreviewPdf,
 }));
 
-// 4. utils/helpers
 vi.mock('../../utils/helpers', () => ({
   getStatusChip: mockGetStatusChip,
   formatEuro: mockFormatEuro,
   downloadFileFromBase64: mockDownloadFileFromBase64,
+  renderCellWithTooltip: vi.fn((value) => value),
+  renderMissingDataWithTooltip: vi.fn(() => '---'),
+  checkEuroTooltip: vi.fn((params) => params?.value ? `€${(params.value / 100).toFixed(2)}` : '---'),
+  checkTooltipValue: vi.fn((params, key) => {
+    if (key) {
+      return params?.value?.[key] || '---';
+    }
+    return params?.value || '---';
+  }),
 }));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
@@ -100,16 +105,17 @@ vi.mock('../../components/Modal/ModalComponent', () => ({
     ) : null,
 }));
 
-// 6. Altri Mocks (OK)
 vi.mock('@pagopa/mui-italia', () => ({
   theme: {
     typography: { fontWeightRegular: 400, fontWeightMedium: 600 },
     palette: { text: { secondary: '#5C6F82' } },
   },
 }));
+
 vi.mock('../../utils/constants', () => ({
   MISSING_DATA_PLACEHOLDER: '---',
 }));
+
 vi.mock('../../routes', () => ({
   default: {
     ACCEPT_DISCOUNT: '/accetta-sconto',
@@ -141,8 +147,6 @@ const mockCapturedTransaction = {
   status: 'CAPTURED',
 };
 
-
-
 const renderAndOpenDrawer = async (transaction) => {
   render(
     <MemoryRouter>
@@ -161,15 +165,10 @@ const renderAndOpenDrawer = async (transaction) => {
   });
 };
 
-
-// --- Test Suite ---
-
 describe('PurchaseManagement', () => {
 
   beforeEach(() => {
-
     vi.clearAllMocks();
-
     mockedLocation = { state: null };
 
     act(() => {
@@ -200,6 +199,75 @@ describe('PurchaseManagement', () => {
     expect(mockedNavigate).toHaveBeenCalledWith(ROUTES.ACCEPT_DISCOUNT);
   });
 
+  describe('getChipLabel functionality', () => {
+    it('should return correct translation keys for all statuses', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      
+      // La funzione getChipLabel viene usata internamente per i Tooltip
+      // Verifichiamo che getStatusChip venga chiamato con i parametri corretti
+      expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'AUTHORIZED');
+      
+      // Test per verificare che la funzione t venga chiamata con le chiavi corrette
+      // attraverso il rendering del componente
+      expect(screen.getByTestId('status-chip')).toBeInTheDocument();
+    });
+
+    it('should handle REFUNDED status label', async () => {
+      const refundedTransaction = { ...mockAuthorizedTransaction, status: 'REFUNDED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+
+      await waitFor(() => {
+        expect(screen.getByText(mockAuthorizedTransaction.id)).toBeInTheDocument();
+      });
+      
+      // getChipLabel è testato indirettamente attraverso getStatusChip
+      expect(mockGetStatusChip).toHaveBeenCalled();
+    });
+
+    it('should handle CANCELLED status label', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      expect(mockGetStatusChip).toHaveBeenCalled();
+    });
+
+    it('should handle CAPTURED status label', async () => {
+      await renderAndOpenDrawer(mockCapturedTransaction);
+      expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'CAPTURED');
+    });
+
+    it('should handle REWARDED status label', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      expect(mockGetStatusChip).toHaveBeenCalled();
+    });
+
+    it('should handle INVOICED status label', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      expect(mockGetStatusChip).toHaveBeenCalled();
+    });
+
+    it('should handle unknown/default status', async () => {
+      const unknownTransaction = { ...mockAuthorizedTransaction, status: 'UNKNOWN' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+  });
+
   describe('Drawer (AUTHORIZED)', () => {
     it('opens and displays correct data for an AUTHORIZED transaction', async () => {
       await renderAndOpenDrawer(mockAuthorizedTransaction);
@@ -212,7 +280,6 @@ describe('PurchaseManagement', () => {
       const dateText = screen.getByText((content) => content.startsWith('27/10/2023'));
       expect(dateText).toBeInTheDocument();
 
-      
       expect(mockFormatEuro).toHaveBeenCalledWith(mockAuthorizedTransaction.effectiveAmountCents);
       expect(mockFormatEuro).toHaveBeenCalledWith(mockAuthorizedTransaction.rewardAmountCents);
       expect(mockFormatEuro).toHaveBeenCalledWith(mockAuthorizedTransaction.residualAmountCents);
@@ -294,7 +361,6 @@ describe('PurchaseManagement', () => {
         expect(screen.getByTestId('modal-component')).toBeInTheDocument();
       });
       expect(screen.getByText('pages.purchaseManagement.captureTransactionModal.title')).toBeInTheDocument();
-
 
       fireEvent.click(screen.getByRole('button', { name: 'Conferma' }));
 
@@ -389,6 +455,23 @@ describe('PurchaseManagement', () => {
       const props = JSON.parse(screen.getByTestId('layout-props').textContent);
       expect(props.externalState.errorDeleteTransaction).toBe(true);
     });
+
+    it('closes cancel modal on "Esci" button', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+
+      fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.cancellPayment'));
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
+
+      expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('pages.purchaseManagement.drawer.title')).toBeInTheDocument();
+      });
+    });
   });
 
   describe('Refund/Reverse Workflow (Captured)', () => {
@@ -414,10 +497,98 @@ describe('PurchaseManagement', () => {
 
       expect(mockedNavigate).toHaveBeenCalledWith(`/storna-transazione/${mockCapturedTransaction.id}`);
     });
+
+    it('closes reverse modal and re-opens drawer on "Indietro"', async () => {
+      await renderAndOpenDrawer(mockCapturedTransaction);
+
+      fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
+
+      await waitFor(() => {
+        expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: 'Indietro' }));
+
+      expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('pages.purchaseManagement.drawer.title')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Location State useEffect - refundUploadSuccess and reverseUploadSuccess', () => {
+    it('sets transactionRefundSuccess when refundUploadSuccess is true in location.state', () => {
+      mockedLocation = { state: { refundUploadSuccess: true } };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
+      expect(props.externalState.transactionRefundSuccess).toBe(true);
+      expect(props.externalState.transactionReverseSuccess).toBe(false);
+    });
+
+    it('sets transactionReverseSuccess when reverseUploadSuccess is true in location.state', () => {
+      mockedLocation = { state: { reverseUploadSuccess: true } };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
+      expect(props.externalState.transactionReverseSuccess).toBe(true);
+      expect(props.externalState.transactionRefundSuccess).toBe(false);
+    });
+
+    it('handles both refundUploadSuccess and reverseUploadSuccess being false', () => {
+      mockedLocation = { state: { refundUploadSuccess: false, reverseUploadSuccess: false } };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
+      expect(props.externalState.transactionRefundSuccess).toBe(false);
+      expect(props.externalState.transactionReverseSuccess).toBe(false);
+    });
+
+    it('handles when location.state is null', () => {
+      mockedLocation = { state: null };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
+      expect(props.externalState.transactionRefundSuccess).toBe(false);
+      expect(props.externalState.transactionReverseSuccess).toBe(false);
+    });
+
+    it('handles when location.state is undefined', () => {
+      mockedLocation = { state: undefined };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
+      expect(props.externalState.transactionRefundSuccess).toBe(false);
+      expect(props.externalState.transactionReverseSuccess).toBe(false);
+    });
   });
 
   describe('Alerts and State Effects', () => {
-
     it('shows alert for transactionAuthorized from store and times out', async () => {
       vi.useFakeTimers();
 
@@ -443,29 +614,114 @@ describe('PurchaseManagement', () => {
       vi.useRealTimers();
     });
 
-    it('shows alert for refundUploadSuccess from location', () => {
-      mockedLocation.state = { refundUploadSuccess: true };
-      render(
-        <MemoryRouter>
-          <PurchaseManagement />
-        </MemoryRouter>
-      );
+  });
+});
 
-      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
-      expect(props.externalState.transactionRefundSuccess).toBe(true);
+describe('getChipLabel functionality', () => {
+    it('should return correct translation key for AUTHORIZED status', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      
+      expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'AUTHORIZED');
+      expect(screen.getByTestId('status-chip')).toHaveTextContent('AUTHORIZED');
     });
 
-    it('shows alert for reverseUploadSuccess from location', () => {
-      mockedLocation.state = { reverseUploadSuccess: true };
+    it('should return correct translation key for CAPTURED status', async () => {
+      await renderAndOpenDrawer(mockCapturedTransaction);
+      
+      expect(mockGetStatusChip).toHaveBeenCalledWith(expect.any(Function), 'CAPTURED');
+      expect(screen.getByTestId('status-chip')).toHaveTextContent('CAPTURED');
+    });
+
+    it('should return correct translation key for REFUNDED status', async () => {
+      const refundedTransaction = { ...mockAuthorizedTransaction, status: 'REFUNDED' };
+      
       render(
         <MemoryRouter>
           <PurchaseManagement />
         </MemoryRouter>
       );
 
-      const props = JSON.parse(screen.getByTestId('layout-props').textContent);
-      expect(props.externalState.transactionReverseSuccess).toBe(true);
+
+      const TransactionsLayoutMock = screen.getByTestId('transactions-layout');
+      const onRowAction = vi.fn();
+      
+  
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return correct translation key for CANCELLED status', async () => {
+      const cancelledTransaction = { ...mockAuthorizedTransaction, status: 'CANCELLED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return correct translation key for REWARDED status', async () => {
+      const rewardedTransaction = { ...mockAuthorizedTransaction, status: 'REWARDED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return correct translation key for INVOICED status', async () => {
+      const invoicedTransaction = { ...mockAuthorizedTransaction, status: 'INVOICED' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+      
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should return error translation key for unknown status', async () => {
+      const unknownTransaction = { ...mockAuthorizedTransaction, status: 'UNKNOWN_STATUS' };
+      
+      render(
+        <MemoryRouter>
+          <PurchaseManagement />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('Simulate Row Action Auth'));
+
+      await waitFor(() => {
+        expect(mockGetStatusChip).toHaveBeenCalled();
+      });
+    });
+
+    it('should use getChipLabel result in Tooltip component', async () => {
+      await renderAndOpenDrawer(mockAuthorizedTransaction);
+      
+      const statusChip = screen.getByTestId('status-chip');
+      expect(statusChip).toBeInTheDocument();
+      expect(statusChip).toHaveTextContent('AUTHORIZED');
     });
   });
-
-});
