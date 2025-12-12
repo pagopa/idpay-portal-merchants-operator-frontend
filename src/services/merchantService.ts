@@ -16,11 +16,11 @@ import {TransactionBarCodeResponse} from "../api/generated/merchants/Transaction
     return MerchantApi.previewPayment(params);
   };
 
-  export const authPaymentBarCode = async (params: { trxCode: string, amountCents: number, additionalProperties?: {} }): Promise<AuthPaymentResponseDTO> => {
+  export const authPaymentBarCode = async (params: { trxCode: string, amountCents: number, additionalProperties?: object }): Promise<AuthPaymentResponseDTO> => {
     return MerchantApi.authPaymentBarCode(params);
   };
 
-export const capturePayment = async (params: { trxCode: string, additionalProperties?: {} }): Promise<TransactionBarCodeResponse> => {
+export const capturePayment = async (params: { trxCode: string, additionalProperties?: object }): Promise<TransactionBarCodeResponse> => {
   return MerchantApi.capturePayment(params);
 };
 
@@ -47,7 +47,9 @@ export const capturePayment = async (params: { trxCode: string, additionalProper
   export const reverseTransactionApi = async (trxId: string, file: File, docNumber: string): Promise<void> => {
     return MerchantApi.reverseTransactionApi(trxId, file, docNumber);
   }
-
+  export const reverseInvoicedTransactionApi = async (trxId: string, file: File, docNumber: string): Promise<void> => {
+    return MerchantApi.reverseInvoicedTransactionApi(trxId, file, docNumber);
+  }
   export const invoiceTransactionApi = async (trxId: string, file: File, docNumber: string): Promise<void> => {
     return MerchantApi.invoiceTransactionApi(trxId, file, docNumber);
   }

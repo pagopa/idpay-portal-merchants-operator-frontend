@@ -16,6 +16,7 @@ import {
 } from "../../utils/helpers";
 import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
 import { useLocation, useNavigate } from "react-router-dom";
+import ROUTES from "../../routes";
 import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
 import { authStore } from "../../store/authStore";
@@ -41,7 +42,9 @@ const RefundManagement = () => {
   const navigate = useNavigate();
 
   const handleReverseTransaction = () => {
-    navigate("/storna-transazione/" + selectedTransaction?.id);
+    navigate("/storna-transazione/" + selectedTransaction?.id, {
+      state: { backTo: ROUTES.REFUNDS_MANAGEMENT },
+    });
   };
 
   useEffect(() => {
