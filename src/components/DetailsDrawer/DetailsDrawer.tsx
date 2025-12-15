@@ -121,7 +121,7 @@ export const DetailsDrawer = ({
 
         <Grid container spacing={2} ref={gridRef} sx={{
           overflowY: isScrollable ? 'auto' : 'visible',
-          maxHeight: isScrollable ? 'calc(100vh - 200px)' : 'none',
+          maxHeight: isScrollable ? 'calc(100vh - 250px)' : 'none',
           maxWidth: '100%'
         }} data-testId="item-test">
           {itemsEntries.map(([key, value], index) => {
