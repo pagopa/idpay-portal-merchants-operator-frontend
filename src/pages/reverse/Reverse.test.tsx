@@ -18,8 +18,12 @@ vi.mock("react-i18next", () => ({
 }));
 
 vi.mock("../../services/merchantService", () => ({
-  reverseTransactionApi: vi.fn(() => "reverseTransactionApi"),
-  reverseInvoicedTransactionApi: vi.fn(() => "reverseInvoicedTransactionApi"),
+  reverseTransactionApi: vi.fn(function reverseTransactionApi() {
+    return "reverseTransactionApi";
+  }),
+  reverseInvoicedTransactionApi: vi.fn(function reverseInvoicedTransactionApi() {
+    return "reverseInvoicedTransactionApi";
+  }),
 }));
 
 vi.mock("./reverse.module.css", () => ({
@@ -34,7 +38,7 @@ vi.mock("../../components/FileUploadAction/FileUploadAction", () => ({
         <div data-testid="title-key">{props.titleKey}</div>
         <div data-testid="subtitle-key">{props.subtitleKey}</div>
         <div data-testid="i18n-block-key">{props.i18nBlockKey}</div>
-        <div data-testid="api-call">{String(props.apiCall)}</div>
+        <div data-testid="api-call">{props.apiCall?.name || 'unknown'}</div>
         <div data-testid="success-state-key">{props.successStateKey}</div>
         <div data-testid="breadcrumbs-label-key">{props.breadcrumbsLabelKey}</div>
         <div data-testid="breadcrumb-path">{props.breadcrumbsProp?.path}</div>
@@ -77,7 +81,7 @@ describe("Reverse Component", () => {
           "Refund Management"
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseInvoicedTransactionApi)
+          "reverseInvoicedTransactionApi"
       );
     });
 
@@ -100,7 +104,7 @@ describe("Reverse Component", () => {
           "Buy Management"
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
 
@@ -120,7 +124,7 @@ describe("Reverse Component", () => {
           "/unknown-route"
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
   });
@@ -143,7 +147,7 @@ describe("Reverse Component", () => {
           "translated_routes.refundManagement"
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseInvoicedTransactionApi)
+          "reverseInvoicedTransactionApi"
       );
     });
 
@@ -164,7 +168,7 @@ describe("Reverse Component", () => {
           "translated_routes.buyManagement"
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
 
@@ -182,7 +186,7 @@ describe("Reverse Component", () => {
           ROUTES.BUY_MANAGEMENT
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
   });
@@ -200,7 +204,7 @@ describe("Reverse Component", () => {
           ROUTES.BUY_MANAGEMENT
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
 
@@ -216,7 +220,7 @@ describe("Reverse Component", () => {
           ROUTES.BUY_MANAGEMENT
       );
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
 
@@ -226,7 +230,7 @@ describe("Reverse Component", () => {
       render(<Reverse />);
 
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
   });
@@ -340,7 +344,7 @@ describe("Reverse Component", () => {
       render(<Reverse />);
 
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
 
@@ -357,7 +361,7 @@ describe("Reverse Component", () => {
       render(<Reverse />);
 
       expect(screen.getByTestId("api-call")).toHaveTextContent(
-          String(reverseTransactionApi)
+          "reverseTransactionApi"
       );
     });
   });
