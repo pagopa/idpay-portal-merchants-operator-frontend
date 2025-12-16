@@ -26,7 +26,7 @@ export default function SideNavItem({
       <ListItemIcon sx={{ ml: level }}>
         {
           hideLabels ? (
-            <Tooltip title={title}>
+            <Tooltip title={title} placement='top'>
               <Icon component={icon} />
             </Tooltip>
           ) : (<Icon component={icon} />)

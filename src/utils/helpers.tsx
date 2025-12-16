@@ -132,7 +132,7 @@ export const renderCellWithTooltip = (value: any) => {
       height: '100%',
       width: '100%'
     }}>
-      <Tooltip title={value}>
+      <Tooltip title={value} placement='top'>
         <Typography sx={{
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -154,7 +154,7 @@ export const renderMissingDataWithTooltip = () => {
       height: '100%',
       width: '100%'
     }}>
-      <Tooltip title={MISSING_DATA_PLACEHOLDER}>
+      <Tooltip title={MISSING_DATA_PLACEHOLDER} placement='top'>
         <Typography sx={{
           overflow: 'hidden',
           textOverflow: 'ellipsis',

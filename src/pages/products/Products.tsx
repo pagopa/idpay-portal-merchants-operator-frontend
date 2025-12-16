@@ -73,7 +73,7 @@ const Products = () => {
                             height: '100%',
                             width: '100%'
                         }}>
-                            <Tooltip title={params.value}>
+                            <Tooltip title={params.value} placement='top'>
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -103,7 +103,7 @@ const Products = () => {
                             height: '100%',
                             width: '100%'
                         }}>
-                            <Tooltip title={params.value}>
+                            <Tooltip title={params.value} placement='top'>
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -133,7 +133,7 @@ const Products = () => {
                             height: '100%',
                             width: '100%'
                         }}>
-                            <Tooltip title={params.value}>
+                            <Tooltip title={params.value} placement='top'>
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -163,7 +163,7 @@ const Products = () => {
                             height: '100%',
                             width: '100%'
                         }}>
-                            <Tooltip title={params.value}>
+                            <Tooltip title={params.value} placement='top'>
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -193,7 +193,7 @@ const Products = () => {
                             height: '100%',
                             width: '100%'
                         }}>
-                            <Tooltip title={params.value}>
+                            <Tooltip title={params.value} placement='top'>
                                 <Typography sx={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
