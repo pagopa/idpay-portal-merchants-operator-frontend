@@ -351,7 +351,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         isOpen={errorAlert.isOpen}
         data-testid="alert-component"
         error
-        message={t("pages.reverse.errorAlert")}
+        message={errorAlert.message}
         contentStyle={{ right: "20px" }}
       />
     </>
