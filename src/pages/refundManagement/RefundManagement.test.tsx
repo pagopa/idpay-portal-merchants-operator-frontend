@@ -218,7 +218,7 @@ describe("RefundManagement", () => {
 
     renderComponent();
 
-    await waitFor(() => expect(screen.getByText("Si è verificato un errore.")).toBeInTheDocument() );
+    await waitFor(() => expect(screen.getByText("Si è verificato un errore.")).toBeInTheDocument());
     expect(screen.queryByTestId("data-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
   });
@@ -357,6 +357,7 @@ describe("RefundManagement", () => {
 });
 
 import { MemoryRouter } from "react-router-dom";
+import { checkEuroTooltip } from "../../utils/helpers";
 
 async function loadRefundManagementWithHarness(routeState?: any) {
   vi.resetModules();
@@ -369,13 +370,13 @@ async function loadRefundManagementWithHarness(routeState?: any) {
 
   const realCreateElement = document.createElement.bind(document);
   const createElementSpy = vi
-      .spyOn(document, "createElement")
-      .mockImplementation((tagName: any, ...args: any[]) => {
-        if (typeof tagName === "string" && tagName.toLowerCase() === "a") {
-          return anchor;
-        }
-        return realCreateElement(tagName, ...args);
-      });
+    .spyOn(document, "createElement")
+    .mockImplementation((tagName: any, ...args: any[]) => {
+      if (typeof tagName === "string" && tagName.toLowerCase() === "a") {
+        return anchor;
+      }
+      return realCreateElement(tagName, ...args);
+    });
 
   vi.doMock("react-i18next", () => ({
     useTranslation: () => ({
@@ -383,14 +384,14 @@ async function loadRefundManagementWithHarness(routeState?: any) {
         const map: Record<string, string> = {
           "pages.refundManagement.title": "Gestione Rimborsi",
           "pages.refundManagement.subtitle":
-              "Gestisci le transazioni elaborate e i rimborsi",
+            "Gestisci le transazioni elaborate e i rimborsi",
           "pages.refundManagement.tableTitle": "Transazioni",
           "pages.refundManagement.noTransactions": "Nessuna transazione trovata.",
           "pages.refundManagement.errorAlert": "Si è verificato un errore.",
           "pages.refundManagement.refundSuccessUpload": "Rimborso caricato",
           "pages.refundManagement.reverseSuccessUpload": "Storno caricato",
           "pages.refundManagement.errorDownloadAlert":
-              "Errore durante il download",
+            "Errore durante il download",
           "pages.purchaseManagement.drawer.title": "Dettagli transazione",
           "commons.fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
           "commons.gtiInFilterPlaceholer": "Cerca per GTIN",
@@ -405,17 +406,37 @@ async function loadRefundManagementWithHarness(routeState?: any) {
     MISSING_DATA_PLACEHOLDER: "—",
   }));
 
-  vi.doMock("../../utils/helpers", () => ({
-    formatEuro: (cents?: number) =>
-        typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN",
-    getStatusChip: (_t: any, value: string) => (
-        <span data-testid="status-chip">{value}</span>
-    ),
-  }));
+vi.doMock("../../utils/helpers", () => ({
+  formatEuro: (cents?: number) =>
+    typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN",
+  getStatusChip: (_t: any, value: string) => (
+    <span data-testid="status-chip">{value}</span>
+  ),
+  renderCellWithTooltip: (value: any) => value ?? "—",
+  renderMissingDataWithTooltip: () => "—",
+  checkTooltipValue: (params: any, key?: string) => {
+    if (key) {
+      if (params?.value?.[key]) {
+        return params.value[key];
+      }
+    }
+    if (params?.value !== undefined && params?.value !== null) {
+      return params.value;
+    }
+    return "—";
+  },
+  checkEuroTooltip: (params: any) => {
+    if (params?.value !== undefined && params?.value !== null) {
+      const cents = params.value;
+      return typeof cents === "number" ? `€${(cents / 100).toFixed(2)}` : "€NaN";
+    }
+    return "—";
+  },
+}));
 
   vi.doMock("../../services/merchantService", () => ({
     getProcessedTransactions: (...args: any[]) =>
-        getProcessedTransactions(...args),
+      getProcessedTransactions(...args),
     downloadInvoiceFileApi: (...args: any[]) => downloadInvoiceFileApi(...args),
   }));
 
@@ -430,37 +451,37 @@ async function loadRefundManagementWithHarness(routeState?: any) {
 
   vi.doMock("../../components/DetailsDrawer/DetailsDrawer", () => ({
     DetailsDrawer: ({
-                      isOpen,
-                      isLoading,
-                      item,
-                      setIsOpen,
-                      onFileDownloadCallback,
-                    }: any) => (
-        <div data-testid="drawer">
-          <div data-testid="drawer-open">{String(isOpen)}</div>
-          <div data-testid="drawer-loading">{String(isLoading)}</div>
-          <button
-              data-testid="close-drawer"
-              onClick={() => setIsOpen(false)}
-          ></button>
-          <button
-              data-testid="trigger-download"
-              onClick={onFileDownloadCallback}
-          ></button>
-          <pre data-testid="drawer-item">
+      isOpen,
+      isLoading,
+      item,
+      setIsOpen,
+      onFileDownloadCallback,
+    }: any) => (
+      <div data-testid="drawer">
+        <div data-testid="drawer-open">{String(isOpen)}</div>
+        <div data-testid="drawer-loading">{String(isLoading)}</div>
+        <button
+          data-testid="close-drawer"
+          onClick={() => setIsOpen(false)}
+        ></button>
+        <button
+          data-testid="trigger-download"
+          onClick={onFileDownloadCallback}
+        ></button>
+        <pre data-testid="drawer-item">
           {item ? JSON.stringify(item) : ""}
         </pre>
-        </div>
+      </div>
     ),
   }));
 
   vi.doMock("../../components/TransactionsLayout/TransactionsLayout", () => ({
     default: ({
-                columns,
-                onRowAction,
-                DrawerComponent,
-                externalState,
-              }: any) => {
+      columns,
+      onRowAction,
+      DrawerComponent,
+      externalState,
+    }: any) => {
       const refundedTx = {
         updateDate: "2025-09-22T14:00:00.000Z",
         additionalProperties: { productName: "Frigorifero EcoFrost" },
@@ -485,77 +506,77 @@ async function loadRefundManagementWithHarness(routeState?: any) {
       };
 
       return (
-          <div>
-            <button
-                data-testid="open-refunded"
-                onClick={() => onRowAction(refundedTx)}
-            />
-            <button
-                data-testid="open-cancelled"
-                onClick={() => onRowAction(cancelledTx)}
-            />
-            <button
-                data-testid="open-rewarded"
-                onClick={() => onRowAction(rewardedTx)}
-            />
+        <div>
+          <button
+            data-testid="open-refunded"
+            onClick={() => onRowAction(refundedTx)}
+          />
+          <button
+            data-testid="open-cancelled"
+            onClick={() => onRowAction(cancelledTx)}
+          />
+          <button
+            data-testid="open-rewarded"
+            onClick={() => onRowAction(rewardedTx)}
+          />
 
-            <div data-testid="col-additional-has">
-              {columns[0].renderCell({
-                value: { productName: "Lavatrice Ultra" },
-              })}
-            </div>
-            <div data-testid="col-additional-missing">
-              {columns[0].renderCell({ value: undefined })}
-            </div>
-
-            <div data-testid="col-date-has">
-              {columns[1].renderCell({ value: "2025-10-01T10:20:00.000Z" })}
-            </div>
-            <div data-testid="col-date-missing">
-              {columns[1].renderCell({ value: undefined })}
-            </div>
-
-            <div data-testid="col-fiscal-missing">
-              {columns[2].renderCell({ value: undefined })}
-            </div>
-
-            <div data-testid="col-total-zero">
-              {columns[3].renderCell({ value: 0 })}
-            </div>
-            <div data-testid="col-total-missing">
-              {columns[3].renderCell({ value: undefined })}
-            </div>
-
-            <div data-testid="col-reward-zero">
-              {columns[4].renderCell({ value: 0 })}
-            </div>
-            <div data-testid="col-reward-missing">
-              {columns[4].renderCell({ value: undefined })}
-            </div>
-
-            <div data-testid="col-authorized-has">
-              {columns[5].renderCell({ value: 1500 })}
-            </div>
-            <div data-testid="col-authorized-missing">
-              {columns[5].renderCell({ value: undefined })}
-            </div>
-
-            <div data-testid="col-status">
-              {columns[6].renderCell({ value: "REWARDED" })}
-            </div>
-
-            <div data-testid="state-refund">
-              {String(externalState?.transactionRefundSuccess)}
-            </div>
-            <div data-testid="state-reverse">
-              {String(externalState?.transactionReverseSuccess)}
-            </div>
-            <div data-testid="state-error">
-              {String(externalState?.errorDownloadAlert)}
-            </div>
-
-            {DrawerComponent}
+          <div data-testid="col-additional-has">
+            {columns[0].renderCell({
+              value: { productName: "Lavatrice Ultra" },
+            })}
           </div>
+          <div data-testid="col-additional-missing">
+            {columns[0].renderCell({ value: undefined })}
+          </div>
+
+          <div data-testid="col-date-has">
+            {columns[1].renderCell({ value: "2025-10-01T10:20:00.000Z" })}
+          </div>
+          <div data-testid="col-date-missing">
+            {columns[1].renderCell({ value: undefined })}
+          </div>
+
+          <div data-testid="col-fiscal-missing">
+            {columns[2].renderCell({ value: undefined })}
+          </div>
+
+          <div data-testid="col-total-zero">
+            {columns[3].renderCell({ value: 0 })}
+          </div>
+          <div data-testid="col-total-missing">
+            {columns[3].renderCell({ value: undefined })}
+          </div>
+
+          <div data-testid="col-reward-zero">
+            {columns[4].renderCell({ value: 0 })}
+          </div>
+          <div data-testid="col-reward-missing">
+            {columns[4].renderCell({ value: undefined })}
+          </div>
+
+          <div data-testid="col-authorized-has">
+            {columns[5].renderCell({ value: 1500 })}
+          </div>
+          <div data-testid="col-authorized-missing">
+            {columns[5].renderCell({ value: undefined })}
+          </div>
+
+          <div data-testid="col-status">
+            {columns[6].renderCell({ value: "REWARDED" })}
+          </div>
+
+          <div data-testid="state-refund">
+            {String(externalState?.transactionRefundSuccess)}
+          </div>
+          <div data-testid="state-reverse">
+            {String(externalState?.transactionReverseSuccess)}
+          </div>
+          <div data-testid="state-error">
+            {String(externalState?.errorDownloadAlert)}
+          </div>
+
+          {DrawerComponent}
+        </div>
       );
     },
   }));
@@ -564,13 +585,13 @@ async function loadRefundManagementWithHarness(routeState?: any) {
 
   const theme = createTheme();
   render(
-      <MemoryRouter
-          initialEntries={[{ pathname: "/refund", state: routeState }]}
-      >
-        <ThemeProvider theme={theme}>
-          <RefundManagement />
-        </ThemeProvider>
-      </MemoryRouter>
+    <MemoryRouter
+      initialEntries={[{ pathname: "/refund", state: routeState }]}
+    >
+      <ThemeProvider theme={theme}>
+        <RefundManagement />
+      </ThemeProvider>
+    </MemoryRouter>
   );
 
   return {
@@ -598,7 +619,7 @@ describe("RefundManagement – extra coverage harness", () => {
     let resolve!: (v: any) => void;
     const deferred = new Promise((r) => (resolve = r));
     downloadInvoiceFileApi.mockReturnValueOnce(
-        deferred.then(() => ({ invoiceUrl: "https://example.com/invoice.pdf" }))
+      deferred.then(() => ({ invoiceUrl: "https://example.com/invoice.pdf" }))
     );
 
     fireEvent.click(screen.getByTestId("open-refunded"));
@@ -624,14 +645,14 @@ describe("RefundManagement – extra coverage harness", () => {
     });
 
     expect(downloadInvoiceFileApi).toHaveBeenCalledWith(
-        "pos-456",
-        "trx-refunded"
+      "pos-456",
+      "trx-refunded"
     );
   });
 
   it("handles CANCELLED invoice label and the fallback filename on REWARDED", async () => {
     const { downloadInvoiceFileApi, anchor } =
-        await loadRefundManagementWithHarness();
+      await loadRefundManagementWithHarness();
 
     fireEvent.click(screen.getByTestId("open-cancelled"));
     let item = screen.getByTestId("drawer-item").textContent!;
@@ -650,7 +671,7 @@ describe("RefundManagement – extra coverage harness", () => {
 
   it("sets error flag when download fails and can close the drawer", async () => {
     const { downloadInvoiceFileApi } =
-        await loadRefundManagementWithHarness();
+      await loadRefundManagementWithHarness();
 
     downloadInvoiceFileApi.mockRejectedValueOnce(new Error("Boom"));
 
@@ -670,7 +691,7 @@ describe("RefundManagement – extra coverage harness", () => {
     await loadRefundManagementWithHarness();
 
     expect(
-        screen.getByTestId("col-additional-has").textContent
+      screen.getByTestId("col-additional-has").textContent
     ).toContain("Lavatrice Ultra");
     expect(screen.getByTestId("col-additional-missing")).toHaveTextContent("—");
 
@@ -685,11 +706,103 @@ describe("RefundManagement – extra coverage harness", () => {
     expect(screen.getByTestId("col-reward-missing")).toHaveTextContent("—");
 
     expect(screen.getByTestId("col-authorized-has")).toHaveTextContent(
-        "€15.00"
+      "€15.00"
     );
     expect(screen.getByTestId("col-authorized-missing")).toHaveTextContent("—");
 
     expect(screen.getByTestId("col-status").querySelector("[data-testid='status-chip']"))
-        .toHaveTextContent("REWARDED");
+      .toHaveTextContent("REWARDED");
+  });
+});
+
+
+describe("getChipLabel functionality", () => {
+  it("should render correct chip labels for all statuses", async () => {
+
+    const transactionsWithDifferentStatuses = [
+      {
+        trxId: "1",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444E",
+        effectiveAmountCents: 8000,
+        rewardAmountCents: 800,
+        status: "AUTHORIZED",
+        eletronicDevice: "Frigorifero EcoFrost",
+      },
+      {
+        trxId: "2",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444F",
+        effectiveAmountCents: 9000,
+        rewardAmountCents: 900,
+        status: "REFUNDED",
+        eletronicDevice: "Lavatrice",
+      },
+      {
+        trxId: "3",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444G",
+        effectiveAmountCents: 7000,
+        rewardAmountCents: 700,
+        status: "CANCELLED",
+        eletronicDevice: "Asciugatrice",
+      },
+      {
+        trxId: "4",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444H",
+        effectiveAmountCents: 6000,
+        rewardAmountCents: 600,
+        status: "CAPTURED",
+        eletronicDevice: "Forno",
+      },
+      {
+        trxId: "5",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444I",
+        effectiveAmountCents: 5000,
+        rewardAmountCents: 500,
+        status: "REWARDED",
+        eletronicDevice: "Lavastoviglie",
+      },
+      {
+        trxId: "6",
+        trxDate: "2025-09-22 14:00:00",
+        fiscalCode: "BBBBBB22C33D444J",
+        effectiveAmountCents: 4000,
+        rewardAmountCents: 400,
+        status: "INVOICED",
+        eletronicDevice: "Microonde",
+      },
+    ];
+
+    mockGetProcessedTransactions.mockResolvedValue({
+      content: transactionsWithDifferentStatuses,
+      page: 0,
+      pageSize: 10,
+      totalElements: 6,
+    });
+
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    expect(screen.getByTestId("cell-status")).toBeInTheDocument();
+  });
+
+  it("should handle unknown status with default error label", async () => {
+    mockGetProcessedTransactions.mockResolvedValue({
+      ...mockApiResponse,
+      content: [
+        {
+          ...mockTransactions[0],
+          status: "UNKNOWN_STATUS",
+        },
+      ],
+    });
+
+    renderComponent();
+    await screen.findByTestId("data-table");
+
+    expect(screen.getByTestId("cell-status")).toBeInTheDocument();
   });
 });

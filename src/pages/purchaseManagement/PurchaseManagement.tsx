@@ -1,4 +1,4 @@
-import { Box, Button, Tooltip, Drawer, Typography, Grid, CircularProgress } from "@mui/material";
+import { Box, Button, Drawer, Typography, Grid, CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect, useRef } from "react";
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -11,7 +11,7 @@ import { GridRenderCellParams } from "@mui/x-data-grid";
 import { theme } from '@pagopa/mui-italia';
 import CloseIcon from '@mui/icons-material/Close';
 import style from './purchaseManagement.module.css';
-import { getStatusChip, formatEuro } from "../../utils/helpers";
+import { getStatusChip, formatEuro, renderCellWithTooltip, renderMissingDataWithTooltip, checkEuroTooltip, checkTooltipValue } from "../../utils/helpers";
 import { utilsStore } from "../../store/utilsStore";
 import ModalComponent from "../../components/Modal/ModalComponent";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
@@ -38,7 +38,7 @@ const PurchaseManagement = () => {
     const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
     const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
     const [transactionDeleteSuccess, setTransactionDeleteSuccess] = useState(false);
-    
+
 
     const gridRef = useRef(null);
 
@@ -73,12 +73,13 @@ const PurchaseManagement = () => {
             const { refundUploadSuccess, reverseUploadSuccess } = location.state;
             if (refundUploadSuccess) {
                 setTransactionRefundSuccess(true);
-            } 
+            }
             if (reverseUploadSuccess) {
                 setTransactionReverseSuccess(true);
             }
         }
     }, [location.state]);
+
 
     const columns = [
         {
@@ -89,23 +90,7 @@ const PurchaseManagement = () => {
             align: 'center',
             sortable: true,
             renderCell: (params: GridRenderCellParams) => {
-                if (params?.value?.productName) {
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={params.value?.productName}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '16px'
-                                }}>
-                                    {params.value?.productName}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkTooltipValue(params, 'productName');
             },
         },
         {
@@ -122,22 +107,9 @@ const PurchaseManagement = () => {
                         hour: '2-digit',
                         minute: '2-digit',
                     }).replace(',', '');
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={formattedDate}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '16px'
-                                }}>
-                                    {formattedDate}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
+                    return renderCellWithTooltip(formattedDate);
                 }
-                return MISSING_DATA_PLACEHOLDER;
+                return renderMissingDataWithTooltip();
             },
         },
         {
@@ -147,23 +119,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value) {
-                    return (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%', width: '100%' }}>
-                            <Tooltip title={params.value}>
-                                <Typography sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '16px'
-                                }}>
-                                    {params.value}
-                                </Typography>
-                            </Tooltip>
-                        </div>
-                    );
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkTooltipValue(params);
             },
         },
         {
@@ -176,10 +132,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -192,10 +145,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -208,10 +158,7 @@ const PurchaseManagement = () => {
             disableColumnMenu: true,
             sortable: false,
             renderCell: (params: GridRenderCellParams) => {
-                if (params.value || params.value === 0) {
-                    return formatEuro(params.value);
-                }
-                return MISSING_DATA_PLACEHOLDER;
+                return checkEuroTooltip(params);
             }
         },
         {
@@ -402,7 +349,7 @@ const PurchaseManagement = () => {
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
                                         {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
-                                </Grid> 
+                                </Grid>
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.totalAmount')}
@@ -442,7 +389,7 @@ const PurchaseManagement = () => {
                                     </Typography>
                                 </Grid>
                                 {
-                                    (selectedTransaction?.status === 'AUTHORIZED' || selectedTransaction?.status === 'CAPTURED')  && (
+                                    (selectedTransaction?.status === 'AUTHORIZED' || selectedTransaction?.status === 'CAPTURED') && (
                                         <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                             <Typography variant="body2" mb={1} sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary, margin: 0 }}>
                                                 {t('pages.purchaseManagement.drawer.document')}
@@ -461,13 +408,13 @@ const PurchaseManagement = () => {
                                                         data-testid="item-loader"
                                                     />
                                                 ) : (
-                                                    <Box sx={{ display: 'flex', gap: 0, alignItems: 'start'}}>
+                                                    <Box sx={{ display: 'flex', gap: 0, alignItems: 'start' }}>
                                                         <DescriptionIcon />
-                                                        <div style={{ marginLeft: '8px', wordBreak: 'break-all'}}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</div>
+                                                        <div style={{ marginLeft: '8px', wordBreak: 'break-all' }}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</div>
                                                     </Box>
                                                 )}
                                             </Button>
-                                        </Grid> 
+                                        </Grid>
                                     )
                                 }
                             </Grid>

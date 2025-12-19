@@ -248,6 +248,33 @@ export const MerchantApi = {
       throw error;
     }
   },
+  reverseInvoicedTransactionApi: async (
+    trxId: string, 
+    file: File,
+    docNumber: string
+  ): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('docNumber', docNumber);
+      
+      const response = await axiosInstance.post(
+        `/transactions/${trxId}/reversal-invoiced`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      const result = handleAxiosResponse(response);
+      return result;
+    } catch (error) {
+      console.error('Error in reverseInvoicedTransaction:', error);
+      throw error;
+    }
+  },
+  
 
  invoiceTransactionApi: async (
     trxId: string, 

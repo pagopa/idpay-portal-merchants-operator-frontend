@@ -19,7 +19,7 @@ const AlertComponent = ({ isOpen, error, message, containerStyle, contentStyle }
                 justifyContent: 'flex-end',
                 position: 'sticky',
                 bottom: '128px',
-                zIndex: '1300',
+                zIndex: '1150',
                 height: '100%',
                 ...containerStyle,
             }}>
@@ -34,7 +34,6 @@ const AlertComponent = ({ isOpen, error, message, containerStyle, contentStyle }
                     width: 'auto',
                     maxWidth: '400px',
                     minWidth: '300px',
-                    zIndex: 1300,
                     boxShadow: 3,
                     borderRadius: 1,
                     '& .MuiAlert-icon': {
