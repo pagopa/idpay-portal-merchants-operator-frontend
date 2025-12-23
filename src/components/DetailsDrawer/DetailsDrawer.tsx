@@ -198,7 +198,9 @@ export const DetailsDrawer = ({
           {secondaryButton && (
             <Button
               onClick={secondaryButton?.onClick}
+              sx={{marginTop: '10px'}}
               href={primaryButton?.url}
+              disabled={invoiceStatus === 'REWARDED'}
             >
               {secondaryButton.label}
             </Button>
