@@ -275,7 +275,7 @@ const RefundManagement = () => {
             },
           }}
           secondaryButton={
-            status === "INVOICED"
+            status === "INVOICED" || status === 'REWARDED'
               ? {
                   label: t("pages.purchaseManagement.drawer.refund"),
                   onClick: handleReverseTransaction,
