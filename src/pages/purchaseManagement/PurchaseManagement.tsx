@@ -350,6 +350,15 @@ const PurchaseManagement = () => {
                                         {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
+                                <Grid size={{ xs: 11, md: 11, lg: 11 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
+                                        {t('pages.purchaseManagement.drawer.trxCode')}
+                                    </Typography>
+
+                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
+                                        {selectedTransaction?.trxCode ?? MISSING_DATA_PLACEHOLDER}
+                                    </Typography>
+                                </Grid>
                                 <Grid size={{ xs: 12, md: 12, lg: 12 }}>
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.totalAmount')}
