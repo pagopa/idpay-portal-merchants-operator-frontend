@@ -20,6 +20,8 @@ const PointOfSaleDTOR = t.interface({});
 const PointOfSaleDTOO = t.partial({
   address: t.string,
 
+  businessName: t.string,
+
   channelEmail: t.string,
 
   channelGeolink: t.string,
@@ -36,6 +38,8 @@ const PointOfSaleDTOO = t.partial({
 
   contactSurname: t.string,
 
+  fiscalCode: t.string,
+
   franchiseName: t.string,
 
   id: t.string,
@@ -47,6 +51,8 @@ const PointOfSaleDTOO = t.partial({
   streetNumber: t.string,
 
   type: enumType<TypeEnum>(TypeEnum, "type"),
+
+  vatNumber: t.string,
 
   website: t.string,
 

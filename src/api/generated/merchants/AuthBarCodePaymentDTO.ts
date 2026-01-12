@@ -27,6 +27,8 @@ export type AuthBarCodePaymentDTOAdditionalProperties = t.TypeOf<
 
 // required attributes
 const AuthBarCodePaymentDTOR = t.interface({
+  additionalProperties: AuthBarCodePaymentDTOAdditionalProperties,
+
   amountCents: t.union([
     WithinRangeInteger<0, 1000000, IWithinRangeIntegerTag<0, 1000000>>(
       0,
@@ -39,9 +41,7 @@ const AuthBarCodePaymentDTOR = t.interface({
 });
 
 // optional attributes
-const AuthBarCodePaymentDTOO = t.partial({
-  additionalProperties: AuthBarCodePaymentDTOAdditionalProperties
-});
+const AuthBarCodePaymentDTOO = t.partial({});
 
 export const AuthBarCodePaymentDTO = t.intersection(
   [AuthBarCodePaymentDTOR, AuthBarCodePaymentDTOO],

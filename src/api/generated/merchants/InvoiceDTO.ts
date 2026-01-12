@@ -12,7 +12,9 @@ const InvoiceDTOR = t.interface({
 });
 
 // optional attributes
-const InvoiceDTOO = t.partial({});
+const InvoiceDTOO = t.partial({
+  docNumber: t.string
+});
 
 export const InvoiceDTO = t.intersection(
   [InvoiceDTOR, InvoiceDTOO],
