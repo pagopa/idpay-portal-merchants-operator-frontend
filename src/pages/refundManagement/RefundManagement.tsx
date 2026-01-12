@@ -76,7 +76,7 @@ const RefundManagement = () => {
           : "Numero fattura";
 
       const mappedTransaction = {
-        "Data e ora": new Date(transaction?.trxChargeDate)
+        [t("pages.refundManagement.drawer.trxDate")]: new Date(transaction?.trxChargeDate)
           .toLocaleDateString("it-IT", {
             day: "2-digit",
             month: "2-digit",
@@ -85,16 +85,17 @@ const RefundManagement = () => {
             minute: "2-digit",
           })
           .replace(",", ""),
-        Elettrodomestico: transaction?.additionalProperties.productName,
-        "Codice Fiscale": transaction?.fiscalCode,
-        "ID transazione": transaction?.id,
-        "Totale della spesa":
+        [t("pages.refundManagement.drawer.householdAppliance")]: transaction?.additionalProperties.productName,
+        [t("pages.refundManagement.drawer.fiscalCode")]: transaction?.fiscalCode,
+        [t("pages.refundManagement.drawer.transactionId")]: transaction?.id,
+        [t("pages.refundManagement.drawer.trxCode")]: transaction?.trxCode,
+        [t("pages.refundManagement.drawer.totalAmount")]:
           transaction?.effectiveAmountCents &&
           formatEuro(transaction.effectiveAmountCents),
-        "Sconto applicato":
+        [t("pages.refundManagement.drawer.rewardAmount")]:
           transaction?.rewardAmountCents &&
           formatEuro(transaction.rewardAmountCents),
-        "Importo autorizzato":
+        [t("pages.refundManagement.drawer.authorizedAmount")]:
           transaction?.authorizedAmountCents &&
           formatEuro(transaction.authorizedAmountCents),
         Stato: getStatusChip(t, transaction?.status),
@@ -261,7 +262,7 @@ const RefundManagement = () => {
           isLoading={downloadInProgress}
           setIsOpen={() => setIsOpen(false)}
           isOpen={isOpen}
-          title={t("pages.purchaseManagement.drawer.title")}
+          title={t("pages.refundManagement.drawer.title")}
           item={selectedTransaction}
           invoiceStatus={status}
           primaryButton={{
@@ -277,7 +278,7 @@ const RefundManagement = () => {
           secondaryButton={
             status === "INVOICED" || status === 'REWARDED'
               ? {
-                  label: t("pages.purchaseManagement.drawer.refund"),
+                  label: t("pages.refundManagement.drawer.refund"),
                   onClick: handleReverseTransaction,
                 }
               : undefined
