@@ -14,6 +14,7 @@
     "gtiInFilterPlaceholer": "Cerca per GTIN",
     "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
     "statusFilterPlaceholer": "Stato",
+    "trxCodeFilterPlaceholer": "Codice sconto",
     "fileSizeError": "Il file supera la dimensione massima di 20MB",
     "discountStatusEnum": {
       "authorized": "Autorizzato",
@@ -254,7 +255,8 @@
         "refund": "Storna",
         "householdAppliance": "Elettrodomestico",
         "document": "Documento di pre-autorizzazione",
-        "transactionId": "ID transazione"
+        "transactionId": "ID transazione",
+        "trxCode": "Codice sconto"
       },
       "cancelTransactionModal": {
         "title": "Annulla transazione",
@@ -290,8 +292,27 @@
       "tableTitle": "Transazioni",
       "refundSuccessUpload": "Richiesta inviata correttamente",
       "reverseSuccessUpload": "Richiesta inviata correttamente",
-      "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova."
-
+      "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova.",
+      "drawer": {
+        "title": "Dettaglio transazione",
+        "product": "Prodotto",
+        "totalAmount": "Totale della spesa",
+        "authorizedAmount": "Importo autorizzato",
+        "rewardAmount": "Sconto applicato",
+        "status": "Stato",
+        "fiscalCode": "Codice fiscale",
+        "trxDate": "Data e ora",
+        "brand": "Modello",
+        "category": "Categoria",
+        "confirmPayment": "Conferma pagamento",
+        "cancellPayment": "Annulla transazione",
+        "requestRefund": "Carica fattura",
+        "refund": "Storna",
+        "householdAppliance": "Elettrodomestico",
+        "document": "Documento di pre-autorizzazione",
+        "transactionId": "ID transazione",
+        "trxCode": "Codice sconto"
+      }
     },
     "products": {
       "title": "Prodotti",

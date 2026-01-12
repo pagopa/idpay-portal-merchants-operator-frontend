@@ -89,6 +89,8 @@ const PointOfSaleTransactionProcessedDTOO = t.partial({
 
   trxChargeDate: UTCISODateFromString,
 
+  trxCode: PatternString("^[a-zA-Z0-9]+$"),
+
   trxDate: UTCISODateFromString,
 
   updateDate: UTCISODateFromString

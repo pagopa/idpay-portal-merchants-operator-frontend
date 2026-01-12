@@ -11,6 +11,8 @@ const InvoiceFileDTOR = t.interface({});
 
 // optional attributes
 const InvoiceFileDTOO = t.partial({
+  docNumber: t.string,
+
   filename: t.string
 });
 
