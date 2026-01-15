@@ -31,10 +31,14 @@ import {
   deleteTransactionDefaultDecoder,
   InvoiceTransactionT,
   invoiceTransactionDefaultDecoder,
+  UpdateInvoiceTransactionT,
+  updateInvoiceTransactionDefaultDecoder,
   GetTransactionPreviewPdfT,
   getTransactionPreviewPdfDefaultDecoder,
   ReversalTransactionT,
   reversalTransactionDefaultDecoder,
+  ReversalTransactionInvoicedT,
+  reversalTransactionInvoicedDefaultDecoder,
   GetPointOfSaleT,
   getPointOfSaleDefaultDecoder,
   DownloadInvoiceFileT,
@@ -55,8 +59,10 @@ export type ApiOperation = TypeofApiCall<GetPointOfSaleTransactionsT> &
   TypeofApiCall<PreviewPaymentT> &
   TypeofApiCall<DeleteTransactionT> &
   TypeofApiCall<InvoiceTransactionT> &
+  TypeofApiCall<UpdateInvoiceTransactionT> &
   TypeofApiCall<GetTransactionPreviewPdfT> &
   TypeofApiCall<ReversalTransactionT> &
+  TypeofApiCall<ReversalTransactionInvoicedT> &
   TypeofApiCall<GetPointOfSaleT> &
   TypeofApiCall<DownloadInvoiceFileT>;
 
@@ -68,8 +74,10 @@ export type ParamKeys = keyof (TypeofApiParams<GetPointOfSaleTransactionsT> &
   TypeofApiParams<PreviewPaymentT> &
   TypeofApiParams<DeleteTransactionT> &
   TypeofApiParams<InvoiceTransactionT> &
+  TypeofApiParams<UpdateInvoiceTransactionT> &
   TypeofApiParams<GetTransactionPreviewPdfT> &
   TypeofApiParams<ReversalTransactionT> &
+  TypeofApiParams<ReversalTransactionInvoicedT> &
   TypeofApiParams<GetPointOfSaleT> &
   TypeofApiParams<DownloadInvoiceFileT>);
 
@@ -103,8 +111,10 @@ export type WithDefaultsT<
   | PreviewPaymentT
   | DeleteTransactionT
   | InvoiceTransactionT
+  | UpdateInvoiceTransactionT
   | GetTransactionPreviewPdfT
   | ReversalTransactionT
+  | ReversalTransactionInvoicedT
   | GetPointOfSaleT
   | DownloadInvoiceFileT,
   K
@@ -138,11 +148,19 @@ export type Client<
 
       readonly invoiceTransaction: TypeofApiCall<InvoiceTransactionT>;
 
+      readonly updateInvoiceTransaction: TypeofApiCall<
+        UpdateInvoiceTransactionT
+      >;
+
       readonly getTransactionPreviewPdf: TypeofApiCall<
         GetTransactionPreviewPdfT
       >;
 
       readonly reversalTransaction: TypeofApiCall<ReversalTransactionT>;
+
+      readonly reversalTransactionInvoiced: TypeofApiCall<
+        ReversalTransactionInvoicedT
+      >;
 
       readonly getPointOfSale: TypeofApiCall<GetPointOfSaleT>;
 
@@ -202,6 +220,13 @@ export type Client<
         >
       >;
 
+      readonly updateInvoiceTransaction: TypeofApiCall<
+        ReplaceRequestParams<
+          UpdateInvoiceTransactionT,
+          Omit<RequestParams<UpdateInvoiceTransactionT>, K>
+        >
+      >;
+
       readonly getTransactionPreviewPdf: TypeofApiCall<
         ReplaceRequestParams<
           GetTransactionPreviewPdfT,
@@ -213,6 +238,13 @@ export type Client<
         ReplaceRequestParams<
           ReversalTransactionT,
           Omit<RequestParams<ReversalTransactionT>, K>
+        >
+      >;
+
+      readonly reversalTransactionInvoiced: TypeofApiCall<
+        ReplaceRequestParams<
+          ReversalTransactionInvoicedT,
+          Omit<RequestParams<ReversalTransactionInvoicedT>, K>
         >
       >;
 
@@ -515,20 +547,38 @@ export function createClient<K extends ParamKeys>({
     url: ({ ["transactionId"]: transactionId }) =>
       `${basePath}/transactions/${transactionId}/invoice`,
 
-    body: ({ ["file"]: file }) => {
-      if (typeof window === "undefined")
-        throw new Error(
-          "File upload is only support inside a browser runtime envoronment"
-        );
-      const formData = new FormData();
-      formData.append("file", file);
-      return formData;
-    },
+    body: ({ ["docNumber"]: docNumber }) => docNumber,
 
     query: () => withoutUndefinedValues({})
   };
   const invoiceTransaction: TypeofApiCall<InvoiceTransactionT> = createFetchRequestForApi(
     invoiceTransactionT,
+    options
+  );
+
+  const updateInvoiceTransactionT: ReplaceRequestParams<
+    UpdateInvoiceTransactionT,
+    RequestParams<UpdateInvoiceTransactionT>
+  > = {
+    method: "put",
+
+    // There is a well-known issue about fetch and Content-Type header when it comes to add multipart/form-data files.
+    //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
+    // The solution is to skip the Content-Type header and let fetch add it for us.
+    // @ts-ignore as IRequestType would require something
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: updateInvoiceTransactionDefaultDecoder(),
+    url: ({ ["transactionId"]: transactionId }) =>
+      `${basePath}/transactions/${transactionId}/invoice/update`,
+
+    body: ({ ["docNumber"]: docNumber }) => docNumber,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const updateInvoiceTransaction: TypeofApiCall<UpdateInvoiceTransactionT> = createFetchRequestForApi(
+    updateInvoiceTransactionT,
     options
   );
 
@@ -569,20 +619,38 @@ export function createClient<K extends ParamKeys>({
     url: ({ ["transactionId"]: transactionId }) =>
       `${basePath}/transactions/${transactionId}/reversal`,
 
-    body: ({ ["file"]: file }) => {
-      if (typeof window === "undefined")
-        throw new Error(
-          "File upload is only support inside a browser runtime envoronment"
-        );
-      const formData = new FormData();
-      formData.append("file", file);
-      return formData;
-    },
+    body: ({ ["docNumber"]: docNumber }) => docNumber,
 
     query: () => withoutUndefinedValues({})
   };
   const reversalTransaction: TypeofApiCall<ReversalTransactionT> = createFetchRequestForApi(
     reversalTransactionT,
+    options
+  );
+
+  const reversalTransactionInvoicedT: ReplaceRequestParams<
+    ReversalTransactionInvoicedT,
+    RequestParams<ReversalTransactionInvoicedT>
+  > = {
+    method: "post",
+
+    // There is a well-known issue about fetch and Content-Type header when it comes to add multipart/form-data files.
+    //  reference: https://github.com/github/fetch/issues/505#issuecomment-293064470
+    // The solution is to skip the Content-Type header and let fetch add it for us.
+    // @ts-ignore as IRequestType would require something
+    headers: ({ ["Bearer"]: Bearer }) => ({
+      Authorization: Bearer
+    }),
+    response_decoder: reversalTransactionInvoicedDefaultDecoder(),
+    url: ({ ["transactionId"]: transactionId }) =>
+      `${basePath}/transactions/${transactionId}/reversal-invoiced`,
+
+    body: ({ ["docNumber"]: docNumber }) => docNumber,
+
+    query: () => withoutUndefinedValues({})
+  };
+  const reversalTransactionInvoiced: TypeofApiCall<ReversalTransactionInvoicedT> = createFetchRequestForApi(
+    reversalTransactionInvoicedT,
     options
   );
 
@@ -641,10 +709,16 @@ export function createClient<K extends ParamKeys>({
     previewPayment: (withDefaults || identity)(previewPayment),
     deleteTransaction: (withDefaults || identity)(deleteTransaction),
     invoiceTransaction: (withDefaults || identity)(invoiceTransaction),
+    updateInvoiceTransaction: (withDefaults || identity)(
+      updateInvoiceTransaction
+    ),
     getTransactionPreviewPdf: (withDefaults || identity)(
       getTransactionPreviewPdf
     ),
     reversalTransaction: (withDefaults || identity)(reversalTransaction),
+    reversalTransactionInvoiced: (withDefaults || identity)(
+      reversalTransactionInvoiced
+    ),
     getPointOfSale: (withDefaults || identity)(getPointOfSale),
     downloadInvoiceFile: (withDefaults || identity)(downloadInvoiceFile)
   };

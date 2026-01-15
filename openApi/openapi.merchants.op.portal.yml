@@ -677,7 +677,7 @@ paths:
           required: true
           schema:
             type: string
-            maxLength: 50        # richiesto OWASP
+            maxLength: 50
             pattern: '^[A-Za-z0-9\-]+$'
       requestBody:
         required: true
@@ -691,11 +691,12 @@ paths:
                 file:
                   type: string
                   format: binary
+                  maxLength: 2147483647
                   description: Reversal file
                 docNumber:
                   type: string
                   nullable: true
-                  maxLength: 50          # richiesto OWASP
+                  maxLength: 50
                   pattern: '^[A-Za-z0-9\-]*$'
                   description: Optional document number linked to the   reversal
       responses:
@@ -1417,7 +1418,6 @@ paths:
               $ref: '#/components/headers/X-RateLimit-Reset'
             Retry-After:
               $ref: '#/components/headers/Retry-After'
-
 components:
   headers:
     X-RateLimit-Limit:
@@ -1825,6 +1825,11 @@ components:
           format: date-time
           description: "ENG: Payment authorization date - IT: La data di autorizzazione del pagamento"
           maxLength: 255
+        trxCode:
+          type: string
+          description: "ENG: Transaction code - IT: Il codice della transazione"
+          maxLength: 100
+          pattern: "^[a-zA-Z0-9]+$"
         updateDate:
           type: string
           format: date-time

@@ -12,7 +12,9 @@ const ReversalInvoiceDTOR = t.interface({
 });
 
 // optional attributes
-const ReversalInvoiceDTOO = t.partial({});
+const ReversalInvoiceDTOO = t.partial({
+  docNumber: t.string
+});
 
 export const ReversalInvoiceDTO = t.intersection(
   [ReversalInvoiceDTOR, ReversalInvoiceDTOO],

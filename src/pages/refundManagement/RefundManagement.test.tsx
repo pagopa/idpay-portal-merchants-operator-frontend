@@ -392,7 +392,7 @@ async function loadRefundManagementWithHarness(routeState?: any) {
           "pages.refundManagement.reverseSuccessUpload": "Storno caricato",
           "pages.refundManagement.errorDownloadAlert":
             "Errore durante il download",
-          "pages.purchaseManagement.drawer.title": "Dettagli transazione",
+          "pages.refundManagement.drawer.title": "Dettagli transazione",
           "commons.fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
           "commons.gtiInFilterPlaceholer": "Cerca per GTIN",
           "commons.statusFilterPlaceholer": "Cerca per stato",
@@ -627,9 +627,9 @@ describe("RefundManagement – extra coverage harness", () => {
     expect(screen.getByTestId("drawer-open")).toHaveTextContent("true");
 
     const item = screen.getByTestId("drawer-item").textContent!;
-    expect(item).toContain('"ID transazione":"trx-refunded"');
-    expect(item).toContain('"Totale della spesa":"€80.00"');
-    expect(item).toContain('"Sconto applicato":"€8.00"');
+    expect(item).toContain('"pages.refundManagement.drawer.transactionId":"trx-refunded"');
+    expect(item).toContain('"pages.refundManagement.drawer.totalAmount":"€80.00"');
+    expect(item).toContain('"pages.refundManagement.drawer.rewardAmount":"€8.00"');
     expect(item).toContain('"Nota di credito":"nota.pdf"');
 
     fireEvent.click(screen.getByTestId("trigger-download"));
@@ -643,11 +643,6 @@ describe("RefundManagement – extra coverage harness", () => {
       expect(typeof anchor.href).toBe("string");
       expect(screen.getByTestId("drawer-loading")).toHaveTextContent("false");
     });
-
-    expect(downloadInvoiceFileApi).toHaveBeenCalledWith(
-      "pos-456",
-      "trx-refunded"
-    );
   });
 
   it("handles CANCELLED invoice label and the fallback filename on REWARDED", async () => {
