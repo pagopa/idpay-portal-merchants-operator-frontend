@@ -85,19 +85,19 @@ const RefundManagement = () => {
             minute: "2-digit",
           })
           .replace(",", ""),
-        [t("pages.refundManagement.drawer.householdAppliance")]: transaction?.additionalProperties.productName,
+        [t("pages.refundManagement.drawer.householdAppliance")]: transaction?.additionalProperties?.productName,
         [t("pages.refundManagement.drawer.fiscalCode")]: transaction?.fiscalCode,
         [t("pages.refundManagement.drawer.transactionId")]: transaction?.id,
         [t("pages.refundManagement.drawer.trxCode")]: transaction?.trxCode,
         [t("pages.refundManagement.drawer.totalAmount")]:
           transaction?.effectiveAmountCents &&
-          formatEuro(transaction.effectiveAmountCents),
+          formatEuro(transaction?.effectiveAmountCents),
         [t("pages.refundManagement.drawer.rewardAmount")]:
           transaction?.rewardAmountCents &&
-          formatEuro(transaction.rewardAmountCents),
+          formatEuro(transaction?.rewardAmountCents),
         [t("pages.refundManagement.drawer.authorizedAmount")]:
           transaction?.authorizedAmountCents &&
-          formatEuro(transaction.authorizedAmountCents),
+          formatEuro(transaction?.authorizedAmountCents),
         Stato: getStatusChip(t, transaction?.status),
         [docNumberLabel]: transaction?.invoiceFile?.docNumber,
         [invoiceLabel]: transaction?.invoiceFile?.filename,
