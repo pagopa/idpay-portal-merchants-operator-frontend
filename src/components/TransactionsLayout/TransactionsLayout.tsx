@@ -10,7 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import AlertComponent from "../Alert/AlertComponent";
 import { GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
-import { getStatusChip, handleGtinChange } from "../../utils/helpers";
+import { getStatusChip, handleGtinChange, handleTrxCodeChange } from "../../utils/helpers";
 import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
 import AlertListComponent from "../Alert/AlertListComponent";
 
@@ -59,6 +59,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     externalState = {}
 }) => {
     const [gtinError, setGtinError] = useState<string>('')
+    const [trxCodeError, setTrxCodeError] = useState<string>('')
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
@@ -75,6 +76,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const [appliedFilters, setAppliedFilters] = useState<GetProcessedTransactionsFilters>({
         fiscalCode: '',
         productGtin: '',
+        trxCode: '',
         status: ''
     });
 
@@ -132,6 +134,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
         productGtin: '',
+        trxCode: '',
         status: ''
     };
 
@@ -162,6 +165,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
         productGtin?: string;
+        trxCode?: string;
         status?: string;
         page?: number;
         size?: number;
@@ -263,10 +267,11 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     };
 
     const handleResetFilters = () => {
-        if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
+        if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || formik.values.status !== null) {
             handleApplyFilters({
                 fiscalCode: '',
                 productGtin: '',
+                trxCode: '',
                 status: '',
             });
         }
@@ -307,15 +312,15 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             </Typography>
 
             <Box>
-                {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== '')) || filtersAppliedOnce) && (
+                {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || formik.values.status !== null && formik.values.status !== '')) || filtersAppliedOnce) && (
                     <FiltersForm
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
                         onFiltersReset={handleResetFilters}
-                        filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
+                        filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
                         filtersAppliedOnce={filtersAppliedOnce}
                     >
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
                             <TextField
                                 name="fiscalCode"
                                 label={t('commons.fiscalCodeFilterPlaceholer')}
@@ -325,7 +330,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                                 onChange={formik.handleChange}
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
                             <TextField
                                 name="productGtin"
                                 label={t('commons.gtiInFilterPlaceholer')}
@@ -338,7 +343,20 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                                 helperText={gtinError}
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
+                            <TextField
+                                name="trxCode"
+                                label={t('commons.trxCodeFilterPlaceholer')}
+                                size="small"
+                                fullWidth
+                                value={formik.values.trxCode}
+                                onChange={(e) => setTrxCodeError(handleTrxCodeChange(e, formik))}
+                                onBlur={() => setTrxCodeError('')}
+                                error={!!trxCodeError}
+                                helperText={trxCodeError}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
                             <FormControl fullWidth size="small">
                                 <InputLabel id="status-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                 <Select

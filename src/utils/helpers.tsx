@@ -124,6 +124,20 @@ export const handleGtinChange = (event, formik) => {
   }
 };
 
+export const handleTrxCodeChange = (event, formik) => {
+  const { value } = event.target;
+  const alphanumericRegex = /^[a-zA-Z0-9]*$/;
+
+  if (!(value.includes(" ") || value.length > 8)) {
+    if (!alphanumericRegex.test(value)) {
+      return "Il codice sconto deve contenere al massimo 8 caratteri alfanumerici.";
+    }
+
+    formik.handleChange(event);
+    return "";
+  }
+};
+
 export const renderCellWithTooltip = (value: any) => {
   return (
     <div style={{
