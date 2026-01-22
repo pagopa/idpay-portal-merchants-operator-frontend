@@ -142,7 +142,7 @@ vi.mock("../../hooks/useAutoResetBanner", () => ({
 }));
 
 vi.mock("../../utils/helpers", () => ({
-  handleGtinChange: vi.fn((event, formik) => {
+  handleCodeChange: vi.fn((event, formik) => {
     const { value } = event.target;
     if (value.includes("+")) {
       return "Errore GTIN";
@@ -522,7 +522,7 @@ describe("Products Component", () => {
   });
 
   it("should handle GTIN code change with error", async () => {
-    const { handleGtinChange } = await import("../../utils/helpers");
+    const {handleCodeChange} = await import("../../utils/helpers");
     mockGetProductsList.mockResolvedValue(mockApiResponse);
     const user = userEvent.setup();
     renderComponent();
@@ -532,7 +532,7 @@ describe("Products Component", () => {
     const gtinInput = screen.getByLabelText("Codice GTIN/EAN");
     await user.type(gtinInput, "+");
 
-    expect(handleGtinChange).toHaveBeenCalled();
+    expect(handleCodeChange).toHaveBeenCalled();
   });
 
   it("should handle GTIN code blur event", async () => {
