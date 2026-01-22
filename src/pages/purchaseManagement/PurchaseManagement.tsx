@@ -405,11 +405,15 @@ const PurchaseManagement = () => {
                                             </Typography>
                                             <Button
                                                 data-testid="btn-test"
-                                                sx={{ padding: "0", fontWeight: theme.typography.fontWeightMedium, fontSize: '18px' }}
+                                                sx={{
+                                                    padding: "0",
+                                                    fontWeight: theme.typography.fontWeightMedium,
+                                                    fontSize: '18px',
+                                                    minHeight: 'fit-content',
+                                                    height: 'auto',
+                                                }}
                                                 onClick={handlePreviewPdf}
                                             >
-
-
                                                 {isPreviewPdfLoading ? (
                                                     <CircularProgress
                                                         color="inherit"
@@ -417,7 +421,12 @@ const PurchaseManagement = () => {
                                                         data-testid="item-loader"
                                                     />
                                                 ) : (
-                                                    <Box sx={{ display: 'flex', gap: 0, alignItems: 'start' }}>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        gap: 0,
+                                                        alignItems: 'start',
+                                                        textAlign: 'left',
+                                                    }}>
                                                         <DescriptionIcon />
                                                         <div style={{ marginLeft: '8px', wordBreak: 'break-all' }}>{selectedTransaction?.trxCode}_preautorizzazione.pdf</div>
                                                     </Box>
