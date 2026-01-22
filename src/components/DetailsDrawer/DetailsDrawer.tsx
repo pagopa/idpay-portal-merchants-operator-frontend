@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import {useState, useEffect, useRef} from "react";
 import {
   Divider,
   Grid,
@@ -9,9 +9,9 @@ import {
   CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { theme } from "@pagopa/mui-italia";
-import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import { ReceiptLong } from "@mui/icons-material";
+import {theme} from "@pagopa/mui-italia";
+import {MISSING_DATA_PLACEHOLDER} from "../../utils/constants";
+import {ReceiptLong} from "@mui/icons-material";
 
 type ButtonProps = {
   label: string;
@@ -33,17 +33,17 @@ type Props = {
 };
 
 export const DetailsDrawer = ({
-  isOpen,
-  setIsOpen,
-  isLoading,
-  title,
-  subtitle,
-  item,
-  primaryButton,
-  secondaryButton,
-  onFileDownloadCallback,
-  invoiceStatus
-}: Props) => {
+                                isOpen,
+                                setIsOpen,
+                                isLoading,
+                                title,
+                                subtitle,
+                                item,
+                                primaryButton,
+                                secondaryButton,
+                                onFileDownloadCallback,
+                                invoiceStatus
+                              }: Props) => {
   const gridRef = useRef(null);
   const [isScrollable, setIsScrollable] = useState(false);
 
@@ -69,7 +69,7 @@ export const DetailsDrawer = ({
   const checkHeight = () => {
     if (gridRef.current) {
       const gridHeight = gridRef.current.scrollHeight;
-      const maxHeight = window.innerHeight - 200;
+      const maxHeight = window.innerHeight - 250;
       setIsScrollable(gridHeight > maxHeight);
     }
   };
@@ -85,7 +85,7 @@ export const DetailsDrawer = ({
         },
       }}
     >
-      <Box p={"1.5rem"} sx={{ position: "relative" }}>
+      <Box p={"1.5rem"} sx={{position: "relative"}}>
         <Box
           sx={{
             display: "flex",
@@ -95,7 +95,7 @@ export const DetailsDrawer = ({
           mb={2}
         >
           <CloseIcon
-            sx={{ color: "#5C6F82" }}
+            sx={{color: "#5C6F82"}}
             data-testid="close-details-drawer-button"
             onClick={() => setIsOpen(false)}
           />
@@ -105,7 +105,7 @@ export const DetailsDrawer = ({
         </Typography>
         {subtitle && (
           <>
-            <Divider color="#E3E7EB" sx={{ mb: 2 }} />
+            <Divider color="#E3E7EB" sx={{mb: 2}}/>
             <Grid container spacing={2}>
               <Typography
                 sx={{
@@ -130,7 +130,7 @@ export const DetailsDrawer = ({
             return (
               key !== "id" &&
               key !== "cancelled" && (
-                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }} sx={{ wordWrap: 'break-word' }}>
+                <Grid key={index} size={{xs: 12, md: 12, lg: 12}} sx={{wordWrap: 'break-word'}}>
                   <Typography
                     variant="body2"
                     sx={{
@@ -143,7 +143,10 @@ export const DetailsDrawer = ({
                   {isDownload && value !== MISSING_DATA_PLACEHOLDER ? (
                     <Button
                       data-testid="btn-test"
-                      sx={{ padding: "0" }}
+                      sx={{
+                        padding: "0",
+                        alignItems: "flex-start"
+                      }}
                       onClick={() => {
                         if (onFileDownloadCallback) onFileDownloadCallback();
                       }}
@@ -152,17 +155,37 @@ export const DetailsDrawer = ({
                         <CircularProgress
                           color="inherit"
                           size={20}
-                          data-testid="item-loader" />
+                          data-testid="item-loader"/>
                       ) : (
-                        <>
-                          <ReceiptLong /> {value}
-                        </>
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            textAlign: "left",
+                            gap: 6,
+                            width: "100%",
+                            marginTop: 2
+                          }}
+                        >
+                          <ReceiptLong style={{marginTop: 2}}/>
+                          <Typography
+                            component="span"
+                            variant="inherit"
+                            sx={{
+                              whiteSpace: "normal",
+                              wordBreak: "break-word",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                              {value}
+                          </Typography>
+                        </span>
                       )}
                     </Button>
                   ) : (
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: theme.typography.fontWeightMedium }}
+                      sx={{fontWeight: theme.typography.fontWeightMedium, wordWrap: 'break-word'}}
                     >
                       {value}
                     </Typography>
