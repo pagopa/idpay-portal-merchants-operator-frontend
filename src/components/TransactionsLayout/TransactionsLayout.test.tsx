@@ -179,7 +179,11 @@ describe("TransactionsLayout", () => {
     await waitFor(() => expect(screen.queryByTestId("loading")).not.toBeInTheDocument());
 
     const fiscalCodeInput = screen.getByLabelText("commons.fiscalCodeFilterPlaceholer");
+    const gtinCodeInput = screen.getByLabelText("commons.gtiInFilterPlaceholer");
+    const trxCodeInput = screen.getByLabelText("commons.trxCodeFilterPlaceholer");
     await user.type(fiscalCodeInput, "TESTCF123");
+    await user.type(gtinCodeInput, "TEST123");
+    await user.type(trxCodeInput, "TEST123");
     
     fireEvent.click(screen.getByTestId("apply-filters"));
 
@@ -293,7 +297,7 @@ describe("TransactionsLayout", () => {
     rerender(
         <BrowserRouter>
             <ThemeProvider theme={createTheme()}>
-                <TransactionsLayout 
+                <TransactionsLayout
                     title="Test"
                     subtitle="Test"
                     tableTitle="Test"
