@@ -24,6 +24,9 @@ describe("FiltersForm", () => {
   it("renders Apply and Reset buttons with translated text", () => {
     render(<FiltersForm formik={mockFormik as any} />);
 
+    expect(screen.getByTestId("apply-filters-test")).toBeInTheDocument();
+    expect(screen.getByTestId("reset-filters-test")).toBeInTheDocument();
+
     expect(screen.getByTestId("apply-filters-test")).toHaveTextContent(
       "Apply Filters"
     );
@@ -59,13 +62,15 @@ describe("FiltersForm", () => {
   });
 
   it("clones children with formik props", () => {
+    const childChange = vi.fn();
+    const childBlur = vi.fn();
     const ChildInput = (props: any) => (
       <input data-testid="child-input" {...props} />
     );
 
     render(
       <FiltersForm formik={mockFormik as any}>
-        <ChildInput name="name" />
+        <ChildInput name="name" onChange={childChange} onBlur={childBlur} />
       </FiltersForm>
     );
 
@@ -78,5 +83,31 @@ describe("FiltersForm", () => {
 
     fireEvent.blur(input);
     expect(mockFormik.handleBlur).toHaveBeenCalled();
+  });
+  it("return child", () => {
+    const ChildInput = (props: any) => (
+      <input data-testid="child-input" {...props} />
+    );
+
+    render(
+      <FiltersForm formik={mockFormik as any}>
+        <ChildInput />
+      </FiltersForm>
+    );
+    expect(screen.getByTestId("child-input")).toBeInTheDocument();
+    
+  });
+  it("return empty field", () => {
+    const ChildInput = (props: any) => (
+      <input data-testid="child-input" {...props} />
+    );
+
+    render(
+      <FiltersForm formik={mockFormik as any}>
+        <ChildInput name="test" />
+      </FiltersForm>
+    );
+    expect(screen.getByTestId("child-input")).toHaveValue("");
+    
   });
 });
