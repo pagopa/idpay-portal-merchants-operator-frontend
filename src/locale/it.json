@@ -14,7 +14,7 @@
     "gtiInFilterPlaceholer": "Cerca per GTIN",
     "fiscalCodeFilterPlaceholer": "Cerca per codice fiscale",
     "statusFilterPlaceholer": "Stato",
-    "trxCodeFilterPlaceholer": "Codice sconto",
+    "trxCodeFilterPlaceholer": "Cerca per codice sconto",
     "fileSizeError": "Il file supera la dimensione massima di 20MB",
     "discountStatusEnum": {
       "authorized": "Autorizzato",
