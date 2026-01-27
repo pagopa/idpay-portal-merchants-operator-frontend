@@ -1843,6 +1843,15 @@ components:
             - CANCELLED
             - REFUNDED
             - INVOICED
+        rewardBatchTrxStatus:
+          type: string
+          description: "ENG: The status of batch-transaction - IT: Lo stato della transazione-lotto"
+          enum:
+            - TO_CHECK
+            - CONSULTABLE
+            - SUSPENDED
+            - APPROVED
+            - REJECTED
         channel:
           type: string
           description: "ENG: Channel from which the transaction takes place - IT: Canale da cui avviene la transazione"
