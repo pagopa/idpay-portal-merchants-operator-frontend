@@ -329,7 +329,15 @@ const PurchaseManagement = () => {
                                     <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightRegular, color: theme.palette.text.secondary }}>
                                         {t('pages.purchaseManagement.drawer.householdAppliance')}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                          fontWeight: theme.typography.fontWeightMedium,
+                                          wordBreak: 'break-word',
+                                          overflowWrap: 'anywhere',
+                                          whiteSpace: 'normal'
+                                      }}
+                                    >
                                         {selectedTransaction?.additionalProperties?.productName ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
@@ -346,7 +354,15 @@ const PurchaseManagement = () => {
                                         {t('pages.purchaseManagement.drawer.transactionId')}
                                     </Typography>
 
-                                    <Typography variant="body2" sx={{ fontWeight: theme.typography.fontWeightMedium }}>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            fontWeight: theme.typography.fontWeightMedium,
+                                            wordBreak: 'break-word',
+                                            overflowWrap: 'anywhere',
+                                            whiteSpace: 'normal'
+                                        }}
+                                    >
                                         {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
                                     </Typography>
                                 </Grid>
