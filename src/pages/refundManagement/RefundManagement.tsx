@@ -1,4 +1,4 @@
-import {Box} from "@mui/material";
+import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useState, useCallback, useEffect } from "react";
 import {
@@ -76,7 +76,9 @@ const RefundManagement = () => {
           : "Numero fattura";
 
       const mappedTransaction = {
-        [t("pages.refundManagement.drawer.trxDate")]: new Date(transaction?.trxChargeDate)
+        [t("pages.refundManagement.drawer.trxDate")]: new Date(
+          transaction?.trxChargeDate,
+        )
           .toLocaleDateString("it-IT", {
             day: "2-digit",
             month: "2-digit",
@@ -85,8 +87,10 @@ const RefundManagement = () => {
             minute: "2-digit",
           })
           .replace(",", ""),
-        [t("pages.refundManagement.drawer.householdAppliance")]: transaction?.additionalProperties?.productName,
-        [t("pages.refundManagement.drawer.fiscalCode")]: transaction?.fiscalCode,
+        [t("pages.refundManagement.drawer.householdAppliance")]:
+          transaction?.additionalProperties?.productName,
+        [t("pages.refundManagement.drawer.fiscalCode")]:
+          transaction?.fiscalCode,
         [t("pages.refundManagement.drawer.transactionId")]: transaction?.id,
         [t("pages.refundManagement.drawer.trxCode")]: transaction?.trxCode,
         [t("pages.refundManagement.drawer.totalAmount")]:
@@ -105,7 +109,7 @@ const RefundManagement = () => {
       };
       setSelectedTransaction(mappedTransaction);
     },
-    [t]
+    [t],
   );
 
   const downloadInvoiceFile = async () => {
@@ -114,7 +118,7 @@ const RefundManagement = () => {
     try {
       const response = await downloadInvoiceFileApi(
         decodeToken?.point_of_sale_id,
-        selectedTransaction?.id
+        selectedTransaction?.id,
       );
       const { invoiceUrl } = response;
 
@@ -225,7 +229,7 @@ const RefundManagement = () => {
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-              {getStatusChip(t, params.value)}
+            {getStatusChip(t, params.value)}
           </Box>
         );
       },
@@ -248,10 +252,10 @@ const RefundManagement = () => {
       alertMessages={{
         error: t("pages.refundManagement.errorAlert"),
         transactionRefundSuccess: t(
-          "pages.refundManagement.refundSuccessUpload"
+          "pages.refundManagement.refundSuccessUpload",
         ),
         transactionReverseSuccess: t(
-          "pages.refundManagement.reverseSuccessUpload"
+          "pages.refundManagement.reverseSuccessUpload",
         ),
         errorDownloadAlert: t("pages.refundManagement.errorDownloadAlert"),
       }}
@@ -270,13 +274,14 @@ const RefundManagement = () => {
             onClick: async () => {
               navigate(
                 `/modifica-documento/${selectedTransaction?.id}/${btoa(
-                  selectedTransaction["Numero fattura"]
-                )}`
+                  selectedTransaction["Numero fattura"],
+                )}`,
               );
             },
+            disabled: selectedTransaction?.rewardBatchTrxStatus === "APPROVED",
           }}
           secondaryButton={
-            status === "INVOICED" || status === 'REWARDED'
+            status === "INVOICED" || status === "REWARDED"
               ? {
                   label: t("pages.refundManagement.drawer.refund"),
                   onClick: handleReverseTransaction,
