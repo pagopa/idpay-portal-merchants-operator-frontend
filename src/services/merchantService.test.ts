@@ -13,6 +13,7 @@ import {
   invoiceTransactionApi,
   updateInvoiceTransactionApi,
   getPreviewPdf,
+  reverseInvoicedTransactionApi,
 } from "./merchantService";
 import { MerchantApi } from "../api/MerchantsApiClient";
 
@@ -28,6 +29,7 @@ vi.mock("../api/MerchantsApiClient", () => ({
     deleteTransactionInProgress: vi.fn(),
     downloadInvoiceFileApi: vi.fn(),
     reverseTransactionApi: vi.fn(),
+    reverseInvoicedTransactionApi: vi.fn(),
     invoiceTransactionApi: vi.fn(),
     updateInvoiceTransactionApi: vi.fn(),
     getPreviewPdf: vi.fn(),
@@ -64,6 +66,17 @@ describe("Merchant Service Functions", () => {
       const result = await reverseTransactionApi("trxId", testFile, "DOC123");
       expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC123");
       expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("reverseInvoicedTransactionApi", () => {
+    it("should call MerchantApi.reverseInvoicedTransactionApi with correct parameters", async () => {
+      vi.mocked(MerchantApi.reverseInvoicedTransactionApi).mockResolvedValue({} as any);
+      const testFile = new File([new Blob()], "fileName");
+      const result = await reverseInvoicedTransactionApi("trxId", testFile, "DOC123");
+      expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC123");
+      expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledTimes(1);
       expect(result).toEqual({});
     });
   });
