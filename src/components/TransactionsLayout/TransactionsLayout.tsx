@@ -10,7 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import AlertComponent from "../Alert/AlertComponent";
 import { GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
 import { GetProcessedTransactionsFilters, PaginationExtendedModel, DecodedJwtToken } from "../../utils/types";
-import { getStatusChip, handleGtinChange } from "../../utils/helpers";
+import { getStatusChip, handleCodeChange } from "../../utils/helpers";
 import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
 import AlertListComponent from "../Alert/AlertListComponent";
 
@@ -58,7 +58,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     isDrawerOpen,
     externalState = {}
 }) => {
-    const [gtinError, setGtinError] = useState<string>('')
+    const [codeError, setCodeError] = useState<Record<string, string>>({gtinCodeError: "", trxCodeError: ""})
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
@@ -75,6 +75,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const [appliedFilters, setAppliedFilters] = useState<GetProcessedTransactionsFilters>({
         fiscalCode: '',
         productGtin: '',
+        trxCode: '',
         status: ''
     });
 
@@ -83,48 +84,6 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         ...alerts
     ];
 
-    //     const fakeData = [
-    //   {
-    //     id: "dd298d78-4cc6-41e0-9883-3a20a5b16987_BARCODE_1764951721096",
-    //     fiscalCode: "CZZCLL82M03X000G",
-    //     effectiveAmountCents: 195600,
-    //     rewardAmountCents: null,
-    //     authorizedAmountCents: 185600,
-    //     trxDate: "2025-12-05T17:22:01.096",
-    //     trxChargeDate: "2025-12-05T17:24:08.232",
-    //     updateDate: "2025-12-05T17:24:15.61",
-    //     status: "REFUNDED",
-    //     channel: "BARCODE",
-    //     additionalProperties: {
-    //       productGtin: "OVENS10",
-    //       productName: "Forno Kenwood KTG606S22 71 l"
-    //     },
-    //     invoiceFile: {
-    //       filename: "nota_di_credito_it (1).pdf",
-    //       docNumber: "rfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4eferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefeferfefrefrff4f4efg4fefef4efe4fefefe4fefefe"
-    //     }
-    //   },
-    //   {
-    //     id: "6affbcad-d876-4b2d-a298-c645583354a2_BARCODE_1764945247722",
-    //     fiscalCode: "CZZCLL82M03X000F",
-    //     effectiveAmountCents: 42563,
-    //     rewardAmountCents: 10000,
-    //     authorizedAmountCents: 32563,
-    //     trxDate: "2025-12-05T15:34:07.722",
-    //     trxChargeDate: "2025-12-05T15:39:41.539",
-    //     updateDate: "2025-12-05T15:39:47.54",
-    //     status: "INVOICED",
-    //     channel: "BARCODE",
-    //     additionalProperties: {
-    //       productGtin: "OVENS03",
-    //       productName: "Forno KENWOOD CK600DFSL 76 l / 47 l"
-    //     },
-    //     invoiceFile: {
-    //       filename: "nota_di_credito_it.pdf",
-    //       docNumber: "testwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwvvvvvvvtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwvvtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwwwtestwwwwwwwwwwwwwwwwwwwwwwwwww"
-    //     }
-    //   },
-    // ];
     const alertsList = Object.entries(externalState).filter(([key]) => !(key.includes('error'))).map(([key, value]) => ({ isOpen: value, message: alertMessages[key] }))
 
     useAutoResetBanner(allAlerts);
@@ -132,6 +91,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const initialValues: GetProcessedTransactionsFilters = {
         fiscalCode: '',
         productGtin: '',
+        trxCode: '',
         status: ''
     };
 
@@ -162,6 +122,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     const fetchTransactions = useCallback(async (params: {
         fiscalCode?: string;
         productGtin?: string;
+        trxCode?: string;
         status?: string;
         page?: number;
         size?: number;
@@ -263,16 +224,21 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     };
 
     const handleResetFilters = () => {
-        if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null) {
+        if (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || formik.values.status !== null) {
             handleApplyFilters({
                 fiscalCode: '',
                 productGtin: '',
+                trxCode: '',
                 status: '',
             });
         }
         setFiltersAppliedOnce(false);
         formik.resetForm();
     };
+
+    const handleCodeErrors = useCallback((code, error) => {
+        setCodeError( prev => ({ ...prev, [code]: error}))
+    }, [])
 
     return (
         <Box>
@@ -307,15 +273,15 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             </Typography>
 
             <Box>
-                {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.status !== null && formik.values.status !== '')) || filtersAppliedOnce) && (
+                {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || formik.values.status !== null && formik.values.status !== '')) || filtersAppliedOnce) && (
                     <FiltersForm
                         formik={formik}
                         onFiltersApplied={handleApplyFilters}
                         onFiltersReset={handleResetFilters}
-                        filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
+                        filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
                         filtersAppliedOnce={filtersAppliedOnce}
                     >
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
                             <TextField
                                 name="fiscalCode"
                                 label={t('commons.fiscalCodeFilterPlaceholer')}
@@ -325,20 +291,33 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                                 onChange={formik.handleChange}
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
                             <TextField
                                 name="productGtin"
                                 label={t('commons.gtiInFilterPlaceholer')}
                                 size="small"
                                 fullWidth
                                 value={formik.values.productGtin}
-                                onChange={(e) => setGtinError(handleGtinChange(e, formik))}
-                                onBlur={() => setGtinError('')}
-                                error={!!gtinError}
-                                helperText={gtinError}
+                                onChange={(e) => handleCodeErrors("gtinCodeError", handleCodeChange(e, formik, 14, "GTIN/EAN"))}
+                                onBlur={() => handleCodeErrors("gtinCodeError", "")}
+                                error={!!codeError.gtinCodeError}
+                                helperText={codeError.gtinCodeError}
                             />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
+                            <TextField
+                                name="trxCode"
+                                label={t('commons.trxCodeFilterPlaceholer')}
+                                size="small"
+                                fullWidth
+                                value={formik.values.trxCode}
+                                onChange={(e) => handleCodeErrors("trxCodeError", handleCodeChange(e, formik, 8, "sconto"))}
+                                onBlur={() => handleCodeErrors("trxCodeError", "")}
+                                error={!!codeError.trxCodeError}
+                                helperText={codeError.trxCodeError}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
                             <FormControl fullWidth size="small">
                                 <InputLabel id="status-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
                                 <Select

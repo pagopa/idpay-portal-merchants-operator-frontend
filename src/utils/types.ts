@@ -40,6 +40,7 @@ export interface PaginationResponse {
 export interface GetProcessedTransactionsFilters {
     fiscalCode?: string;
     productGtin?: string;
+    trxCode?: string;
     status?: string;
 }
 

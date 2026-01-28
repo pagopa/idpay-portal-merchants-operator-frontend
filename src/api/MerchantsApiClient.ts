@@ -147,7 +147,8 @@ export const MerchantApi = {
     sort?: string,
     fiscalCode?: string,
     status?: string,
-    productGtin?: string
+    productGtin?: string,
+    trxCode?: string
   }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     try {
         // Remove undefined params
@@ -171,7 +172,8 @@ export const MerchantApi = {
     sort?: string,
     fiscalCode?: string,
     status?: string,
-    productGtin?: string
+    productGtin?: string,
+    trxCode?: string
   }): Promise<PointOfSaleTransactionsListDTO> => {
     try {
         // Remove undefined params
