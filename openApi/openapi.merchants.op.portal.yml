@@ -474,6 +474,7 @@ paths:
         - $ref: "#/components/parameters/sort_trx_processed_query"
         - $ref: "#/components/parameters/fiscalCode_query"
         - $ref: "#/components/parameters/status_trx_processed_query"
+        - $ref: "#/components/parameters/trx_code_query"
         - $ref: "#/components/parameters/productGtin_query"
         - $ref: "#/components/parameters/initiativeId_path"
         - $ref: "#/components/parameters/pointOfSaleId_path"
@@ -503,6 +504,7 @@ paths:
         - $ref: "#/components/parameters/sort_trx_in_progress_query"
         - $ref: "#/components/parameters/fiscalCode_query"
         - $ref: "#/components/parameters/status_trx_in_progress_query"
+        - $ref: "#/components/parameters/trx_code_query"
         - $ref: "#/components/parameters/productGtin_query"
         - $ref: "#/components/parameters/initiativeId_path"
         - $ref: "#/components/parameters/pointOfSaleId_path"
@@ -2823,6 +2825,15 @@ components:
           - trxChargeDate, asc
           - status, asc
           - productName, asc
+    trx_code_query:
+      name: trxCode
+      in: query
+      description: "ENG: The transaction's code - IT: Codice della transazione"
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+        pattern: '^[A-Z0-9]+$'
     initiativeId_path:
       name: initiativeId
       in: path
