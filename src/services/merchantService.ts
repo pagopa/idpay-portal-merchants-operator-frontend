@@ -24,11 +24,11 @@ export const capturePayment = async (params: { trxCode: string, additionalProper
   return MerchantApi.capturePayment(params);
 };
 
-  export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, productGtin?: string }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
+  export const getProcessedTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, productGtin?: string, trxCode?: string }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
     return MerchantApi.getProcessedTransactions(initiativeId, pointOfSaleId, params);
   };
 
-  export const getInProgressTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, productGtin?: string }): Promise<PointOfSaleTransactionsListDTO> => {
+  export const getInProgressTransactions = async (initiativeId: string, pointOfSaleId: string, params: { page?: number, size?: number, sort?: string, fiscalCode?: string, status?: string, productGtin?: string, trxCode?: string  }): Promise<PointOfSaleTransactionsListDTO> => {
     return MerchantApi.getInProgressTransactions(initiativeId, pointOfSaleId, params);
   };
 

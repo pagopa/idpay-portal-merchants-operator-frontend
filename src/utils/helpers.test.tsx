@@ -1,15 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { 
   getStatusChip, 
-  formatEuro, 
-  handleGtinChange, 
-  downloadFileFromBase64, 
+  formatEuro,
   filterInputWithSpaceRule,
   renderCellWithTooltip,
   renderMissingDataWithTooltip,
   checkTooltipValue,
-  checkEuroTooltip
+  checkEuroTooltip,
+  handleCodeChange
 } from "./helpers";
 import { MISSING_DATA_PLACEHOLDER } from "./constants";
 
@@ -73,7 +72,7 @@ describe("formatEuro", () => {
   });
 });
 
-describe("handleGtinChange", () => {
+describe("handleCodeChange", () => {
   let mockFormik: any;
 
   beforeEach(() => {
@@ -84,7 +83,7 @@ describe("handleGtinChange", () => {
 
   it("should call formik.handleChange for valid values", () => {
     const mockEvent = { target: { value: "12345" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
     expect(result).toBe("");
@@ -92,7 +91,7 @@ describe("handleGtinChange", () => {
 
   it("should call formik.handleChange for alphanumeric valid values", () => {
     const mockEvent = { target: { value: "ABC123XYZ" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
     expect(result).toBe("");
@@ -100,7 +99,7 @@ describe("handleGtinChange", () => {
 
   it("should return error for special characters", () => {
     const mockEvent = { target: { value: "+" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(result).toBe("Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.");
     expect(mockFormik.handleChange).not.toHaveBeenCalled();
@@ -108,7 +107,7 @@ describe("handleGtinChange", () => {
 
   it("should return error for values with spaces", () => {
     const mockEvent = { target: { value: "123 456" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(result).toBe(undefined);
     expect(mockFormik.handleChange).not.toHaveBeenCalled();
@@ -116,7 +115,7 @@ describe("handleGtinChange", () => {
 
   it("should return error for values longer than 14 characters", () => {
     const mockEvent = { target: { value: "123456789012345" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(result).toBe(undefined);
     expect(mockFormik.handleChange).not.toHaveBeenCalled();
@@ -124,7 +123,7 @@ describe("handleGtinChange", () => {
 
   it("should handle exactly 14 valid characters", () => {
     const mockEvent = { target: { value: "12345678901234" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
     expect(result).toBe("");
@@ -132,7 +131,7 @@ describe("handleGtinChange", () => {
 
   it("should return error for mixed special characters", () => {
     const mockEvent = { target: { value: "ABC@123" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(result).toBe("Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici."); 
     expect(mockFormik.handleChange).not.toHaveBeenCalled();
@@ -140,7 +139,7 @@ describe("handleGtinChange", () => {
 
   it("should handle empty string", () => {
     const mockEvent = { target: { value: "" } };
-    const result = handleGtinChange(mockEvent, mockFormik);
+    const result = handleCodeChange(mockEvent, mockFormik, 14, "GTIN/EAN");
 
     expect(mockFormik.handleChange).toHaveBeenCalledWith(mockEvent);
     expect(result).toBe("");

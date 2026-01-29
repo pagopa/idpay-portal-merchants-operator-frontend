@@ -110,13 +110,13 @@ export function downloadFileFromBase64(base64: string, fileName: string) {
   URL.revokeObjectURL(url);
 }
 
-export const handleGtinChange = (event, formik) => {
+export const handleCodeChange = (event, formik, length, codeName) => {
   const { value } = event.target;
   const alphanumericRegex = /^[a-zA-Z0-9]*$/;
 
-  if (!(value.includes(" ") || value.length > 14)) {
+  if (!(value.includes(" ") || value.length > length)) {
     if (!alphanumericRegex.test(value)) {
-      return "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.";
+      return `Il codice ${codeName} deve contenere al massimo ${length} caratteri alfanumerici.`;
     }
 
     formik.handleChange(event);
