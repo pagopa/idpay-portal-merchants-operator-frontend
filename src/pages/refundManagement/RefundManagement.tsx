@@ -76,6 +76,7 @@ const RefundManagement = () => {
           : "Numero fattura";
 
       const mappedTransaction = {
+        rewardBatchTrxStatus: transaction?.rewardBatchTrxStatus,
         [t("pages.refundManagement.drawer.trxDate")]: new Date(
           transaction?.trxChargeDate,
         )

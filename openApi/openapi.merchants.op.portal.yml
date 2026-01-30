@@ -1847,6 +1847,7 @@ components:
             - INVOICED
         rewardBatchTrxStatus:
           type: string
+          nullable: true
           description: "ENG: The status of batch-transaction - IT: Lo stato della transazione-lotto"
           enum:
             - TO_CHECK
