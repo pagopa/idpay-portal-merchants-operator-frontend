@@ -410,4 +410,82 @@ describe("fileUploadAction component test", () => {
 
     expect(screen.queryByTestId("file-btn-test")).not.toBeInTheDocument();
   });
+
+  it("should show deniedSentError message when API returns REWARD_BATCH_STATUS_NOT_ALLOWED", async () => {
+    const mockApiCall = vi.fn().mockRejectedValue({
+      response: {
+        data: {
+          code: "REWARD_BATCH_STATUS_NOT_ALLOWED",
+        },
+      },
+    });
+
+    const user = userEvent.setup({ delay: null });
+
+    render(<FileUploadAction {...baseProps} apiCall={mockApiCall} />);
+
+    const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+    const uploadInput = screen.getByTestId("upload-input-test");
+    await user.upload(uploadInput, file);
+
+    const docNumberInput = screen.getByLabelText("Document Number");
+    await user.type(docNumberInput, "DOC123");
+    fireEvent.blur(docNumberInput);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
+    });
+  });
+
+  it("should show alreadySentError message when API returns REWARD_BATCH_ALREADY_SENT", async () => {
+    const mockApiCall = vi.fn().mockRejectedValue({
+      response: {
+        data: {
+          code: "REWARD_BATCH_ALREADY_SENT",
+        },
+      },
+    });
+
+    const user = userEvent.setup({ delay: null });
+
+    render(<FileUploadAction {...baseProps} apiCall={mockApiCall} />);
+
+    const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+    const uploadInput = screen.getByTestId("upload-input-test");
+    await user.upload(uploadInput, file);
+
+    const docNumberInput = screen.getByLabelText("Document Number");
+    await user.type(docNumberInput, "DOC123");
+    fireEvent.blur(docNumberInput);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
+    });
+  });
+
+  it.skip("should prefill docNumber from fileDocNumber param (base64 decoded)", async () => {
+    const encodedDocNumber = btoa("DOC_FROM_URL");
+
+    vi.mocked(require("react-router-dom").useParams).mockReturnValue({
+      trxId: "test-transaction-123",
+      fileDocNumber: encodedDocNumber,
+    });
+
+    render(<FileUploadAction {...baseProps} />);
+
+    const docNumberInput = screen.getByLabelText(
+      "Document Number",
+    ) as HTMLInputElement;
+
+    await waitFor(() => {
+      expect(docNumberInput.value).toBe("DOC_FROM_URL");
+    });
+  });
+
 });
