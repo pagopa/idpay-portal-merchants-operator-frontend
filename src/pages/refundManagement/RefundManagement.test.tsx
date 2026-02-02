@@ -165,9 +165,21 @@ describe("RefundManagement", () => {
     });
 
     const clickSpy = vi.fn();
-    vi.spyOn(document, "createElement").mockReturnValue({
-      click: clickSpy,
-    } as unknown as HTMLAnchorElement);
+
+    const originalCreateElement = document.createElement.bind(document);
+
+    vi.spyOn(document, "createElement").mockImplementation(((
+      tagName: string,
+    ) => {
+      if (tagName === "a") {
+        return {
+          click: clickSpy,
+          set href(_v: string) {},
+          set download(_v: string) {},
+        } as unknown as HTMLAnchorElement;
+      }
+      return originalCreateElement(tagName);
+    }) as typeof document.createElement);
 
     renderComponent();
 
