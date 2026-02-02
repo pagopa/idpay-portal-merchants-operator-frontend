@@ -235,10 +235,10 @@ describe("RefundManagement", () => {
 
   it("navigates to modify document when primary button is clicked", () => {
     renderComponent();
-    fireEvent.click(screen.getByTestId("open-refunded"));
+    fireEvent.click(screen.getByTestId("open-invoiced"));
     fireEvent.click(screen.getByTestId("primary-button"));
     expect(navigateMock).toHaveBeenCalledWith(
-      expect.stringContaining("/modifica-documento/trx-refunded/"),
+      expect.stringContaining("/modifica-documento/trx-invoiced/"),
     );
   });
 
