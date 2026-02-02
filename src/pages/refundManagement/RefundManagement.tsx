@@ -131,8 +131,7 @@ const RefundManagement = () => {
       setInvoiceStatus(transaction?.status);
       setIsDrawerOpen(true);
       setIsDisabledModDocButton(
-        transaction?.rewardBatchTrxStatus === "APPROVED" ||
-          transaction?.rewardBatchTrxStatus === "SUSPENDED",
+        transaction?.rewardBatchTrxStatus === "APPROVED",
       );
 
       setSelectedTransaction(mapTransactionToDrawerItem(transaction, t));

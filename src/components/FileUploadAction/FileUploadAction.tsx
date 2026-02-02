@@ -137,11 +137,16 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           },
         });
       } catch (error) {
-        const errorCode =
-          error.response?.data?.code === "REWARD_BATCH_ALREADY_SENT";
-        const errorMessage = errorCode
-          ? t("pages.reverse.alreadySentError")
-          : t("pages.reverse.errorAlert");
+        const errorResponseCode = error?.response?.data?.code;
+
+        let errorMessage = t("pages.reverse.errorAlert");
+
+        if (errorResponseCode === "REWARD_BATCH_STATUS_NOT_ALLOWED") {
+          errorMessage = t("pages.reverse.deniedSentError");
+        } else if (errorResponseCode === "REWARD_BATCH_ALREADY_SENT") {
+          errorMessage = t("pages.reverse.alreadySentError");
+        }
+
         console.error("API Error:", error);
         setErrorAlert({ isOpen: true, message: errorMessage });
         setLoadingFile(false);
@@ -284,7 +289,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
               <Alert severity="error">{t("errors.requiredFileError")}</Alert>
             </Box>
           )}
-          <Box component="div" mt={1} mb={2}>
+          <Box mt={1} mb={2}>
             <SingleFileInput
               onFileSelected={handleFileSelect}
               onFileRemoved={handleRemoveFile}
@@ -313,7 +318,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
             {file && (
               <Button
-                component="div"
                 data-testid="file-btn-test"
                 variant="naked"
                 startIcon={<FileUploadIcon />}
