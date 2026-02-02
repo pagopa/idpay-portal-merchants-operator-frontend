@@ -131,7 +131,7 @@ export const DetailsDrawer = ({
             maxHeight: isScrollable ? "calc(100vh - 250px)" : "none",
             maxWidth: "100%",
           }}
-          data-testId="item-test"
+          data-testid="item-test"
         >
           {itemsEntries.map(([key, value], index) => {
             const isDownload = key === "Fattura" || key === "Nota di credito";
@@ -198,6 +198,7 @@ export const DetailsDrawer = ({
                     </Button>
                   ) : (
                     <Typography
+                      component="div"
                       variant="body2"
                       sx={{
                         fontWeight: theme.typography.fontWeightMedium,
