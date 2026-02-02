@@ -33,6 +33,7 @@ const RefundManagement = () => {
   const [transactionRefundSuccess, setTransactionRefundSuccess] =
     useState(false);
   const [downloadInProgress, setDownloadInProgress] = useState(false);
+  const [isDisabledModDocButton, setIsDisabledModDocButton] = useState(false);
   const [status, setStatus] = useState<
     "INVOICED" | "REWARDED" | "REFUNDED" | "CANCELLED"
   >();
@@ -75,8 +76,11 @@ const RefundManagement = () => {
           ? "cancelled"
           : "Numero fattura";
 
+      setIsDisabledModDocButton(
+        transaction?.rewardBatchTrxStatus === "APPROVED",
+      );
+
       const mappedTransaction = {
-        rewardBatchTrxStatus: transaction?.rewardBatchTrxStatus,
         [t("pages.refundManagement.drawer.trxDate")]: new Date(
           transaction?.trxChargeDate,
         )
@@ -279,7 +283,7 @@ const RefundManagement = () => {
                 )}`,
               );
             },
-            disabled: selectedTransaction?.rewardBatchTrxStatus === "APPROVED",
+            disabled: isDisabledModDocButton,
           }}
           secondaryButton={
             status === "INVOICED" || status === "REWARDED"
