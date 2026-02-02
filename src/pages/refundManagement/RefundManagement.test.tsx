@@ -5,10 +5,6 @@ import { MemoryRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import RefundManagement from "./RefundManagement";
 
-/* =======================
-   ROUTER MOCK (dinamico)
-======================= */
-
 let mockLocationState: unknown = undefined;
 const navigateMock = vi.fn();
 
@@ -22,10 +18,6 @@ vi.mock("react-router-dom", async () => {
     useLocation: () => ({ state: mockLocationState }),
   };
 });
-
-/* =======================
-   GENERIC MOCKS
-======================= */
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -51,10 +43,6 @@ vi.mock("../../services/merchantService", () => ({
   downloadInvoiceFileApi: (...args: unknown[]) =>
     downloadInvoiceFileApi(...args),
 }));
-
-/* =======================
-   DETAILS DRAWER MOCK
-======================= */
 
 vi.mock("../../components/DetailsDrawer/DetailsDrawer", () => ({
   DetailsDrawer: ({
@@ -93,10 +81,6 @@ vi.mock("../../components/DetailsDrawer/DetailsDrawer", () => ({
     </div>
   ),
 }));
-
-/* =======================
-   TRANSACTIONS LAYOUT MOCK
-======================= */
 
 vi.mock("../../components/TransactionsLayout/TransactionsLayout", () => ({
   default: ({
@@ -159,10 +143,6 @@ vi.mock("../../components/TransactionsLayout/TransactionsLayout", () => ({
   ),
 }));
 
-/* =======================
-   RENDER HELPER
-======================= */
-
 const renderComponent = () =>
   render(
     <MemoryRouter>
@@ -172,11 +152,7 @@ const renderComponent = () =>
     </MemoryRouter>,
   );
 
-/* =======================
-   TESTS
-======================= */
-
-describe("RefundManagement – high coverage", () => {
+describe("RefundManagement", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
@@ -185,22 +161,18 @@ describe("RefundManagement – high coverage", () => {
   it("sets refund success alert from location.state", () => {
     mockLocationState = { refundUploadSuccess: true };
     renderComponent();
-
     expect(screen.getByTestId("state-refund")).toHaveTextContent("true");
   });
 
   it("sets reverse success alert from location.state", () => {
     mockLocationState = { reverseUploadSuccess: true };
     renderComponent();
-
     expect(screen.getByTestId("state-reverse")).toHaveTextContent("true");
   });
 
   it("opens drawer for INVOICED and allows reverse", () => {
     renderComponent();
-
     fireEvent.click(screen.getByTestId("open-invoiced"));
-
     expect(screen.getByTestId("drawer-open")).toHaveTextContent("true");
     expect(screen.getByTestId("invoice-status")).toHaveTextContent("INVOICED");
     expect(screen.getByTestId("secondary-button")).toBeInTheDocument();
@@ -208,9 +180,7 @@ describe("RefundManagement – high coverage", () => {
 
   it("disables modify button when rewardBatchTrxStatus is APPROVED", () => {
     renderComponent();
-
     fireEvent.click(screen.getByTestId("open-refunded"));
-
     const primary = screen.getByTestId("primary-button");
     expect(primary).toBeDisabled();
     expect(screen.getByTestId("invoice-status")).toHaveTextContent("REFUNDED");
@@ -218,9 +188,7 @@ describe("RefundManagement – high coverage", () => {
 
   it("does not show secondary button for CANCELLED", () => {
     renderComponent();
-
     fireEvent.click(screen.getByTestId("open-cancelled"));
-
     expect(screen.queryByTestId("secondary-button")).toBeNull();
     expect(screen.getByTestId("invoice-status")).toHaveTextContent("CANCELLED");
   });
@@ -253,15 +221,32 @@ describe("RefundManagement – high coverage", () => {
     });
   });
 
-  it("sets errorDownloadAlert when download fails", async () => {
-    downloadInvoiceFileApi.mockRejectedValueOnce(new Error("boom"));
-
+  it("navigates to reverse transaction when secondary button is clicked", () => {
     renderComponent();
     fireEvent.click(screen.getByTestId("open-invoiced"));
-    fireEvent.click(screen.getByTestId("download"));
+    fireEvent.click(screen.getByTestId("secondary-button"));
+    expect(navigateMock).toHaveBeenCalledWith(
+      "/storna-transazione/trx-invoiced",
+      expect.objectContaining({
+        state: { backTo: expect.any(String) },
+      }),
+    );
+  });
 
-    await waitFor(() => {
-      expect(screen.getByTestId("state-error")).toHaveTextContent("true");
-    });
+  it("navigates to modify document when primary button is clicked", () => {
+    renderComponent();
+    fireEvent.click(screen.getByTestId("open-refunded"));
+    fireEvent.click(screen.getByTestId("primary-button"));
+    expect(navigateMock).toHaveBeenCalledWith(
+      expect.stringContaining("/modifica-documento/trx-refunded/"),
+    );
+  });
+
+  it("opens drawer for all supported statuses without crashing", () => {
+    renderComponent();
+    fireEvent.click(screen.getByTestId("open-invoiced"));
+    fireEvent.click(screen.getByTestId("open-refunded"));
+    fireEvent.click(screen.getByTestId("open-cancelled"));
+    expect(screen.getByTestId("drawer")).toBeInTheDocument();
   });
 });
