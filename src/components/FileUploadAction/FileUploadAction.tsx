@@ -154,7 +154,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   };
 
   const handleDocNumberChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.value.length <= 100) {
       setDocNumber(event.target.value);
@@ -284,7 +284,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
               <Alert severity="error">{t("errors.requiredFileError")}</Alert>
             </Box>
           )}
-          <Box mt={1} mb={2}>
+          <Box component="div" mt={1} mb={2}>
             <SingleFileInput
               onFileSelected={handleFileSelect}
               onFileRemoved={handleRemoveFile}
@@ -313,6 +313,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
             {file && (
               <Button
+                component="div"
                 data-testid="file-btn-test"
                 variant="naked"
                 startIcon={<FileUploadIcon />}
