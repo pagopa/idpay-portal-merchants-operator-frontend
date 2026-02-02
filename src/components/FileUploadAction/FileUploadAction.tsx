@@ -137,11 +137,16 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           },
         });
       } catch (error) {
-        const errorCode =
-          error.response?.data?.code === "REWARD_BATCH_ALREADY_SENT";
-        const errorMessage = errorCode
-          ? t("pages.reverse.alreadySentError")
-          : t("pages.reverse.errorAlert");
+        const errorResponseCode = error?.response?.data?.code;
+
+        let errorMessage = t("pages.reverse.errorAlert");
+
+        if (errorResponseCode === "REWARD_BATCH_STATUS_NOT_ALLOWED") {
+          errorMessage = t("pages.reverse.deniedSentError");
+        } else if (errorResponseCode === "REWARD_BATCH_ALREADY_SENT") {
+          errorMessage = t("pages.reverse.alreadySentError");
+        }
+
         console.error("API Error:", error);
         setErrorAlert({ isOpen: true, message: errorMessage });
         setLoadingFile(false);
@@ -154,7 +159,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   };
 
   const handleDocNumberChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.value.length <= 100) {
       setDocNumber(event.target.value);

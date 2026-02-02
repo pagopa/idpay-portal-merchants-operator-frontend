@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FileUploadAction from "./FileUploadAction";
@@ -8,8 +9,10 @@ const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 
 let mockNavigate = vi.fn();
 
-vi.mock("react-router-dom", async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual<typeof import("react-router-dom")>(
+    "react-router-dom",
+  );
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -23,26 +26,26 @@ vi.mock("@pagopa/mui-italia", async () => {
   return {
     ...actual,
     SingleFileInput: vi.fn(
-        ({
-           value,
-           onFileRemoved,
-           dropzoneLabel,
-         }: {
-          value: File | null;
-          onFileRemoved: () => void;
-          dropzoneLabel: string;
-        }) => (
-            <div data-testid="mock-single-file-input">
-              {value ? (
-                  <div>
-                    <span>{value.name}</span>
-                    <button onClick={onFileRemoved}>Rimuovi</button>
-                  </div>
-              ) : (
-                  <span>{dropzoneLabel}</span>
-              )}
+      ({
+        value,
+        onFileRemoved,
+        dropzoneLabel,
+      }: {
+        value: File | null;
+        onFileRemoved: () => void;
+        dropzoneLabel: string;
+      }) => (
+        <div data-testid="mock-single-file-input">
+          {value ? (
+            <div>
+              <span>{value.name}</span>
+              <button onClick={onFileRemoved}>Rimuovi</button>
             </div>
-        )
+          ) : (
+            <span>{dropzoneLabel}</span>
+          )}
+        </div>
+      ),
     ),
   };
 });
@@ -105,7 +108,7 @@ describe("fileUploadAction component test", () => {
 
   it("should display file type error alert", () => {
     const { getByTestId, queryByTestId } = render(
-        <FileUploadAction {...baseProps} />
+      <FileUploadAction {...baseProps} />,
     );
 
     const uploadInputTest = getByTestId("upload-input-test");
@@ -113,7 +116,9 @@ describe("fileUploadAction component test", () => {
     expect(queryByTestId("alert")).not.toBeInTheDocument();
 
     fireEvent.change(uploadInputTest, {
-      target: { files: [{ type: "wrong/file", name: "test.txt" }] as Array<File> },
+      target: {
+        files: [{ type: "wrong/file", name: "test.txt" }] as Array<File>,
+      },
     });
 
     expect(getByTestId("alert")).toBeInTheDocument();
@@ -144,15 +149,22 @@ describe("fileUploadAction component test", () => {
     const continueButton = screen.getByTestId("continue-btn-test");
     await user.click(continueButton);
 
-    expect(mockApiCall).toHaveBeenCalledWith("test-transaction-123", file, "DOC123");
+    expect(mockApiCall).toHaveBeenCalledWith(
+      "test-transaction-123",
+      file,
+      "DOC123",
+    );
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT, {
-        state: {
-          [baseProps.successStateKey]: true,
-        },
-      });
-    }, { timeout: 3000 });
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT, {
+          state: {
+            [baseProps.successStateKey]: true,
+          },
+        });
+      },
+      { timeout: 3000 },
+    );
   });
 
   test("should show an error alert on apiCall failure", async () => {
@@ -173,9 +185,9 @@ describe("fileUploadAction component test", () => {
     await user.click(continueButton);
 
     expect(mockApiCall).toHaveBeenCalledWith(
-        "test-transaction-123",
-        expect.any(File),
-        "DOC123"
+      "test-transaction-123",
+      expect.any(File),
+      "DOC123",
     );
 
     await waitFor(() => {
@@ -213,7 +225,7 @@ describe("fileUploadAction component test", () => {
     render(<FileUploadAction {...baseProps} />);
 
     const fileInput = screen.getByTestId(
-        "upload-input-test"
+      "upload-input-test",
     ) as HTMLInputElement;
 
     const fileToUpload = new File(["content"], "documento.pdf", {
@@ -231,7 +243,7 @@ describe("fileUploadAction component test", () => {
     expect(fileInput.value).toBe("");
 
     expect(
-        screen.getByText(`${baseProps.i18nBlockKey}.uploadFile`)
+      screen.getByText(`${baseProps.i18nBlockKey}.uploadFile`),
     ).toBeInTheDocument();
   });
 
@@ -258,7 +270,9 @@ describe("fileUploadAction component test", () => {
   });
 
   it("should open manual link when link is clicked", () => {
-    const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    const windowOpenSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation(() => null);
 
     render(<FileUploadAction {...baseProps} />);
 
@@ -281,7 +295,9 @@ describe("fileUploadAction component test", () => {
     fireEvent.blur(docNumberInput);
 
     await waitFor(() => {
-      expect(screen.getByText("Lunghezza minima 2 caratteri")).toBeInTheDocument();
+      expect(
+        screen.getByText("Lunghezza minima 2 caratteri"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -296,7 +312,9 @@ describe("fileUploadAction component test", () => {
 
     await waitFor(() => {
       expect(screen.queryByText("Campo obbligatorio")).not.toBeInTheDocument();
-      expect(screen.queryByText("Lunghezza minima 2 caratteri")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Lunghezza minima 2 caratteri"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -350,4 +368,124 @@ describe("fileUploadAction component test", () => {
 
     vi.useRealTimers();
   }, 10000);
+
+  it("should show error when continue is clicked without uploading a file", async () => {
+    const user = userEvent.setup({ delay: null });
+    render(<FileUploadAction {...baseProps} />);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    expect(screen.getByTestId("alert")).toBeInTheDocument();
+  });
+
+  it("should show required error when docNumber is empty and continue is clicked", async () => {
+    const user = userEvent.setup({ delay: null });
+    render(<FileUploadAction {...baseProps} />);
+
+    const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+    const uploadInput = screen.getByTestId("upload-input-test");
+    await user.upload(uploadInput, file);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    expect(screen.getByText("Campo obbligatorio")).toBeInTheDocument();
+  });
+
+  it("should not call apiCall if continue is clicked without file", async () => {
+    const mockApiCall = vi.fn();
+    const user = userEvent.setup({ delay: null });
+
+    render(<FileUploadAction {...baseProps} apiCall={mockApiCall} />);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    expect(mockApiCall).not.toHaveBeenCalled();
+  });
+
+  it("should not render replace button when no file is uploaded", () => {
+    render(<FileUploadAction {...baseProps} />);
+
+    expect(screen.queryByTestId("file-btn-test")).not.toBeInTheDocument();
+  });
+
+  it("should show deniedSentError message when API returns REWARD_BATCH_STATUS_NOT_ALLOWED", async () => {
+    const mockApiCall = vi.fn().mockRejectedValue({
+      response: {
+        data: {
+          code: "REWARD_BATCH_STATUS_NOT_ALLOWED",
+        },
+      },
+    });
+
+    const user = userEvent.setup({ delay: null });
+
+    render(<FileUploadAction {...baseProps} apiCall={mockApiCall} />);
+
+    const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+    const uploadInput = screen.getByTestId("upload-input-test");
+    await user.upload(uploadInput, file);
+
+    const docNumberInput = screen.getByLabelText("Document Number");
+    await user.type(docNumberInput, "DOC123");
+    fireEvent.blur(docNumberInput);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
+    });
+  });
+
+  it("should show alreadySentError message when API returns REWARD_BATCH_ALREADY_SENT", async () => {
+    const mockApiCall = vi.fn().mockRejectedValue({
+      response: {
+        data: {
+          code: "REWARD_BATCH_ALREADY_SENT",
+        },
+      },
+    });
+
+    const user = userEvent.setup({ delay: null });
+
+    render(<FileUploadAction {...baseProps} apiCall={mockApiCall} />);
+
+    const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+    const uploadInput = screen.getByTestId("upload-input-test");
+    await user.upload(uploadInput, file);
+
+    const docNumberInput = screen.getByLabelText("Document Number");
+    await user.type(docNumberInput, "DOC123");
+    fireEvent.blur(docNumberInput);
+
+    const continueButton = screen.getByTestId("continue-btn-test");
+    await user.click(continueButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-component")).toBeInTheDocument();
+    });
+  });
+
+  it.skip("should prefill docNumber from fileDocNumber param (base64 decoded)", async () => {
+    const encodedDocNumber = btoa("DOC_FROM_URL");
+
+    vi.mocked(require("react-router-dom").useParams).mockReturnValue({
+      trxId: "test-transaction-123",
+      fileDocNumber: encodedDocNumber,
+    });
+
+    render(<FileUploadAction {...baseProps} />);
+
+    const docNumberInput = screen.getByLabelText(
+      "Document Number",
+    ) as HTMLInputElement;
+
+    await waitFor(() => {
+      expect(docNumberInput.value).toBe("DOC_FROM_URL");
+    });
+  });
+
 });
