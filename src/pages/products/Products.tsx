@@ -17,7 +17,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import style from '../purchaseManagement/purchaseManagement.module.css';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from "../../hooks/useAutoResetBanner";
-import { handleGtinChange } from "../../utils/helpers";
+import { handleCodeChange } from "../../utils/helpers";
 
 
 
@@ -404,7 +404,7 @@ const Products = () => {
                                     size="small"
                                     fullWidth
                                     value={formik.values.gtinCode}
-                                    onChange={(e) => setGtinError(handleGtinChange(e, formik))}
+                                    onChange={(e) => setGtinError(handleCodeChange(e, formik, 14, "GTIN/EAN"))}
                                     onBlur={() => setGtinError('')}
                                     error={!!gtinError}
                                     helperText={gtinError}

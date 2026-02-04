@@ -105,23 +105,23 @@ vi.mock("../../components/DataTable/DataTable", () => ({
 
         {rows.map((row: any) => (
           <div
-            key={row.gtinCode}
-            data-testid={`row-${row.gtinCode}`}
+            key={row.id}
+            data-testid={`row-${row.id}`}
             onClick={() => handleRowAction(row)}
           >
-            <div data-testid={`cell-category-${row.gtinCode}`}>
+            <div data-testid={`cell-category-${row.id}`}>
               {renderCellForField(row, "category")}
             </div>
-            <div data-testid={`cell-brand-${row.gtinCode}`}>
+            <div data-testid={`cell-brand-${row.id}`}>
               {renderCellForField(row, "brand")}
             </div>
-            <div data-testid={`cell-model-${row.gtinCode}`}>
+            <div data-testid={`cell-model-${row.id}`}>
               {renderCellForField(row, "model")}
             </div>
-            <div data-testid={`cell-gtin-${row.gtinCode}`}>
+            <div data-testid={`cell-gtin-${row.id}`}>
               {renderCellForField(row, "gtinCode")}
             </div>
-            <div data-testid={`cell-eprel-${row.gtinCode}`}>
+            <div data-testid={`cell-eprel-${row.id}`}>
               {renderCellForField(row, "eprelCode")}
             </div>
           </div>
@@ -142,7 +142,7 @@ vi.mock("../../hooks/useAutoResetBanner", () => ({
 }));
 
 vi.mock("../../utils/helpers", () => ({
-  handleGtinChange: vi.fn((event, formik) => {
+  handleCodeChange: vi.fn((event, formik) => {
     const { value } = event.target;
     if (value.includes("+")) {
       return "Errore GTIN";
@@ -161,6 +161,7 @@ vi.mock("../../services/merchantService", () => ({
 
 const mockProducts = [
   {
+    id: "12345",
     category: "WASHINGMACHINES",
     brand: "Brand A",
     model: "Model X",
@@ -174,6 +175,7 @@ const mockProducts = [
     countryOfProduction: "Italy",
   },
   {
+    id: "67890",
     category: "OVENS",
     brand: "Brand B",
     model: "Model Y",
@@ -439,10 +441,11 @@ describe("Products Component", () => {
 
   it("should render placeholders for missing data in table cells", async () => {
     const productWithMissingData = {
+      id: "55555",
       category: null,
       brand: null,
       model: null,
-      gtinCode: "55555",
+      gtinCode: null,
       eprelCode: null,
       productName: "Prodotto Incompleto",
     };
@@ -467,14 +470,18 @@ describe("Products Component", () => {
 
     const eprelCell = screen.getByTestId("cell-eprel-55555");
     expect(eprelCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
+
+    const gtinCell = screen.getByTestId("cell-gtin-55555");
+    expect(gtinCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
   });
 
   it("should render placeholders for missing data in drawer", async () => {
     const productWithMissingData = {
+      id: "55555",
       category: null,
       brand: "Brand C",
       model: undefined,
-      gtinCode: "55555",
+      gtinCode: null,
       eprelCode: null,
       productName: "Prodotto Incompleto",
       productCode: null,
@@ -522,7 +529,7 @@ describe("Products Component", () => {
   });
 
   it("should handle GTIN code change with error", async () => {
-    const { handleGtinChange } = await import("../../utils/helpers");
+    const {handleCodeChange} = await import("../../utils/helpers");
     mockGetProductsList.mockResolvedValue(mockApiResponse);
     const user = userEvent.setup();
     renderComponent();
@@ -532,7 +539,7 @@ describe("Products Component", () => {
     const gtinInput = screen.getByLabelText("Codice GTIN/EAN");
     await user.type(gtinInput, "+");
 
-    expect(handleGtinChange).toHaveBeenCalled();
+    expect(handleCodeChange).toHaveBeenCalled();
   });
 
   it("should handle GTIN code blur event", async () => {
