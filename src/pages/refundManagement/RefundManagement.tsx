@@ -92,7 +92,7 @@ const mapTransactionToDrawerItem = (
   };
 };
 
-export const RefundManagement = () => {
+const RefundManagement = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -305,3 +305,4 @@ export const RefundManagement = () => {
   );
 };
 
+export default RefundManagement;

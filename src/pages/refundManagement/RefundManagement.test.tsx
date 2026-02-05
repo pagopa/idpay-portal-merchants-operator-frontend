@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import {RefundManagement} from "./RefundManagement";
+import RefundManagement from "./RefundManagement";
 
 let mockLocationState: unknown = undefined;
 const navigateMock = vi.fn();
