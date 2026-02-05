@@ -1,28 +1,27 @@
-import { Box } from "@mui/material";
-import { useTranslation } from "react-i18next";
-import { useState, useCallback, useEffect } from "react";
-import { GridRenderCellParams } from "@mui/x-data-grid";
-import { useLocation, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-
+import {Box} from "@mui/material";
+import {useTranslation} from "react-i18next";
+import {useCallback, useEffect, useState} from "react";
+import {GridRenderCellParams} from "@mui/x-data-grid";
+import {useLocation, useNavigate} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
+import {downloadInvoiceFileApi, getProcessedTransactions,} from "../../services/merchantService";
 import {
-  getProcessedTransactions,
-  downloadInvoiceFileApi,
-} from "../../services/merchantService";
-import {
-  getStatusChip,
-  formatEuro,
-  renderCellWithTooltip,
-  renderMissingDataWithTooltip,
   checkEuroTooltip,
   checkTooltipValue,
+  formatEuro,
+  getStatusChip,
+  renderCellWithTooltip,
+  renderMissingDataWithTooltip,
 } from "../../utils/helpers";
-import { DetailsDrawer } from "../../components/DetailsDrawer/DetailsDrawer";
+import {DetailsDrawer} from "../../components/DetailsDrawer/DetailsDrawer";
 import TransactionsLayout from "../../components/TransactionsLayout/TransactionsLayout";
 import ROUTES from "../../routes";
-import { authStore } from "../../store/authStore";
-import { DecodedJwtToken } from "../../utils/types";
-import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
+import {authStore} from "../../store/authStore";
+import {DecodedJwtToken} from "../../utils/types";
+import {
+  PointOfSaleTransactionProcessedDTO,
+  StatusEnum
+} from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
 
 const formatDateTime = (value?: string) => {
   if (!value) {
@@ -47,16 +46,16 @@ const mapTransactionToDrawerItem = (
   t: (key: string) => string,
 ) => {
   const invoiceLabel =
-    transaction?.status === "REFUNDED"
+    transaction?.status === StatusEnum.REFUNDED
       ? "Nota di credito"
-      : transaction?.status === "CANCELLED"
+      : transaction?.status === StatusEnum.CANCELLED
       ? "cancelled"
       : "Fattura";
 
   const docNumberLabel =
-    transaction?.status === "REFUNDED"
+    transaction?.status === StatusEnum.REFUNDED
       ? "Numero nota di credito"
-      : transaction?.status === "CANCELLED"
+      : transaction?.status === StatusEnum.CANCELLED
       ? "cancelled"
       : "Numero fattura";
 
@@ -93,7 +92,7 @@ const mapTransactionToDrawerItem = (
   };
 };
 
-const RefundManagement = () => {
+export const RefundManagement = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -102,9 +101,7 @@ const RefundManagement = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<PointOfSaleTransactionProcessedDTO>({});
-  const [invoiceStatus, setInvoiceStatus] = useState<
-    "INVOICED" | "REWARDED" | "REFUNDED" | "CANCELLED"
-  >();
+  const [invoiceStatus, setInvoiceStatus] = useState<StatusEnum>();
   const [downloadInProgress, setDownloadInProgress] = useState(false);
   const [isDisabledModDocButton, setIsDisabledModDocButton] = useState(false);
 
@@ -251,7 +248,7 @@ const RefundManagement = () => {
       tableTitle={t("pages.refundManagement.tableTitle")}
       fetchTransactionsApi={getProcessedTransactions}
       columns={columns}
-      statusOptions={["REWARDED", "CANCELLED", "REFUNDED", "INVOICED"]}
+      statusOptions={Object.keys(StatusEnum)}
       noDataMessage={t("pages.refundManagement.noTransactions")}
       onRowAction={handleRowAction}
       alerts={[
@@ -288,7 +285,7 @@ const RefundManagement = () => {
               ),
           }}
           secondaryButton={
-            invoiceStatus === "INVOICED" || invoiceStatus === "REWARDED"
+            invoiceStatus === StatusEnum.INVOICED
               ? {
                   label: t("pages.refundManagement.drawer.refund"),
                   onClick: handleReverseTransaction,
@@ -308,4 +305,3 @@ const RefundManagement = () => {
   );
 };
 
-export default RefundManagement;
