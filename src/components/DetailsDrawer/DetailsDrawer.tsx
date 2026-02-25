@@ -51,7 +51,7 @@ export const DetailsDrawer = ({
   useEffect(() => {
     if (
       isOpen &&
-      (invoiceStatus === "INVOICED" || invoiceStatus === "REWARDED")
+      (invoiceStatus === "INVOICED")
     ) {
       setTimeout(() => {
         checkHeight();
@@ -227,7 +227,7 @@ export const DetailsDrawer = ({
           }}
         >
           {primaryButton &&
-            (invoiceStatus === "INVOICED" || invoiceStatus === "REWARDED") && (
+            (invoiceStatus === "INVOICED") && (
               <Button
                 onClick={primaryButton?.onClick}
                 href={primaryButton?.url}
@@ -237,16 +237,17 @@ export const DetailsDrawer = ({
                 {primaryButton.label}
               </Button>
             )}
-          {secondaryButton && (
-            <Button
-              onClick={secondaryButton?.onClick}
-              sx={{ marginTop: "10px" }}
-              href={primaryButton?.url}
-              disabled={secondaryButton?.disabled}
-            >
-              {secondaryButton.label}
-            </Button>
-          )}
+          {secondaryButton &&
+            (invoiceStatus === "INVOICED") && (
+              <Button
+                onClick={secondaryButton?.onClick}
+                sx={{ marginTop: "10px" }}
+                href={primaryButton?.url}
+                disabled={secondaryButton?.disabled}
+              >
+                {secondaryButton.label}
+              </Button>
+            )}
         </Box>
       )}
     </Drawer>
