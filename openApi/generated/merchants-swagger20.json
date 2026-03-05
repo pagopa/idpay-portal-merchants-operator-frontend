@@ -74,6 +74,15 @@
             "type": "string"
           },
           {
+            "description": "ENG: The transaction's code - IT: Codice della transazione",
+            "in": "query",
+            "maxLength": 100,
+            "name": "trxCode",
+            "pattern": "^[A-Z0-9]+$",
+            "required": false,
+            "type": "string"
+          },
+          {
             "in": "query",
             "maxLength": 14,
             "name": "productGtin",
@@ -319,6 +328,15 @@
             ],
             "in": "query",
             "name": "status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "description": "ENG: The transaction's code - IT: Codice della transazione",
+            "in": "query",
+            "maxLength": 100,
+            "name": "trxCode",
+            "pattern": "^[A-Z0-9]+$",
             "required": false,
             "type": "string"
           },
@@ -3732,6 +3750,18 @@
           "minimum": 0,
           "type": "integer"
         },
+        "rewardBatchTrxStatus": {
+          "description": "ENG: The status of batch-transaction - IT: Lo stato della transazione-lotto",
+          "enum": [
+            "TO_CHECK",
+            "CONSULTABLE",
+            "SUSPENDED",
+            "APPROVED",
+            "REJECTED"
+          ],
+          "type": "string",
+          "x-nullable": true
+        },
         "status": {
           "description": "ENG: The status of the transaction - IT: Lo stato della transazione",
           "enum": [
@@ -4501,6 +4531,15 @@
         "name": "transactionId",
         "pattern": ".*",
         "required": true,
+        "type": "string"
+      },
+      "trx_code_query": {
+        "description": "ENG: The transaction's code - IT: Codice della transazione",
+        "in": "query",
+        "maxLength": 100,
+        "name": "trxCode",
+        "pattern": "^[A-Z0-9]+$",
+        "required": false,
         "type": "string"
       },
       "trx_id_path": {
