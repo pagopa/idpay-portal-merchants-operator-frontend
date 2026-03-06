@@ -207,8 +207,8 @@ const PurchaseManagement = () => {
             setCancelTransactionModal(false);
             setTransactionDeleteSuccess(true);
             setTriggerFetchTransactions(true);
-        } catch (error) {
-            console.error('Error deleting transaction:', error);
+        } catch {
+            // console.error('Error deleting transaction:', error);
             setCancelTransactionModal(false);
             setErrorDeleteTransaction(true);
             setOpenDrawer(true);
@@ -222,8 +222,8 @@ const PurchaseManagement = () => {
             setCaptureTransactionModal(false);
             setTransactionCaptured(true);
             setTriggerFetchTransactions(true);
-        } catch (error) {
-            console.error('Error capture transaction:', error);
+        } catch {
+            // console.error('Error capture transaction:', error);
             setCaptureTransactionModal(false);
             setErrorCaptureTransaction(true);
             setOpenDrawer(true);
@@ -243,8 +243,8 @@ const PurchaseManagement = () => {
         try {
             const response = await getPreviewPdf(selectedTransaction?.id);
             downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
-        } catch (error) {
-            console.error('Error getting preview PDF:', error);
+        } catch {
+            // console.error('Error getting preview PDF:', error);
             setErrorPreviewPdf(true);
         } finally {
             setIsPreviewPdfLoading(false);

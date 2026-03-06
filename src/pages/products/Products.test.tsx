@@ -272,9 +272,6 @@ describe("Products Component", () => {
   });
 
   it("should handle errors during product fetch", async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
     mockGetProductsList.mockRejectedValue(new Error("API Error"));
     renderComponent();
 
@@ -285,11 +282,6 @@ describe("Products Component", () => {
     expect(screen.getByTestId("alert-component")).toHaveTextContent(
       "Errore nel recupero dei prodotti."
     );
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Error fetching products:",
-      expect.any(Error)
-    );
-    consoleErrorSpy.mockRestore();
   });
 
   it("should call fetchProducts with new pagination values", async () => {
@@ -577,7 +569,6 @@ describe("Products Component", () => {
   });
 
   it("should handle formik submit", async () => {
-    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     mockGetProductsList.mockResolvedValue(mockApiResponse);
     renderComponent();
 
@@ -586,7 +577,6 @@ describe("Products Component", () => {
     const form = screen.getByTestId("filters-form");
     fireEvent.submit(form);
 
-    consoleSpy.mockRestore();
   });
 
   it("should navigate to csv link", () => {

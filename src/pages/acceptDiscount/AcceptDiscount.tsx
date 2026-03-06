@@ -81,8 +81,8 @@ const AcceptDiscount = () => {
     try {
       const { content } = await getProductsList({ fullProductName, size: 50 });
       setProductsList([...content]);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // console.log(error);
       setProductsList([]);
     }
   };
@@ -121,7 +121,7 @@ const AcceptDiscount = () => {
         setPreviewIsLoading(false);
         navigate("/accetta-buono-sconto/riepilogo");
       } catch (error) {
-        console.error("Error in previewPayment:", error);
+        // console.error("Error in previewPayment:", error);
         if (
           error.response.data.code === "PAYMENT_NOT_FOUND_OR_EXPIRED" ||
           error.response.data.code === "PAYMENT_ALREADY_AUTHORIZED"

@@ -97,8 +97,9 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
     const formik = useFormik<GetProcessedTransactionsFilters>({
         initialValues,
-        onSubmit: (values) => {
-            console.log('Eseguo ricerca con filtri:', values);
+        onSubmit: async (values) => {
+            handleApplyFilters(values)
+            // console.log('Eseguo ricerca con filtri:', values);
         }
     });
 
@@ -155,8 +156,8 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
             setRows([...response.content]);
             setErrorAlert(false);
-        } catch (error) {
-            console.error('Errore fetch:', error);
+        } catch {
+            // console.error('Errore fetch:', error);
             setErrorAlert(true);
         } finally {
             setLoading(false);
@@ -242,9 +243,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
     return (
         <Box>
-            <>{console.log("APPLIED", filtersAppliedOnce)}</>
             {DrawerComponent}
-
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox
                     title={title}
@@ -276,7 +275,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                 {(rows.length > 0 || (rows.length === 0 && (formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || formik.values.status !== null && formik.values.status !== '')) || filtersAppliedOnce) && (
                     <FiltersForm
                         formik={formik}
-                        onFiltersApplied={handleApplyFilters}
+                        onFiltersApplied={formik.handleSubmit}
                         onFiltersReset={handleResetFilters}
                         filtersApplied={formik.values.fiscalCode.length > 0 || formik.values.productGtin.length > 0 || formik.values.trxCode.length > 0 || (formik.values.status !== null && formik.values.status !== '')}
                         filtersAppliedOnce={filtersAppliedOnce}
