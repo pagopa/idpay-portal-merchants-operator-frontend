@@ -1,11 +1,11 @@
-import { Modal, Box } from "@mui/material";
+import { Modal, Box, SxProps, Theme } from "@mui/material";
 import React from "react";
 
 interface ModalComponentProps {
     open: boolean;
     onClose: () => void;
     children: React.ReactNode;
-    style?: React.CSSProperties;
+    style?: SxProps<Theme> | undefined;
     className?: string;
 }
 
