@@ -12,6 +12,18 @@ const viteConfig = defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
+  resolve: {
+    alias: [
+      {
+        find: /^@mui\/icons-material\/esm\/(.*)$/,
+        replacement: '@mui/icons-material/$1',
+      },
+      {
+        find: /^@mui\/material\/esm\/(.*)$/,
+        replacement: '@mui/material/$1',
+      }
+    ],
+  }
 });
 
 const vitestConfig = defineVitestConfig({
@@ -23,6 +35,29 @@ const vitestConfig = defineVitestConfig({
       inline: [
         '@mui/x-data-grid'
       ]
+    },
+    css: true,
+    alias: [
+      {
+        find: '@pagopa/mui-italia/components',
+        replacement: 'D:/PagoPa/idpay-portal-merchants-operator-frontend/node_modules/@pagopa/mui-italia/components/index.js',
+      },
+      {
+        find: /^@mui\/icons-material\/esm\/(.*)$/,
+        replacement: '@mui/icons-material/$1',
+      }
+    ],
+    server: {
+      deps: {
+        inline: [
+          '@pagopa/mui-italia',
+          '@mui/material',
+          '@mui/x-data-grid',
+          '@mui/icons-material',
+          '@emotion/react',
+          '@emotion/styled'
+        ],
+      },
     },
     coverage: {
       provider: 'v8',
