@@ -51,8 +51,9 @@ const Products = () => {
 
     const formik = useFormik({
         initialValues,
-        onSubmit: (values) => {
-            console.log('Eseguo ricerca con filtri:', values);
+        onSubmit: async (values) => {
+            handleFiltersApplied(values)
+            // console.log('Eseguo ricerca con filtri:', values);
         }
     });
 
@@ -228,8 +229,8 @@ const Products = () => {
                 totalElements: totalElements || 0
             });
             setProductsListIsLoading(false);
-        } catch (error) {
-            console.error('Error fetching products:', error);
+        } catch {
+            // console.error('Error fetching products:', error);
             setProductsListIsLoading(false);
             setErrorAlert(true);
         }
@@ -323,7 +324,7 @@ const Products = () => {
                     ((productsList && productsList?.length > 0) || (productsList.length === 0 && (formik.values.category.length > 0 || formik.values.brand.length > 0 || formik.values.model.length > 0 || formik.values.eprelCode.length > 0 || formik.values.gtinCode.length > 0)) || filtersAppliedOnce) && (
                         <FiltersForm
                             formik={formik}
-                            onFiltersApplied={handleFiltersApplied}
+                            onFiltersApplied={formik.handleSubmit}
                             onFiltersReset={handleFiltersReset}
                             filtersApplied={areFiltersApplied()}
                             filtersAppliedOnce={filtersAppliedOnce}
