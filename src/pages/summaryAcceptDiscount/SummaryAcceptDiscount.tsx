@@ -47,9 +47,9 @@ const SummaryAcceptDiscount = () => {
             setAuthorizeIsLoading(false);
             setTransactionAuthorized(true);
             navigate(ROUTES.BUY_MANAGEMENT);
-        } catch (error) {
+        } catch {
             setErrorAlert(true);
-            console.log(error);
+            // console.log(error);
             setAuthorizeIsLoading(false);
         }
     };
