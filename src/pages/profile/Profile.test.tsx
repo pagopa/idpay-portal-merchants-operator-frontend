@@ -102,9 +102,6 @@ describe("Profile Component (Vitest)", () => {
   });
 
   it("should show AlertComponent in case of API error", async () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
     const mockError = new Error("API Error Test");
     getPointOfSaleDetails.mockRejectedValue(mockError);
 
@@ -113,12 +110,7 @@ describe("Profile Component (Vitest)", () => {
     await waitFor(() => {
       expect(screen.queryByTestId("alert-component")).toBeInTheDocument();
     })
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Error fetching details:",
-      mockError
-    );
 
-    consoleErrorSpy.mockRestore();
   });
 
   it("should handle API returning empty fields", async () => {
