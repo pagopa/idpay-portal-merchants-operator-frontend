@@ -243,6 +243,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
     return (
         <Box>
+            {/* <>{console.log("APPLIED", filtersAppliedOnce)}</> */}
             {DrawerComponent}
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox

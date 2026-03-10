@@ -36,7 +36,7 @@ const createAxiosInstance = (): AxiosInstance => {
     (error: AxiosError) => {
       // console.log(error);
       // if (error.response?.status === 401) {
-        // onRedirectToLogin();
+      //   onRedirectToLogin();
       // }
       return Promise.reject(error);
     }
@@ -71,7 +71,9 @@ export const MerchantApi = {
     organizationId?: string
    }
   ): Promise<ProductListDTO> => {
-    
+    // try {
+
+      // Remove undefined params
       const cleanParams = Object.fromEntries(
         Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
       );
@@ -81,7 +83,11 @@ export const MerchantApi = {
       });
       
       const result = handleAxiosResponse(response);
-      return result
+      return result;
+    // } catch (error) {
+    //   console.error('Error in getProducts:', error);
+    //   throw error;
+    // }
   },
 
 
@@ -93,9 +99,14 @@ export const MerchantApi = {
       discountCode: string
     }
   ): Promise<PreviewPaymentDTO> => {
+    // try {
       const response = await axiosInstance.put(`/transactions/bar-code/${params.discountCode}/preview`, params);
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in previewPayment:', error);
+    //   throw error;
+    // }
   },
 
   authPaymentBarCode: async (
@@ -105,9 +116,14 @@ export const MerchantApi = {
       additionalProperties?: object
     }
   ): Promise<AuthPaymentResponseDTO> => {
+    // try {
       const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/authorize`, params);
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in authPaymentBarCode:', error);
+    //   throw error;
+    // }
   },
 
   capturePayment: async (
@@ -116,8 +132,13 @@ export const MerchantApi = {
         additionalProperties?: object
       }
   ): Promise<TransactionBarCodeResponse> => {
+    // try {
       const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/capture`, params);
      return handleAxiosResponse(response);
+    // } catch (error) {
+    //   console.error('Error in capturePayment:', error);
+    //   throw error;
+    // }
   },
 
   getProcessedTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
@@ -129,6 +150,7 @@ export const MerchantApi = {
     productGtin?: string,
     trxCode?: string
   }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
+    // try {
         // Remove undefined params
         const cleanParams = Object.fromEntries(
           Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
@@ -138,6 +160,10 @@ export const MerchantApi = {
       });
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in getProcessedTransactions:', error);
+    //   throw error;
+    // }
   },
 
   getInProgressTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
@@ -149,6 +175,7 @@ export const MerchantApi = {
     productGtin?: string,
     trxCode?: string
   }): Promise<PointOfSaleTransactionsListDTO> => {
+    // try {
         // Remove undefined params
         const cleanParams = Object.fromEntries(
           Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
@@ -158,24 +185,43 @@ export const MerchantApi = {
       });
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in getInProgressTransactions:', error);
+    //   throw error;
+    // }
   },
 
   getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string): Promise<PointOfSaleDTO> => {
+    // try {
       const response = await axiosInstance.get(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
       const result = handleAxiosResponse(response)
       return result
+    // } catch (error) {
+    //   console.error('Error in getInProgressTransactions:', error);
+    //   throw error;
+    // }
   },
 
   deleteTransactionInProgress: async (trxId: string): Promise<void> => {
+    // try {
       const response = await axiosInstance.delete(`/transactions/${trxId}`);
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in deleteTransactionInProgress:', error);
+    //   throw error;
+    // }
   },
 
   downloadInvoiceFileApi: async (pointOfSaleId: string,trxId: string): Promise<{ invoiceUrl: string }> => {
+    // try {
       const response = await axiosInstance.get(`${pointOfSaleId}/transactions/${trxId}/download`);
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in downloadInvoiceFile:', error);
+    //   throw error;
+    // }
   },
 
   reverseTransactionApi: async (
@@ -183,6 +229,7 @@ export const MerchantApi = {
     file: File,
     docNumber: string
   ): Promise<void> => {
+    // try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('docNumber', docNumber);
@@ -198,12 +245,17 @@ export const MerchantApi = {
       );
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in reverseTransaction:', error);
+    //   throw error;
+    // }
   },
   reverseInvoicedTransactionApi: async (
     trxId: string, 
     file: File,
     docNumber: string
   ): Promise<void> => {
+    // try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('docNumber', docNumber);
@@ -219,6 +271,10 @@ export const MerchantApi = {
       );
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in reverseInvoicedTransaction:', error);
+    //   throw error;
+    // }
   },
   
 
@@ -227,6 +283,7 @@ export const MerchantApi = {
     file: File,
     docNumber: string
   ): Promise<void> => {
+    // try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('docNumber', docNumber);
@@ -241,12 +298,17 @@ export const MerchantApi = {
       );
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in invoiceTransaction:', error);
+    //   throw error;
+    // }
   },
   updateInvoiceTransactionApi: async (
       trxId: string,
       file: File,
       docNumber: string
   ): Promise<void> => {
+    // try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('docNumber', docNumber);
@@ -261,16 +323,20 @@ export const MerchantApi = {
       );
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in invoiceTransaction:', error);
+    //   throw error;
+    // }
   },
 
   getPreviewPdf: async (trxId: string): Promise<{ data: string }> => {
+    // try {
       const response = await axiosInstance.get(`/transactions/${trxId}/preview-pdf`);
       const result = handleAxiosResponse(response);
       return result;
+    // } catch (error) {
+    //   console.error('Error in getPreviewPdf:', error);
+    //   throw error;
+    // }
   },
 };
-
-
-
-
-
