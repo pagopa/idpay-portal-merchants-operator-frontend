@@ -162,8 +162,8 @@ const RefundManagement = () => {
       link.href = invoiceUrl;
       link.download = filename;
       link.click();
-    } catch (error) {
-      console.error("Errore download file:", error);
+    } catch {
+      // console.error("Errore download file:", error);
       setErrorDownloadAlert(true);
     } finally {
       setDownloadInProgress(false);
