@@ -9,11 +9,15 @@ import { vi } from "vitest";
 import SummaryAcceptDiscount from "./SummaryAcceptDiscount";
 import ROUTES from "../../routes";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key,
+    })
+  }
+});
 
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", () => ({

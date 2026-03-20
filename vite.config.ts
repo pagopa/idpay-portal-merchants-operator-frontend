@@ -55,7 +55,8 @@ const vitestConfig = defineVitestConfig({
           '@mui/x-data-grid',
           '@mui/icons-material',
           '@emotion/react',
-          '@emotion/styled'
+          '@emotion/styled',
+          '@pagopa/selfcare-common-frontend'
         ],
       },
     },
