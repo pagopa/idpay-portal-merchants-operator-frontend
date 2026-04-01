@@ -99,7 +99,6 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         initialValues,
         onSubmit: async (values) => {
             handleApplyFilters(values)
-            // console.log('Eseguo ricerca con filtri:', values);
         }
     });
 
@@ -157,7 +156,6 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             setRows([...response.content]);
             setErrorAlert(false);
         } catch {
-            // console.error('Errore fetch:', error);
             setErrorAlert(true);
         } finally {
             setLoading(false);
@@ -243,7 +241,6 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
     return (
         <Box>
-            {/* <>{console.log("APPLIED", filtersAppliedOnce)}</> */}
             {DrawerComponent}
             <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <TitleBox

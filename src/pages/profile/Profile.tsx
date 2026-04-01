@@ -20,7 +20,6 @@ const fetchDetails = async ({ setLoading, setErrorAlert, token, user }) => {
     );
     return response;
   } catch {
-    // console.error("Error fetching details:", error);
     setErrorAlert(true)
   } finally {
     setLoading(false)

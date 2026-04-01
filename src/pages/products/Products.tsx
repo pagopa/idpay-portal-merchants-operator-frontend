@@ -53,7 +53,6 @@ const Products = () => {
         initialValues,
         onSubmit: async (values) => {
             handleFiltersApplied(values)
-            // console.log('Eseguo ricerca con filtri:', values);
         }
     });
 
@@ -230,7 +229,6 @@ const Products = () => {
             });
             setProductsListIsLoading(false);
         } catch {
-            // console.error('Error fetching products:', error);
             setProductsListIsLoading(false);
             setErrorAlert(true);
         }

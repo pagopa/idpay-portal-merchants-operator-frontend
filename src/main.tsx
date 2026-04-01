@@ -8,11 +8,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from "./contexts/AuthContext";
 import './locale';
 import { initializeCookieOneTrust } from './utils/oneTrustLoader.ts';
+import { logger } from "./utils/logger";
 
-initializeCookieOneTrust()
-// .catch(err => {
-//   console.log('Failed to initialize Cookie OneTrust: ', err);
-// })
+initializeCookieOneTrust().catch((err) => {
+  logger.error("Failed to initialize Cookie OneTrust:", err);
+});
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');

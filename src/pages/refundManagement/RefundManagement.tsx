@@ -163,7 +163,6 @@ const RefundManagement = () => {
       link.download = filename;
       link.click();
     } catch {
-      // console.error("Errore download file:", error);
       setErrorDownloadAlert(true);
     } finally {
       setDownloadInProgress(false);

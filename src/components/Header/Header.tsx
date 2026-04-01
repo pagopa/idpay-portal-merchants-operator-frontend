@@ -80,7 +80,6 @@ const Header = ({ userProps }: HeaderProps) => {
         }
         ]}
         partyId="party-idpay-merchants"
-        // onSelectedParty={e => console.log("Selected Item:", e.name)}
       />
     </>
   );

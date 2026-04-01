@@ -49,7 +49,6 @@ const SummaryAcceptDiscount = () => {
             navigate(ROUTES.BUY_MANAGEMENT);
         } catch {
             setErrorAlert(true);
-            // console.log(error);
             setAuthorizeIsLoading(false);
         }
     };

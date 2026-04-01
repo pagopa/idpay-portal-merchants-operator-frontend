@@ -11,6 +11,16 @@ vi.mock("axios", () => {
   const mockRequestUse = vi.fn();
   const mockResponseUse = vi.fn();
 
+  // MerchantsApiClient uses axios default export + axios.create().
+  // logger/logApiError rely on axios.isAxiosError; expose it to avoid vitest runtime error.
+  const isAxiosError = (value: unknown): value is import("axios").AxiosError => {
+    return (
+      Boolean(value) &&
+      typeof value === "object" &&
+      "isAxiosError" in (value as Record<string, unknown>)
+    );
+  };
+
   return {
     default: {
       create: vi.fn(() => ({
@@ -23,7 +33,9 @@ vi.mock("axios", () => {
           response: { use: mockResponseUse },
         },
       })),
+      isAxiosError,
     },
+    isAxiosError,
   };
 });
 
@@ -39,11 +51,17 @@ const mockedAxios = vi.mocked(await import("axios")).default;
 
 describe("MerchantApi", () => {
   // Get the mocked axios instance
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: {
+    get: ReturnType<typeof vi.fn>;
+    put: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
-    // Get the mocked instance that axios.create returns
-    mockAxiosInstance = (mockedAxios.create as any)();
+    // axios.create() is typed as AxiosInstance, but our vi.mock factory returns an object
+    // whose methods are vi.fn(). Cast for test-only typing.
+    mockAxiosInstance = mockedAxios.create() as unknown as typeof mockAxiosInstance;
   });
 
   afterEach(() => {
@@ -316,7 +334,7 @@ describe("MerchantApi", () => {
       const mockResponse = { data: {}, status: 204 };
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.invoiceTransactionApi(trxID, testFile);
+      const result = await MerchantApi.invoiceTransactionApi(trxID, testFile, "DOC789");
 
       expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse.data);
@@ -331,7 +349,7 @@ describe("MerchantApi", () => {
       mockAxiosInstance.post.mockRejectedValue(apiError);
 
       await expect(
-          MerchantApi.invoiceTransactionApi(trxId, testFile)
+          MerchantApi.invoiceTransactionApi(trxId, testFile, "DOC789")
       ).rejects.toThrow("404 Not Found from API");
     });
   });
@@ -401,7 +419,7 @@ describe("MerchantApi", () => {
       const mockResponse = { data: {}, status: 204 };
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.reverseTransactionApi(trxID, testFile);
+      const result = await MerchantApi.reverseTransactionApi(trxID, testFile, "DOC789");
 
       expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse.data);
@@ -416,7 +434,7 @@ describe("MerchantApi", () => {
       mockAxiosInstance.post.mockRejectedValue(apiError);
 
       await expect(
-          MerchantApi.reverseTransactionApi(trxId, testFile)
+          MerchantApi.reverseTransactionApi(trxId, testFile, "DOC789")
       ).rejects.toThrow("404 Not Found from API");
     });
   });
