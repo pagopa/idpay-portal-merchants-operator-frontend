@@ -32,7 +32,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import style from '../purchaseManagement/purchaseManagement.module.css';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
-import { handleCodeChange } from '../../utils/helpers';
+import { handleCodeChange, renderCellWithTooltip, renderMissingDataWithTooltip } from '../../utils/helpers';
 
 const Products = () => {
   const [gtinError, setGtinError] = useState<string>('');
@@ -74,33 +74,8 @@ const Products = () => {
       disableColumnMenu: true,
       align: 'center',
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'brand',
@@ -108,33 +83,8 @@ const Products = () => {
       flex: 1,
       disableColumnMenu: true,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'model',
@@ -142,33 +92,8 @@ const Products = () => {
       flex: 1.5,
       disableColumnMenu: true,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'gtinCode',
@@ -176,33 +101,8 @@ const Products = () => {
       flex: 2,
       disableColumnMenu: true,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'eprelCode',
@@ -305,7 +205,7 @@ const Products = () => {
     }
   };
 
-  const handleFiltersApplied = (filtersObj: any) => {
+  const handleFiltersApplied = (filtersObj: typeof initialValues) => {
     setFiltersAppliedOnce(true);
     setAppliedFilters(filtersObj);
     const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
@@ -329,7 +229,7 @@ const Products = () => {
     formik.resetForm();
     fetchProducts({});
   };
-  const handleRowAction = (row: any) => {
+  const handleRowAction = (row: unknown) => {
     setOpenDrawer(true);
     setSelectedProduct(row);
   };
