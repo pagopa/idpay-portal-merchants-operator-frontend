@@ -136,7 +136,18 @@ export const handleCodeChange = (event, formik, length, codeName) => {
   }
 };
 
-export const renderCellWithTooltip = (value: any) => {
+export const renderCellWithTooltip = (value: unknown) => {
+  const renderableValue =
+    value === null || value === undefined
+      ? ''
+      : typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+        ? String(value)
+        : value instanceof Date
+          ? value.toISOString()
+          : typeof value === 'object'
+            ? JSON.stringify(value)
+            : String(value);
+
   return (
     <div
       style={{
@@ -146,7 +157,7 @@ export const renderCellWithTooltip = (value: any) => {
         width: '100%',
       }}
     >
-      <Tooltip title={value}>
+      <Tooltip title={renderableValue}>
         <Typography
           sx={{
             overflow: 'hidden',
@@ -154,7 +165,7 @@ export const renderCellWithTooltip = (value: any) => {
             whiteSpace: 'nowrap',
           }}
         >
-          {value}
+          {renderableValue}
         </Typography>
       </Tooltip>
     </div>
