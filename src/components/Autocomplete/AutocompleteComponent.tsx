@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import CircularProgress from "@mui/material/CircularProgress";
-import { ProductDTO } from "../../api/generated/merchants/ProductDTO";
-import { REQUIRED_FIELD_ERROR } from "../../utils/constants";
-import { useTranslation } from "react-i18next";
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import CircularProgress from '@mui/material/CircularProgress';
+import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
+import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { useTranslation } from 'react-i18next';
 
 type AutocompleteComponentProps = {
   options: ProductDTO[];
@@ -18,48 +18,44 @@ type AutocompleteComponentProps = {
 
 const autocompleteSx = (width?: string | number) => ({
   width,
-  "& .MuiFormLabel-root.Mui-error": {
-    color: "#5C6E82 !important",
+  '& .MuiFormLabel-root.Mui-error': {
+    color: '#5C6E82 !important',
   },
 });
 
 const popperSx = {
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15), 0px 0px 2px rgba(0, 0, 0, 0.05)",
-  borderRadius: "4px",
-  "& .MuiAutocomplete-option": {
-    "&:hover": {
-      backgroundColor: "#0073E614 !important",
-      color: "#0073E6 !important",
-      fontWeight: "600 !important",
+  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.15), 0px 0px 2px rgba(0, 0, 0, 0.05)',
+  borderRadius: '4px',
+  '& .MuiAutocomplete-option': {
+    '&:hover': {
+      backgroundColor: '#0073E614 !important',
+      color: '#0073E6 !important',
+      fontWeight: '600 !important',
     },
   },
-  "& .MuiAutocomplete-noOptions": {
-    fontWeight: "600",
+  '& .MuiAutocomplete-noOptions': {
+    fontWeight: '600',
   },
 };
 
 const listboxSx = {
-  "&::-webkit-scrollbar": {
-    width: "6px",
+  '&::-webkit-scrollbar': {
+    width: '6px',
   },
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#0073E6",
-    borderRadius: "4px",
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#0073E6',
+    borderRadius: '4px',
   },
-  "&::-webkit-scrollbar-thumb:hover": {
-    backgroundColor: "#005BB5",
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: '#005BB5',
   },
-  "&::-webkit-scrollbar-track": {
-    backgroundColor: "#f1f1f1",
-    borderRadius: "4px",
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: '#f1f1f1',
+    borderRadius: '4px',
   },
 };
 
-function getVisibleOptions(
-  loading: boolean,
-  inputValue: string,
-  options: ProductDTO[]
-) {
+function getVisibleOptions(loading: boolean, inputValue: string, options: ProductDTO[]) {
   return loading ? [] : inputValue.trim().length >= 5 ? options : [];
 }
 
@@ -73,38 +69,30 @@ export default function AutocompleteComponent({
 }: AutocompleteComponentProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [inputValue, setInputValue] = useState(value?.fullProductName || "");
+  const [inputValue, setInputValue] = useState(value?.fullProductName || '');
   const { t } = useTranslation();
 
   const isOptionEqualToValue = useCallback(
-    (option: ProductDTO, value: ProductDTO) =>
-      option?.fullProductName === value?.fullProductName,
+    (option: ProductDTO, value: ProductDTO) => option?.fullProductName === value?.fullProductName,
     []
   );
 
-  const getOptionLabel = useCallback(
-    (option: ProductDTO) => option?.fullProductName || "",
-    []
-  );
+  const getOptionLabel = useCallback((option: ProductDTO) => option?.fullProductName || '', []);
 
   useEffect(() => {
-    if (
-      value?.fullProductName &&
-      value.fullProductName !== inputValue &&
-      inputValue === ""
-    ) {
+    if (value?.fullProductName && value.fullProductName !== inputValue && inputValue === '') {
       setInputValue(value.fullProductName);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  const lastDebouncedValue = useRef<string>("");
+  const lastDebouncedValue = useRef<string>('');
 
   useEffect(() => {
     const trimmed = inputValue.trim();
     if (trimmed.length < 5) {
       setLoading(false);
-      lastDebouncedValue.current = "";
+      lastDebouncedValue.current = '';
       return;
     }
     if (lastDebouncedValue.current === trimmed) {
@@ -147,21 +135,18 @@ export default function AutocompleteComponent({
   );
 
   const handleBlur = useCallback(() => {
-    const normalized = inputValue.trim().replace(/\s+/g, " ");
+    const normalized = inputValue.trim().replace(/\s+/g, ' ');
     if (inputValue !== normalized) {
       setInputValue(normalized);
     }
   }, [inputValue]);
 
-  const handlePaste = useCallback(
-    (event: React.ClipboardEvent<HTMLInputElement>) => {
-      const pasted = event.clipboardData.getData("text");
-      const normalized = pasted.trim().replace(/\s+/g, " ");
-      event.preventDefault();
-      setInputValue(normalized);
-    },
-    []
-  );
+  const handlePaste = useCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = event.clipboardData.getData('text');
+    const normalized = pasted.trim().replace(/\s+/g, ' ');
+    event.preventDefault();
+    setInputValue(normalized);
+  }, []);
 
   return (
     <Autocomplete
@@ -174,8 +159,8 @@ export default function AutocompleteComponent({
       getOptionLabel={getOptionLabel}
       options={getVisibleOptions(loading, inputValue, options)}
       loading={loading}
-      noOptionsText={t("pages.acceptDiscount.noOptionsText")}
-      loadingText={t("pages.acceptDiscount.loadingText")}
+      noOptionsText={t('pages.acceptDiscount.noOptionsText')}
+      loadingText={t('pages.acceptDiscount.loadingText')}
       value={value ?? null}
       inputValue={inputValue}
       onChange={handleChange}
@@ -190,22 +175,16 @@ export default function AutocompleteComponent({
           label="Cerca"
           size="small"
           error={inputError}
-          helperText={inputError ? REQUIRED_FIELD_ERROR : ""}
+          helperText={inputError ? REQUIRED_FIELD_ERROR : ''}
           sx={{ marginTop: 2 }}
           onBlur={handleBlur}
           onPaste={handlePaste}
           InputProps={{
             ...params.InputProps,
             sx: {
-              paddingRight: "0px !important",
+              paddingRight: '0px !important',
             },
-            endAdornment: (
-              <>
-                {loading ? (
-                  <CircularProgress color="inherit" size={20} />
-                ) : null}
-              </>
-            ),
+            endAdornment: <>{loading ? <CircularProgress color="inherit" size={20} /> : null}</>,
           }}
         />
       )}
@@ -213,7 +192,7 @@ export default function AutocompleteComponent({
         popper: {
           modifiers: [
             {
-              name: "offset",
+              name: 'offset',
               options: {
                 offset: [0, 8],
               },

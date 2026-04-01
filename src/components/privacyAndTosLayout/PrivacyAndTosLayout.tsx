@@ -4,17 +4,25 @@ import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import { CustomFooter } from '../Footer/CustomFooter';
 
-export const PrivacyAndTosLayout = ({ text, title }: { text: Record<string, string>, title: string }) => {
-
+export const PrivacyAndTosLayout = ({
+  text,
+  title,
+}: {
+  text: Record<string, string>;
+  title: string;
+}) => {
   return (
-
     <>
-      <HeaderAccount rootLink={{
-        href: "https://www.pagopa.it/it/",
-        label: "PagoPA S.p.A.",
-        ariaLabel: "PagoPA S.p.A.",
-        title: "PagoPA S.p.A.",
-      }} enableLogin={false} onAssistanceClick={() => window.open(import.meta.env.VITE_ASSISTANCE || '', '_blank')} />
+      <HeaderAccount
+        rootLink={{
+          href: 'https://www.pagopa.it/it/',
+          label: 'PagoPA S.p.A.',
+          ariaLabel: 'PagoPA S.p.A.',
+          title: 'PagoPA S.p.A.',
+        }}
+        enableLogin={false}
+        onAssistanceClick={() => window.open(import.meta.env.VITE_ASSISTANCE || '', '_blank')}
+      />
 
       <HeaderProduct
         productsList={[
@@ -24,19 +32,13 @@ export const PrivacyAndTosLayout = ({ text, title }: { text: Record<string, stri
             productUrl: 'test',
             linkType: 'internal',
             icon: '',
-          }
+          },
         ]}
       />
       <Box sx={{ width: '100%', padding: '20px' }}>
-
         <Box>
           <Box mt={2} sx={{ display: 'grid', gridColumn: 'span 8' }}>
-            <TitleBox
-              title={title}
-              mbTitle={2}
-              mtTitle={2}
-              variantTitle="h4"
-            />
+            <TitleBox title={title} mbTitle={2} mtTitle={2} variantTitle="h4" />
           </Box>
         </Box>
 
@@ -52,8 +54,6 @@ export const PrivacyAndTosLayout = ({ text, title }: { text: Record<string, stri
             </Grid>
           </Box>
         </Paper>
-
-
       </Box>
       <CustomFooter />
     </>

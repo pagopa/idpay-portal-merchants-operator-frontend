@@ -1,4 +1,4 @@
-import {  Button, Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { ButtonNaked } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import React, { cloneElement, isValidElement } from 'react';
@@ -19,7 +19,7 @@ const FiltersForm = <T extends Record<string, any>>({
   onFiltersApplied,
   onFiltersReset,
   filtersApplied,
-  filtersAppliedOnce
+  filtersAppliedOnce,
 }: Props<T>) => {
   const { t } = useTranslation();
 
@@ -39,7 +39,7 @@ const FiltersForm = <T extends Record<string, any>>({
   const enhancedChildren = React.Children.map(children, (child) => {
     if (isValidElement(child) && child.props.name) {
       const fieldName = child.props.name;
-      
+
       return cloneElement(child, {
         ...child.props,
         value: formik.values[fieldName] || '',
@@ -61,37 +61,37 @@ const FiltersForm = <T extends Record<string, any>>({
   });
 
   return (
-    <Grid sx={{ my: 4, width: '100%' }} container spacing={2} >
+    <Grid sx={{ my: 4, width: '100%' }} container spacing={2}>
       {enhancedChildren}
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
-      <Button
-        sx={{ height: '44.5px', gridColumn: 'span 1' }} 
-        variant="outlined"
-        fullWidth
-        size="small"
-        onClick={handleApplyFilters}
-        disabled={formik.isSubmitting || !filtersApplied}
-        data-testid="apply-filters-test"
-      >
-        {t('commons.filterBtn')}
-      </Button>
+        <Button
+          sx={{ height: '44.5px', gridColumn: 'span 1' }}
+          variant="outlined"
+          fullWidth
+          size="small"
+          onClick={handleApplyFilters}
+          disabled={formik.isSubmitting || !filtersApplied}
+          data-testid="apply-filters-test"
+        >
+          {t('commons.filterBtn')}
+        </Button>
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
-      <ButtonNaked
-        component="button"
-        sx={{
-          color: 'primary.main',
-          fontWeight: 600,
-          fontSize: '0.875rem',
-          gridColumn: 'span 1',
-          height: '44.5px'
-        }}
-        onClick={handleResetFilters}
-        disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce) }
-        data-testid="reset-filters-test"
-      >
-        {t('commons.removeFiltersBtn')}
-      </ButtonNaked>
+        <ButtonNaked
+          component="button"
+          sx={{
+            color: 'primary.main',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            gridColumn: 'span 1',
+            height: '44.5px',
+          }}
+          onClick={handleResetFilters}
+          disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce)}
+          data-testid="reset-filters-test"
+        >
+          {t('commons.removeFiltersBtn')}
+        </ButtonNaked>
       </Grid>
     </Grid>
   );

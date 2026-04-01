@@ -1,15 +1,15 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import ROUTES from "../../routes";
-import Refund from "./Refund";
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import ROUTES from '../../routes';
+import Refund from './Refund';
 
-vi.mock("react-i18next", () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        "commons.exitBtn": "Esci",
-        "pages.refund.title": "title test",
-        "pages.refund.subtitle": "subtitle test",
+        'commons.exitBtn': 'Esci',
+        'pages.refund.title': 'title test',
+        'pages.refund.subtitle': 'subtitle test',
       };
       return translations[key] || key;
     },
@@ -17,15 +17,15 @@ vi.mock("react-i18next", () => ({
 }));
 
 const navigateMock = vi.fn();
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual<any>("react-router-dom");
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<any>('react-router-dom');
   return {
     ...actual,
     useNavigate: () => navigateMock,
   };
 });
 
-vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
+vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
   TitleBox: ({ title, subTitle }: any) => (
     <div>
       <h4>{title}</h4>
@@ -34,21 +34,19 @@ vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
   ),
 }));
 
-describe("Refund component", () => {
-  it("renders title with translations", () => {
+describe('Refund component', () => {
+  it('renders title with translations', () => {
     render(<Refund />);
 
-    expect(screen.getByText("Esci")).toBeInTheDocument();
-    expect(screen.getAllByText("title test")[0]).toBeInTheDocument();
+    expect(screen.getByText('Esci')).toBeInTheDocument();
+    expect(screen.getAllByText('title test')[0]).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("heading", { name: "title test" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'title test' })).toBeInTheDocument();
   });
 
-  it("calls navigate when back button is clicked", () => {
+  it('calls navigate when back button is clicked', () => {
     render(<Refund />);
-    fireEvent.click(screen.getByText("Esci"));
+    fireEvent.click(screen.getByText('Esci'));
 
     expect(navigateMock).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT);
   });

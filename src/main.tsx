@@ -5,20 +5,20 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import { theme } from '@pagopa/mui-italia';
 import { BrowserRouter } from 'react-router-dom';
 
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from './contexts/AuthContext';
 import './locale';
 import { initializeCookieOneTrust } from './utils/oneTrustLoader.ts';
-import { logger } from "./utils/logger";
+import { logger } from './utils/logger';
 
 initializeCookieOneTrust().catch((err) => {
-  logger.error("Failed to initialize Cookie OneTrust:", err);
+  logger.error('Failed to initialize Cookie OneTrust:', err);
 });
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
-createRoot(rootElement).render(  
+createRoot(rootElement).render(
   <AuthProvider>
-    <BrowserRouter basename='/esercente'>
+    <BrowserRouter basename="/esercente">
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <App />

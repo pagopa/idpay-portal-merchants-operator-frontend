@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
 type UtilsStoreState = {
-    transactionAuthorized: boolean;
-    setTransactionAuthorized: (value: boolean) => void;
-  };
+  transactionAuthorized: boolean;
+  setTransactionAuthorized: (value: boolean) => void;
+};
 
 export const utilsStore = create<UtilsStoreState>((set) => ({
   transactionAuthorized: false,

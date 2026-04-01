@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { authStore } from "./authStore";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { authStore } from './authStore';
 
 const mockToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvZSBETyIsImlhdCI6MTUxNjIzOTAyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-const mockUser = { id: 1, name: "Test User" };
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvZSBETyIsImlhdCI6MTUxNjIzOTAyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+const mockUser = { id: 1, name: 'Test User' };
 const mockLogoutFn = vi.fn();
 
 beforeEach(() => {
@@ -16,8 +16,8 @@ beforeEach(() => {
   mockLogoutFn.mockClear();
 });
 
-describe("authStore", () => {
-  it("dovrebbe impostare il token e isAuthenticated su true", () => {
+describe('authStore', () => {
+  it('dovrebbe impostare il token e isAuthenticated su true', () => {
     authStore.getState().setJwtToken(mockToken);
 
     const state = authStore.getState();
@@ -26,8 +26,8 @@ describe("authStore", () => {
     expect(state.isAuthenticated).toBe(true);
   });
 
-  it("dovrebbe rimuovere il token e impostare isAuthenticated su false se il token è null", () => {
-    authStore.setState({ token: "qualcosa", isAuthenticated: true });
+  it('dovrebbe rimuovere il token e impostare isAuthenticated su false se il token è null', () => {
+    authStore.setState({ token: 'qualcosa', isAuthenticated: true });
 
     authStore.getState().setJwtToken(null);
 
@@ -37,13 +37,13 @@ describe("authStore", () => {
     expect(state.isAuthenticated).toBe(false);
   });
 
-  it("dovrebbe impostare la funzione di logout esterna (logoutFn)", () => {
+  it('dovrebbe impostare la funzione di logout esterna (logoutFn)', () => {
     authStore.getState().setLogout(mockLogoutFn);
 
     expect(authStore.getState().logoutFn).toBe(mockLogoutFn);
   });
 
-  it("dovrebbe eseguire logoutFn e resettare lo stato (token, isAuthenticated, user, logoutFn)", () => {
+  it('dovrebbe eseguire logoutFn e resettare lo stato (token, isAuthenticated, user, logoutFn)', () => {
     authStore.setState({
       token: mockToken,
       isAuthenticated: true,
@@ -63,7 +63,7 @@ describe("authStore", () => {
     expect(state.logoutFn).toBe(null);
   });
 
-  it("dovrebbe resettare solo lo stato se logoutFn non è impostata", () => {
+  it('dovrebbe resettare solo lo stato se logoutFn non è impostata', () => {
     authStore.setState({
       token: mockToken,
       isAuthenticated: true,
@@ -88,7 +88,7 @@ describe("authStore", () => {
     expect(authStore.getState().user).toBe(mockUser);
   });
 
-  it("dovrebbe resettare solo il token e isAuthenticated, mantenendo user e logoutFn", () => {
+  it('dovrebbe resettare solo il token e isAuthenticated, mantenendo user e logoutFn', () => {
     authStore.setState({
       token: mockToken,
       isAuthenticated: true,

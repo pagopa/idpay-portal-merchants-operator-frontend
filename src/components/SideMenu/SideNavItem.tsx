@@ -1,7 +1,7 @@
 import { ListItemButton, ListItemText, ListItemIcon, Icon, Tooltip } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
 import styles from './SideMenu.module.css';
-    
+
 type Props = {
   handleClick: () => void;
   title: string;
@@ -19,29 +19,36 @@ export default function SideNavItem({
   icon,
   level,
   disabled = false,
-  hideLabels = false
+  hideLabels = false,
 }: Props) {
   return (
-    <ListItemButton selected={isSelected} disabled={disabled} onClick={handleClick} className={hideLabels ? styles.sideMenuItem : ''}>
+    <ListItemButton
+      selected={isSelected}
+      disabled={disabled}
+      onClick={handleClick}
+      className={hideLabels ? styles.sideMenuItem : ''}
+    >
       <ListItemIcon sx={{ ml: level }}>
-        {
-          hideLabels ? (
-            <Tooltip title={title}>
-              <Icon component={icon} />
-            </Tooltip>
-          ) : (<Icon component={icon} />)
-        }
+        {hideLabels ? (
+          <Tooltip title={title}>
+            <Icon component={icon} />
+          </Tooltip>
+        ) : (
+          <Icon component={icon} />
+        )}
       </ListItemIcon>
-      {!hideLabels && <ListItemText
-        primary={title}
-        sx={{
-          wordWrap: 'break-word',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          textAlign: 'left',
-          display: 'block',
-        }}
-      />}
+      {!hideLabels && (
+        <ListItemText
+          primary={title}
+          sx={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            textAlign: 'left',
+            display: 'block',
+          }}
+        />
+      )}
     </ListItemButton>
   );
 }
