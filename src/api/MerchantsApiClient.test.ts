@@ -437,7 +437,9 @@ describe('MerchantApi', () => {
 
       const result = await MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(`${pointOfSaleId}/transactions/${trxId}/download`);
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+        `${pointOfSaleId}/transactions/${trxId}/download`
+      );
       expect(result).toEqual(mockResponse.data);
     });
 

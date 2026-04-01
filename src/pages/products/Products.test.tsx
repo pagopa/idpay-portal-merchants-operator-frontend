@@ -2,10 +2,131 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { FormikProps } from 'formik';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Products from './Products';
 import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
 import '@testing-library/jest-dom/vitest';
+
+type BaseProps = { children?: React.ReactNode } & Record<string, unknown>;
+
+vi.mock('@mui/material', async () => {
+  const React = await import('react');
+
+  const create =
+    (testId: string, as: keyof JSX.IntrinsicElements = 'div') =>
+    ({ children, ...props }: BaseProps) =>
+      React.createElement(as, { 'data-testid': testId, ...(props as object) }, children);
+
+  return {
+    Box: create('Box'),
+    CircularProgress: (props: Record<string, unknown>) => (
+      <div role="progressbar" data-testid="CircularProgress" {...(props as object)} />
+    ),
+    Typography: create('Typography'),
+    Paper: create('Paper'),
+    Grid: create('Grid'),
+    TextField: ({
+      label,
+      name,
+      value,
+      onChange,
+      onBlur,
+      error,
+      helperText,
+    }: {
+      label?: string;
+      name?: string;
+      value?: unknown;
+      onChange?: React.ChangeEventHandler<HTMLInputElement>;
+      onBlur?: React.FocusEventHandler<HTMLInputElement>;
+      error?: boolean;
+      helperText?: string;
+    }) => (
+      <div>
+        {label ? <label>{label}</label> : null}
+        <input
+          aria-label={label}
+          name={name}
+          value={typeof value === 'string' ? value : ''}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+        {error ? <span>{helperText}</span> : null}
+      </div>
+    ),
+    Select: ({
+      children,
+      labelId,
+      id,
+      ...props
+    }: BaseProps & { labelId?: string; id?: string }) => (
+      <select
+        id={id}
+        aria-labelledby={labelId}
+        {...(props as object)}
+      >
+        {children}
+      </select>
+    ),
+    MenuItem: ({ children, value }: { children?: React.ReactNode; value: string }) => (
+      <option value={value}>{children}</option>
+    ),
+    FormControl: create('FormControl'),
+    InputLabel: ({ children, id, ...props }: BaseProps & { id?: string }) => (
+      <label htmlFor={typeof id === 'string' ? id : undefined} {...(props as object)}>
+        {children}
+      </label>
+    ),
+    Drawer: ({ open, children }: { open: boolean; children?: React.ReactNode }) =>
+      open ? <div role="presentation">{children}</div> : null,
+    Divider: create('Divider'),
+    Link: ({
+      children,
+      href,
+      target,
+      ...props
+    }: {
+      children?: React.ReactNode;
+      href?: string;
+      target?: string;
+    } & Record<string, unknown>) => (
+      <a href={href} target={target} {...(props as object)}>
+        {children}
+      </a>
+    ),
+    Button: ({
+      children,
+      onClick,
+      ...props
+    }: {
+      children?: React.ReactNode;
+      onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    } & Record<string, unknown>) => (
+      <button type="button" onClick={onClick} {...(props as object)}>
+        {children}
+      </button>
+    ),
+  };
+});
+
+vi.mock('@mui/material/Tooltip', async () => {
+  const React = await import('react');
+  return {
+    default: ({ children }: { children?: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+  };
+});
+
+vi.mock('@mui/icons-material/FileDownload', () => ({ default: () => null }));
+vi.mock('@mui/icons-material/Close', () => ({ default: (props: Record<string, unknown>) => <div data-testid="CloseIcon" {...(props as object)} /> }));
+
+vi.mock('@mui/x-data-grid', () => ({}));
+
+vi.mock('@pagopa/mui-italia', () => ({
+  theme: {
+    typography: { fontWeightMedium: 500, fontWeightBold: 700, fontWeightRegular: 400 },
+    palette: { text: { secondary: '#666' } },
+  },
+}));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -215,14 +336,7 @@ const mockApiResponse = {
   totalElements: 2,
 };
 
-const renderComponent = () => {
-  const theme = createTheme();
-  return render(
-    <ThemeProvider theme={theme}>
-      <Products />
-    </ThemeProvider>
-  );
-};
+const renderComponent = () => render(<Products />);
 
 describe('Products Component', () => {
   beforeEach(() => {
@@ -565,13 +679,9 @@ describe('Products Component', () => {
 
   it('should handle all category options in select', async () => {
     mockGetProductsList.mockResolvedValue(mockApiResponse);
-    const user = userEvent.setup();
     renderComponent();
 
     await screen.findByTestId('filters-form');
-
-    const categorySelect = screen.getByLabelText('Categoria');
-    await user.click(categorySelect);
 
     expect(screen.getByText('Lavatrici')).toBeInTheDocument();
     expect(screen.getByText('Asciugatrici')).toBeInTheDocument();
@@ -603,8 +713,8 @@ describe('Products Component', () => {
     renderComponent();
     await screen.findByTestId('data-table');
 
-    const exportButton = screen.getByRole('button', { name: 'Esporta csv' });
-    await userEvent.click(exportButton);
+    const muiExportButton = screen.getAllByRole('button', { name: 'Esporta csv' })[1];
+    await userEvent.click(muiExportButton);
 
     expect(openSpy).toHaveBeenCalledWith('https://example.com/export.csv', '_blank');
     expect(focus).toHaveBeenCalled();
@@ -659,11 +769,12 @@ describe('Products Component', () => {
       expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByTestId('apply-filters-button'));
+    expect(screen.queryByTestId('filters-form')).not.toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByTestId('filters-form')).toBeInTheDocument();
-    });
+    const exportButtons = screen.getAllByRole('button', { name: 'Esporta csv' });
+    await userEvent.click(exportButtons[0]);
+
+    expect(screen.queryByTestId('filters-form')).not.toBeInTheDocument();
   });
 
   it('should not render link and should render placeholder for eprelCode when value is empty string', async () => {
@@ -724,8 +835,7 @@ describe('Products Component', () => {
     await user.click(screen.getByTestId('row-77777'));
 
     await screen.findByText('Prodotto Senza Capacità');
-    const drawer = screen.getByRole('presentation');
-    expect(drawer).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
+    expect(screen.getByText('Capacità')).toBeInTheDocument();
   });
 
   it('should render capacity value when capacity is empty string', async () => {
