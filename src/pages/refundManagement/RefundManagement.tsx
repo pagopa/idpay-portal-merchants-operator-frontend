@@ -22,7 +22,7 @@ import TransactionsLayout from "../../components/TransactionsLayout/Transactions
 import ROUTES from "../../routes";
 import { authStore } from "../../store/authStore";
 import { DecodedJwtToken } from "../../utils/types";
-import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/merchants/PointOfSaleTransactionProcessedDTO";
+import { PointOfSaleTransactionProcessedDTO } from "../../api/generated/data-contracts";
 
 const formatDateTime = (value?: string) => {
   if (!value) {

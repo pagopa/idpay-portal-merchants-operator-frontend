@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-import { ProductDTO } from "../../api/generated/merchants/ProductDTO";
+import { ProductDTO } from "../../api/generated/data-contracts";
 import { REQUIRED_FIELD_ERROR } from "../../utils/constants";
 import { useTranslation } from "react-i18next";
 

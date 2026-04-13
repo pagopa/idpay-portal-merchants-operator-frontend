@@ -1,342 +1,210 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import type { ProductListDTO } from './generated/merchants/ProductListDTO';
-import type { PreviewPaymentDTO } from './generated/merchants/PreviewPaymentDTO';
-//store
-import { authStore } from '../store/authStore';
-import { AuthPaymentResponseDTO } from './generated/merchants/AuthPaymentResponseDTO';
-import type { PointOfSaleTransactionsProcessedListDTO } from './generated/merchants/PointOfSaleTransactionsProcessedListDTO';
-import type { PointOfSaleTransactionsListDTO } from './generated/merchants/PointOfSaleTransactionsListDTO';
-import { PointOfSaleDTO } from './generated/merchants/PointOfSaleDTO';
-import {TransactionBarCodeResponse} from "./generated/merchants/TransactionBarCodeResponse.ts";
+import { Products } from "./generated/Products";
+import { Transactions } from "./generated/Transactions";
+import { Initiatives } from "./generated/Initiatives";
+import { MerchantId } from "./generated/MerchantId";
+import { PointOfSaleId } from "./generated/PointOfSaleId";
+import type {
+  ProductListDTO,
+  PreviewPaymentDTO,
+  AuthPaymentResponseDTO,
+  TransactionBarCodeResponse,
+  ReportDTO,
+  AuthBarCodePaymentDTO,
+} from "./generated/data-contracts";
+import { createApiConfig, getAuthToken } from "./BaseApiClient";
 
-//axios instance 
-const createAxiosInstance = (): AxiosInstance => {
-  const instance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-    timeout: Number(import.meta.env.VITE_API_TIMEOUT_MS) || 10000,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+// Instantiate API modules
+const productsApi = new Products<string>(createApiConfig());
+const transactionsApi = new Transactions<string>(createApiConfig());
+const initiativesApi = new Initiatives<string>(createApiConfig());
+const merchantIdApi = new MerchantId<string>(createApiConfig());
+const pointOfSaleIdApi = new PointOfSaleId<string>(createApiConfig());
 
-  // Request Interceptor 
-  instance.interceptors.request.use((config) => {
-    const { token } = authStore.getState();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
-  // Response Interceptor 
-  instance.interceptors.response.use(
-    (response: AxiosResponse) => {
-      return response;
-    },
-    (error: AxiosError) => {
-      // console.log(error);
-      // if (error.response?.status === 401) {
-      //   onRedirectToLogin();
-      // }
-      return Promise.reject(error);
-    }
-  );
-
-  return instance;
-};
-
-const axiosInstance = createAxiosInstance();
-
-// const onRedirectToLogin = () => {
-//   console.log("ERROR 401");
-// };
-
-const handleAxiosResponse = <T>(response: AxiosResponse<T>): T => {
-  return response.data;
+const applySecurity = () => {
+  const token = getAuthToken();
+  productsApi.setSecurityData(token);
+  transactionsApi.setSecurityData(token);
+  initiativesApi.setSecurityData(token);
+  merchantIdApi.setSecurityData(token);
+  pointOfSaleIdApi.setSecurityData(token);
 };
 
 export const MerchantApi = {
   getProducts: async (
-   params: {
-    status?: string 
-    page?: number, 
-    size?: number, 
-    sort?: string, 
-    category?: string, 
-    eprelCode?: string, 
-    gtinCode?: string, 
-    productFileId?: string, 
-    productName?: string,
-    fullProductName?:string, 
-    organizationId?: string
-   }
+    params: Parameters<typeof productsApi.getProducts>[0],
   ): Promise<ProductListDTO> => {
-    // try {
-
-      // Remove undefined params
-      const cleanParams = Object.fromEntries(
-        Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
-      );
-
-      const response = await axiosInstance.get('/products', {
-        params: cleanParams
-      });
-      
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in getProducts:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    const response = await productsApi.getProducts(params);
+    return response.data;
   },
-
 
   previewPayment: async (
     params: {
-      productGtin: string,
-      productName: string,
-      amountCents: number,
-      discountCode: string
-    }
+      productGtin: string;
+      productName: string;
+      amountCents: number;
+      discountCode: string;
+    },
   ): Promise<PreviewPaymentDTO> => {
-    // try {
-      const response = await axiosInstance.put(`/transactions/bar-code/${params.discountCode}/preview`, params);
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in previewPayment:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    const response = await transactionsApi.previewPayment(
+      params.discountCode,
+      {
+        productGtin: params.productGtin,
+        productName: params.productName,
+        amountCents: params.amountCents,
+      },
+    );
+    return response.data;
   },
 
   authPaymentBarCode: async (
     params: {
-      trxCode: string,
-      amountCents: number,
-      additionalProperties?: object
-    }
+      trxCode: string;
+      amountCents: number;
+      idTrxAcquirer: string;
+      additionalProperties: Record<string, string>;
+    },
   ): Promise<AuthPaymentResponseDTO> => {
-    // try {
-      const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/authorize`, params);
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in authPaymentBarCode:', error);
-    //   throw error;
-    // }
+    applySecurity();
+
+    const payload: AuthBarCodePaymentDTO = {
+      amountCents: params.amountCents,
+      idTrxAcquirer: params.idTrxAcquirer,
+      additionalProperties: params.additionalProperties,
+    };
+
+    const response = await transactionsApi.authPaymentBarCode(
+      params.trxCode,
+      payload,
+    );
+    return response.data;
   },
 
   capturePayment: async (
-      params: {
-        trxCode: string,
-        additionalProperties?: object
-      }
+    params: { trxCode: string },
   ): Promise<TransactionBarCodeResponse> => {
-    // try {
-      const response = await axiosInstance.put(`/transactions/bar-code/${params.trxCode}/capture`, params);
-     return handleAxiosResponse(response);
-    // } catch (error) {
-    //   console.error('Error in capturePayment:', error);
-    //   throw error;
-    // }
-  },
-
-  getProcessedTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
-    page?: number,
-    size?: number,
-    sort?: string,
-    fiscalCode?: string,
-    status?: string,
-    productGtin?: string,
-    trxCode?: string
-  }): Promise<PointOfSaleTransactionsProcessedListDTO> => {
-    // try {
-        // Remove undefined params
-        const cleanParams = Object.fromEntries(
-          Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
-        );
-      const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/processed`, {
-        params: cleanParams
-      });
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in getProcessedTransactions:', error);
-    //   throw error;
-    // }
-  },
-
-  getInProgressTransactions: async (initiativeId: string, pointOfSaleId: string, params: {
-    page?: number,
-    size?: number,
-    sort?: string,
-    fiscalCode?: string,
-    status?: string,
-    productGtin?: string,
-    trxCode?: string
-  }): Promise<PointOfSaleTransactionsListDTO> => {
-    // try {
-        // Remove undefined params
-        const cleanParams = Object.fromEntries(
-          Object.entries(params).filter(([_/* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) => value !== undefined && value !== '' && value !== null)
-        );
-      const response = await axiosInstance.get(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`, {
-        params: cleanParams
-      });
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in getInProgressTransactions:', error);
-    //   throw error;
-    // }
-  },
-
-  getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string): Promise<PointOfSaleDTO> => {
-    // try {
-      const response = await axiosInstance.get(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
-      const result = handleAxiosResponse(response)
-      return result
-    // } catch (error) {
-    //   console.error('Error in getInProgressTransactions:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    const response = await transactionsApi.capturePayment(params.trxCode);
+    return response.data;
   },
 
   deleteTransactionInProgress: async (trxId: string): Promise<void> => {
-    // try {
-      const response = await axiosInstance.delete(`/transactions/${trxId}`);
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in deleteTransactionInProgress:', error);
-    //   throw error;
-    // }
-  },
-
-  downloadInvoiceFileApi: async (pointOfSaleId: string,trxId: string): Promise<{ invoiceUrl: string }> => {
-    // try {
-      const response = await axiosInstance.get(`${pointOfSaleId}/transactions/${trxId}/download`);
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in downloadInvoiceFile:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    await transactionsApi.deleteTransaction(trxId);
   },
 
   reverseTransactionApi: async (
-    trxId: string, 
+    trxId: string,
     file: File,
-    docNumber: string
+    docNumber: string,
   ): Promise<void> => {
-    // try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('docNumber', docNumber);
-      
-      const response = await axiosInstance.post(
-        `/transactions/${trxId}/reversal`, 
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in reverseTransaction:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    await transactionsApi.reversalTransaction(trxId, {
+      file,
+      docNumber,
+    });
   },
+
   reverseInvoicedTransactionApi: async (
-    trxId: string, 
+    trxId: string,
     file: File,
-    docNumber: string
+    docNumber: string,
   ): Promise<void> => {
-    // try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('docNumber', docNumber);
-      
-      const response = await axiosInstance.post(
-        `/transactions/${trxId}/reversal-invoiced`, 
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in reverseInvoicedTransaction:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    await transactionsApi.reversalTransactionInvoiced(trxId, {
+      file,
+      docNumber,
+    });
   },
-  
 
- invoiceTransactionApi: async (
-    trxId: string, 
+  invoiceTransactionApi: async (
+    trxId: string,
     file: File,
-    docNumber: string
+    docNumber: string,
   ): Promise<void> => {
-    // try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('docNumber', docNumber);
-      const response = await axiosInstance.post(
-        `/transactions/${trxId}/invoice`, 
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in invoiceTransaction:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    await transactionsApi.invoiceTransaction(trxId, {
+      file,
+      docNumber,
+    });
   },
+
   updateInvoiceTransactionApi: async (
-      trxId: string,
-      file: File,
-      docNumber: string
+    trxId: string,
+    file: File,
+    docNumber: string,
   ): Promise<void> => {
-    // try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('docNumber', docNumber);
-      const response = await axiosInstance.put(
-          `transactions/${trxId}/invoice/update`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-      );
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in invoiceTransaction:', error);
-    //   throw error;
-    // }
+    applySecurity();
+    await transactionsApi.updateInvoiceTransaction(trxId, {
+      file,
+      docNumber,
+    });
   },
 
-  getPreviewPdf: async (trxId: string): Promise<{ data: string }> => {
-    // try {
-      const response = await axiosInstance.get(`/transactions/${trxId}/preview-pdf`);
-      const result = handleAxiosResponse(response);
-      return result;
-    // } catch (error) {
-    //   console.error('Error in getPreviewPdf:', error);
-    //   throw error;
-    // }
+  getPreviewPdf: async (trxId: string): Promise<ReportDTO> => {
+    applySecurity();
+    const response = await transactionsApi.getTransactionPreviewPdf(trxId);
+    return response.data;
+  },
+
+  // ---- Proper implementations using generated APIs ----
+
+  getProcessedTransactions: async (
+    initiativeId: string,
+    pointOfSaleId: string,
+    params?: Parameters<
+      typeof initiativesApi.getPointOfSaleTransactionsProcessed
+    >[2],
+  ) => {
+    applySecurity();
+    const response =
+      await initiativesApi.getPointOfSaleTransactionsProcessed(
+        initiativeId,
+        pointOfSaleId,
+        params,
+      );
+    return response.data;
+  },
+
+  getInProgressTransactions: async (
+    initiativeId: string,
+    pointOfSaleId: string,
+    params?: Parameters<
+      typeof initiativesApi.getPointOfSaleTransactions
+    >[2],
+  ) => {
+    applySecurity();
+    const response =
+      await initiativesApi.getPointOfSaleTransactions(
+        initiativeId,
+        pointOfSaleId,
+        params,
+      );
+    return response.data;
+  },
+
+  getPointOfSaleDetails: async (
+    merchantId: string,
+    pointOfSaleId: string,
+  ) => {
+    applySecurity();
+    const response = await merchantIdApi.getPointOfSale(
+      merchantId,
+      pointOfSaleId,
+    );
+    return response.data;
+  },
+
+  downloadInvoiceFileApi: async (
+    pointOfSaleId: string,
+    trxId: string,
+  ) => {
+    applySecurity();
+    const response = await pointOfSaleIdApi.downloadInvoiceFile(
+      pointOfSaleId,
+      trxId,
+    );
+    return response.data;
   },
 };

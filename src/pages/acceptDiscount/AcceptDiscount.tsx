@@ -20,7 +20,7 @@ import {
   previewPayment,
 } from "../../services/merchantService";
 import Autocomplete from "../../components/Autocomplete/AutocompleteComponent";
-import { ProductDTO } from "../../api/generated/merchants/ProductDTO";
+import { ProductDTO } from "../../api/generated/data-contracts";
 import AlertComponent from "../../components/Alert/AlertComponent";
 import { useNavigate } from "react-router-dom";
 import EuroIcon from "@mui/icons-material/Euro";
@@ -48,7 +48,7 @@ const AcceptDiscount = () => {
     totalAmount: "",
     discountCode: "",
   });
-  const [productsList, setProductsList] = useState<ProductDTO[]>([]);
+  const [productsList, setProductsList] = useState<unknown[]>([]);
   const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
   const [previewIsLoading, setPreviewIsLoading] = useState(false);
@@ -234,7 +234,7 @@ const AcceptDiscount = () => {
               inputTitle={t("pages.acceptDiscount.selectProductTitle")}
             >
               <Autocomplete
-                options={productsList}
+                options={productsList as ProductDTO[]}
                 onChangeDebounce={(value) => handleChangeAutocomplete(value)}
                 onChange={(productObj) =>
                   handleFieldChange("product", productObj)
