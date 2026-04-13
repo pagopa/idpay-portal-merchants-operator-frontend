@@ -8,7 +8,7 @@ vi.mock('react-i18next', () => ({
       ({
         'commons.filterBtn': 'Apply Filters',
         'commons.removeFiltersBtn': 'Reset Filters',
-      }[key] || key),
+      })[key] || key,
   }),
 }));
 

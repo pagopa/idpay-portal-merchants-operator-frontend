@@ -32,7 +32,7 @@ const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(
   () =>
     ({
       focus: vi.fn(),
-    } as any)
+    }) as any
 );
 
 beforeEach(() => {

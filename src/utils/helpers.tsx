@@ -163,12 +163,12 @@ export const renderCellWithTooltip = (value: unknown) => {
     value === null || value === undefined
       ? ''
       : typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-      ? String(value)
-      : value instanceof Date
-      ? value.toISOString()
-      : typeof value === 'object'
-      ? JSON.stringify(value)
-      : String(value);
+        ? String(value)
+        : value instanceof Date
+          ? value.toISOString()
+          : typeof value === 'object'
+            ? JSON.stringify(value)
+            : String(value);
 
   return (
     <div

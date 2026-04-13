@@ -47,15 +47,15 @@ const mapTransactionToDrawerItem = (
     transaction?.status === 'REFUNDED'
       ? 'Nota di credito'
       : transaction?.status === 'CANCELLED'
-      ? 'cancelled'
-      : 'Fattura';
+        ? 'cancelled'
+        : 'Fattura';
 
   const docNumberLabel =
     transaction?.status === 'REFUNDED'
       ? 'Numero nota di credito'
       : transaction?.status === 'CANCELLED'
-      ? 'cancelled'
-      : 'Numero fattura';
+        ? 'cancelled'
+        : 'Numero fattura';
 
   return {
     [t('pages.refundManagement.drawer.trxDate')]: new Date(transaction?.trxChargeDate)
