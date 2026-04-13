@@ -13,7 +13,6 @@ import type {
 } from './generated/data-contracts';
 import { createApiConfig, getAuthToken } from './BaseApiClient';
 
-// Instantiate API modules
 const productsApi = new Products<string>(createApiConfig());
 const transactionsApi = new Transactions<string>(createApiConfig());
 const initiativesApi = new Initiatives<string>(createApiConfig());
@@ -127,8 +126,6 @@ export const MerchantApi = {
     const response = await transactionsApi.getTransactionPreviewPdf(trxId);
     return response.data;
   },
-
-  // ---- Proper implementations using generated APIs ----
 
   getProcessedTransactions: async (
     initiativeId: string,

@@ -8,7 +8,7 @@ import {
   PaginationExtendedModel,
   DecodedJwtToken,
   transactionInProgreessDTO,
-} from './types'; // importa il file contenente le interfacce
+} from './types';
 
 describe('TypeScript Interfaces', () => {
   it('should create a valid JwtUser object', () => {

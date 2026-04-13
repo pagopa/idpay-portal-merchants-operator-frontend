@@ -2,7 +2,6 @@ import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
 import type { DecodedJwtToken, LoggedUser } from '../../utils/types';
 import { useAuth } from '../../contexts/AuthContext';
-// import type { JwtUser } from '../../utils/types';
 import keycloak from '../../config/keycloak';
 import { jwtDecode } from 'jwt-decode';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
@@ -36,7 +35,6 @@ const Header = ({ userProps }: HeaderProps) => {
   }, [user, token]);
 
   const welfareProduct: ProductEntity = {
-    // TODO check if correct
     id: 'prod-idpay-merchants',
     title: 'Bonus Elettrodomestici',
     productUrl: 'test',

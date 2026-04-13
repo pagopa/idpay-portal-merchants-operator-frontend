@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import BreadcrumbsBox from './BreadcrumbsBox';
 import { BrowserRouter } from 'react-router-dom';
 
-// mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual: any = await vi.importActual('react-router-dom');
@@ -31,10 +30,8 @@ describe('BreadcrumbsBox', () => {
       </BrowserRouter>
     );
 
-    // verifica back button
     expect(screen.getByTestId('back-btn-test')).toHaveTextContent('Indietro');
 
-    // verifica breadcrumb
     items.forEach((item) => {
       expect(screen.getByText(item.label)).toBeInTheDocument();
     });
@@ -110,11 +107,9 @@ describe('BreadcrumbsBox', () => {
       </BrowserRouter>
     );
 
-    // Trova e clicca sulla seconda voce del breadcrumb ("Page 1")
     const breadcrumbItem = screen.getByText('Page 1');
     fireEvent.click(breadcrumbItem);
 
-    // Verifica che la navigazione sia stata chiamata con il path corretto
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith('Page 1');
   });
@@ -126,11 +121,9 @@ describe('BreadcrumbsBox', () => {
       </BrowserRouter>
     );
 
-    // Trova e clicca sull'ultima voce ("Page 2")
     const lastBreadcrumbItem = screen.getByText('Page 2');
     fireEvent.click(lastBreadcrumbItem);
 
-    // Verifica che la navigazione NON sia stata chiamata
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 });

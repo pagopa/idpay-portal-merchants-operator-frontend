@@ -9,9 +9,7 @@ vi.mock('./generated/Products', () => ({
     setSecurityData = vi.fn();
     getProducts = (params: Record<string, unknown>) =>
       mockGet('/products', {
-        params: Object.fromEntries(
-          Object.entries(params || {}).filter(([, v]) => v !== undefined)
-        ),
+        params: Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined)),
       });
   },
 }));
@@ -25,8 +23,7 @@ vi.mock('./generated/Transactions', () => ({
       mockPut(`/transactions/bar-code/${trxCode}/authorize`, body);
     capturePayment = (trxCode: string) =>
       mockPut(`/transactions/bar-code/${trxCode}/capture`, { trxCode });
-    deleteTransaction = (trxCode: string) =>
-      mockDelete(`/transactions/${trxCode}`);
+    deleteTransaction = (trxCode: string) => mockDelete(`/transactions/${trxCode}`);
     reversalTransaction = (trxCode: string) =>
       mockPost(`/transactions/${trxCode}/reversal`, new FormData(), {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -39,8 +36,7 @@ vi.mock('./generated/Transactions', () => ({
       mockPost(`/transactions/${trxCode}/invoice`, body);
     updateInvoiceTransaction = (trxCode: string, body: Record<string, unknown>) =>
       mockPut(`/transactions/${trxCode}/invoice/update`, body);
-    getTransactionPreviewPdf = (trxCode: string) =>
-      mockGet(`/transactions/${trxCode}/preview-pdf`);
+    getTransactionPreviewPdf = (trxCode: string) => mockGet(`/transactions/${trxCode}/preview-pdf`);
   },
 }));
 
@@ -52,10 +48,9 @@ vi.mock('./generated/Initiatives', () => ({
       pointOfSaleId: string,
       params: Record<string, unknown>
     ) =>
-      mockGet(
-        `/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`,
-        { params }
-      );
+      mockGet(`/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`, {
+        params,
+      });
     getPointOfSaleTransactionsProcessed = (
       initiativeId: string,
       pointOfSaleId: string,
@@ -164,14 +159,11 @@ describe('MerchantApi', () => {
 
       const result = await MerchantApi.authPaymentBarCode(params);
 
-      expect(mockPut).toHaveBeenCalledWith(
-        `/transactions/bar-code/${params.trxCode}/authorize`,
-        {
-          amountCents: params.amountCents,
-          idTrxAcquirer: undefined,
-          additionalProperties: params.additionalProperties,
-        }
-      );
+      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/authorize`, {
+        amountCents: params.amountCents,
+        idTrxAcquirer: undefined,
+        additionalProperties: params.additionalProperties,
+      });
       expect(result).toEqual(mockResponse.data);
     });
   });
@@ -194,10 +186,9 @@ describe('MerchantApi', () => {
 
       const result = await MerchantApi.capturePayment(params);
 
-      expect(mockPut).toHaveBeenCalledWith(
-        `/transactions/bar-code/${params.trxCode}/capture`,
-        { trxCode: params.trxCode }
-      );
+      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/capture`, {
+        trxCode: params.trxCode,
+      });
 
       expect(result).toEqual(mockResponseData);
     });
@@ -216,10 +207,9 @@ describe('MerchantApi', () => {
 
       await expect(promise).rejects.toThrow('400 Bad Request: Capture Failed');
 
-      expect(mockPut).toHaveBeenCalledWith(
-        `/transactions/bar-code/${params.trxCode}/capture`,
-        { trxCode: params.trxCode }
-      );
+      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/capture`, {
+        trxCode: params.trxCode,
+      });
     });
   });
 
@@ -286,9 +276,7 @@ describe('MerchantApi', () => {
 
       const result = await MerchantApi.getPointOfSaleDetails(merchantId, pointOfSaleId);
 
-      expect(mockGet).toHaveBeenCalledWith(
-        `/${merchantId}/point-of-sales/${pointOfSaleId}`
-      );
+      expect(mockGet).toHaveBeenCalledWith(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
       expect(result).toEqual(mockResponse.data);
     });
 
@@ -303,9 +291,7 @@ describe('MerchantApi', () => {
 
       await expect(promise).rejects.toThrow('404 Not Found from API');
 
-      expect(mockGet).toHaveBeenCalledWith(
-        `/${merchantId}/point-of-sales/${pointOfSaleId}`
-      );
+      expect(mockGet).toHaveBeenCalledWith(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
       expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
@@ -483,9 +469,7 @@ describe('MerchantApi', () => {
 
       const result = await MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId);
 
-      expect(mockGet).toHaveBeenCalledWith(
-        `${pointOfSaleId}/transactions/${trxId}/download`
-      );
+      expect(mockGet).toHaveBeenCalledWith(`${pointOfSaleId}/transactions/${trxId}/download`);
       expect(result).toEqual(mockResponse.data);
     });
 

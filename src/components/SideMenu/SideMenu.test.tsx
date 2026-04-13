@@ -2,39 +2,28 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock external dependencies
-
-// Mock navigate function
 const mockNavigate = vi.fn();
 
-// Mock 'react-router-dom' hooks
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useLocation: vi.fn(() => ({ pathname: '' })),
 }));
 
-// Mock 'react-i18next'
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
-// Mock 'SideNavItem' component
 vi.mock('./SideNavItem', () => ({
   default: ({ title, handleClick, isSelected, icon: Icon }: any) => (
-    <div
-      data-testid={`sidenav-item-${title}`}
-      data-selected={isSelected} // Usiamo un attributo per verificare la selezione
-      onClick={handleClick}
-    >
+    <div data-testid={`sidenav-item-${title}`} data-selected={isSelected} onClick={handleClick}>
       {title}
       <Icon />
     </div>
   ),
 }));
 
-// Mock icons and routes
 vi.mock('@mui/icons-material/ConfirmationNumber', () => ({
   default: () => <div />,
 }));
@@ -46,13 +35,10 @@ vi.mock('../../routes', () => ({
   },
 }));
 
-// Import component to test and mocked dependencies
 import SideMenu from './SideMenu';
 import ROUTES from '../../routes';
 
-//Test suite
 describe('SideMenu Component', () => {
-  // Before each test, clear mocks to avoid interference
   beforeEach(() => {
     vi.clearAllMocks();
   });

@@ -57,9 +57,7 @@ vi.mock('../../components/Autocomplete/AutocompleteComponent', () => ({
 }));
 
 vi.mock('../../components/Alert/AlertComponent', () => ({
-  default: ({ message }: { message: string }) => (
-    <div data-testid="AlertComponent">{message}</div>
-  ),
+  default: ({ message }: { message: string }) => <div data-testid="AlertComponent">{message}</div>,
 }));
 
 vi.mock('react-i18next', () => ({

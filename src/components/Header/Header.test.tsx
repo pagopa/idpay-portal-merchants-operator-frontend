@@ -61,17 +61,7 @@ vi.mock('@pagopa/mui-italia', () => ({
       <div data-testid="header-product">
         <span data-testid="product-title">{props.productsList[0].title}</span>
         {selectedParty && <span data-testid="party-name">{selectedParty.name}</span>}
-        <button
-          data-testid="select-party-button"
-          // onClick={() =>
-          //     props.onSelectedParty({
-          //       id: props.partyId,
-          //       name: selectedParty.name,
-          //     })
-          // }
-        >
-          Select Party
-        </button>
+        <button data-testid="select-party-button">Select Party</button>
       </div>
     );
   },
@@ -161,13 +151,6 @@ describe('Header Component - Franchise Name Fetch', () => {
     });
   });
 
-  // it("should handle error when fetching franchise details fails", async () => {
-  //   const error = new Error("API Error");
-  //   (getPointOfSaleDetails as any).mockRejectedValueOnce(error);
-
-  //   render(<Header userProps={mockUserProps} />);
-  // });
-
   it('should use empty string when franchiseName is not returned', async () => {
     (getPointOfSaleDetails as any).mockResolvedValueOnce({});
 
@@ -200,15 +183,6 @@ describe('Header Component - User Actions', () => {
     await waitFor(() => {
       expect(screen.getByTestId('party-name')).toHaveTextContent('Test Franchise');
     });
-
-    // const selectPartyButton = screen.getByTestId("select-party-button");
-    // fireEvent.click(selectPartyButton);
-
-    // expect(loggerLogSpy).toHaveBeenCalledWith(
-    //     "Selected Item:",
-    //     "Test Franchise"
-    // );
-    // expect(loggerLogSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should open manual link when onDocumentationClick is triggered', async () => {

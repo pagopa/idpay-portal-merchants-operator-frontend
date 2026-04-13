@@ -2,12 +2,8 @@ import { Chip, Tooltip, Typography } from '@mui/material';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getStatusChip(t: any, status: string) {
-  const statusMap: Record<
-    string,
-    { label: string; backgroundColor: string; color: string }
-  > = {
+  const statusMap: Record<string, { label: string; backgroundColor: string; color: string }> = {
     AUTHORIZED: {
       label: t('pages.refundManagement.authorized'),
       backgroundColor: '#EEEEEE !important',

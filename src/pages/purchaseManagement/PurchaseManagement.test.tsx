@@ -103,9 +103,7 @@ vi.mock('../../services/merchantService', () => ({
 }));
 
 vi.mock('../../utils/helpers', () => ({
-  getStatusChip: vi.fn((_, status: string) => (
-    <div data-testid="status-chip">{status}</div>
-  )),
+  getStatusChip: vi.fn((_, status: string) => <div data-testid="status-chip">{status}</div>),
   formatEuro: vi.fn((v: number) => `€${v}`),
   downloadFileFromBase64: mockDownload,
   checkEuroTooltip: vi.fn((p: { value?: number }) =>

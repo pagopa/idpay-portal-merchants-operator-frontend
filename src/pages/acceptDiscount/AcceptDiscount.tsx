@@ -115,7 +115,6 @@ const AcceptDiscount = () => {
         setPreviewIsLoading(false);
         navigate('/accetta-buono-sconto/riepilogo');
       } catch (error) {
-        // console.error("Error in previewPayment:", error);
         if (
           error?.response?.data?.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
           error?.response?.data?.code === 'PAYMENT_ALREADY_AUTHORIZED'

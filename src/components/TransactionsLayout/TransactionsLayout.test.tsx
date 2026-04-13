@@ -58,10 +58,8 @@ vi.mock('../Alert/AlertComponent', () => ({
   default: ({ message }: { message: string }) => <div data-testid="alert">{message}</div>,
 }));
 
-// Mock del servizio API
 const mockFetchTransactionsApi = vi.fn();
 
-// Mock di jwt-decode e authStore
 vi.mock('jwt-decode', () => ({
   jwtDecode: () => ({ point_of_sale_id: 'pos-123' }),
 }));
@@ -75,7 +73,6 @@ vi.mock('../../hooks/useAutoResetBanner', () => ({
   useAutoResetBanner: vi.fn(),
 }));
 
-// Dati di mock
 const mockTransactions = [
   { id: 'trx1', fiscalCode: 'AAAAAA11B22C333D', status: 'COMPLETED' },
   { id: 'trx2', fiscalCode: 'BBBBBB22C33D444E', status: 'REJECTED' },
@@ -90,7 +87,6 @@ const mockApiResponse = {
 
 const mockColumns = [{ field: 'id', headerName: 'ID' }];
 
-// Funzione helper per il rendering del componente
 const renderComponent = (props = {}) => {
   const defaultProps = {
     title: 'Test Title',
@@ -115,7 +111,6 @@ const renderComponent = (props = {}) => {
   );
 };
 
-// Suite di test
 describe('TransactionsLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -181,7 +176,7 @@ describe('TransactionsLayout', () => {
     fireEvent.click(screen.getByTestId('apply-filters'));
 
     await waitFor(() => {
-      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2); // 1 initial, 1 after filter
+      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2);
     });
 
     expect(mockFetchTransactionsApi).toHaveBeenLastCalledWith(

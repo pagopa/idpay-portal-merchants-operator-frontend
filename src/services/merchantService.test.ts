@@ -159,11 +159,7 @@ describe('merchantService', () => {
     vi.mocked(MerchantApi.reverseInvoicedTransactionApi).mockResolvedValue(undefined as never);
 
     await expect(reverseInvoicedTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
-    expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith(
-      'T',
-      file,
-      'DOC'
-    );
+    expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
   });
 
   it('invoiceTransactionApi delegates correctly', async () => {

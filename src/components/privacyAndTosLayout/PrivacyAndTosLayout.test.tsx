@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { PrivacyAndTosLayout } from './PrivacyAndTosLayout';
 import DOMPurify from 'dompurify';
 
-// Mock dei moduli
 vi.mock('../../components/OneTrustContentWrapper', () => (props: { idSelector: string }) => (
   <div data-testid="onetrust-wrapper" data-idselector={props.idSelector} />
 ));
@@ -50,7 +49,6 @@ vi.mock('../Footer/CustomFooter', () => ({
   CustomFooter: () => <footer data-testid="custom-footer">Footer</footer>,
 }));
 
-// Mock di DOMPurify
 vi.mock('dompurify', () => ({
   default: {
     sanitize: vi.fn((html: string) => html),
