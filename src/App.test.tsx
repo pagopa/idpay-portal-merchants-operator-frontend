@@ -1,93 +1,125 @@
-import { vi, describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import ROUTES from './routes';
 
 vi.mock('./components/Layout/Layout', () => ({
-  default: ({ children }) => <div data-testid="mock-layout">{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="layout">{children}</div>
+  ),
 }));
+
 vi.mock('./components/ProtectedRoute', () => ({
-  default: ({ children }) => <div data-testid="mock-protected-route">{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="protected">{children}</div>
+  ),
 }));
-vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({
-  default: () => <div data-testid="refund-management-page">Refund Management</div>,
-}));
+
 vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({
-  default: () => <div data-testid="accept-discount-page">Accept Discount</div>,
+  default: () => <div>AcceptDiscountPage</div>,
 }));
 vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({
-  default: () => <div data-testid="summary-accept-discount-page">Summary Accept Discount</div>,
+  default: () => <div>SummaryAcceptDiscountPage</div>,
+}));
+vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({
+  default: () => <div>RefundManagementPage</div>,
 }));
 vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({
-  default: () => <div data-testid="purchase-management-page">Purchase Management</div>,
+  default: () => <div>PurchaseManagementPage</div>,
 }));
 vi.mock('./pages/profile/Profile.tsx', () => ({
-  default: () => <div data-testid="profile-page">Profile</div>,
+  default: () => <div>ProfilePage</div>,
+}));
+vi.mock('./pages/products/Products.tsx', () => ({
+  default: () => <div>ProductsPage</div>,
+}));
+vi.mock('./pages/reverse/Reverse.tsx', () => ({
+  default: () => <div>ReversePage</div>,
+}));
+vi.mock('./pages/refund/Refund.tsx', () => ({
+  default: () => <div>RefundPage</div>,
+}));
+vi.mock('./pages/privacyPolicy/PrivacyPolicy.tsx', () => ({
+  default: () => <div>PrivacyPolicyPage</div>,
+}));
+vi.mock('./pages/tos/TOS.tsx', () => ({
+  default: () => <div>TermsOfServicePage</div>,
+}));
+vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({
+  default: () => <div>ModifyDocumentPage</div>,
 }));
 
-describe('App', () => {
-  it('renders the ProtectedRoute and Layout wrappers', () => {
-    // Render the App component wrapped in MemoryRouter to simulate routing.
+describe('App routing', () => {
+  const renderWithRoute = (route: string) =>
     render(
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={[route]}>
         <App />
       </MemoryRouter>
     );
 
-    // Check if the mock wrapper components are present in the document.
-    expect(screen.getByTestId('mock-protected-route')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-layout')).toBeInTheDocument();
+  it('renders privacy policy (public)', () => {
+    renderWithRoute(ROUTES.PRIVACY_POLICY);
+    expect(screen.getByText('PrivacyPolicyPage')).toBeInTheDocument();
   });
 
-  it('renders the RefundManagement component on the home route', () => {
-    // Render the component on the home path.
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <App />
-      </MemoryRouter>
-    );
-
-    // Check if the mocked PurchaseManagement component is rendered.
-    expect(screen.getByTestId('purchase-management-page')).toBeInTheDocument();
+  it('renders terms of service (public)', () => {
+    renderWithRoute(ROUTES.TOS);
+    expect(screen.getByText('TermsOfServicePage')).toBeInTheDocument();
   });
 
-  it('renders the acceptDiscount component on the correct route', () => {
-    // Render the component on the accept discount path.
-    render(
-      <MemoryRouter initialEntries={[ROUTES.ACCEPT_DISCOUNT]}>
-        <App />
-      </MemoryRouter>
-    );
-
-    // Check if the mocked acceptDiscount component is rendered.
-    expect(screen.getByTestId('accept-discount-page')).toBeInTheDocument();
+  it('redirects HOME to BUY_MANAGEMENT', () => {
+    renderWithRoute(ROUTES.HOME);
+    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
   });
 
-  it('renders the SummaryAcceptDiscount component on the correct route', () => {
-    render(
-      <MemoryRouter initialEntries={[ROUTES.ACCEPT_DISCOUNT_SUMMARY]}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('summary-accept-discount-page')).toBeInTheDocument();
+  it('renders accept discount', () => {
+    renderWithRoute(ROUTES.ACCEPT_DISCOUNT);
+    expect(screen.getByText('AcceptDiscountPage')).toBeInTheDocument();
   });
 
-  it('renders the PurchaseManagement component on the correct route', () => {
-    render(
-      <MemoryRouter initialEntries={[ROUTES.BUY_MANAGEMENT]}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('purchase-management-page')).toBeInTheDocument();
+  it('renders accept discount summary', () => {
+    renderWithRoute(ROUTES.ACCEPT_DISCOUNT_SUMMARY);
+    expect(screen.getByText('SummaryAcceptDiscountPage')).toBeInTheDocument();
   });
 
-  it('renders the Profile component on the correct route', () => {
-    render(
-      <MemoryRouter initialEntries={[ROUTES.PROFILE]}>
-        <App />
-      </MemoryRouter>
-    );
-    expect(screen.getByTestId('profile-page')).toBeInTheDocument();
+  it('renders refunds management', () => {
+    renderWithRoute(ROUTES.REFUNDS_MANAGEMENT);
+    expect(screen.getByText('RefundManagementPage')).toBeInTheDocument();
+  });
+
+  it('renders buy management', () => {
+    renderWithRoute(ROUTES.BUY_MANAGEMENT);
+    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
+  });
+
+  it('renders profile', () => {
+    renderWithRoute(ROUTES.PROFILE);
+    expect(screen.getByText('ProfilePage')).toBeInTheDocument();
+  });
+
+  it('renders products', () => {
+    renderWithRoute(ROUTES.PRODUCTS);
+    expect(screen.getByText('ProductsPage')).toBeInTheDocument();
+  });
+
+  it('renders reverse', () => {
+    renderWithRoute(ROUTES.REVERSE);
+    expect(screen.getByText('ReversePage')).toBeInTheDocument();
+  });
+
+  it('renders refund', () => {
+    renderWithRoute(ROUTES.REFUND);
+    expect(screen.getByText('RefundPage')).toBeInTheDocument();
+  });
+
+  it('renders modify document', () => {
+    renderWithRoute(ROUTES.MODIFY_DOCUMENT);
+    expect(screen.getByText('ModifyDocumentPage')).toBeInTheDocument();
+  });
+
+  it('redirects unknown route to BUY_MANAGEMENT', () => {
+    renderWithRoute('/unknown');
+    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
   });
 });
