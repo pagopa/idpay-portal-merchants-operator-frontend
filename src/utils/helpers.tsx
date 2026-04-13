@@ -191,14 +191,18 @@ export const renderMissingDataWithTooltip = () => {
 
 export const checkTooltipValue = (params, key?: string) => {
   if (key) {
-    if (params?.value?.[key]) {
-      return renderCellWithTooltip(params.value?.[key]);
+    const v = params?.value?.[key];
+    if (v === null || v === undefined || v === '') {
+      return renderMissingDataWithTooltip();
     }
+    return renderCellWithTooltip(v);
   }
-  if (params?.value) {
-    return renderCellWithTooltip(params.value);
+
+  if (params?.value === null || params?.value === undefined || params?.value === '') {
+    return renderMissingDataWithTooltip();
   }
-  return renderMissingDataWithTooltip();
+
+  return renderCellWithTooltip(params.value);
 };
 
 export const checkEuroTooltip = (params: GridRenderCellParams) => {

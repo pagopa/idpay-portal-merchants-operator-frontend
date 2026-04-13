@@ -9,7 +9,10 @@ const DetailsCard = ({
   item: Record<string, string | number>;
 }) => {
   const listItems = Object.entries(item).reduce(
-    (acc, [key, value]) => [...acc, [key, !value ? '-' : value]],
+    (acc, [key, value]) => [
+      ...acc,
+      [key, value === 0 || value ? value : '-'],
+    ],
     []
   );
 
