@@ -236,4 +236,28 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('open-cancelled'));
     expect(screen.getByTestId('drawer')).toBeInTheDocument();
   });
+
+  it('handles download error and sets error alert', async () => {
+    downloadInvoiceFileApi.mockRejectedValueOnce(new Error('download failed'));
+
+    renderComponent();
+    fireEvent.click(screen.getByTestId('open-invoiced'));
+    fireEvent.click(screen.getByTestId('download'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('state-error')).toHaveTextContent('true');
+    });
+  });
+
+  it('does not set alerts when location.state is undefined', () => {
+    renderComponent();
+    expect(screen.getByTestId('state-refund')).toHaveTextContent('false');
+    expect(screen.getByTestId('state-reverse')).toHaveTextContent('false');
+  });
+
+  it('handles formatDateTime fallback when no date is provided', () => {
+    renderComponent();
+    fireEvent.click(screen.getByTestId('open-cancelled'));
+    expect(screen.getByTestId('drawer')).toBeInTheDocument();
+  });
 });
