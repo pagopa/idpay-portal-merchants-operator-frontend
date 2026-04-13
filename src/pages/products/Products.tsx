@@ -32,7 +32,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import style from '../purchaseManagement/purchaseManagement.module.css';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
-import {handleCodeChange, renderMissingDataWithTooltip} from '../../utils/helpers';
+import {handleCodeChange, renderCellWithTooltip, renderMissingDataWithTooltip} from '../../utils/helpers';
 
 const Products = () => {
   const [gtinError, setGtinError] = useState<string>('');
