@@ -1,5 +1,5 @@
-import { ApiConfig } from "./generated/http-client";
-import { authStore } from "../store/authStore";
+import { ApiConfig } from './generated/http-client';
+import { authStore } from '../store/authStore';
 
 export const createApiConfig = (): ApiConfig<string> => {
   return {

@@ -9,6 +9,7 @@
     "build": "tsc -b && vite build",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
+    "prettify": "prettier --write \"./**/*.{ts,tsx}\"",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate": "npm-run-all generate:*",

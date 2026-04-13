@@ -10,11 +10,10 @@ type Props = {
 import Header from '../Header/Header';
 import SideMenu from '../SideMenu/SideMenu';
 import { useState } from 'react';
-import {CustomFooter} from "../Footer/CustomFooter.tsx";
-
+import { CustomFooter } from '../Footer/CustomFooter.tsx';
 
 const Layout = ({ children }: Props) => {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
   const match = (paths) => {
@@ -31,7 +30,7 @@ const Layout = ({ children }: Props) => {
     ROUTES.PROFILE,
     ROUTES.BUY_MANAGEMENT,
     ROUTES.PRODUCTS,
-    ROUTES.REFUNDS_MANAGEMENT
+    ROUTES.REFUNDS_MANAGEMENT,
   ]);
 
   return (
@@ -47,7 +46,16 @@ const Layout = ({ children }: Props) => {
           <Grid
             container
             width="100%"
-            sx={{ overflowX: 'clip', backgroundColor: '#F5F5F5', '&>div': {width: '100%'}, '& > div': {display: 'flex', flexDirection: 'column', height: '100%'}}}
+            sx={{
+              overflowX: 'clip',
+              backgroundColor: '#F5F5F5',
+              '&>div': { width: '100%' },
+              '& > div': {
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+              },
+            }}
             pb={16}
             pt={2}
             px={2}
@@ -62,13 +70,7 @@ const Layout = ({ children }: Props) => {
           gridTemplateColumns="repeat(12, 1fr)"
           justifyContent="center"
         >
-          <Box
-            sx={{overflowX: 'clip'}}
-            display="grid"
-            pb={16}
-            pt={2}
-            gridColumn="span 12"
-          >
+          <Box sx={{ overflowX: 'clip' }} display="grid" pb={16} pt={2} gridColumn="span 12">
             {children}
           </Box>
         </Box>

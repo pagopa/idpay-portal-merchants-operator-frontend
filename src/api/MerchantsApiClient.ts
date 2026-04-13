@@ -1,8 +1,8 @@
-import { Products } from "./generated/Products";
-import { Transactions } from "./generated/Transactions";
-import { Initiatives } from "./generated/Initiatives";
-import { MerchantId } from "./generated/MerchantId";
-import { PointOfSaleId } from "./generated/PointOfSaleId";
+import { Products } from './generated/Products';
+import { Transactions } from './generated/Transactions';
+import { Initiatives } from './generated/Initiatives';
+import { MerchantId } from './generated/MerchantId';
+import { PointOfSaleId } from './generated/PointOfSaleId';
 import type {
   ProductListDTO,
   PreviewPaymentDTO,
@@ -10,8 +10,8 @@ import type {
   TransactionBarCodeResponse,
   ReportDTO,
   AuthBarCodePaymentDTO,
-} from "./generated/data-contracts";
-import { createApiConfig, getAuthToken } from "./BaseApiClient";
+} from './generated/data-contracts';
+import { createApiConfig, getAuthToken } from './BaseApiClient';
 
 // Instantiate API modules
 const productsApi = new Products<string>(createApiConfig());
@@ -31,41 +31,34 @@ const applySecurity = () => {
 
 export const MerchantApi = {
   getProducts: async (
-    params: Parameters<typeof productsApi.getProducts>[0],
+    params: Parameters<typeof productsApi.getProducts>[0]
   ): Promise<ProductListDTO> => {
     applySecurity();
     const response = await productsApi.getProducts(params);
     return response.data;
   },
 
-  previewPayment: async (
-    params: {
-      productGtin: string;
-      productName: string;
-      amountCents: number;
-      discountCode: string;
-    },
-  ): Promise<PreviewPaymentDTO> => {
+  previewPayment: async (params: {
+    productGtin: string;
+    productName: string;
+    amountCents: number;
+    discountCode: string;
+  }): Promise<PreviewPaymentDTO> => {
     applySecurity();
-    const response = await transactionsApi.previewPayment(
-      params.discountCode,
-      {
-        productGtin: params.productGtin,
-        productName: params.productName,
-        amountCents: params.amountCents,
-      },
-    );
+    const response = await transactionsApi.previewPayment(params.discountCode, {
+      productGtin: params.productGtin,
+      productName: params.productName,
+      amountCents: params.amountCents,
+    });
     return response.data;
   },
 
-  authPaymentBarCode: async (
-    params: {
-      trxCode: string;
-      amountCents: number;
-      idTrxAcquirer: string;
-      additionalProperties: Record<string, string>;
-    },
-  ): Promise<AuthPaymentResponseDTO> => {
+  authPaymentBarCode: async (params: {
+    trxCode: string;
+    amountCents: number;
+    idTrxAcquirer: string;
+    additionalProperties: Record<string, string>;
+  }): Promise<AuthPaymentResponseDTO> => {
     applySecurity();
 
     const payload: AuthBarCodePaymentDTO = {
@@ -74,16 +67,11 @@ export const MerchantApi = {
       additionalProperties: params.additionalProperties,
     };
 
-    const response = await transactionsApi.authPaymentBarCode(
-      params.trxCode,
-      payload,
-    );
+    const response = await transactionsApi.authPaymentBarCode(params.trxCode, payload);
     return response.data;
   },
 
-  capturePayment: async (
-    params: { trxCode: string },
-  ): Promise<TransactionBarCodeResponse> => {
+  capturePayment: async (params: { trxCode: string }): Promise<TransactionBarCodeResponse> => {
     applySecurity();
     const response = await transactionsApi.capturePayment(params.trxCode);
     return response.data;
@@ -94,11 +82,7 @@ export const MerchantApi = {
     await transactionsApi.deleteTransaction(trxId);
   },
 
-  reverseTransactionApi: async (
-    trxId: string,
-    file: File,
-    docNumber: string,
-  ): Promise<void> => {
+  reverseTransactionApi: async (trxId: string, file: File, docNumber: string): Promise<void> => {
     applySecurity();
     await transactionsApi.reversalTransaction(trxId, {
       file,
@@ -109,7 +93,7 @@ export const MerchantApi = {
   reverseInvoicedTransactionApi: async (
     trxId: string,
     file: File,
-    docNumber: string,
+    docNumber: string
   ): Promise<void> => {
     applySecurity();
     await transactionsApi.reversalTransactionInvoiced(trxId, {
@@ -118,11 +102,7 @@ export const MerchantApi = {
     });
   },
 
-  invoiceTransactionApi: async (
-    trxId: string,
-    file: File,
-    docNumber: string,
-  ): Promise<void> => {
+  invoiceTransactionApi: async (trxId: string, file: File, docNumber: string): Promise<void> => {
     applySecurity();
     await transactionsApi.invoiceTransaction(trxId, {
       file,
@@ -133,7 +113,7 @@ export const MerchantApi = {
   updateInvoiceTransactionApi: async (
     trxId: string,
     file: File,
-    docNumber: string,
+    docNumber: string
   ): Promise<void> => {
     applySecurity();
     await transactionsApi.updateInvoiceTransaction(trxId, {
@@ -153,58 +133,40 @@ export const MerchantApi = {
   getProcessedTransactions: async (
     initiativeId: string,
     pointOfSaleId: string,
-    params?: Parameters<
-      typeof initiativesApi.getPointOfSaleTransactionsProcessed
-    >[2],
+    params?: Parameters<typeof initiativesApi.getPointOfSaleTransactionsProcessed>[2]
   ) => {
     applySecurity();
-    const response =
-      await initiativesApi.getPointOfSaleTransactionsProcessed(
-        initiativeId,
-        pointOfSaleId,
-        params,
-      );
+    const response = await initiativesApi.getPointOfSaleTransactionsProcessed(
+      initiativeId,
+      pointOfSaleId,
+      params
+    );
     return response.data;
   },
 
   getInProgressTransactions: async (
     initiativeId: string,
     pointOfSaleId: string,
-    params?: Parameters<
-      typeof initiativesApi.getPointOfSaleTransactions
-    >[2],
+    params?: Parameters<typeof initiativesApi.getPointOfSaleTransactions>[2]
   ) => {
     applySecurity();
-    const response =
-      await initiativesApi.getPointOfSaleTransactions(
-        initiativeId,
-        pointOfSaleId,
-        params,
-      );
-    return response.data;
-  },
-
-  getPointOfSaleDetails: async (
-    merchantId: string,
-    pointOfSaleId: string,
-  ) => {
-    applySecurity();
-    const response = await merchantIdApi.getPointOfSale(
-      merchantId,
+    const response = await initiativesApi.getPointOfSaleTransactions(
+      initiativeId,
       pointOfSaleId,
+      params
     );
     return response.data;
   },
 
-  downloadInvoiceFileApi: async (
-    pointOfSaleId: string,
-    trxId: string,
-  ) => {
+  getPointOfSaleDetails: async (merchantId: string, pointOfSaleId: string) => {
     applySecurity();
-    const response = await pointOfSaleIdApi.downloadInvoiceFile(
-      pointOfSaleId,
-      trxId,
-    );
+    const response = await merchantIdApi.getPointOfSale(merchantId, pointOfSaleId);
+    return response.data;
+  },
+
+  downloadInvoiceFileApi: async (pointOfSaleId: string, trxId: string) => {
+    applySecurity();
+    const response = await pointOfSaleIdApi.downloadInvoiceFile(pointOfSaleId, trxId);
     return response.data;
   },
 };

@@ -35,57 +35,59 @@ vi.mock('./SideNavItem', () => ({
 }));
 
 // Mock icons and routes
-vi.mock('@mui/icons-material/ConfirmationNumber', () => ({ default: () => <div /> }));
+vi.mock('@mui/icons-material/ConfirmationNumber', () => ({
+  default: () => <div />,
+}));
 vi.mock('@mui/icons-material/Payments', () => ({ default: () => <div /> }));
 vi.mock('../../routes', () => ({
   default: {
     BUY_MANAGEMENT: '/gestione-acquisti',
-    HOME: '/home', 
+    HOME: '/home',
   },
 }));
-
 
 // Import component to test and mocked dependencies
 import SideMenu from './SideMenu';
 import ROUTES from '../../routes';
 
-
 //Test suite
 describe('SideMenu Component', () => {
-
   // Before each test, clear mocks to avoid interference
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('should render both menu items', () => {
-    render(<SideMenu isOpen={true} setIsOpen={() => {}}/>);
+    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
 
     expect(screen.getByText('sideMenu.purchaseManagement')).toBeInTheDocument();
     expect(screen.getByText('sideMenu.refundManagement')).toBeInTheDocument();
   });
 
-
   it('should navigate to purchase management on click', async () => {
     const user = userEvent.setup();
-    render(<SideMenu isOpen={true} setIsOpen={() => {}}/>);
+    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
 
     const purchaseItem = screen.getByText('sideMenu.purchaseManagement');
     await user.click(purchaseItem);
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT, { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT, {
+      replace: true,
+    });
   });
 
   it('should navigate to refund management on click', async () => {
     const user = userEvent.setup();
-    render(<SideMenu isOpen={true} setIsOpen={() => {}}/>);
-    
+    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
+
     const refundItem = screen.getByText('sideMenu.refundManagement');
     await user.click(refundItem);
-    
+
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT, { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT, {
+      replace: true,
+    });
   });
 
   it('should navigate to profile on click', async () => {
@@ -96,7 +98,9 @@ describe('SideMenu Component', () => {
     await user.click(profileItem);
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.PROFILE, { replace: true });
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.PROFILE, {
+      replace: true,
+    });
   });
 
   it('should toggle menu on click', async () => {

@@ -1,22 +1,14 @@
-import {
-  Box,
-  Typography,
-  Link,
-  Stack,
-  Button,
-  Alert,
-  TextField,
-} from "@mui/material";
-import BreadcrumbsBox from "../BreadcrumbsBox/BreadcrumbsBox";
-import { useTranslation } from "react-i18next";
-import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
-import { useNavigate, useParams } from "react-router-dom";
-import ROUTES from "../../routes";
-import { SingleFileInput, theme } from "@pagopa/mui-italia";
-import { useState, useRef, useEffect } from "react";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import AlertComponent from "../Alert/AlertComponent";
-import { REQUIRED_FIELD_ERROR } from "../../utils/constants.ts";
+import { Box, Typography, Link, Stack, Button, Alert, TextField } from '@mui/material';
+import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox';
+import { useTranslation } from 'react-i18next';
+import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
+import { useNavigate, useParams } from 'react-router-dom';
+import ROUTES from '../../routes';
+import { SingleFileInput, theme } from '@pagopa/mui-italia';
+import { useState, useRef, useEffect } from 'react';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import AlertComponent from '../Alert/AlertComponent';
+import { REQUIRED_FIELD_ERROR } from '../../utils/constants.ts';
 
 interface BreadcrumbsProps {
   label: string;
@@ -39,7 +31,7 @@ interface FileUploadActionProps {
 }
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
-const VALID_MIME_TYPES = ["application/pdf", "application/xml", "text/xml"];
+const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
 
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
   titleKey,
@@ -57,12 +49,12 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [requiredFileError, setRequiredFileError] = useState<boolean>(false);
-  const [docNumber, setDocNumber] = useState<string>("");
+  const [docNumber, setDocNumber] = useState<string>('');
   const [docNumberError, setDocNumberError] = useState<boolean>(false);
   const [fileSizeError, setFileSizeError] = useState<boolean>(false);
   const [fileTypeError, setFileTypeError] = useState<boolean>(false);
   const [loadingFile, setLoadingFile] = useState<boolean>(false);
-  const [errorAlert, setErrorAlert] = useState({ isOpen: false, message: "" });
+  const [errorAlert, setErrorAlert] = useState({ isOpen: false, message: '' });
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -108,7 +100,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   const handleRemoveFile = () => {
     setFile(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -122,7 +114,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
       setFileSizeError(false);
       setFileTypeError(false);
     }
-    if (!docNumber || docNumber === "" || docNumber.trim().length < 2) {
+    if (!docNumber || docNumber === '' || docNumber.trim().length < 2) {
       setDocNumberError(true);
     }
     if (file && trxId && docNumber.trim() && docNumber.trim().length >= 2) {
@@ -138,12 +130,12 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
       } catch (error) {
         const errorResponseCode = error?.response?.data?.code;
 
-        let errorMessage = t("pages.reverse.errorAlert");
+        let errorMessage = t('pages.reverse.errorAlert');
 
-        if (errorResponseCode === "REWARD_BATCH_STATUS_NOT_ALLOWED") {
-          errorMessage = t("pages.reverse.deniedSentError");
-        } else if (errorResponseCode === "REWARD_BATCH_ALREADY_SENT") {
-          errorMessage = t("pages.reverse.alreadySentError");
+        if (errorResponseCode === 'REWARD_BATCH_STATUS_NOT_ALLOWED') {
+          errorMessage = t('pages.reverse.deniedSentError');
+        } else if (errorResponseCode === 'REWARD_BATCH_ALREADY_SENT') {
+          errorMessage = t('pages.reverse.alreadySentError');
         }
         // console.error("API Error:", error);
         setErrorAlert({ isOpen: true, message: errorMessage });
@@ -156,9 +148,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     navigate(breadcrumbsProp?.path);
   };
 
-  const handleDocNumberChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleDocNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length <= 100) {
       setDocNumber(event.target.value);
     }
@@ -168,7 +158,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     <>
       <Box p={4} maxWidth="75%" justifySelf="center">
         <BreadcrumbsBox
-          backLabel={t("commons.exitBtn")}
+          backLabel={t('commons.exitBtn')}
           items={[
             { label: breadcrumbsProp?.label, path: breadcrumbsProp?.path },
             { label: breadcrumbsLabelKey, path: ROUTES.REVERSE },
@@ -188,22 +178,15 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           py={3}
           px={4}
           sx={{ backgroundColor: theme.palette.background.paper }}
-          borderRadius={"4px"}
+          borderRadius={'4px'}
         >
           <Box mb={3}>
-            <Typography
-              mt={2}
-              variant="h6"
-              fontWeight={theme.typography.fontWeightBold}
-            >
+            <Typography mt={2} variant="h6" fontWeight={theme.typography.fontWeightBold}>
               {docNumberTitle}
             </Typography>
           </Box>
           <Box mt={2}>
-            <Typography
-              variant="body2"
-              fontWeight={theme.typography.fontWeightMedium}
-            >
+            <Typography variant="body2" fontWeight={theme.typography.fontWeightMedium}>
               {docNumberInsert}
             </Typography>
           </Box>
@@ -214,7 +197,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             onChange={handleDocNumberChange}
             onBlur={() => {
               // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-              !docNumber || docNumber === "" || docNumber.trim().length < 2
+              !docNumber || docNumber === '' || docNumber.trim().length < 2
                 ? setDocNumberError(true)
                 : setDocNumberError(false);
             }}
@@ -222,17 +205,17 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             size="small"
             sx={{
               mt: 2,
-              "& .MuiFormLabel-root.Mui-error": {
-                color: "#5C6E82 !important",
+              '& .MuiFormLabel-root.Mui-error': {
+                color: '#5C6E82 !important',
               },
             }}
             error={docNumberError}
             helperText={
-              docNumberError && docNumber === ""
+              docNumberError && docNumber === ''
                 ? REQUIRED_FIELD_ERROR
                 : docNumberError && docNumber?.trim().length < 2
-                ? "Lunghezza minima 2 caratteri"
-                : ""
+                ? 'Lunghezza minima 2 caratteri'
+                : ''
             }
           />
         </Box>
@@ -240,8 +223,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         <Box
           sx={{
             backgroundColor: theme.palette.background.paper,
-            borderRadius: "4px",
-            minWidth: { lg: "1000px" },
+            borderRadius: '4px',
+            minWidth: { lg: '1000px' },
           }}
           mt={4}
           p={3}
@@ -250,20 +233,15 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           <Typography variant="h6" fontWeight={theme.typography.fontWeightBold}>
             {t(`${i18nBlockKey}.creditNote`)}
           </Typography>
-          <Typography
-            variant="body2"
-            mt={4}
-            mb={1}
-            sx={{ marginTop: "32px !important" }}
-          >
+          <Typography variant="body2" mt={4} mb={1} sx={{ marginTop: '32px !important' }}>
             {t(`${i18nBlockKey}.creditNoteSubtitle`)}
           </Typography>
           <Link
-            onClick={() => window.open(manualLink || "", "_blank")}
+            onClick={() => window.open(manualLink || '', '_blank')}
             sx={{
-              cursor: "pointer",
+              cursor: 'pointer',
               fontWeight: theme.typography.fontWeightMedium,
-              fontSize: "14px",
+              fontSize: '14px',
             }}
           >
             {t(`${i18nBlockKey}.manualLink`)}
@@ -277,14 +255,12 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           )}
           {fileTypeError && (
             <Box data-testid="alert" mt={2}>
-              <Alert severity="error">
-                {t(`${i18nBlockKey}.fileNotSupported`)}
-              </Alert>
+              <Alert severity="error">{t(`${i18nBlockKey}.fileNotSupported`)}</Alert>
             </Box>
           )}
           {requiredFileError && (
             <Box data-testid="alert" mt={2}>
-              <Alert severity="error">{t("errors.requiredFileError")}</Alert>
+              <Alert severity="error">{t('errors.requiredFileError')}</Alert>
             </Box>
           )}
           <Box mt={1} mb={2}>
@@ -303,14 +279,14 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
               type="file"
               accept="application/pdf, application/xml"
               ref={fileInputRef}
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
               data-testid="upload-input-test"
               onChange={(e) => {
                 const selectedFile = e.target.files?.[0];
                 if (selectedFile) {
                   handleFileSelect(selectedFile);
                 }
-                e.target.value = "";
+                e.target.value = '';
               }}
             />
 
@@ -320,32 +296,24 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 variant="naked"
                 startIcon={<FileUploadIcon />}
                 onClick={handleButtonClick}
-                sx={{ fontWeight: "bold", fontSize: "14px" }}
+                sx={{ fontWeight: 'bold', fontSize: '14px' }}
               >
                 {t(`${i18nBlockKey}.replaceFile`)}
               </Button>
             )}
           </Box>
           <Stack
-            direction={{ xs: "column", sm: "row" }}
+            direction={{ xs: 'column', sm: 'row' }}
             p={{ xs: 2, sm: 0 }}
             spacing={2}
             mt={3}
             justifyContent="space-between"
           >
-            <Button
-              data-testid="back-btn-test"
-              variant="outlined"
-              onClick={handleBackNavigation}
-            >
-              {t("commons.backBtn")}
+            <Button data-testid="back-btn-test" variant="outlined" onClick={handleBackNavigation}>
+              {t('commons.backBtn')}
             </Button>
-            <Button
-              data-testid="continue-btn-test"
-              variant="contained"
-              onClick={handleAction}
-            >
-              {t("commons.continueBtn")}
+            <Button data-testid="continue-btn-test" variant="contained" onClick={handleAction}>
+              {t('commons.continueBtn')}
             </Button>
           </Stack>
         </Box>
@@ -355,7 +323,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         data-testid="alert-component"
         error
         message={errorAlert.message}
-        contentStyle={{ right: "20px" }}
+        contentStyle={{ right: '20px' }}
       />
     </>
   );

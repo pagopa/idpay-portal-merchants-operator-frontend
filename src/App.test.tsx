@@ -27,7 +27,6 @@ vi.mock('./pages/profile/Profile.tsx', () => ({
 }));
 
 describe('App', () => {
-
   it('renders the ProtectedRoute and Layout wrappers', () => {
     // Render the App component wrapped in MemoryRouter to simulate routing.
     render(

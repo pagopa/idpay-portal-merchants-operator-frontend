@@ -1,83 +1,66 @@
-import { describe, it, expect, vi, beforeEach} from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
-import { REQUIRED_FIELD_ERROR } from "../../utils/constants";
-import ROUTES from "../../routes";
-import {
-  getProductsList,
-  previewPayment,
-} from "../../services/merchantService";
-import { ProductDTO } from "../../api/generated/merchants/ProductDTO";
-import AcceptDiscount from "./AcceptDiscount";
+import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import ROUTES from '../../routes';
+import { getProductsList, previewPayment } from '../../services/merchantService';
+import { ProductDTO } from '../../api/generated/merchants/ProductDTO';
+import AcceptDiscount from './AcceptDiscount';
 
 const mockNavigate = vi.fn();
-vi.mock("react-router-dom", () => ({
+vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
 const mockGetProductsList = vi.fn();
 const mockPreviewPayment = vi.fn();
-vi.mock("../../services/merchantService", () => {
+vi.mock('../../services/merchantService', () => {
   return {
     getProductsList: vi.fn(() => mockGetProductsList()),
     previewPayment: vi.fn(() => mockPreviewPayment()),
   };
 });
 
-vi.mock("../../components/BreadcrumbsBox/BreadcrumbsBox", () => ({
+vi.mock('../../components/BreadcrumbsBox/BreadcrumbsBox', () => ({
   default: vi.fn(() => <div data-testid="BreadcrumbsBox" />),
 }));
-vi.mock("@pagopa/selfcare-common-frontend/lib", () => ({
+vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
   TitleBox: vi.fn(() => <div data-testid="TitleBox" />),
 }));
-vi.mock("../AcceptDiscountCard", () => ({
+vi.mock('../AcceptDiscountCard', () => ({
   default: vi.fn(({ children, titleBox, subTitleBox }) => (
-    <div
-      data-testid="AcceptDiscountCard"
-      data-title={titleBox}
-      data-subtitle={subTitleBox}
-    >
+    <div data-testid="AcceptDiscountCard" data-title={titleBox} data-subtitle={subTitleBox}>
       {children}
     </div>
   )),
 }));
-vi.mock("../../components/Modal/ModalComponent", () => ({
+vi.mock('../../components/Modal/ModalComponent', () => ({
   default: vi.fn(({ open, children }) =>
     open ? <div data-testid="ModalComponent">{children}</div> : null
   ),
 }));
 
-vi.mock("../../components/Autocomplete/AutocompleteComponent", () => ({
-  default: vi.fn(
-    ({ options, onChangeDebounce, onChange, value, inputError }) => (
-      <input
-        data-testid="Autocomplete"
-        data-error={inputError}
-        value={value?.fullProductName || ""}
-        onChange={(e) => onChangeDebounce(e.target.value)}
-        onBlur={() => {
-          if (options.length > 0) {
-            onChange(options[0]);
-          }
-        }}
-      />
-    )
-  ),
-}));
-vi.mock("../../components/Alert/AlertComponent", () => ({
-  default: vi.fn(({ message }) => (
-    <div data-testid="AlertComponent">{message}</div>
+vi.mock('../../components/Autocomplete/AutocompleteComponent', () => ({
+  default: vi.fn(({ options, onChangeDebounce, onChange, value, inputError }) => (
+    <input
+      data-testid="Autocomplete"
+      data-error={inputError}
+      value={value?.fullProductName || ''}
+      onChange={(e) => onChangeDebounce(e.target.value)}
+      onBlur={() => {
+        if (options.length > 0) {
+          onChange(options[0]);
+        }
+      }}
+    />
   )),
+}));
+vi.mock('../../components/Alert/AlertComponent', () => ({
+  default: vi.fn(({ message }) => <div data-testid="AlertComponent">{message}</div>),
 }));
 
 const mockT = vi.fn((key) => key);
-vi.mock("react-i18next", () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: mockT,
     i18n: {
@@ -101,94 +84,86 @@ const mockSessionStorage = (() => {
     }),
   };
 })();
-Object.defineProperty(window, "sessionStorage", { value: mockSessionStorage });
+Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
 
 const mockProducts: ProductDTO[] = [
-  { gtinCode: "123", fullProductName: "Prodotto Test 1" } as ProductDTO,
-  { gtinCode: "456", fullProductName: "Prodotto Test 2" } as ProductDTO,
+  { gtinCode: '123', fullProductName: 'Prodotto Test 1' } as ProductDTO,
+  { gtinCode: '456', fullProductName: 'Prodotto Test 2' } as ProductDTO,
 ];
 
 const mockDiscountCoupon = {
   product: mockProducts[0],
   originalAmountCents: 10000, // 100.00 EUR
-  trxCode: "TRX12345",
+  trxCode: 'TRX12345',
 };
 
 const renderComponent = () => render(<AcceptDiscount />);
 
-const getProductAutocomplete = () => screen.getByTestId("Autocomplete");
+const getProductAutocomplete = () => screen.getByTestId('Autocomplete');
 const getTotalAmountInput = () =>
-  screen.getByLabelText(mockT("pages.acceptDiscount.expenditureAmount"));
+  screen.getByLabelText(mockT('pages.acceptDiscount.expenditureAmount'));
 const getDiscountCodeInput = () =>
-  screen.getByLabelText(mockT("pages.acceptDiscount.discountCode"));
-const getContinueButton = () =>
-  screen.getByRole("button", { name: mockT("commons.continueBtn") });
-const getBackButton = () => screen.getByRole("button", { name: "Indietro" });
+  screen.getByLabelText(mockT('pages.acceptDiscount.discountCode'));
+const getContinueButton = () => screen.getByRole('button', { name: mockT('commons.continueBtn') });
+const getBackButton = () => screen.getByRole('button', { name: 'Indietro' });
 
-describe("AcceptDiscount Component", () => {
+describe('AcceptDiscount Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSessionStorage.clear();
     mockGetProductsList.mockResolvedValue({ content: mockProducts });
   });
 
-  it("should render the component correctly and fetch products list on mount", async () => {
+  it('should render the component correctly and fetch products list on mount', async () => {
     renderComponent();
 
-    expect(screen.getByTestId("BreadcrumbsBox")).toBeInTheDocument();
+    expect(screen.getByTestId('BreadcrumbsBox')).toBeInTheDocument();
     expect(getProductAutocomplete()).toBeInTheDocument();
     expect(getTotalAmountInput()).toBeInTheDocument();
     expect(getDiscountCodeInput()).toBeInTheDocument();
   });
 
-  it("should load data from sessionStorage on mount if available", async () => {
-    mockSessionStorage.setItem(
-      "discountCoupon",
-      JSON.stringify(mockDiscountCoupon)
-    );
+  it('should load data from sessionStorage on mount if available', async () => {
+    mockSessionStorage.setItem('discountCoupon', JSON.stringify(mockDiscountCoupon));
 
     renderComponent();
 
     await waitFor(() => {
-      expect(getProductAutocomplete()).toHaveValue(
-        mockDiscountCoupon.product.fullProductName
-      );
-      expect(getTotalAmountInput()).toHaveValue("100");
+      expect(getProductAutocomplete()).toHaveValue(mockDiscountCoupon.product.fullProductName);
+      expect(getTotalAmountInput()).toHaveValue('100');
       expect(getDiscountCodeInput()).toHaveValue(mockDiscountCoupon.trxCode);
     });
   });
 
-  it("should show error messages when required fields are empty on continue click", async () => {
+  it('should show error messages when required fields are empty on continue click', async () => {
     renderComponent();
 
     await act(async () => {
       fireEvent.click(getContinueButton());
     });
 
-    expect(getProductAutocomplete()).toHaveAttribute("data-error", "true");
+    expect(getProductAutocomplete()).toHaveAttribute('data-error', 'true');
 
-    expect(getTotalAmountInput()).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getAllByText("Campo obbligatorio")[0]).toBeInTheDocument();
+    expect(getTotalAmountInput()).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getAllByText('Campo obbligatorio')[0]).toBeInTheDocument();
 
-    expect(getDiscountCodeInput()).toHaveAttribute("aria-invalid", "true");
+    expect(getDiscountCodeInput()).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getAllByText(REQUIRED_FIELD_ERROR).length).toBe(2);
 
     expect(mockPreviewPayment).not.toHaveBeenCalled();
   });
 
-  it("should open and close the exit modal", () => {
+  it('should open and close the exit modal', () => {
     renderComponent();
 
     fireEvent.click(getBackButton());
 
-    expect(screen.getByTestId("ModalComponent")).toBeInTheDocument();
-    expect(
-      screen.getByText(mockT("pages.acceptDiscount.modalTitle"))
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('ModalComponent')).toBeInTheDocument();
+    expect(screen.getByText(mockT('pages.acceptDiscount.modalTitle'))).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Torna indietro" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Torna indietro' }));
 
-    expect(screen.queryByTestId("ModalComponent")).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ModalComponent')).not.toBeInTheDocument();
   });
 
   it('should exit the page and clear sessionStorage when clicking "Esci" in the modal', () => {
@@ -196,69 +171,65 @@ describe("AcceptDiscount Component", () => {
 
     fireEvent.click(getBackButton());
 
-    fireEvent.click(screen.getByRole("button", { name: "Esci" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Esci' }));
 
-    expect(mockSessionStorage.removeItem).toHaveBeenCalledWith(
-      "discountCoupon"
-    );
+    expect(mockSessionStorage.removeItem).toHaveBeenCalledWith('discountCoupon');
 
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT);
   });
 
-  it("should correctly handle comma separator and restrict to two decimal places for totalAmount", () => {
+  it('should correctly handle comma separator and restrict to two decimal places for totalAmount', () => {
     renderComponent();
     const totalAmountInput = getTotalAmountInput();
 
-    fireEvent.change(totalAmountInput, { target: { value: "123" } });
-    expect(totalAmountInput).toHaveValue("123");
+    fireEvent.change(totalAmountInput, { target: { value: '123' } });
+    expect(totalAmountInput).toHaveValue('123');
 
-    fireEvent.change(totalAmountInput, { target: { value: "123," } });
-    expect(totalAmountInput).toHaveValue("123,");
+    fireEvent.change(totalAmountInput, { target: { value: '123,' } });
+    expect(totalAmountInput).toHaveValue('123,');
 
-    fireEvent.change(totalAmountInput, { target: { value: "123,45" } });
-    expect(totalAmountInput).toHaveValue("123,45");
+    fireEvent.change(totalAmountInput, { target: { value: '123,45' } });
+    expect(totalAmountInput).toHaveValue('123,45');
 
-    fireEvent.change(totalAmountInput, { target: { value: "123,456" } });
-    expect(totalAmountInput).toHaveValue("123,45");
+    fireEvent.change(totalAmountInput, { target: { value: '123,456' } });
+    expect(totalAmountInput).toHaveValue('123,45');
 
-    fireEvent.change(totalAmountInput, { target: { value: "" } });
-    fireEvent.change(totalAmountInput, { target: { value: "12A" } });
-    expect(totalAmountInput).toHaveValue("");
+    fireEvent.change(totalAmountInput, { target: { value: '' } });
+    fireEvent.change(totalAmountInput, { target: { value: '12A' } });
+    expect(totalAmountInput).toHaveValue('');
 
-    fireEvent.change(totalAmountInput, { target: { value: "1,2,3" } });
-    expect(totalAmountInput).toHaveValue("");
-    fireEvent.change(totalAmountInput, { target: { value: "123" } });
-    fireEvent.change(totalAmountInput, { target: { value: "123,45" } });
-    fireEvent.change(totalAmountInput, { target: { value: "123,45,6" } });
-    expect(totalAmountInput).toHaveValue("123,45");
+    fireEvent.change(totalAmountInput, { target: { value: '1,2,3' } });
+    expect(totalAmountInput).toHaveValue('');
+    fireEvent.change(totalAmountInput, { target: { value: '123' } });
+    fireEvent.change(totalAmountInput, { target: { value: '123,45' } });
+    fireEvent.change(totalAmountInput, { target: { value: '123,45,6' } });
+    expect(totalAmountInput).toHaveValue('123,45');
   });
 
-  it("should correctly handle comma separator and restrict to two decimal places for totalAmount", () => {
+  it('should correctly handle comma separator and restrict to two decimal places for totalAmount', () => {
     renderComponent();
     const discountCodeInput = getDiscountCodeInput();
 
-    fireEvent.change(discountCodeInput, { target: { value: "123" } });
-    expect(discountCodeInput).toHaveValue("123");
+    fireEvent.change(discountCodeInput, { target: { value: '123' } });
+    expect(discountCodeInput).toHaveValue('123');
 
-    fireEvent.change(discountCodeInput, { target: { value: "" } });
-    expect(discountCodeInput).toHaveValue("");
+    fireEvent.change(discountCodeInput, { target: { value: '' } });
+    expect(discountCodeInput).toHaveValue('');
   });
 
-  describe("AcceptDiscount focus/blur", () => {
+  describe('AcceptDiscount focus/blur', () => {
     it("mostra l'icona Euro al focus e la nasconde al blur", () => {
       renderComponent();
 
-      const input = screen.getByLabelText(
-        "pages.acceptDiscount.expenditureAmount"
-      );
+      const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
 
-      expect(screen.queryByTestId("EuroIcon")).not.toBeInTheDocument();
+      expect(screen.queryByTestId('EuroIcon')).not.toBeInTheDocument();
 
       fireEvent.focus(input);
-      expect(screen.getByTestId("EuroIcon")).toBeInTheDocument();
+      expect(screen.getByTestId('EuroIcon')).toBeInTheDocument();
 
       fireEvent.blur(input);
-      expect(screen.queryByTestId("EuroIcon")).not.toBeInTheDocument();
+      expect(screen.queryByTestId('EuroIcon')).not.toBeInTheDocument();
     });
   });
 
@@ -267,107 +238,91 @@ describe("AcceptDiscount Component", () => {
 
     renderComponent();
 
-    const autocompleteInput = screen.getByTestId("Autocomplete");
+    const autocompleteInput = screen.getByTestId('Autocomplete');
 
-    fireEvent.change(autocompleteInput, { target: { value: "ProdottoX" } });
+    fireEvent.change(autocompleteInput, { target: { value: 'ProdottoX' } });
 
     await waitFor(() => {
       expect(getProductsList).toHaveBeenCalledWith({
-        fullProductName: "ProdottoX",
+        fullProductName: 'ProdottoX',
         size: 50,
       });
     });
   });
 
-  it("imposta productsList vuoto se getProductsList lancia un errore", async () => {
-    (getProductsList as vi.Mock).mockRejectedValue(new Error("API Error"));
+  it('imposta productsList vuoto se getProductsList lancia un errore', async () => {
+    (getProductsList as vi.Mock).mockRejectedValue(new Error('API Error'));
 
     renderComponent();
 
-    const autocompleteInput = screen.getByTestId("Autocomplete");
-    fireEvent.change(autocompleteInput, { target: { value: "Prodotto" } });
+    const autocompleteInput = screen.getByTestId('Autocomplete');
+    fireEvent.change(autocompleteInput, { target: { value: 'Prodotto' } });
 
     await waitFor(() => {
       expect(getProductsList).toHaveBeenCalledWith({
-        fullProductName: "Prodotto",
+        fullProductName: 'Prodotto',
         size: 50,
       });
     });
 
-    expect(screen.queryByRole("option")).not.toBeInTheDocument();
+    expect(screen.queryByRole('option')).not.toBeInTheDocument();
   });
 
-  it("setta fieldErrors.discountCodeWrong se codice scaduto o già autorizzato", async () => {
+  it('setta fieldErrors.discountCodeWrong se codice scaduto o già autorizzato', async () => {
     (previewPayment as vi.Mock).mockRejectedValue({
-      response: { data: { code: "PAYMENT_NOT_FOUND_OR_EXPIRED" } },
+      response: { data: { code: 'PAYMENT_NOT_FOUND_OR_EXPIRED' } },
     });
 
     renderComponent();
 
-    fireEvent.change(
-      screen.getByLabelText("pages.acceptDiscount.expenditureAmount"),
-      {
-        target: { value: "10" },
-      }
-    );
-    fireEvent.change(
-      screen.getByLabelText("pages.acceptDiscount.discountCode"),
-      {
-        target: { value: "ABC123" },
-      }
-    );
-    fireEvent.change(screen.getByTestId("Autocomplete"), {
-      target: { value: { gtinCode: "123", fullProductName: "Prodotto" } },
+    fireEvent.change(screen.getByLabelText('pages.acceptDiscount.expenditureAmount'), {
+      target: { value: '10' },
+    });
+    fireEvent.change(screen.getByLabelText('pages.acceptDiscount.discountCode'), {
+      target: { value: 'ABC123' },
+    });
+    fireEvent.change(screen.getByTestId('Autocomplete'), {
+      target: { value: { gtinCode: '123', fullProductName: 'Prodotto' } },
     });
 
-    fireEvent.click(screen.getByText("commons.continueBtn"));
+    fireEvent.click(screen.getByText('commons.continueBtn'));
 
     await waitFor(() => {
-      const discountField = screen.getByLabelText(
-        "pages.acceptDiscount.discountCode"
-      );
+      const discountField = screen.getByLabelText('pages.acceptDiscount.discountCode');
     });
   });
 });
 
-describe("AcceptDiscount try/catch coverage", () => {
+describe('AcceptDiscount try/catch coverage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
   });
 
   const fillForm = async () => {
-    fireEvent.change(
-      screen.getByLabelText("pages.acceptDiscount.expenditureAmount"),
-      {
-        target: { value: "10" },
-      }
-    );
-    fireEvent.change(
-      screen.getByLabelText("pages.acceptDiscount.discountCode"),
-      {
-        target: { value: "ABC123" },
-      }
-    );
-    fireEvent.change(screen.getByTestId("Autocomplete"), {
-      target: { value: { gtinCode: "123", fullProductName: "Prodotto" } },
+    fireEvent.change(screen.getByLabelText('pages.acceptDiscount.expenditureAmount'), {
+      target: { value: '10' },
+    });
+    fireEvent.change(screen.getByLabelText('pages.acceptDiscount.discountCode'), {
+      target: { value: 'ABC123' },
+    });
+    fireEvent.change(screen.getByTestId('Autocomplete'), {
+      target: { value: { gtinCode: '123', fullProductName: 'Prodotto' } },
     });
   };
 
-  it("setta fieldErrors.discountCodeWrong se codice scaduto o già autorizzato", async () => {
+  it('setta fieldErrors.discountCodeWrong se codice scaduto o già autorizzato', async () => {
     (previewPayment as vi.Mock).mockRejectedValue({
-      response: { data: { code: "PAYMENT_NOT_FOUND_OR_EXPIRED" } },
+      response: { data: { code: 'PAYMENT_NOT_FOUND_OR_EXPIRED' } },
     });
 
     renderComponent();
 
     await fillForm();
-    fireEvent.click(screen.getByText("commons.continueBtn"));
+    fireEvent.click(screen.getByText('commons.continueBtn'));
 
     await waitFor(() => {
-      const discountField = screen.getByLabelText(
-        "pages.acceptDiscount.discountCode"
-      );
+      const discountField = screen.getByLabelText('pages.acceptDiscount.discountCode');
     });
   });
 });
