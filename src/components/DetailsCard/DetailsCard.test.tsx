@@ -36,4 +36,16 @@ describe('DetailsCard', () => {
     expect(cardTitle).toBeInTheDocument();
     expect(cardItem).toBeInTheDocument();
   });
+
+  it("should render '-' for falsy values except 0", () => {
+    DetailsCardSetup({ a: undefined, b: null, c: '', d: 0 });
+
+    expect(screen.getAllByText('-')).toHaveLength(3);
+    expect(screen.getByText('0')).toBeInTheDocument();
+  });
+
+  it('should render a number as value without turning it into "-"', () => {
+    DetailsCardSetup({ age: 42 });
+    expect(screen.getByText('42')).toBeInTheDocument();
+  });
 });

@@ -104,6 +104,24 @@ describe('logger.ts', () => {
     expect(console.groupEnd).toHaveBeenCalled();
   });
 
+  it('logApiError covers edge: error as string, undefined, null, and without apiName or originalResponse', async () => {
+    vi.doMock('./constants', () => ({ DEBUG_CONSOLE: true }));
+    const axios = await import('axios');
+    // Not an axios error
+    (axios.isAxiosError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+
+    const { logApiError } = await import('./logger');
+
+    logApiError('simple error string');
+    logApiError(undefined);
+    logApiError(null, undefined, undefined);
+    logApiError({}, undefined, undefined);
+
+    expect(console.groupCollapsed).toHaveBeenCalledWith('[API ERROR]');
+    expect(console.error).toHaveBeenCalled();
+    expect(console.groupEnd).toHaveBeenCalled();
+  });
+
   it('logApiError is no-op when DEBUG_CONSOLE is false', async () => {
     vi.doMock('./constants', () => ({ DEBUG_CONSOLE: false }));
     const { logApiError } = await import('./logger');
