@@ -4,85 +4,58 @@ import { GridRenderCellParams } from '@mui/x-data-grid';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getStatusChip(t: any, status: string) {
-  switch (status) {
-    case 'AUTHORIZED':
-      return (
-        <Chip
-          label={t('pages.refundManagement.authorized')}
-          size="small"
-          sx={{
-            backgroundColor: '#EEEEEE !important',
-            color: '#17324D !important',
-          }}
-        />
-      );
-    case 'REFUNDED':
-      return (
-        <Chip
-          label={t('pages.refundManagement.refunded')}
-          size="small"
-          sx={{
-            backgroundColor: '#C4DCF5 !important',
-            color: '#17324D !important',
-          }}
-        />
-      );
-    case 'CANCELLED':
-      return (
-        <Chip
-          label={t('pages.refundManagement.cancelled')}
-          size="small"
-          sx={{
-            backgroundColor: '#FFE0E0 !important',
-            color: '#761F1F !important',
-          }}
-        />
-      );
-    case 'CAPTURED':
-      return (
-        <Chip
-          label={t('pages.refundManagement.captured')}
-          size="small"
-          sx={{
-            backgroundColor: '#FFF5DA !important',
-            color: '#614C16 !important',
-          }}
-        />
-      );
-    case 'REWARDED':
-      return (
-        <Chip
-          label={t('pages.refundManagement.rewarded')}
-          size="small"
-          sx={{
-            backgroundColor: '#E1F4E1 !important',
-            color: '#224021 !important',
-          }}
-        />
-      );
-    case 'INVOICED':
-      return (
-        <Chip
-          label={t('pages.refundManagement.invoiced')}
-          size="small"
-          sx={{
-            backgroundColor: '#E1F5FE !important',
-            color: '#215C76 !important',
-          }}
-        />
-      );
-    default:
-      return (
-        <Chip
-          label="Errore"
-          size="small"
-          sx={{
-            backgroundColor: '#E1F4E1 !important',
-            color: '#17324D !important',
-          }}
-        />
-      );
-  }
+  const statusMap: Record<
+    string,
+    { label: string; backgroundColor: string; color: string }
+  > = {
+    AUTHORIZED: {
+      label: t('pages.refundManagement.authorized'),
+      backgroundColor: '#EEEEEE !important',
+      color: '#17324D !important',
+    },
+    REFUNDED: {
+      label: t('pages.refundManagement.refunded'),
+      backgroundColor: '#C4DCF5 !important',
+      color: '#17324D !important',
+    },
+    CANCELLED: {
+      label: t('pages.refundManagement.cancelled'),
+      backgroundColor: '#FFE0E0 !important',
+      color: '#761F1F !important',
+    },
+    CAPTURED: {
+      label: t('pages.refundManagement.captured'),
+      backgroundColor: '#FFF5DA !important',
+      color: '#614C16 !important',
+    },
+    REWARDED: {
+      label: t('pages.refundManagement.rewarded'),
+      backgroundColor: '#E1F4E1 !important',
+      color: '#224021 !important',
+    },
+    INVOICED: {
+      label: t('pages.refundManagement.invoiced'),
+      backgroundColor: '#E1F5FE !important',
+      color: '#215C76 !important',
+    },
+  };
+
+  const config = statusMap[status] ?? {
+    label: 'Errore',
+    backgroundColor: '#E1F4E1 !important',
+    color: '#17324D !important',
+  };
+
+  return (
+    <Chip
+      label={config.label}
+      size="small"
+      sx={{
+        backgroundColor: config.backgroundColor,
+        color: config.color,
+      }}
+    />
+  );
 }
 
 export function formatEuro(value: number) {
