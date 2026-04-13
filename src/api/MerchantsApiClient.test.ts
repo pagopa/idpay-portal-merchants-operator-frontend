@@ -1,59 +1,98 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { MerchantApi } from './MerchantsApiClient';
+const mockGet = vi.fn();
+const mockPut = vi.fn();
+const mockPost = vi.fn();
+const mockDelete = vi.fn();
 
-// Create mock functions directly in the vi.mock factory
-vi.mock('axios', () => {
-  const mockGet = vi.fn();
-  const mockPut = vi.fn();
-  const mockPost = vi.fn();
-  const mockDelete = vi.fn();
-  const mockRequestUse = vi.fn();
-  const mockResponseUse = vi.fn();
+vi.mock('./generated/Products', () => ({
+  Products: class {
+    setSecurityData = vi.fn();
+    getProducts = (params: Record<string, unknown>) =>
+      mockGet('/products', {
+        params: Object.fromEntries(
+          Object.entries(params || {}).filter(([, v]) => v !== undefined)
+        ),
+      });
+  },
+}));
 
-  const isAxiosError = (value: unknown): value is import('axios').AxiosError => {
-    return (
-      Boolean(value) &&
-      typeof value === 'object' &&
-      'isAxiosError' in (value as Record<string, unknown>)
-    );
-  };
+vi.mock('./generated/Transactions', () => ({
+  Transactions: class {
+    setSecurityData = vi.fn();
+    previewPayment = (code: string, body: Record<string, unknown>) =>
+      mockPut(`/transactions/bar-code/${code}/preview`, body);
+    authPaymentBarCode = (trxCode: string, body: Record<string, unknown>) =>
+      mockPut(`/transactions/bar-code/${trxCode}/authorize`, body);
+    capturePayment = (trxCode: string) =>
+      mockPut(`/transactions/bar-code/${trxCode}/capture`, { trxCode });
+    deleteTransaction = (trxCode: string) =>
+      mockDelete(`/transactions/${trxCode}`);
+    reversalTransaction = (trxCode: string) =>
+      mockPost(`/transactions/${trxCode}/reversal`, new FormData(), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    reversalTransactionInvoiced = (trxCode: string) =>
+      mockPost(`/transactions/${trxCode}/reversal-invoiced`, new FormData(), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    invoiceTransaction = (trxCode: string, body: Record<string, unknown>) =>
+      mockPost(`/transactions/${trxCode}/invoice`, body);
+    updateInvoiceTransaction = (trxCode: string, body: Record<string, unknown>) =>
+      mockPut(`/transactions/${trxCode}/invoice/update`, body);
+    getTransactionPreviewPdf = (trxCode: string) =>
+      mockGet(`/transactions/${trxCode}/preview-pdf`);
+  },
+}));
 
-  return {
-    default: {
-      create: vi.fn(() => ({
-        get: mockGet,
-        put: mockPut,
-        post: mockPost,
-        delete: mockDelete,
-        interceptors: {
-          request: { use: mockRequestUse },
-          response: { use: mockResponseUse },
-        },
-      })),
-      isAxiosError,
-    },
-    isAxiosError,
-  };
-});
+vi.mock('./generated/Initiatives', () => ({
+  Initiatives: class {
+    setSecurityData = vi.fn();
+    getPointOfSaleTransactions = (
+      initiativeId: string,
+      pointOfSaleId: string,
+      params: Record<string, unknown>
+    ) =>
+      mockGet(
+        `/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`,
+        { params }
+      );
+    getPointOfSaleTransactionsProcessed = (
+      initiativeId: string,
+      pointOfSaleId: string,
+      params: Record<string, unknown>
+    ) =>
+      mockGet(
+        `/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/processed`,
+        { params }
+      );
+  },
+}));
 
-// Mock authStore
+vi.mock('./generated/MerchantId', () => ({
+  MerchantId: class {
+    setSecurityData = vi.fn();
+    getPointOfSale = (merchantId: string, pointOfSaleId: string) =>
+      mockGet(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
+  },
+}));
+
+vi.mock('./generated/PointOfSaleId', () => ({
+  PointOfSaleId: class {
+    setSecurityData = vi.fn();
+    downloadInvoiceFile = (pointOfSaleId: string, trxId: string) =>
+      mockGet(`${pointOfSaleId}/transactions/${trxId}/download`);
+  },
+}));
+
 vi.mock('../store/authStore', () => ({
   authStore: {
     getState: vi.fn(() => ({ token: 'mocked_token' })),
   },
 }));
 
-// Get access to the mocked axios instance after the mock is set up
-const mockedAxios = vi.mocked(await import('axios')).default;
+import { MerchantApi } from './MerchantsApiClient';
 
 describe('MerchantApi', () => {
-  // Get the mocked axios instance
-  let mockAxiosInstance: any;
-
-  beforeEach(() => {
-    mockAxiosInstance = mockedAxios.create() as unknown as typeof mockAxiosInstance;
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -61,7 +100,7 @@ describe('MerchantApi', () => {
   describe('getProducts', () => {
     it('should call GET /products with correct parameters', async () => {
       const mockResponse = { data: { products: [], total: 0 } };
-      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+      mockGet.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.getProducts({
         page: 1,
@@ -70,7 +109,7 @@ describe('MerchantApi', () => {
         eprelCode: undefined,
       });
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/products', {
+      expect(mockGet).toHaveBeenCalledWith('/products', {
         params: {
           page: 1,
           size: 10,
@@ -82,7 +121,7 @@ describe('MerchantApi', () => {
     });
 
     it('should throw error if API fails', async () => {
-      mockAxiosInstance.get.mockRejectedValue(new Error('API Error'));
+      mockGet.mockRejectedValue(new Error('API Error'));
 
       await expect(MerchantApi.getProducts({})).rejects.toThrow('API Error');
     });
@@ -97,13 +136,17 @@ describe('MerchantApi', () => {
         discountCode: 'DISCOUNT123',
       };
       const mockResponse = { data: { previewed: true } };
-      mockAxiosInstance.put.mockResolvedValue(mockResponse);
+      mockPut.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.previewPayment(mockData);
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+      expect(mockPut).toHaveBeenCalledWith(
         `/transactions/bar-code/${mockData.discountCode}/preview`,
-        mockData
+        {
+          productGtin: mockData.productGtin,
+          productName: mockData.productName,
+          amountCents: mockData.amountCents,
+        }
       );
       expect(result).toEqual(mockResponse.data);
     });
@@ -117,13 +160,17 @@ describe('MerchantApi', () => {
         additionalProperties: {},
       };
       const mockResponse = { data: { authorized: true } };
-      mockAxiosInstance.put.mockResolvedValue(mockResponse);
+      mockPut.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.authPaymentBarCode(params);
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+      expect(mockPut).toHaveBeenCalledWith(
         `/transactions/bar-code/${params.trxCode}/authorize`,
-        params
+        {
+          amountCents: params.amountCents,
+          idTrxAcquirer: undefined,
+          additionalProperties: params.additionalProperties,
+        }
       );
       expect(result).toEqual(mockResponse.data);
     });
@@ -143,13 +190,13 @@ describe('MerchantApi', () => {
       };
       const mockResponse = { data: mockResponseData };
 
-      mockAxiosInstance.put.mockResolvedValue(mockResponse);
+      mockPut.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.capturePayment(params);
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+      expect(mockPut).toHaveBeenCalledWith(
         `/transactions/bar-code/${params.trxCode}/capture`,
-        params
+        { trxCode: params.trxCode }
       );
 
       expect(result).toEqual(mockResponseData);
@@ -163,15 +210,15 @@ describe('MerchantApi', () => {
 
       const apiError = new Error('400 Bad Request: Capture Failed');
 
-      mockAxiosInstance.put.mockRejectedValue(apiError);
+      mockPut.mockRejectedValue(apiError);
 
       const promise = MerchantApi.capturePayment(params);
 
       await expect(promise).rejects.toThrow('400 Bad Request: Capture Failed');
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith(
+      expect(mockPut).toHaveBeenCalledWith(
         `/transactions/bar-code/${params.trxCode}/capture`,
-        params
+        { trxCode: params.trxCode }
       );
     });
   });
@@ -196,7 +243,7 @@ describe('MerchantApi', () => {
         productGtin: '1234567890123',
       };
 
-      mockAxiosInstance.get.mockResolvedValue(mockSuccessResponse);
+      mockGet.mockResolvedValue(mockSuccessResponse);
 
       const result = await MerchantApi.getInProgressTransactions(
         initiativeId,
@@ -204,7 +251,7 @@ describe('MerchantApi', () => {
         queryParams
       );
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         `/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions`,
         { params: queryParams }
       );
@@ -216,7 +263,7 @@ describe('MerchantApi', () => {
       const queryParams = { page: 0 };
       const apiError = new Error('500 Internal Server Error');
 
-      mockAxiosInstance.get.mockRejectedValue(apiError);
+      mockGet.mockRejectedValue(apiError);
 
       const promise = MerchantApi.getInProgressTransactions(
         initiativeId,
@@ -226,7 +273,7 @@ describe('MerchantApi', () => {
 
       await expect(promise).rejects.toThrow('500 Internal Server Error');
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -235,11 +282,11 @@ describe('MerchantApi', () => {
       const merchantId = 'MI123';
       const pointOfSaleId = 'POS456';
       const mockResponse = { data: { transactions: [], total: 0 } };
-      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+      mockGet.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.getPointOfSaleDetails(merchantId, pointOfSaleId);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         `/${merchantId}/point-of-sales/${pointOfSaleId}`
       );
       expect(result).toEqual(mockResponse.data);
@@ -250,16 +297,16 @@ describe('MerchantApi', () => {
       const pointOfSaleId = 'POS456';
       const apiError = new Error('404 Not Found from API');
 
-      mockAxiosInstance.get.mockRejectedValue(apiError);
+      mockGet.mockRejectedValue(apiError);
 
       const promise = MerchantApi.getPointOfSaleDetails(merchantId, pointOfSaleId);
 
       await expect(promise).rejects.toThrow('404 Not Found from API');
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         `/${merchantId}/point-of-sales/${pointOfSaleId}`
       );
-      expect(mockAxiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -272,7 +319,7 @@ describe('MerchantApi', () => {
         size: 10,
       };
       const mockResponse = { data: { transactions: [], total: 0 } };
-      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+      mockGet.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.getProcessedTransactions(
         initiativeId,
@@ -280,7 +327,7 @@ describe('MerchantApi', () => {
         queryParams
       );
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         `/initiatives/${initiativeId}/point-of-sales/${pointOfSaleId}/transactions/processed`,
         { params: queryParams }
       );
@@ -296,7 +343,7 @@ describe('MerchantApi', () => {
       };
       const apiError = new Error('404 Not Found from API');
 
-      mockAxiosInstance.get.mockRejectedValue(apiError);
+      mockGet.mockRejectedValue(apiError);
 
       const promise = MerchantApi.getProcessedTransactions(
         initiativeId,
@@ -315,12 +362,12 @@ describe('MerchantApi', () => {
       const trxID = '123456789';
 
       const mockResponse = { data: {}, status: 204 };
-      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+      mockPost.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.invoiceTransactionApi(trxID, testFile, 'DOC789');
 
-      expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockResponse.data);
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(result).toBeUndefined();
     });
 
     it('should throw an errore when API call fail', async () => {
@@ -329,7 +376,7 @@ describe('MerchantApi', () => {
       const trxId = '123456789';
 
       const apiError = new Error('404 Not Found from API');
-      mockAxiosInstance.post.mockRejectedValue(apiError);
+      mockPost.mockRejectedValue(apiError);
 
       await expect(MerchantApi.invoiceTransactionApi(trxId, testFile)).rejects.toThrow(
         '404 Not Found from API'
@@ -345,12 +392,12 @@ describe('MerchantApi', () => {
       const docNumber = 'DOC789';
 
       const mockResponse = { data: {}, status: 204 };
-      mockAxiosInstance.put.mockResolvedValue(mockResponse);
+      mockPut.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.updateInvoiceTransactionApi(trxId, testFile, docNumber);
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockResponse.data);
+      expect(mockPut).toHaveBeenCalledTimes(1);
+      expect(result).toBeUndefined();
     });
 
     it('should throw an error when API call fails', async () => {
@@ -360,13 +407,13 @@ describe('MerchantApi', () => {
       const docNumber = 'DOC789';
 
       const apiError = new Error('404 Not Found from API');
-      mockAxiosInstance.put.mockRejectedValue(apiError);
+      mockPut.mockRejectedValue(apiError);
 
       await expect(
         MerchantApi.updateInvoiceTransactionApi(trxId, testFile, docNumber)
       ).rejects.toThrow('404 Not Found from API');
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledTimes(1);
+      expect(mockPut).toHaveBeenCalledTimes(1);
     });
 
     it('should handle FormData with file and docNumber', async () => {
@@ -376,12 +423,12 @@ describe('MerchantApi', () => {
       const docNumber = 'DOC_UPDATE_123';
 
       const mockResponse = { data: { updated: true }, status: 200 };
-      mockAxiosInstance.put.mockResolvedValue(mockResponse);
+      mockPut.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.updateInvoiceTransactionApi(trxId, testFile, docNumber);
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(mockResponse.data);
+      expect(mockPut).toHaveBeenCalledTimes(1);
+      expect(result).toBeUndefined();
     });
   });
 
@@ -393,13 +440,13 @@ describe('MerchantApi', () => {
       const docNumber = 'DOC789';
 
       const mockResponse = { data: {}, status: 204 };
-      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+      mockPost.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.reverseTransactionApi(trxID, testFile, docNumber);
 
-      expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
+      expect(mockPost).toHaveBeenCalledTimes(1);
 
-      const [url, body, config] = mockAxiosInstance.post.mock.calls[0];
+      const [url, body, config] = mockPost.mock.calls[0];
 
       expect(url).toBe(`/transactions/${trxID}/reversal`);
       expect(body).toBeInstanceOf(FormData);
@@ -409,7 +456,7 @@ describe('MerchantApi', () => {
         },
       });
 
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toBeUndefined();
     });
 
     it('should throw an error when API call fails', async () => {
@@ -418,7 +465,7 @@ describe('MerchantApi', () => {
       const trxId = '123456789';
 
       const apiError = new Error('404 Not Found from API');
-      mockAxiosInstance.post.mockRejectedValue(apiError);
+      mockPost.mockRejectedValue(apiError);
 
       await expect(MerchantApi.reverseTransactionApi(trxId, testFile, 'DOC789')).rejects.toThrow(
         '404 Not Found from API'
@@ -432,11 +479,11 @@ describe('MerchantApi', () => {
       const trxId = 'TRX_456';
       const mockResponse = { data: { invoiceUrl: 'https://example.com/invoice.pdf' } };
 
-      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+      mockGet.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+      expect(mockGet).toHaveBeenCalledWith(
         `${pointOfSaleId}/transactions/${trxId}/download`
       );
       expect(result).toEqual(mockResponse.data);
@@ -447,7 +494,7 @@ describe('MerchantApi', () => {
       const trxId = 'TRX_456';
       const apiError = new Error('Download failed');
 
-      mockAxiosInstance.get.mockRejectedValue(apiError);
+      mockGet.mockRejectedValue(apiError);
 
       await expect(MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId)).rejects.toThrow(
         'Download failed'
@@ -463,11 +510,11 @@ describe('MerchantApi', () => {
       const docNumber = 'DOC_INV_001';
 
       const mockResponse = { data: {}, status: 204 };
-      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+      mockPost.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.reverseInvoicedTransactionApi(trxId, testFile, docNumber);
 
-      const [url, body, config] = mockAxiosInstance.post.mock.calls[0];
+      const [url, body, config] = mockPost.mock.calls[0];
 
       expect(url).toBe(`/transactions/${trxId}/reversal-invoiced`);
       expect(body).toBeInstanceOf(FormData);
@@ -477,7 +524,7 @@ describe('MerchantApi', () => {
         },
       });
 
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toBeUndefined();
     });
 
     it('should propagate error when API call fails', async () => {
@@ -486,7 +533,7 @@ describe('MerchantApi', () => {
       const trxId = 'TRX_INV_002';
       const apiError = new Error('Reversal-invoiced failed');
 
-      mockAxiosInstance.post.mockRejectedValue(apiError);
+      mockPost.mockRejectedValue(apiError);
 
       await expect(
         MerchantApi.reverseInvoicedTransactionApi(trxId, testFile, 'DOC789')
@@ -499,23 +546,23 @@ describe('MerchantApi', () => {
       const trxId = 'TRX_TO_DELETE_789';
 
       const mockResponse = { data: {}, status: 204 };
-      mockAxiosInstance.delete.mockResolvedValue(mockResponse);
+      mockDelete.mockResolvedValue(mockResponse);
 
-      await expect(MerchantApi.deleteTransactionInProgress(trxId)).resolves.toEqual({});
+      await expect(MerchantApi.deleteTransactionInProgress(trxId)).resolves.toBeUndefined();
 
-      expect(mockAxiosInstance.delete).toHaveBeenCalledWith(`/transactions/${trxId}`);
-      expect(mockAxiosInstance.delete).toHaveBeenCalledTimes(1);
+      expect(mockDelete).toHaveBeenCalledWith(`/transactions/${trxId}`);
+      expect(mockDelete).toHaveBeenCalledTimes(1);
     });
 
     it('should throw error if API fails during deletion', async () => {
       const trxId = 'FAIL_ID_101';
       const apiError = new Error('DELETE API Error');
-      mockAxiosInstance.delete.mockRejectedValue(apiError);
+      mockDelete.mockRejectedValue(apiError);
 
       await expect(MerchantApi.deleteTransactionInProgress(trxId)).rejects.toThrow(
         'DELETE API Error'
       );
-      expect(mockAxiosInstance.delete).toHaveBeenCalledWith(`/transactions/${trxId}`);
+      expect(mockDelete).toHaveBeenCalledWith(`/transactions/${trxId}`);
     });
   });
 
@@ -524,32 +571,32 @@ describe('MerchantApi', () => {
 
     it('should call GET /transactions/:trxId/preview-pdf and return correct data', async () => {
       const mockResponse = { data: 'base64pdfdata' };
-      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+      mockGet.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.getPreviewPdf(trxId);
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
-      expect(mockAxiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
+      expect(mockGet).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse.data);
     });
 
     it('should handle empty trxId gracefully', async () => {
       const mockResponse = { data: '' };
-      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+      mockGet.mockResolvedValue(mockResponse);
 
       const result = await MerchantApi.getPreviewPdf('');
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(`/transactions//preview-pdf`);
+      expect(mockGet).toHaveBeenCalledWith(`/transactions//preview-pdf`);
       expect(result).toEqual(mockResponse.data);
     });
 
     it('should throw an error if API call fails', async () => {
       const apiError = new Error('PDF not found');
-      mockAxiosInstance.get.mockRejectedValue(apiError);
+      mockGet.mockRejectedValue(apiError);
 
       await expect(MerchantApi.getPreviewPdf(trxId)).rejects.toThrow('PDF not found');
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
-      expect(mockAxiosInstance.get).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
+      expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
 });
