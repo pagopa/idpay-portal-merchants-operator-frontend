@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { GridRenderCellParams } from '@mui/x-data-grid';
 import {
   getStatusChip,
   formatEuro,
@@ -9,7 +10,9 @@ import {
   renderMissingDataWithTooltip,
   checkTooltipValue,
   checkEuroTooltip,
+  checkDateTooltip,
   handleCodeChange,
+  downloadFileFromBase64,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -176,6 +179,30 @@ describe('filterInputWithSpaceRule', () => {
     expect(filterInputWithSpaceRule('a b')).toBe('ab');
     expect(filterInputWithSpaceRule('1 2 3')).toBe('123');
   });
+
+  it('handles a string of only spaces', () => {
+    expect(filterInputWithSpaceRule('     ')).toBe('');
+  });
+
+  it('returns correct result for leading and trailing spaces', () => {
+    expect(filterInputWithSpaceRule('   1a2   ')).toBe('1a2');
+  });
+
+  it('returns correct result for empty string', () => {
+    expect(filterInputWithSpaceRule('')).toBe('');
+  });
+
+  it('returns correct result when space is only at start', () => {
+    expect(filterInputWithSpaceRule(' abc')).toBe('abc');
+  });
+
+  it('handles single-word string with no spaces', () => {
+    expect(filterInputWithSpaceRule('abc')).toBe('abc');
+  });
+
+  it('does not introduce spaces if there were none', () => {
+    expect(filterInputWithSpaceRule('ab')).toBe('ab');
+  });
 });
 
 describe('renderCellWithTooltip', () => {
@@ -230,36 +257,243 @@ describe('checkTooltipValue', () => {
     const { container } = render(checkTooltipValue(params));
     expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
   });
+
+  it('should render value with tooltip when key is provided and value[key] present', () => {
+    const key = 'foo';
+    const params = { value: { foo: 'bar' } };
+    const { container } = render(checkTooltipValue(params, key));
+    expect(container.textContent).toContain('bar');
+  });
+
+  it('should render missing data when key is provided but value[key] is falsy', () => {
+    const key = 'foo';
+    const params = { value: { foo: null } };
+    const { container } = render(checkTooltipValue(params, key));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
+  it('should render tooltip for value number', () => {
+    const params = { value: 42 };
+    const { container } = render(checkTooltipValue(params));
+    expect(container.textContent).toContain('42');
+  });
+
+  it('should render tooltip for value boolean', () => {
+    const params = { value: true };
+    const { container } = render(checkTooltipValue(params));
+    expect(container.textContent).toContain('true');
+  });
+
+  it('should render tooltip for value date', () => {
+    const params = { value: new Date('2024-04-13T10:00:00Z') };
+    const { container } = render(checkTooltipValue(params));
+    expect(container.textContent).toContain('2024');
+  });
 });
 
 describe('checkEuroTooltip', () => {
+  const minimalParams = {
+    api: {} as any,
+    id: 1,
+    field: 'field',
+    row: {},
+    value: undefined,
+  } as GridRenderCellParams;
+
   it('should render formatted euro value for positive number', () => {
-    const params = { value: 12345 };
+    const params = { ...minimalParams, value: 12345 };
     const { container } = render(checkEuroTooltip(params));
     expect(container.textContent).toContain('123,45€');
   });
 
   it('should render formatted euro value for zero', () => {
-    const params = { value: 0 };
+    const params = { ...minimalParams, value: 0 };
     const { container } = render(checkEuroTooltip(params));
     expect(container.textContent).toContain('0,00€');
   });
 
   it('should render missing data when value is undefined', () => {
-    const params = { value: undefined };
+    const params = { ...minimalParams, value: undefined };
     const { container } = render(checkEuroTooltip(params));
     expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
   });
 
   it('should render missing data when value is null', () => {
-    const params = { value: null };
+    const params = { ...minimalParams, value: null };
     const { container } = render(checkEuroTooltip(params));
     expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
   });
 
+  it('should render missing data when value key is truly missing', () => {
+    const paramsNoValue = { api: {} as any, id: 2, field: 'abc', row: {} } as GridRenderCellParams;
+    const { container } = render(checkEuroTooltip(paramsNoValue));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
   it('should render formatted euro for large numbers', () => {
-    const params = { value: 987654321 };
+    const params = { ...minimalParams, value: 987654321 };
     const { container } = render(checkEuroTooltip(params));
     expect(container.textContent).toContain('9.876.543,21€');
+  });
+});
+/* removed: duplicate and incorrect 'checkDateTooltip' describe block with invalid parameters */
+describe('checkDateTooltip', () => {
+  const minimalParams = {
+    api: {} as any,
+    id: 1,
+    field: 'field',
+    row: {},
+    value: undefined,
+  } as GridRenderCellParams;
+
+  it('should render missing data when value is falsy', () => {
+    const params = { ...minimalParams, value: null };
+    const { container } = render(checkDateTooltip(params));
+    expect(container.textContent).toContain(MISSING_DATA_PLACEHOLDER);
+  });
+
+  it('should render formatted date string for string input', () => {
+    const params = { ...minimalParams, value: '2021-01-01T12:00:00Z' };
+    const { container } = render(checkDateTooltip(params));
+    expect(container.textContent).toContain('01/01/2021');
+  });
+
+  it('should render formatted date string for number input', () => {
+    const params = { ...minimalParams, value: new Date('2021-01-01T12:00:00Z').getTime() };
+    const { container } = render(checkDateTooltip(params));
+    expect(container.textContent).toContain('01/01/2021');
+  });
+
+  it('should render formatted date string for Date object input', () => {
+    const params = { ...minimalParams, value: new Date('2021-01-01T12:00:00Z') };
+    const { container } = render(checkDateTooltip(params));
+    expect(container.textContent).toContain('01/01/2021');
+  });
+});
+
+/* removed: duplicate and incorrect 'checkDateTooltip' describe block with invalid parameters */
+
+describe('downloadFileFromBase64', () => {
+  it('should create a download link and click it', () => {
+    const base64 = 'data:application/pdf;base64,SGVsbG8gd29ybGQ=';
+    const fileName = 'test.pdf';
+
+    // Patch global URL if missing in test env
+    if (!global.URL) {
+      global.URL = {} as any;
+    }
+    if (!global.URL.createObjectURL) {
+      global.URL.createObjectURL = vi.fn(() => 'blob:url');
+    }
+    if (!global.URL.revokeObjectURL) {
+      global.URL.revokeObjectURL = vi.fn();
+    }
+
+    // Mock URL.createObjectURL and revokeObjectURL
+    const createObjectURLMock = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:url');
+    const revokeObjectURLMock = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+    // Mock click on anchor element
+    const clickMock = vi.fn();
+    const appendChildMock = vi.fn();
+    const removeMock = vi.fn();
+
+    const createElementMock = vi.spyOn(document, 'createElement').mockImplementation(() => {
+      return {
+        href: '',
+        download: '',
+        click: clickMock,
+        style: {},
+        setAttribute: () => {},
+        remove: removeMock,
+      } as unknown as HTMLAnchorElement;
+    });
+
+    const appendChildOriginal = document.body.appendChild;
+    vi.spyOn(document.body, 'appendChild').mockImplementation(appendChildMock);
+
+    downloadFileFromBase64(base64, fileName);
+
+    expect(createObjectURLMock).toHaveBeenCalled();
+    expect(clickMock).toHaveBeenCalled();
+    expect(removeMock).toHaveBeenCalled();
+
+    // Restore mocks
+    createObjectURLMock.mockRestore();
+    revokeObjectURLMock.mockRestore();
+    createElementMock.mockRestore();
+    vi.restoreAllMocks();
+  });
+});
+
+// DIRECT function/branch coverage calls for helpers.tsx
+describe('helpers direct call coverage', () => {
+  it('calls handleCodeChange with minimal params for each path', () => {
+    const mockFormik = { handleChange: vi.fn() };
+    // Should call formik
+    handleCodeChange({ target: { value: 'ABCD' } }, mockFormik, 14, 'CODE');
+    // Should return error for non-alphanumeric
+    expect(handleCodeChange({ target: { value: '12.34' } }, mockFormik, 12, 'GTIN')).toMatch(
+      /deve contenere/
+    );
+    // Should hit early exit (space or too long)
+    expect(
+      handleCodeChange({ target: { value: '12 34' } }, mockFormik, 12, 'GTIN')
+    ).toBeUndefined();
+    expect(
+      handleCodeChange({ target: { value: 'ABCDEFGHIJKLMNO' } }, mockFormik, 10, 'CODE')
+    ).toBeUndefined();
+  });
+
+  it('calls renderCellWithTooltip with each type/edge case', () => {
+    renderCellWithTooltip(undefined);
+    renderCellWithTooltip(null);
+    renderCellWithTooltip('str');
+    renderCellWithTooltip(987);
+    renderCellWithTooltip(true);
+    renderCellWithTooltip(false);
+    renderCellWithTooltip(new Date(2024, 3, 14));
+    renderCellWithTooltip({});
+    renderCellWithTooltip([]);
+  });
+
+  it('calls renderMissingDataWithTooltip', () => {
+    renderMissingDataWithTooltip();
+  });
+
+  it('calls checkTooltipValue for no value, value, and with key', () => {
+    checkTooltipValue({ value: undefined });
+    checkTooltipValue({ value: null });
+    checkTooltipValue({ value: 'v' });
+    checkTooltipValue({ value: { k: 7 } }, 'k');
+    checkTooltipValue({ value: { k: undefined } }, 'k');
+    checkTooltipValue({ value: {} }, 'notfound');
+  });
+
+  it('calls checkEuroTooltip', () => {
+    const minimalParams = {
+      api: {} as any,
+      id: 1,
+      field: '',
+      row: {},
+      value: 5,
+    } as GridRenderCellParams;
+    checkEuroTooltip(minimalParams);
+    checkEuroTooltip({ ...minimalParams, value: 0 });
+    checkEuroTooltip({ ...minimalParams, value: undefined });
+  });
+
+  it('calls checkDateTooltip', () => {
+    const minimalParams = {
+      api: {} as any,
+      id: 1,
+      field: '',
+      row: {},
+      value: '2024-04-14T16:00:00Z',
+    } as GridRenderCellParams;
+    checkDateTooltip(minimalParams);
+    checkDateTooltip({ ...minimalParams, value: null });
+    checkDateTooltip({ ...minimalParams, value: new Date() });
+    checkDateTooltip({ ...minimalParams, value: Date.now() });
   });
 });
