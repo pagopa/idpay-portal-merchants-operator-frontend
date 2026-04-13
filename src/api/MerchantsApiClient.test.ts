@@ -10,6 +10,14 @@ vi.mock('axios', () => {
   const mockRequestUse = vi.fn();
   const mockResponseUse = vi.fn();
 
+  const isAxiosError = (value: unknown): value is import('axios').AxiosError => {
+    return (
+      Boolean(value) &&
+      typeof value === 'object' &&
+      'isAxiosError' in (value as Record<string, unknown>)
+    );
+  };
+
   return {
     default: {
       create: vi.fn(() => ({
@@ -22,7 +30,9 @@ vi.mock('axios', () => {
           response: { use: mockResponseUse },
         },
       })),
+      isAxiosError,
     },
+    isAxiosError,
   };
 });
 
@@ -41,12 +51,10 @@ describe('MerchantApi', () => {
   let mockAxiosInstance: any;
 
   beforeEach(() => {
-    // Get the mocked instance that axios.create returns
-    mockAxiosInstance = (mockedAxios.create as any)();
+    mockAxiosInstance = mockedAxios.create() as unknown as typeof mockAxiosInstance;
   });
 
   afterEach(() => {
-    // Clear all mocks
     vi.clearAllMocks();
   });
 
@@ -309,7 +317,7 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.invoiceTransactionApi(trxID, testFile);
+      const result = await MerchantApi.invoiceTransactionApi(trxID, testFile, 'DOC789');
 
       expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse.data);
@@ -378,21 +386,33 @@ describe('MerchantApi', () => {
   });
 
   describe('reverseTransactionApi', () => {
-    it('should call POST /transactions/:trxId/reversal with correct payload', async () => {
+    it('should call POST /transactions/:trxId/reversal with correct payload (FormData + multipart header)', async () => {
       const blobPart = [new Blob()];
       const testFile = new File(blobPart, 'fileName');
       const trxID = '123456789';
+      const docNumber = 'DOC789';
 
       const mockResponse = { data: {}, status: 204 };
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.reverseTransactionApi(trxID, testFile);
+      const result = await MerchantApi.reverseTransactionApi(trxID, testFile, docNumber);
 
       expect(mockAxiosInstance.post).toHaveBeenCalledTimes(1);
+
+      const [url, body, config] = mockAxiosInstance.post.mock.calls[0];
+
+      expect(url).toBe(`/transactions/${trxID}/reversal`);
+      expect(body).toBeInstanceOf(FormData);
+      expect(config).toEqual({
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       expect(result).toEqual(mockResponse.data);
     });
 
-    it('should throw an errore when API call fail', async () => {
+    it('should throw an error when API call fails', async () => {
       const blobPart = [new Blob()];
       const testFile = new File(blobPart, 'fileName');
       const trxId = '123456789';
@@ -400,9 +420,77 @@ describe('MerchantApi', () => {
       const apiError = new Error('404 Not Found from API');
       mockAxiosInstance.post.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.reverseTransactionApi(trxId, testFile)).rejects.toThrow(
+      await expect(MerchantApi.reverseTransactionApi(trxId, testFile, 'DOC789')).rejects.toThrow(
         '404 Not Found from API'
       );
+    });
+  });
+
+  describe('downloadInvoiceFileApi', () => {
+    it('should call GET :pointOfSaleId/transactions/:trxId/download and return invoiceUrl', async () => {
+      const pointOfSaleId = 'POS_123';
+      const trxId = 'TRX_456';
+      const mockResponse = { data: { invoiceUrl: 'https://example.com/invoice.pdf' } };
+
+      mockAxiosInstance.get.mockResolvedValue(mockResponse);
+
+      const result = await MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId);
+
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+        `${pointOfSaleId}/transactions/${trxId}/download`
+      );
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it('should propagate error when GET fails', async () => {
+      const pointOfSaleId = 'POS_123';
+      const trxId = 'TRX_456';
+      const apiError = new Error('Download failed');
+
+      mockAxiosInstance.get.mockRejectedValue(apiError);
+
+      await expect(MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId)).rejects.toThrow(
+        'Download failed'
+      );
+    });
+  });
+
+  describe('reverseInvoicedTransactionApi', () => {
+    it('should call POST /transactions/:trxId/reversal-invoiced with FormData and multipart header', async () => {
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, 'fileName');
+      const trxId = 'TRX_INV_001';
+      const docNumber = 'DOC_INV_001';
+
+      const mockResponse = { data: {}, status: 204 };
+      mockAxiosInstance.post.mockResolvedValue(mockResponse);
+
+      const result = await MerchantApi.reverseInvoicedTransactionApi(trxId, testFile, docNumber);
+
+      const [url, body, config] = mockAxiosInstance.post.mock.calls[0];
+
+      expect(url).toBe(`/transactions/${trxId}/reversal-invoiced`);
+      expect(body).toBeInstanceOf(FormData);
+      expect(config).toEqual({
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it('should propagate error when API call fails', async () => {
+      const blobPart = [new Blob()];
+      const testFile = new File(blobPart, 'fileName');
+      const trxId = 'TRX_INV_002';
+      const apiError = new Error('Reversal-invoiced failed');
+
+      mockAxiosInstance.post.mockRejectedValue(apiError);
+
+      await expect(
+        MerchantApi.reverseInvoicedTransactionApi(trxId, testFile, 'DOC789')
+      ).rejects.toThrow('Reversal-invoiced failed');
     });
   });
 

@@ -63,7 +63,6 @@ const Products = () => {
     initialValues,
     onSubmit: async (values) => {
       handleFiltersApplied(values);
-      // console.log('Eseguo ricerca con filtri:', values);
     },
   });
 
@@ -75,33 +74,8 @@ const Products = () => {
       disableColumnMenu: true,
       align: 'center',
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'brand',
@@ -109,33 +83,8 @@ const Products = () => {
       flex: 1,
       disableColumnMenu: true,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'model',
@@ -143,33 +92,8 @@ const Products = () => {
       flex: 1.5,
       disableColumnMenu: true,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'gtinCode',
@@ -177,33 +101,8 @@ const Products = () => {
       flex: 2,
       disableColumnMenu: true,
       sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-                width: '100%',
-              }}
-            >
-              <Tooltip title={params.value}>
-                <Typography
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {params.value}
-                </Typography>
-              </Tooltip>
-            </div>
-          );
-        }
-        return MISSING_DATA_PLACEHOLDER;
-      },
+      renderCell: (params: GridRenderCellParams) =>
+        params.value ? renderCellWithTooltip(params.value) : renderMissingDataWithTooltip(),
     },
     {
       field: 'eprelCode',
@@ -233,10 +132,7 @@ const Products = () => {
                 >
                   {params.value && params?.value !== '' && params?.value !== null && (
                     <Link
-                      sx={{
-                        color: '#0062C3',
-                        fontWeight: theme.typography.fontWeightMedium,
-                      }}
+                      sx={{ color: '#0062C3', fontWeight: theme.typography.fontWeightMedium }}
                       href={params?.row?.linkEprel}
                       target="_blank"
                     >
@@ -276,7 +172,6 @@ const Products = () => {
       });
       setProductsListIsLoading(false);
     } catch {
-      // console.error('Error fetching products:', error);
       setProductsListIsLoading(false);
       setErrorAlert(true);
     }
@@ -310,7 +205,7 @@ const Products = () => {
     }
   };
 
-  const handleFiltersApplied = (filtersObj: any) => {
+  const handleFiltersApplied = (filtersObj: typeof initialValues) => {
     setFiltersAppliedOnce(true);
     setAppliedFilters(filtersObj);
     const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
@@ -334,7 +229,7 @@ const Products = () => {
     formik.resetForm();
     fetchProducts({});
   };
-  const handleRowAction = (row: any) => {
+  const handleRowAction = (row: unknown) => {
     setOpenDrawer(true);
     setSelectedProduct(row);
   };

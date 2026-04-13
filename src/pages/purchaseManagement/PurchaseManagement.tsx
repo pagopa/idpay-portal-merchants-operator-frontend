@@ -18,10 +18,9 @@ import style from './purchaseManagement.module.css';
 import {
   getStatusChip,
   formatEuro,
-  renderCellWithTooltip,
-  renderMissingDataWithTooltip,
   checkEuroTooltip,
   checkTooltipValue,
+  checkDateTooltip,
 } from '../../utils/helpers';
 import { utilsStore } from '../../store/utilsStore';
 import ModalComponent from '../../components/Modal/ModalComponent';
@@ -106,21 +105,7 @@ const PurchaseManagement = () => {
       headerName: 'Data e ora',
       flex: 1.5,
       disableColumnMenu: true,
-      renderCell: (params: GridRenderCellParams) => {
-        if (params.value) {
-          const formattedDate = new Date(params.value)
-            .toLocaleDateString('it-IT', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-            .replace(',', '');
-          return renderCellWithTooltip(formattedDate);
-        }
-        return renderMissingDataWithTooltip();
-      },
+      renderCell: (params: GridRenderCellParams) => checkDateTooltip(params),
     },
     {
       field: 'fiscalCode',
@@ -218,7 +203,6 @@ const PurchaseManagement = () => {
       setTransactionDeleteSuccess(true);
       setTriggerFetchTransactions(true);
     } catch {
-      // console.error('Error deleting transaction:', error);
       setCancelTransactionModal(false);
       setErrorDeleteTransaction(true);
       setOpenDrawer(true);
@@ -233,7 +217,6 @@ const PurchaseManagement = () => {
       setTransactionCaptured(true);
       setTriggerFetchTransactions(true);
     } catch {
-      // console.error('Error capture transaction:', error);
       setCaptureTransactionModal(false);
       setErrorCaptureTransaction(true);
       setOpenDrawer(true);
@@ -254,7 +237,6 @@ const PurchaseManagement = () => {
       const response = await getPreviewPdf(selectedTransaction?.id);
       downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
     } catch {
-      // console.error('Error getting preview PDF:', error);
       setErrorPreviewPdf(true);
     } finally {
       setIsPreviewPdfLoading(false);

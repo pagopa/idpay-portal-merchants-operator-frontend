@@ -177,10 +177,7 @@ describe('PurchaseManagement', () => {
       utilsStore.setState({ transactionAuthorized: false }, true);
     });
 
-    mockGetInProgressTransactions.mockResolvedValue({
-      content: [],
-      totalElements: 0,
-    });
+    mockGetInProgressTransactions.mockResolvedValue({ content: [], totalElements: 0 });
   });
 
   afterEach(() => {
@@ -218,10 +215,7 @@ describe('PurchaseManagement', () => {
     });
 
     it('should handle REFUNDED status label', async () => {
-      const refundedTransaction = {
-        ...mockAuthorizedTransaction,
-        status: 'REFUNDED',
-      };
+      const refundedTransaction = { ...mockAuthorizedTransaction, status: 'REFUNDED' };
 
       render(
         <MemoryRouter>
@@ -260,10 +254,7 @@ describe('PurchaseManagement', () => {
     });
 
     it('should handle unknown/default status', async () => {
-      const unknownTransaction = {
-        ...mockAuthorizedTransaction,
-        status: 'UNKNOWN',
-      };
+      const unknownTransaction = { ...mockAuthorizedTransaction, status: 'UNKNOWN' };
 
       render(
         <MemoryRouter>
@@ -532,9 +523,7 @@ describe('PurchaseManagement', () => {
       ).toBeInTheDocument();
 
       fireEvent.click(
-        screen.getByRole('button', {
-          name: 'pages.purchaseManagement.drawer.refund',
-        })
+        screen.getByRole('button', { name: 'pages.purchaseManagement.drawer.refund' })
       );
 
       expect(mockedNavigate).toHaveBeenCalledWith(
@@ -590,9 +579,7 @@ describe('PurchaseManagement', () => {
     });
 
     it('handles both refundUploadSuccess and reverseUploadSuccess being false', () => {
-      mockedLocation = {
-        state: { refundUploadSuccess: false, reverseUploadSuccess: false },
-      };
+      mockedLocation = { state: { refundUploadSuccess: false, reverseUploadSuccess: false } };
 
       render(
         <MemoryRouter>
@@ -678,10 +665,7 @@ describe('getChipLabel functionality', () => {
   });
 
   it('should return correct translation key for REFUNDED status', async () => {
-    const refundedTransaction = {
-      ...mockAuthorizedTransaction,
-      status: 'REFUNDED',
-    };
+    const refundedTransaction = { ...mockAuthorizedTransaction, status: 'REFUNDED' };
 
     render(
       <MemoryRouter>
@@ -700,10 +684,7 @@ describe('getChipLabel functionality', () => {
   });
 
   it('should return correct translation key for CANCELLED status', async () => {
-    const cancelledTransaction = {
-      ...mockAuthorizedTransaction,
-      status: 'CANCELLED',
-    };
+    const cancelledTransaction = { ...mockAuthorizedTransaction, status: 'CANCELLED' };
 
     render(
       <MemoryRouter>
@@ -719,10 +700,7 @@ describe('getChipLabel functionality', () => {
   });
 
   it('should return correct translation key for REWARDED status', async () => {
-    const rewardedTransaction = {
-      ...mockAuthorizedTransaction,
-      status: 'REWARDED',
-    };
+    const rewardedTransaction = { ...mockAuthorizedTransaction, status: 'REWARDED' };
 
     render(
       <MemoryRouter>
@@ -738,10 +716,7 @@ describe('getChipLabel functionality', () => {
   });
 
   it('should return correct translation key for INVOICED status', async () => {
-    const invoicedTransaction = {
-      ...mockAuthorizedTransaction,
-      status: 'INVOICED',
-    };
+    const invoicedTransaction = { ...mockAuthorizedTransaction, status: 'INVOICED' };
 
     render(
       <MemoryRouter>
@@ -757,10 +732,7 @@ describe('getChipLabel functionality', () => {
   });
 
   it('should return error translation key for unknown status', async () => {
-    const unknownTransaction = {
-      ...mockAuthorizedTransaction,
-      status: 'UNKNOWN_STATUS',
-    };
+    const unknownTransaction = { ...mockAuthorizedTransaction, status: 'UNKNOWN_STATUS' };
 
     render(
       <MemoryRouter>

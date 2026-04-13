@@ -17,7 +17,6 @@ const fetchDetails = async ({ setLoading, setErrorAlert, token, user }) => {
     const response = await getPointOfSaleDetails(user.merchant_id, decodeToken?.point_of_sale_id);
     return response;
   } catch {
-    // console.error("Error fetching details:", error);
     setErrorAlert(true);
   } finally {
     setLoading(false);

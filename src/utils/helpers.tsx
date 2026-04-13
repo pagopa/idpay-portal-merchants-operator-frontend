@@ -1,5 +1,6 @@
 import { Chip, Tooltip, Typography } from '@mui/material';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
+import { GridRenderCellParams } from '@mui/x-data-grid';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getStatusChip(t: any, status: string) {
@@ -157,7 +158,18 @@ export const handleCodeChange = (event, formik, length, codeName) => {
   }
 };
 
-export const renderCellWithTooltip = (value: any) => {
+export const renderCellWithTooltip = (value: unknown) => {
+  const renderableValue =
+    value === null || value === undefined
+      ? ''
+      : typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+        ? String(value)
+        : value instanceof Date
+          ? value.toISOString()
+          : typeof value === 'object'
+            ? JSON.stringify(value)
+            : String(value);
+
   return (
     <div
       style={{
@@ -167,7 +179,7 @@ export const renderCellWithTooltip = (value: any) => {
         width: '100%',
       }}
     >
-      <Tooltip title={value}>
+      <Tooltip title={renderableValue}>
         <Typography
           sx={{
             overflow: 'hidden',
@@ -175,7 +187,7 @@ export const renderCellWithTooltip = (value: any) => {
             whiteSpace: 'nowrap',
           }}
         >
-          {value}
+          {renderableValue}
         </Typography>
       </Tooltip>
     </div>
@@ -220,9 +232,29 @@ export const checkTooltipValue = (params, key?: string) => {
   return renderMissingDataWithTooltip();
 };
 
-export const checkEuroTooltip = (params) => {
+export const checkEuroTooltip = (params: GridRenderCellParams) => {
   if (params?.value || params?.value === 0) {
-    return renderCellWithTooltip(formatEuro(params.value));
+    return renderCellWithTooltip(formatEuro(params.value as number));
   }
   return renderMissingDataWithTooltip();
+};
+
+export const checkDateTooltip = (
+  params: GridRenderCellParams,
+  locale: string = 'it-IT',
+  options: Intl.DateTimeFormatOptions = {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+) => {
+  if (!params?.value) {
+    return renderMissingDataWithTooltip();
+  }
+  const formattedDate = new Date(params.value as string | number | Date)
+    .toLocaleDateString(locale, options)
+    .replace(',', '');
+  return renderCellWithTooltip(formattedDate);
 };

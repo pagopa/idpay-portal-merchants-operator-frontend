@@ -194,7 +194,7 @@ describe('Header Component - User Actions', () => {
     expect(keycloak.logout).toHaveBeenCalledTimes(1);
   });
 
-  it('should call console.log when onSelectedParty is triggered in HeaderProduct', async () => {
+  it('should call logger.log when onSelectedParty is triggered in HeaderProduct', async () => {
     render(<Header userProps={mockUserProps} />);
 
     await waitFor(() => {
@@ -204,11 +204,11 @@ describe('Header Component - User Actions', () => {
     // const selectPartyButton = screen.getByTestId("select-party-button");
     // fireEvent.click(selectPartyButton);
 
-    // expect(consoleLogSpy).toHaveBeenCalledWith(
+    // expect(loggerLogSpy).toHaveBeenCalledWith(
     //     "Selected Item:",
     //     "Test Franchise"
     // );
-    // expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+    // expect(loggerLogSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should open manual link when onDocumentationClick is triggered', async () => {

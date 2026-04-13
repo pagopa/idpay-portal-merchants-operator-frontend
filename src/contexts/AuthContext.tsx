@@ -51,12 +51,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             );
             setUser(response.data);
           } catch {
-            // console.error('Errore inizializzazione Keycloak:', error);
             keycloak.logout();
           }
         }
-        // } catch (error) {
-        //   console.error('Errore inizializzazione Keycloak:', error);
       } finally {
         setLoading(false);
       }
@@ -64,7 +61,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initKeycloak();
 
-    // Automatic refresh token
     const refreshToken = () => {
       if (keycloak.authenticated) {
         keycloak
@@ -72,11 +68,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           .then((refreshed) => {
             if (refreshed) {
               setToken(keycloak.token || null);
-              // console.log('Token aggiornato');
             }
           })
           .catch(() => {
-            // console.log('Impossibile aggiornare il token');
             logout();
           });
       }

@@ -77,7 +77,6 @@ const AcceptDiscount = () => {
       const { content } = await getProductsList({ fullProductName, size: 50 });
       setProductsList([...content]);
     } catch {
-      // console.log(error);
       setProductsList([]);
     }
   };

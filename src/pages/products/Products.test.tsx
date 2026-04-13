@@ -1,9 +1,132 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { FormikProps } from 'formik';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Products from './Products';
 import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
+import '@testing-library/jest-dom/vitest';
+
+type BaseProps = { children?: React.ReactNode } & Record<string, unknown>;
+
+vi.mock('@mui/material', async () => {
+  const React = await import('react');
+
+  const create =
+    (testId: string, as: keyof JSX.IntrinsicElements = 'div') =>
+    ({ children, ...props }: BaseProps) =>
+      React.createElement(as, { 'data-testid': testId, ...(props as object) }, children);
+
+  return {
+    Box: create('Box'),
+    CircularProgress: (props: Record<string, unknown>) => (
+      <div role="progressbar" data-testid="CircularProgress" {...(props as object)} />
+    ),
+    Typography: create('Typography'),
+    Paper: create('Paper'),
+    Grid: create('Grid'),
+    TextField: ({
+      label,
+      name,
+      value,
+      onChange,
+      onBlur,
+      error,
+      helperText,
+    }: {
+      label?: string;
+      name?: string;
+      value?: unknown;
+      onChange?: React.ChangeEventHandler<HTMLInputElement>;
+      onBlur?: React.FocusEventHandler<HTMLInputElement>;
+      error?: boolean;
+      helperText?: string;
+    }) => (
+      <div>
+        {label ? <label>{label}</label> : null}
+        <input
+          aria-label={label}
+          name={name}
+          value={typeof value === 'string' ? value : ''}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+        {error ? <span>{helperText}</span> : null}
+      </div>
+    ),
+    Select: ({
+      children,
+      labelId,
+      id,
+      ...props
+    }: BaseProps & { labelId?: string; id?: string }) => (
+      <select
+        id={id}
+        aria-labelledby={labelId}
+        {...(props as object)}
+      >
+        {children}
+      </select>
+    ),
+    MenuItem: ({ children, value }: { children?: React.ReactNode; value: string }) => (
+      <option value={value}>{children}</option>
+    ),
+    FormControl: create('FormControl'),
+    InputLabel: ({ children, id, ...props }: BaseProps & { id?: string }) => (
+      <label htmlFor={typeof id === 'string' ? id : undefined} {...(props as object)}>
+        {children}
+      </label>
+    ),
+    Drawer: ({ open, children }: { open: boolean; children?: React.ReactNode }) =>
+      open ? <div role="presentation">{children}</div> : null,
+    Divider: create('Divider'),
+    Link: ({
+      children,
+      href,
+      target,
+      ...props
+    }: {
+      children?: React.ReactNode;
+      href?: string;
+      target?: string;
+    } & Record<string, unknown>) => (
+      <a href={href} target={target} {...(props as object)}>
+        {children}
+      </a>
+    ),
+    Button: ({
+      children,
+      onClick,
+      ...props
+    }: {
+      children?: React.ReactNode;
+      onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    } & Record<string, unknown>) => (
+      <button type="button" onClick={onClick} {...(props as object)}>
+        {children}
+      </button>
+    ),
+  };
+});
+
+vi.mock('@mui/material/Tooltip', async () => {
+  const React = await import('react');
+  return {
+    default: ({ children }: { children?: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+  };
+});
+
+vi.mock('@mui/icons-material/FileDownload', () => ({ default: () => null }));
+vi.mock('@mui/icons-material/Close', () => ({ default: (props: Record<string, unknown>) => <div data-testid="CloseIcon" {...(props as object)} /> }));
+
+vi.mock('@mui/x-data-grid', () => ({}));
+
+vi.mock('@pagopa/mui-italia', () => ({
+  theme: {
+    typography: { fontWeightMedium: 500, fontWeightBold: 700, fontWeightRegular: 400 },
+    palette: { text: { secondary: '#666' } },
+  },
+}));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -41,8 +164,26 @@ vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
   ),
 }));
 
+type ProductsFilters = {
+  category: string;
+  brand: string;
+  model: string;
+  eprelCode: string;
+  gtinCode: string;
+};
+
 vi.mock('../../components/FiltersForm/FiltersForm', () => ({
-  default: ({ onFiltersApplied, onFiltersReset, children, formik }: any) => (
+  default: ({
+    onFiltersApplied,
+    onFiltersReset,
+    children,
+    formik,
+  }: {
+    onFiltersApplied: (values: ProductsFilters) => void;
+    onFiltersReset: () => void;
+    children: React.ReactNode;
+    formik: FormikProps<ProductsFilters>;
+  }) => (
     <form data-testid="filters-form">
       {children}
       <input
@@ -65,14 +206,33 @@ vi.mock('../../components/FiltersForm/FiltersForm', () => ({
   ),
 }));
 
+type ProductRow = Record<string, unknown> & { id: string };
+
+type ColumnDef = {
+  field: string;
+  renderCell?: (params: { value: unknown; row: ProductRow }) => React.ReactNode;
+};
+
 vi.mock('../../components/DataTable/DataTable', () => ({
-  default: ({ rows, columns, handleRowAction, onPaginationPageChange, onSortModelChange }: any) => {
-    const renderCellForField = (row: any, field: string) => {
-      const column = columns.find((c: any) => c.field === field);
-      if (column && column.renderCell) {
+  default: ({
+    rows,
+    columns,
+    handleRowAction,
+    onPaginationPageChange,
+    onSortModelChange,
+  }: {
+    rows: Array<ProductRow>;
+    columns: Array<ColumnDef>;
+    handleRowAction: (row: ProductRow) => void;
+    onPaginationPageChange: (model: { page: number; pageSize: number }) => void;
+    onSortModelChange: (model: Array<{ field: string; sort: 'asc' | 'desc' }>) => void;
+  }) => {
+    const renderCellForField = (row: ProductRow, field: string) => {
+      const column = columns.find((c) => c.field === field);
+      if (column?.renderCell) {
         return column.renderCell({ value: row[field], row });
       }
-      return row[field];
+      return String(row[field] ?? '');
     };
 
     return (
@@ -92,7 +252,7 @@ vi.mock('../../components/DataTable/DataTable', () => ({
         />
         <button data-testid="trigger-sort-empty" onClick={() => onSortModelChange([])} />
 
-        {rows.map((row: any) => (
+        {rows.map((row: ProductRow) => (
           <div key={row.id} data-testid={`row-${row.id}`} onClick={() => handleRowAction(row)}>
             <div data-testid={`cell-category-${row.id}`}>{renderCellForField(row, 'category')}</div>
             <div data-testid={`cell-brand-${row.id}`}>{renderCellForField(row, 'brand')}</div>
@@ -123,13 +283,19 @@ vi.mock('../../utils/helpers', () => ({
     formik.handleChange(event);
     return '';
   }),
+  renderCellWithTooltip: vi.fn((value: unknown) => (
+    <span data-testid="renderCellWithTooltip">{String(value)}</span>
+  )),
+  renderMissingDataWithTooltip: vi.fn(() => (
+    <span data-testid="renderMissingDataWithTooltip">{MISSING_DATA_PLACEHOLDER}</span>
+  )),
 }));
 
 vi.stubEnv('VITE_PAGINATION_SIZE', '10');
 
 const mockGetProductsList = vi.fn();
 vi.mock('../../services/merchantService', () => ({
-  getProductsList: (params: any) => mockGetProductsList(params),
+  getProductsList: (params: unknown) => mockGetProductsList(params),
 }));
 
 const mockProducts = [
@@ -170,14 +336,7 @@ const mockApiResponse = {
   totalElements: 2,
 };
 
-const renderComponent = () => {
-  const theme = createTheme();
-  return render(
-    <ThemeProvider theme={theme}>
-      <Products />
-    </ThemeProvider>
-  );
-};
+const renderComponent = () => render(<Products />);
 
 describe('Products Component', () => {
   beforeEach(() => {
@@ -520,13 +679,9 @@ describe('Products Component', () => {
 
   it('should handle all category options in select', async () => {
     mockGetProductsList.mockResolvedValue(mockApiResponse);
-    const user = userEvent.setup();
     renderComponent();
 
     await screen.findByTestId('filters-form');
-
-    const categorySelect = screen.getByLabelText('Categoria');
-    await user.click(categorySelect);
 
     expect(screen.getByText('Lavatrici')).toBeInTheDocument();
     expect(screen.getByText('Asciugatrici')).toBeInTheDocument();
@@ -548,9 +703,172 @@ describe('Products Component', () => {
     fireEvent.submit(form);
   });
 
-  it('should navigate to csv link', () => {
+  it('should open csv link and focus new tab when clicking export button', async () => {
+    vi.stubEnv('VITE_CSV_LINK', 'https://example.com/export.csv');
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+
+    const focus = vi.fn();
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue({ focus } as unknown as Window);
+
     renderComponent();
-    const csvButton = screen.getByTestId('csv-button');
-    userEvent.click(csvButton);
+    await screen.findByTestId('data-table');
+
+    const muiExportButton = screen.getAllByRole('button', { name: 'Esporta csv' })[1];
+    await userEvent.click(muiExportButton);
+
+    expect(openSpy).toHaveBeenCalledWith('https://example.com/export.csv', '_blank');
+    expect(focus).toHaveBeenCalled();
+
+    openSpy.mockRestore();
+  });
+
+  it('should call fetchProducts with empty sort when paginating and no sort applied', async () => {
+    mockGetProductsList.mockResolvedValue(mockApiResponse);
+    renderComponent();
+    await screen.findByTestId('data-table');
+
+    fireEvent.click(screen.getByTestId('trigger-pagination'));
+
+    await waitFor(() => {
+      expect(mockGetProductsList).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          sort: '',
+          page: 1,
+          size: 10,
+        })
+      );
+    });
+  });
+
+  it('should not render FiltersForm when list is empty and no filters were applied', async () => {
+    mockGetProductsList.mockResolvedValue({
+      ...mockApiResponse,
+      content: [],
+      totalElements: 0,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('filters-form')).not.toBeInTheDocument();
+  });
+
+  it('should render FiltersForm when list is empty but filters were applied once', async () => {
+    mockGetProductsList.mockResolvedValue({
+      ...mockApiResponse,
+      content: [],
+      totalElements: 0,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('filters-form')).not.toBeInTheDocument();
+
+    const exportButtons = screen.getAllByRole('button', { name: 'Esporta csv' });
+    await userEvent.click(exportButtons[0]);
+
+    expect(screen.queryByTestId('filters-form')).not.toBeInTheDocument();
+  });
+
+  it('should not render link and should render placeholder for eprelCode when value is empty string', async () => {
+    mockGetProductsList.mockResolvedValue({
+      content: [
+        {
+          id: '99999',
+          category: 'OVENS',
+          brand: 'Brand Z',
+          model: 'Model Z',
+          gtinCode: '99999',
+          eprelCode: '',
+          linkEprel: 'https://example.com/eprel-z',
+          productName: 'Prodotto EPREL Vuoto',
+        },
+      ],
+      pageNo: 0,
+      pageSize: 10,
+      totalElements: 1,
+    });
+
+    renderComponent();
+
+    await screen.findByTestId('data-table');
+
+    const eprelCell = screen.getByTestId('cell-eprel-99999');
+    expect(eprelCell.querySelector('a')).not.toBeInTheDocument();
+    expect(eprelCell).toHaveTextContent(MISSING_DATA_PLACEHOLDER);
+  });
+
+  it('should render capacity placeholder when capacity is undefined', async () => {
+    mockGetProductsList.mockResolvedValue({
+      content: [
+        {
+          id: '77777',
+          category: 'OVENS',
+          brand: 'Brand C',
+          model: 'Model C',
+          gtinCode: '77777',
+          eprelCode: 'EPREL7',
+          linkEprel: 'https://example.com/eprel7',
+          productName: 'Prodotto Senza Capacità',
+          productCode: 'PC777',
+          capacity: undefined,
+          energyClass: 'A+',
+          countryOfProduction: 'Italy',
+        },
+      ],
+      pageNo: 0,
+      pageSize: 10,
+      totalElements: 1,
+    });
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    await screen.findByTestId('data-table');
+    await user.click(screen.getByTestId('row-77777'));
+
+    await screen.findByText('Prodotto Senza Capacità');
+    expect(screen.getByText('Capacità')).toBeInTheDocument();
+  });
+
+  it('should render capacity value when capacity is empty string', async () => {
+    mockGetProductsList.mockResolvedValue({
+      content: [
+        {
+          id: '88888',
+          category: 'OVENS',
+          brand: 'Brand D',
+          model: 'Model D',
+          gtinCode: '88888',
+          eprelCode: 'EPREL8',
+          linkEprel: 'https://example.com/eprel8',
+          productName: 'Prodotto Capacità Vuota',
+          productCode: 'PC888',
+          capacity: '',
+          energyClass: 'A',
+          countryOfProduction: 'Italy',
+        },
+      ],
+      pageNo: 0,
+      pageSize: 10,
+      totalElements: 1,
+    });
+
+    const user = userEvent.setup();
+    renderComponent();
+
+    await screen.findByTestId('data-table');
+    await user.click(screen.getByTestId('row-88888'));
+
+    await screen.findByText('Prodotto Capacità Vuota');
+    const drawer = screen.getByRole('presentation');
+    expect(drawer).toHaveTextContent('Prodotto Capacità Vuota');
   });
 });

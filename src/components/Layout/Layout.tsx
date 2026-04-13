@@ -81,5 +81,4 @@ const Layout = ({ children }: Props) => {
     </Box>
   );
 };
-// export default withParties(Layout);
 export default Layout;

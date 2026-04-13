@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 import {
   getStatusChip,
   formatEuro,
@@ -70,7 +71,7 @@ describe('formatEuro', () => {
   });
 });
 
-describe('handleCodeChange', () => {
+describe("handleCodeChange", () => {
   let mockFormik: any;
 
   beforeEach(() => {
@@ -191,6 +192,16 @@ describe('renderCellWithTooltip', () => {
   it('should render cell with tooltip for empty string', () => {
     const { container } = render(renderCellWithTooltip(''));
     expect(container).toBeTruthy();
+  });
+
+  it('should stringify object values instead of crashing', () => {
+    const { container } = render(renderCellWithTooltip({}));
+    expect(container.textContent).toContain('{}');
+  });
+
+  it('should stringify object values (with fields) instead of crashing', () => {
+    const { container } = render(renderCellWithTooltip({ a: 1 }));
+    expect(container.textContent).toContain('{"a":1}');
   });
 });
 

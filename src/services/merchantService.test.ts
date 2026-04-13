@@ -122,9 +122,7 @@ describe('Merchant Service Functions', () => {
 
     it('should handle different file types', async () => {
       vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue({} as any);
-      const pdfFile = new File([new Blob()], 'invoice.pdf', {
-        type: 'application/pdf',
-      });
+      const pdfFile = new File([new Blob()], 'invoice.pdf', { type: 'application/pdf' });
       const result = await updateInvoiceTransactionApi('trxId123', pdfFile, 'DOC999');
       expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith(
         'trxId123',
@@ -137,12 +135,7 @@ describe('Merchant Service Functions', () => {
 
   describe('getProductsList', () => {
     it('should call MerchantApi.getProducts with correct parameters', async () => {
-      const mockParams = {
-        page: 1,
-        size: 10,
-        status: 'ACTIVE' as const,
-        eprelCode: '12345',
-      };
+      const mockParams = { page: 1, size: 10, status: 'ACTIVE' as const, eprelCode: '12345' };
       const mockResponse = { products: [{ id: '1' }], total: 1 };
       vi.mocked(MerchantApi.getProducts).mockResolvedValue(mockResponse);
       const result = await getProductsList(mockParams);
