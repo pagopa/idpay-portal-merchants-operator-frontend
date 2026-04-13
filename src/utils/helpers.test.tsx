@@ -71,7 +71,7 @@ describe('formatEuro', () => {
   });
 });
 
-describe("handleCodeChange", () => {
+describe('handleCodeChange', () => {
   let mockFormik: any;
 
   beforeEach(() => {

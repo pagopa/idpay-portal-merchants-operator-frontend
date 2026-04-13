@@ -9,7 +9,6 @@
     "build": "tsc -b && vite build",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "prettify": "prettier --write \"./**/*.{ts,tsx}\"",
     "lint": "eslint .",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\"",
     "preview": "vite preview",

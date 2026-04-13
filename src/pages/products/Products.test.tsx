@@ -59,11 +59,7 @@ vi.mock('@mui/material', async () => {
       id,
       ...props
     }: BaseProps & { labelId?: string; id?: string }) => (
-      <select
-        id={id}
-        aria-labelledby={labelId}
-        {...(props as object)}
-      >
+      <select id={id} aria-labelledby={labelId} {...(props as object)}>
         {children}
       </select>
     ),
@@ -117,7 +113,11 @@ vi.mock('@mui/material/Tooltip', async () => {
 });
 
 vi.mock('@mui/icons-material/FileDownload', () => ({ default: () => null }));
-vi.mock('@mui/icons-material/Close', () => ({ default: (props: Record<string, unknown>) => <div data-testid="CloseIcon" {...(props as object)} /> }));
+vi.mock('@mui/icons-material/Close', () => ({
+  default: (props: Record<string, unknown>) => (
+    <div data-testid="CloseIcon" {...(props as object)} />
+  ),
+}));
 
 vi.mock('@mui/x-data-grid', () => ({}));
 

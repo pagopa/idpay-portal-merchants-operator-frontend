@@ -213,8 +213,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
               docNumberError && docNumber === ''
                 ? REQUIRED_FIELD_ERROR
                 : docNumberError && docNumber?.trim().length < 2
-                ? "Lunghezza minima 2 caratteri"
-                : ""
+                ? 'Lunghezza minima 2 caratteri'
+                : ''
             }
           />
         </Box>
