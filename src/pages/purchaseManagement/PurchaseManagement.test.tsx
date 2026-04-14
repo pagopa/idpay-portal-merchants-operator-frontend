@@ -62,8 +62,14 @@ vi.mock('@mui/material', () => ({
       {children}
     </button>
   ),
-  Drawer: ({ open, children, onClose }: { open: boolean; children: React.ReactNode; onClose?: () => void }) =>
-    open ? <div data-testid="drawer" onClick={onClose}>{children}</div> : null,
+  Drawer: ({
+    open,
+    children,
+  }: {
+    open: boolean;
+    children: React.ReactNode;
+    onClose?: () => void;
+  }) => (open ? <div data-testid="drawer">{children}</div> : null),
   Typography: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Grid: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   CircularProgress: () => <div data-testid="item-loader" />,
@@ -313,15 +319,27 @@ describe('PurchaseManagement coverage completion', () => {
     });
   });
 
-  it.skip('shows CircularProgress while PDF is loading', async () => {
-    let resolve: (v: unknown) => void;
-    mockPreview.mockReturnValue(new Promise((r) => { resolve = r; }));
+  it('shows CircularProgress while PDF is loading', async () => {
+    let resolve!: (v: unknown) => void;
+    const pending = new Promise((r) => {
+      resolve = r;
+    });
+    mockPreview.mockReturnValue(pending);
+
     renderPage();
     await openAuthorizedDrawer();
-    fireEvent.click(screen.getByTestId('btn-test'));
-    await waitFor(() => expect(screen.getByTestId('item-loader')).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('btn-test'));
+    });
+
+    expect(await screen.findByTestId('item-loader')).toBeInTheDocument();
+
     act(() => resolve({ data: 'b64' }));
-    await waitFor(() => expect(screen.queryByTestId('item-loader')).not.toBeInTheDocument());
+
+    await waitFor(() =>
+      expect(screen.queryByTestId('item-loader')).not.toBeInTheDocument()
+    );
   });
 
   it('covers refund modal opened from CAPTURED drawer', async () => {
