@@ -40,7 +40,7 @@ describe('DetailsCard', () => {
   it("should render '-' for falsy values except 0", () => {
     DetailsCardSetup({ a: undefined, b: null, c: '', d: 0 });
 
-    expect(screen.getAllByText('-')).toHaveLength(4);
+    expect(screen.getAllByText('-')).toHaveLength(3);
     expect(screen.getByText('0')).toBeInTheDocument();
   });
 
