@@ -22,6 +22,10 @@ const viteConfig = defineConfig({
         find: /^@mui\/material\/esm\/(.*)$/,
         replacement: '@mui/material/$1',
       },
+      {
+        find: /^@mui\/utils\/formatMuiErrorMessage$/,
+        replacement: '@mui/utils/formatMuiErrorMessage',
+      },
     ],
   },
 });
@@ -44,6 +48,10 @@ const vitestConfig = defineVitestConfig({
       {
         find: /^@mui\/icons-material\/esm\/(.*)$/,
         replacement: '@mui/icons-material/$1',
+      },
+      {
+        find: /^@mui\/utils\/formatMuiErrorMessage$/,
+        replacement: '@mui/utils/formatMuiErrorMessage',
       },
     ],
     server: {

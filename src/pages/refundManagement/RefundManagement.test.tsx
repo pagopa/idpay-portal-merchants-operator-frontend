@@ -75,6 +75,19 @@ vi.mock('../../components/DetailsDrawer/DetailsDrawer', () => ({
   ),
 }));
 
+vi.mock('../../utils/helpers', () => {
+  const renderCellWithTooltip = vi.fn((v: string) => v);
+  const renderMissingDataWithTooltip = vi.fn(() => 'MISSING');
+  return {
+    getStatusChip: vi.fn((_: unknown, status: string) => status),
+    formatEuro: vi.fn((v: number) => `€${v}`),
+    renderCellWithTooltip,
+    renderMissingDataWithTooltip,
+    checkEuroTooltip: vi.fn(),
+    checkTooltipValue: vi.fn(),
+  };
+});
+
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
   default: ({
     onRowAction,
@@ -97,7 +110,14 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
             id: 'trx-invoiced',
             status: 'INVOICED',
             rewardBatchTrxStatus: 'PENDING',
-            invoiceFile: { filename: 'fattura.pdf' },
+            trxChargeDate: new Date().toISOString(),
+            additionalProperties: { productName: 'prod' },
+            fiscalCode: 'AAA',
+            trxCode: 'trxCode',
+            effectiveAmountCents: 100,
+            rewardAmountCents: 10,
+            authorizedAmountCents: 90,
+            invoiceFile: { filename: 'fattura.pdf', docNumber: '123' },
           })
         }
       />
@@ -109,7 +129,14 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
             id: 'trx-refunded',
             status: 'REFUNDED',
             rewardBatchTrxStatus: 'APPROVED',
-            invoiceFile: { filename: 'nota.pdf' },
+            trxChargeDate: new Date().toISOString(),
+            additionalProperties: { productName: 'prod' },
+            fiscalCode: 'AAA',
+            trxCode: 'trxCode',
+            effectiveAmountCents: 100,
+            rewardAmountCents: 10,
+            authorizedAmountCents: 90,
+            invoiceFile: { filename: 'nota.pdf', docNumber: 'CN-1' },
           })
         }
       />
@@ -121,6 +148,14 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
             id: 'trx-cancelled',
             status: 'CANCELLED',
             rewardBatchTrxStatus: 'PENDING',
+            trxChargeDate: new Date().toISOString(),
+            additionalProperties: { productName: 'prod' },
+            fiscalCode: 'AAA',
+            trxCode: 'trxCode',
+            effectiveAmountCents: 100,
+            rewardAmountCents: 10,
+            authorizedAmountCents: 90,
+            invoiceFile: { filename: 'canceled.pdf', docNumber: '0' },
           })
         }
       />
@@ -258,6 +293,12 @@ describe('RefundManagement', () => {
   it('handles formatDateTime fallback when no date is provided', () => {
     renderComponent();
     fireEvent.click(screen.getByTestId('open-cancelled'));
+    expect(screen.getByTestId('drawer')).toBeInTheDocument();
+  });
+
+  it('covers formatDateTime with a valid date', () => {
+    renderComponent();
+    fireEvent.click(screen.getByTestId('open-invoiced'));
     expect(screen.getByTestId('drawer')).toBeInTheDocument();
   });
 });
