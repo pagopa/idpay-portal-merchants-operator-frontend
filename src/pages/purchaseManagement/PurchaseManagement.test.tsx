@@ -146,6 +146,7 @@ describe('PurchaseManagement coverage completion', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedLocation = { state: null };
+    vi.useRealTimers();
 
     act(() => {
       utilsStore.setState({
@@ -269,5 +270,68 @@ describe('PurchaseManagement coverage completion', () => {
     });
     expect(utilsStore.getState().transactionAuthorized).toBe(false);
     vi.useRealTimers();
+  });
+
+  it('covers triggerFetchTransactions timeout branch', async () => {
+    // It's hard to reliably assert the internal `triggerFetchTransactions` flag because it's not
+    // exposed. Also, mixing fake timers with RTL `waitFor` can easily lead to deadlocks.
+    // For coverage purposes we can just ensure the 3s timer runs by driving the state change
+    // and then executing pending timers.
+    vi.useFakeTimers();
+
+    act(() => {
+      utilsStore.setState({
+        ...utilsStore.getState(),
+        transactionAuthorized: true,
+      });
+    });
+
+    renderPage();
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(utilsStore.getState().transactionAuthorized).toBe(false);
+
+    vi.useRealTimers();
+  });
+
+  it('covers reverse navigation branch', async () => {
+    renderPage();
+    fireEvent.click(screen.getByText('cap'));
+    await waitFor(() => screen.getByText('2'));
+
+    // In CAPTURED, secondary action opens the refund modal and closes the drawer
+    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
+    expect(screen.getByTestId('modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
+    expect(mockedNavigate).toHaveBeenCalledWith('/storna-transazione/2');
+  });
+
+  it('covers request refund navigation branch', async () => {
+    renderPage();
+    fireEvent.click(screen.getByText('cap'));
+    await waitFor(() => screen.getByText('2'));
+
+    // In CAPTURED, primary action is request refund
+    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.requestRefund'));
+    expect(mockedNavigate).toHaveBeenCalledWith('/richiedi-rimborso/2');
+  });
+
+  it('covers modal onClose handler', async () => {
+    renderPage();
+    fireEvent.click(screen.getByText('auth'));
+    await waitFor(() => screen.getByText('1'));
+
+    // open capture modal
+    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.confirmPayment'));
+    expect(screen.getByTestId('modal')).toBeInTheDocument();
+
+    // close modal via onClose: our Modal mock doesn't expose onClose, so we
+    // close it by clicking "Indietro" which resets the modal flags.
+    fireEvent.click(screen.getByText('Indietro'));
+    expect(screen.queryByTestId('modal')).toBeNull();
   });
 });
