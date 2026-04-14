@@ -42,12 +42,12 @@ vi.mock('../../services/merchantService', () => ({
 
 vi.mock('../../components/DetailsDrawer/DetailsDrawer', () => ({
   DetailsDrawer: ({
-    isOpen,
-    invoiceStatus,
-    primaryButton,
-    secondaryButton,
-    onFileDownloadCallback,
-  }: {
+                    isOpen,
+                    invoiceStatus,
+                    primaryButton,
+                    secondaryButton,
+                    onFileDownloadCallback,
+                  }: {
     isOpen: boolean;
     invoiceStatus?: string;
     primaryButton?: { disabled?: boolean; onClick: () => void };
@@ -75,94 +75,120 @@ vi.mock('../../components/DetailsDrawer/DetailsDrawer', () => ({
   ),
 }));
 
-vi.mock('../../utils/helpers', () => {
-  const renderCellWithTooltip = vi.fn((v: string) => v);
-  const renderMissingDataWithTooltip = vi.fn(() => 'MISSING');
-  return {
-    getStatusChip: vi.fn((_: unknown, status: string) => status),
-    formatEuro: vi.fn((v: number) => `€${v}`),
-    renderCellWithTooltip,
-    renderMissingDataWithTooltip,
-    checkEuroTooltip: vi.fn(),
-    checkTooltipValue: vi.fn(),
-  };
-});
+const renderMissingDataWithTooltipMock = vi.fn(() => 'MISSING');
+const renderCellWithTooltipMock = vi.fn((v: string) => v);
+
+vi.mock('../../utils/helpers', () => ({
+  getStatusChip: vi.fn((_: unknown, status: string) => status),
+  formatEuro: vi.fn((v: number) => `€${v}`),
+  renderCellWithTooltip: (v: string) => renderCellWithTooltipMock(v),
+  renderMissingDataWithTooltip: () => renderMissingDataWithTooltipMock(),
+  checkEuroTooltip: vi.fn(),
+  checkTooltipValue: vi.fn(),
+}));
+
+// Capture columns so we can invoke renderCell directly
+let capturedColumns: Array<{ field: string; renderCell?: (params: { value: unknown }) => unknown }> = [];
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
   default: ({
-    onRowAction,
-    externalState,
-    DrawerComponent,
-  }: {
+              onRowAction,
+              externalState,
+              DrawerComponent,
+              columns,
+            }: {
     onRowAction: (row: unknown) => void;
     externalState: Record<string, boolean>;
     DrawerComponent: React.ReactNode;
-  }) => (
-    <div>
-      <div data-testid="state-refund">{String(externalState.transactionRefundSuccess)}</div>
-      <div data-testid="state-reverse">{String(externalState.transactionReverseSuccess)}</div>
-      <div data-testid="state-error">{String(externalState.errorDownloadAlert)}</div>
+    columns: Array<{ field: string; renderCell?: (params: { value: unknown }) => unknown }>;
+  }) => {
+    capturedColumns = columns;
+    return (
+      <div>
+        <div data-testid="state-refund">{String(externalState.transactionRefundSuccess)}</div>
+        <div data-testid="state-reverse">{String(externalState.transactionReverseSuccess)}</div>
+        <div data-testid="state-error">{String(externalState.errorDownloadAlert)}</div>
 
-      <button
-        data-testid="open-invoiced"
-        onClick={() =>
-          onRowAction({
-            id: 'trx-invoiced',
-            status: 'INVOICED',
-            rewardBatchTrxStatus: 'PENDING',
-            trxChargeDate: new Date().toISOString(),
-            additionalProperties: { productName: 'prod' },
-            fiscalCode: 'AAA',
-            trxCode: 'trxCode',
-            effectiveAmountCents: 100,
-            rewardAmountCents: 10,
-            authorizedAmountCents: 90,
-            invoiceFile: { filename: 'fattura.pdf', docNumber: '123' },
-          })
-        }
-      />
+        <button
+          data-testid="open-invoiced"
+          onClick={() =>
+            onRowAction({
+              id: 'trx-invoiced',
+              status: 'INVOICED',
+              rewardBatchTrxStatus: 'PENDING',
+              trxChargeDate: new Date().toISOString(),
+              additionalProperties: { productName: 'prod' },
+              fiscalCode: 'AAA',
+              trxCode: 'trxCode',
+              effectiveAmountCents: 100,
+              rewardAmountCents: 10,
+              authorizedAmountCents: 90,
+              invoiceFile: { filename: 'fattura.pdf', docNumber: '123' },
+            })
+          }
+        />
 
-      <button
-        data-testid="open-refunded"
-        onClick={() =>
-          onRowAction({
-            id: 'trx-refunded',
-            status: 'REFUNDED',
-            rewardBatchTrxStatus: 'APPROVED',
-            trxChargeDate: new Date().toISOString(),
-            additionalProperties: { productName: 'prod' },
-            fiscalCode: 'AAA',
-            trxCode: 'trxCode',
-            effectiveAmountCents: 100,
-            rewardAmountCents: 10,
-            authorizedAmountCents: 90,
-            invoiceFile: { filename: 'nota.pdf', docNumber: 'CN-1' },
-          })
-        }
-      />
+        <button
+          data-testid="open-rewarded"
+          onClick={() =>
+            onRowAction({
+              id: 'trx-rewarded',
+              status: 'REWARDED',
+              rewardBatchTrxStatus: 'PENDING',
+              trxChargeDate: new Date().toISOString(),
+              additionalProperties: { productName: 'prod' },
+              fiscalCode: 'BBB',
+              trxCode: 'trxCode2',
+              effectiveAmountCents: 200,
+              rewardAmountCents: 20,
+              authorizedAmountCents: 180,
+              invoiceFile: { filename: 'fattura2.pdf', docNumber: 'INV-2' },
+            })
+          }
+        />
 
-      <button
-        data-testid="open-cancelled"
-        onClick={() =>
-          onRowAction({
-            id: 'trx-cancelled',
-            status: 'CANCELLED',
-            rewardBatchTrxStatus: 'PENDING',
-            trxChargeDate: new Date().toISOString(),
-            additionalProperties: { productName: 'prod' },
-            fiscalCode: 'AAA',
-            trxCode: 'trxCode',
-            effectiveAmountCents: 100,
-            rewardAmountCents: 10,
-            authorizedAmountCents: 90,
-            invoiceFile: { filename: 'canceled.pdf', docNumber: '0' },
-          })
-        }
-      />
+        <button
+          data-testid="open-refunded"
+          onClick={() =>
+            onRowAction({
+              id: 'trx-refunded',
+              status: 'REFUNDED',
+              rewardBatchTrxStatus: 'APPROVED',
+              trxChargeDate: new Date().toISOString(),
+              additionalProperties: { productName: 'prod' },
+              fiscalCode: 'AAA',
+              trxCode: 'trxCode',
+              effectiveAmountCents: 100,
+              rewardAmountCents: 10,
+              authorizedAmountCents: 90,
+              invoiceFile: { filename: 'nota.pdf', docNumber: 'CN-1' },
+            })
+          }
+        />
 
-      {DrawerComponent}
-    </div>
-  ),
+        <button
+          data-testid="open-cancelled"
+          onClick={() =>
+            onRowAction({
+              id: 'trx-cancelled',
+              status: 'CANCELLED',
+              rewardBatchTrxStatus: 'PENDING',
+              trxChargeDate: new Date().toISOString(),
+              additionalProperties: { productName: 'prod' },
+              fiscalCode: 'AAA',
+              trxCode: 'trxCode',
+              effectiveAmountCents: 100,
+              rewardAmountCents: 10,
+              authorizedAmountCents: 90,
+              invoiceFile: { filename: 'canceled.pdf', docNumber: '0' },
+            })
+          }
+        />
+
+        {DrawerComponent}
+      </div>
+    );
+  },
 }));
 
 const renderComponent = () =>
@@ -178,6 +204,7 @@ describe('RefundManagement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
+    capturedColumns = [];
   });
 
   it('sets refund success alert from location.state', () => {
@@ -198,6 +225,13 @@ describe('RefundManagement', () => {
     expect(screen.getByTestId('drawer-open')).toHaveTextContent('true');
     expect(screen.getByTestId('invoice-status')).toHaveTextContent('INVOICED');
     expect(screen.getByTestId('secondary-button')).toBeInTheDocument();
+  });
+
+  it('shows secondary button for REWARDED status', () => {
+    renderComponent();
+    fireEvent.click(screen.getByTestId('open-rewarded'));
+    expect(screen.getByTestId('secondary-button')).toBeInTheDocument();
+    expect(screen.getByTestId('invoice-status')).toHaveTextContent('REWARDED');
   });
 
   it('disables modify button when rewardBatchTrxStatus is APPROVED', () => {
@@ -255,12 +289,13 @@ describe('RefundManagement', () => {
     );
   });
 
-  it('navigates to modify document when primary button is clicked', () => {
+  it('navigates to modify document with btoa-encoded doc number for INVOICED', () => {
     renderComponent();
     fireEvent.click(screen.getByTestId('open-invoiced'));
     fireEvent.click(screen.getByTestId('primary-button'));
+
     expect(navigateMock).toHaveBeenCalledWith(
-      expect.stringContaining('/modifica-documento/trx-invoiced/')
+      `/modifica-documento/trx-invoiced/${btoa('123')}`
     );
   });
 
@@ -290,15 +325,27 @@ describe('RefundManagement', () => {
     expect(screen.getByTestId('state-reverse')).toHaveTextContent('false');
   });
 
-  it('handles formatDateTime fallback when no date is provided', () => {
+  it('formatDateTime: calls renderMissingDataWithTooltip when value is undefined', () => {
     renderComponent();
-    fireEvent.click(screen.getByTestId('open-cancelled'));
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
+    const col = capturedColumns.find((c) => c.field === 'trxChargeDate');
+    expect(col).toBeDefined();
+    col!.renderCell!({ value: undefined });
+    expect(renderMissingDataWithTooltipMock).toHaveBeenCalled();
   });
 
-  it('covers formatDateTime with a valid date', () => {
+  it('formatDateTime: calls renderCellWithTooltip with formatted date when value is valid', () => {
     renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
+    const col = capturedColumns.find((c) => c.field === 'trxChargeDate');
+    expect(col).toBeDefined();
+    col!.renderCell!({ value: '2024-06-15T10:30:00.000Z' });
+    expect(renderCellWithTooltipMock).toHaveBeenCalled();
+  });
+
+  it('formatDateTime: calls renderMissingDataWithTooltip when value is empty string', () => {
+    renderComponent();
+    const col = capturedColumns.find((c) => c.field === 'trxChargeDate');
+    expect(col).toBeDefined();
+    col!.renderCell!({ value: '' });
+    expect(renderMissingDataWithTooltipMock).toHaveBeenCalled();
   });
 });
