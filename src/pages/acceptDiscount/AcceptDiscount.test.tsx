@@ -242,12 +242,10 @@ describe('AcceptDiscount', () => {
 
     fireEvent.click(screen.getByText('commons.continueBtn'));
 
-    // flush promise chain that sets the alert
     await act(async () => {});
 
     expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
 
-    // if the component uses setTimeout, this will trigger it; if it uses an interval, we still tick enough.
     await act(async () => {
       vi.advanceTimersByTime(6000);
       vi.runOnlyPendingTimers();
@@ -255,8 +253,6 @@ describe('AcceptDiscount', () => {
 
     await act(async () => {});
 
-    // note: with the current component implementation, the alert might not auto-dismiss.
-    // keep this assertion aligned with the actual behavior: it must still be rendered here.
     expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
 
     vi.useRealTimers();
@@ -275,7 +271,6 @@ describe('AcceptDiscount', () => {
 
     fireEvent.click(screen.getByText('commons.continueBtn'));
 
-    // flush promise chain that sets the alert + schedules the timer
     await act(async () => {});
 
     expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
@@ -386,7 +381,6 @@ describe('AcceptDiscount', () => {
 
     fireEvent.change(autocomplete, { target: { value: 'test' } });
 
-    // debounce inside component
     await act(async () => {
       vi.runOnlyPendingTimers();
     });
