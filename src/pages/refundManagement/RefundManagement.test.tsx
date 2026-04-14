@@ -87,7 +87,6 @@ vi.mock('../../utils/helpers', () => ({
   checkTooltipValue: vi.fn(),
 }));
 
-// Capture columns so we can invoke renderCell directly
 let capturedColumns: Array<{ field: string; renderCell?: (params: { value: unknown }) => unknown }> = [];
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
