@@ -18,13 +18,11 @@ vi.mock('../../services/merchantService', () => ({
   previewPayment: vi.fn(),
 }));
 
-const BreadcrumbsBoxMock = vi.fn(
-  ({ onClickBackButton }: { onClickBackButton?: () => void }) => (
-    <button data-testid="BreadcrumbsBox" onClick={onClickBackButton}>
-      back
-    </button>
-  )
-);
+const BreadcrumbsBoxMock = vi.fn(({ onClickBackButton }: { onClickBackButton?: () => void }) => (
+  <button data-testid="BreadcrumbsBox" onClick={onClickBackButton}>
+    back
+  </button>
+));
 
 vi.mock('../../components/BreadcrumbsBox/BreadcrumbsBox', () => ({
   default: (props: { onClickBackButton?: () => void }) => BreadcrumbsBoxMock(props),
@@ -45,10 +43,10 @@ vi.mock('../../components/Modal/ModalComponent', () => ({
 
 vi.mock('../../components/Autocomplete/AutocompleteComponent', () => ({
   default: ({
-              onChangeDebounce,
-              onChange,
-              value,
-            }: {
+    onChangeDebounce,
+    onChange,
+    value,
+  }: {
     onChangeDebounce: (v: string) => void;
     onChange: (v: ProductDTO) => void;
     value: ProductDTO | null;
@@ -417,7 +415,9 @@ describe('AcceptDiscount', () => {
 
     fireEvent.focus(input);
 
-    expect(document.querySelector('[data-testid="EuroIcon"]') || document.querySelector('svg')).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="EuroIcon"]') || document.querySelector('svg')
+    ).toBeTruthy();
   });
 
   it('hides euro icon adornment when expenditure field is blurred and empty', () => {

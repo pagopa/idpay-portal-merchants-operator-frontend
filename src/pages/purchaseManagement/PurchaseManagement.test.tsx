@@ -48,11 +48,11 @@ let mockedLocation: { state: unknown } = { state: null };
 vi.mock('@mui/material', () => ({
   Box: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Button: ({
-             children,
-             onClick,
-             disabled,
-             ...rest
-           }: {
+    children,
+    onClick,
+    disabled,
+    ...rest
+  }: {
     children: React.ReactNode;
     onClick?: () => void;
     disabled?: boolean;
@@ -135,9 +135,15 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
     DrawerComponent: React.ReactNode;
   }) => (
     <div data-testid="layout">
-      <button data-testid="btn-add" onClick={props.additionalButton.onClick}>add</button>
-      <button data-testid="btn-auth" onClick={() => props.onRowAction(mockAuthorized)}>auth</button>
-      <button data-testid="btn-cap" onClick={() => props.onRowAction(mockCaptured)}>cap</button>
+      <button data-testid="btn-add" onClick={props.additionalButton.onClick}>
+        add
+      </button>
+      <button data-testid="btn-auth" onClick={() => props.onRowAction(mockAuthorized)}>
+        auth
+      </button>
+      <button data-testid="btn-cap" onClick={() => props.onRowAction(mockCaptured)}>
+        cap
+      </button>
       <div data-testid="external">{JSON.stringify(props.externalState)}</div>
       {props.DrawerComponent}
     </div>
@@ -146,17 +152,19 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
 
 vi.mock('../../components/Modal/ModalComponent', () => ({
   default: ({
-              open,
-              children,
-              onClose,
-            }: {
+    open,
+    children,
+    onClose,
+  }: {
     open: boolean;
     children: React.ReactNode;
     onClose?: () => void;
   }) =>
     open ? (
       <div data-testid="modal">
-        <button data-testid="modal-close" onClick={onClose}>close</button>
+        <button data-testid="modal-close" onClick={onClose}>
+          close
+        </button>
         {children}
       </div>
     ) : null,
@@ -337,9 +345,7 @@ describe('PurchaseManagement coverage completion', () => {
 
     act(() => resolve({ data: 'b64' }));
 
-    await waitFor(() =>
-      expect(screen.queryByTestId('item-loader')).not.toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.queryByTestId('item-loader')).not.toBeInTheDocument());
   });
 
   it('covers refund modal opened from CAPTURED drawer', async () => {
@@ -404,7 +410,9 @@ describe('PurchaseManagement coverage completion', () => {
       utilsStore.setState({ ...utilsStore.getState(), transactionAuthorized: true });
     });
     renderPage();
-    act(() => { vi.advanceTimersByTime(5000); });
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
     expect(utilsStore.getState().transactionAuthorized).toBe(false);
     vi.useRealTimers();
   });
@@ -446,7 +454,9 @@ describe('PurchaseManagement coverage completion', () => {
 
     Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
       configurable: true,
-      get() { return 9999; },
+      get() {
+        return 9999;
+      },
     });
 
     await openAuthorizedDrawer();
@@ -459,7 +469,9 @@ describe('PurchaseManagement coverage completion', () => {
 
     Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
       configurable: true,
-      get() { return 0; },
+      get() {
+        return 0;
+      },
     });
   });
 });

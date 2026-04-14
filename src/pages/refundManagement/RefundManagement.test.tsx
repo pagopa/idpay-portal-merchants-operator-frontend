@@ -42,12 +42,12 @@ vi.mock('../../services/merchantService', () => ({
 
 vi.mock('../../components/DetailsDrawer/DetailsDrawer', () => ({
   DetailsDrawer: ({
-                    isOpen,
-                    invoiceStatus,
-                    primaryButton,
-                    secondaryButton,
-                    onFileDownloadCallback,
-                  }: {
+    isOpen,
+    invoiceStatus,
+    primaryButton,
+    secondaryButton,
+    onFileDownloadCallback,
+  }: {
     isOpen: boolean;
     invoiceStatus?: string;
     primaryButton?: { disabled?: boolean; onClick: () => void };
@@ -87,15 +87,18 @@ vi.mock('../../utils/helpers', () => ({
   checkTooltipValue: vi.fn(),
 }));
 
-let capturedColumns: Array<{ field: string; renderCell?: (params: { value: unknown }) => unknown }> = [];
+let capturedColumns: Array<{
+  field: string;
+  renderCell?: (params: { value: unknown }) => unknown;
+}> = [];
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
   default: ({
-              onRowAction,
-              externalState,
-              DrawerComponent,
-              columns,
-            }: {
+    onRowAction,
+    externalState,
+    DrawerComponent,
+    columns,
+  }: {
     onRowAction: (row: unknown) => void;
     externalState: Record<string, boolean>;
     DrawerComponent: React.ReactNode;
@@ -293,9 +296,7 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('open-invoiced'));
     fireEvent.click(screen.getByTestId('primary-button'));
 
-    expect(navigateMock).toHaveBeenCalledWith(
-      `/modifica-documento/trx-invoiced/${btoa('123')}`
-    );
+    expect(navigateMock).toHaveBeenCalledWith(`/modifica-documento/trx-invoiced/${btoa('123')}`);
   });
 
   it('opens drawer for all supported statuses without crashing', () => {
