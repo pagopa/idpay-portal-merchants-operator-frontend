@@ -50,11 +50,15 @@ vi.mock("@pagopa/mui-italia", async () => {
   };
 });
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key,
+    })
+  }
+});
 
 vi.mock("../../utils/constants.ts", () => ({
   REQUIRED_FIELD_ERROR: "Campo obbligatorio",

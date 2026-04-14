@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach} from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import Profile from "./Profile";
 import { useAuth } from "../../contexts/AuthContext";
@@ -6,11 +6,15 @@ import { authStore } from "../../store/authStore";
 import { getPointOfSaleDetails } from "../../services/merchantService";
 import { jwtDecode } from "jwt-decode";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key) => key,
-  }),
-}));
+vi.mock("react-i18next", async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key,
+    })
+  }
+});
 
 vi.mock("../../contexts/AuthContext");
 vi.mock("../../store/authStore");
