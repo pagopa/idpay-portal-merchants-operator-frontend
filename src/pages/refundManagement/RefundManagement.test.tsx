@@ -299,6 +299,16 @@ describe('RefundManagement', () => {
     expect(navigateMock).toHaveBeenCalledWith(`/modifica-documento/trx-invoiced/${btoa('123')}`);
   });
 
+  it('navigates to modify document with btoa-encoded doc number for CANCELLED (covers cancelled label path)', () => {
+    renderComponent();
+    fireEvent.click(screen.getByTestId('open-cancelled'));
+    fireEvent.click(screen.getByTestId('primary-button'));
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      `/modifica-documento/trx-cancelled/${btoa(String(undefined))}`
+    );
+  });
+
   it('opens drawer for all supported statuses without crashing', () => {
     renderComponent();
     fireEvent.click(screen.getByTestId('open-invoiced'));
