@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "prettify": "prettier --write \"./**/*.{ts,tsx}\"",
     "preview": "vite preview",
-    "generate:api": "swagger-typescript-api generate --path openApi/openapi.merchants.op.portal.yml --output src/api/generated --name Api.ts --http-client axios --modular"
+    "generate": "swagger-typescript-api generate --path openApi/openapi.merchants.op.portal.yml --output src/api/generated --name Api.ts --http-client axios --modular"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
