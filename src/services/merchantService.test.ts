@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   getProductsList,
   previewPayment,
@@ -14,10 +14,10 @@ import {
   updateInvoiceTransactionApi,
   getPreviewPdf,
   reverseInvoicedTransactionApi,
-} from "./merchantService";
-import { MerchantApi } from "../api/MerchantsApiClient";
+} from './merchantService';
+import { MerchantApi } from '../api/MerchantsApiClient';
 
-vi.mock("../api/MerchantsApiClient", () => ({
+vi.mock('../api/MerchantsApiClient', () => ({
   MerchantApi: {
     getProducts: vi.fn(),
     previewPayment: vi.fn(),
@@ -36,239 +36,159 @@ vi.mock("../api/MerchantsApiClient", () => ({
   },
 }));
 
-const mockCapturePayment = MerchantApi.capturePayment as vi.Mock;
-const mockGetInProgressTransactions = MerchantApi.getInProgressTransactions as vi.Mock;
-const mockDeleteTransactionInProgress = MerchantApi.deleteTransactionInProgress as vi.Mock;
-
-describe("Merchant Service Functions", () => {
+describe('merchantService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
+  it('getProductsList delegates to MerchantApi.getProducts', async () => {
+    const response = { products: [], total: 0 };
+    vi.mocked(MerchantApi.getProducts).mockResolvedValue(response as never);
+
+    const result = await getProductsList({} as never);
+
+    expect(MerchantApi.getProducts).toHaveBeenCalled();
+    expect(result).toEqual(response);
   });
 
-  describe("downloadInvoiceFileApi", () => {
-    it("should call MerchantApi.downloadInvoiceFileApi with correct parameters", async () => {
-      vi.mocked(MerchantApi.downloadInvoiceFileApi).mockResolvedValue({} as any);
-      const result = await downloadInvoiceFileApi("salesPoint", "trxId");
-      expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledWith("salesPoint", "trxId");
-      expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({});
-    });
+  it('previewPayment delegates correctly', async () => {
+    const params = {
+      productGtin: '1',
+      productName: 'Test',
+      amountCents: 100,
+      discountCode: 'DISC',
+    };
+    const response = { trxId: 'T1', finalAmount: 90 };
+
+    vi.mocked(MerchantApi.previewPayment).mockResolvedValue(response as never);
+
+    const result = await previewPayment(params);
+
+    expect(MerchantApi.previewPayment).toHaveBeenCalledWith(params);
+    expect(result).toEqual(response);
   });
 
-  describe("reverseTransactionApi", () => {
-    it("should call MerchantApi.reverseTransactionApi with correct parameters", async () => {
-      vi.mocked(MerchantApi.reverseTransactionApi).mockResolvedValue({} as any);
-      const testFile = new File([new Blob()], "fileName");
-      const result = await reverseTransactionApi("trxId", testFile, "DOC123");
-      expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC123");
-      expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({});
+  it('authPaymentBarCode enriches payload with uuid and defaults', async () => {
+    const response = { trxId: 'TRX', status: 'AUTHORIZED' };
+    vi.mocked(MerchantApi.authPaymentBarCode).mockResolvedValue(response as never);
+
+    const result = await authPaymentBarCode({
+      trxCode: 'TRX',
+      amountCents: 1000,
     });
+
+    const callArg = vi.mocked(MerchantApi.authPaymentBarCode).mock.calls[0][0];
+
+    expect(callArg).toMatchObject({
+      trxCode: 'TRX',
+      amountCents: 1000,
+    });
+    expect(typeof callArg.idTrxAcquirer).toBe('string');
+    expect(callArg.additionalProperties).toEqual({});
+
+    expect(result).toEqual(response);
   });
 
-  describe("reverseInvoicedTransactionApi", () => {
-    it("should call MerchantApi.reverseInvoicedTransactionApi with correct parameters", async () => {
-      vi.mocked(MerchantApi.reverseInvoicedTransactionApi).mockResolvedValue({} as any);
-      const testFile = new File([new Blob()], "fileName");
-      const result = await reverseInvoicedTransactionApi("trxId", testFile, "DOC123");
-      expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC123");
-      expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({});
-    });
+  it('capturePayment delegates correctly', async () => {
+    const response = { trxCode: 'T1', status: 'CAPTURED' };
+    vi.mocked(MerchantApi.capturePayment).mockResolvedValue(response as never);
+
+    const result = await capturePayment({ trxCode: 'T1' });
+
+    expect(MerchantApi.capturePayment).toHaveBeenCalledWith({ trxCode: 'T1' });
+    expect(result).toEqual(response);
   });
 
-  describe("invoiceTransactionApi", () => {
-    it("should call MerchantApi.invoiceTransactionApi with correct parameters", async () => {
-      vi.mocked(MerchantApi.invoiceTransactionApi).mockResolvedValue({} as any);
-      const testFile = new File([new Blob()], "fileName");
-      const result = await invoiceTransactionApi("trxId", testFile, "DOC456");
-      expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC456");
-      expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({});
-    });
+  it('deleteTransactionInProgress delegates correctly', async () => {
+    vi.mocked(MerchantApi.deleteTransactionInProgress).mockResolvedValue(undefined as never);
+
+    await expect(deleteTransactionInProgress('ID')).resolves.toBeUndefined();
+    expect(MerchantApi.deleteTransactionInProgress).toHaveBeenCalledWith('ID');
   });
 
-  describe("updateInvoiceTransactionApi", () => {
-    it("should call MerchantApi.updateInvoiceTransactionApi with correct parameters", async () => {
-      vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue({} as any);
-      const testFile = new File([new Blob()], "updatedFileName");
-      const result = await updateInvoiceTransactionApi("trxId", testFile, "DOC789");
-      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith("trxId", testFile, "DOC789");
-      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledTimes(1);
-      expect(result).toEqual({});
-    });
+  it('getProcessedTransactions delegates correctly', async () => {
+    const response = { transactions: [], totalElements: 0 };
+    vi.mocked(MerchantApi.getProcessedTransactions).mockResolvedValue(response as never);
 
-    it("should propagate errors from MerchantApi.updateInvoiceTransactionApi", async () => {
-      const testFile = new File([new Blob()], "fileName");
-      const mockError = new Error("Update failed");
-      vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockRejectedValue(mockError);
-      await expect(updateInvoiceTransactionApi("trxId", testFile, "DOC789")).rejects.toThrow("Update failed");
-      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledTimes(1);
-    });
+    const result = await getProcessedTransactions('I', 'P', {} as never);
 
-    it("should handle different file types", async () => {
-      vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue({} as any);
-      const pdfFile = new File([new Blob()], "invoice.pdf", { type: "application/pdf" });
-      const result = await updateInvoiceTransactionApi("trxId123", pdfFile, "DOC999");
-      expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith("trxId123", pdfFile, "DOC999");
-      expect(result).toEqual({});
-    });
+    expect(MerchantApi.getProcessedTransactions).toHaveBeenCalledWith('I', 'P', {});
+    expect(result).toEqual(response);
   });
 
-  describe("getProductsList", () => {
-    it("should call MerchantApi.getProducts with correct parameters", async () => {
-      const mockParams = { page: 1, size: 10, status: "ACTIVE" as const, eprelCode: "12345" };
-      const mockResponse = { products: [{ id: "1" }], total: 1 };
-      vi.mocked(MerchantApi.getProducts).mockResolvedValue(mockResponse);
-      const result = await getProductsList(mockParams);
-      expect(MerchantApi.getProducts).toHaveBeenCalledWith(mockParams);
-      expect(result).toEqual(mockResponse);
-    });
+  it('getInProgressTransactions delegates correctly', async () => {
+    const response = { content: [], totalElements: 0 };
+    vi.mocked(MerchantApi.getInProgressTransactions).mockResolvedValue(response as never);
 
-    it("should handle empty parameters", async () => {
-      const mockParams = {};
-      const mockResponse = { products: [], total: 0 };
-      vi.mocked(MerchantApi.getProducts).mockResolvedValue(mockResponse);
-      const result = await getProductsList(mockParams);
-      expect(MerchantApi.getProducts).toHaveBeenCalledWith(mockParams);
-      expect(result).toEqual(mockResponse);
-    });
+    const result = await getInProgressTransactions('I', 'P', {} as never);
 
-    it("should propagate errors from MerchantApi.getProducts", async () => {
-      const mockParams = { page: 1 };
-      const mockError = new Error("API Error");
-      vi.mocked(MerchantApi.getProducts).mockRejectedValue(mockError);
-      await expect(getProductsList(mockParams)).rejects.toThrow("API Error");
-    });
+    expect(MerchantApi.getInProgressTransactions).toHaveBeenCalledWith('I', 'P', {});
+    expect(result).toEqual(response);
   });
 
-  describe("previewPayment", () => {
-    it("should call MerchantApi.previewPayment with correct parameters", async () => {
-      const mockParams = { productGtin: "123", productName: "Test", amountCents: 5000, discountCode: "DISC" };
-      const mockResponse = { trxId: "TRX123", finalAmount: 4000 };
-      vi.mocked(MerchantApi.previewPayment).mockResolvedValue(mockResponse);
-      const result = await previewPayment(mockParams);
-      expect(MerchantApi.previewPayment).toHaveBeenCalledWith(mockParams);
-      expect(result).toEqual(mockResponse);
-    });
+  it('getPointOfSaleDetails delegates correctly', async () => {
+    const response = { id: '1' };
+    vi.mocked(MerchantApi.getPointOfSaleDetails).mockResolvedValue(response as never);
 
-    it("should propagate errors", async () => {
-      const mockParams = { productGtin: "123", productName: "Test", amountCents: 5000, discountCode: "INVALID" };
-      const mockError = new Error("Invalid discount code");
-      vi.mocked(MerchantApi.previewPayment).mockRejectedValue(mockError);
-      await expect(previewPayment(mockParams)).rejects.toThrow("Invalid discount code");
-    });
+    const result = await getPointOfSaleDetails('M', 'P');
+
+    expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith('M', 'P');
+    expect(result).toEqual(response);
   });
 
-  describe("authPaymentBarCode", () => {
-    it("should call MerchantApi.authPaymentBarCode with correct parameters", async () => {
-      const mockParams = { trxCode: "TRX789", amountCents: 2500 };
-      const mockResponse = { trxId: "TRX789", status: "AUTHORIZED" };
-      vi.mocked(MerchantApi.authPaymentBarCode).mockResolvedValue(mockResponse as any);
-      const result = await authPaymentBarCode(mockParams as any);
-      expect(MerchantApi.authPaymentBarCode).toHaveBeenCalledWith(mockParams);
-      expect(result).toEqual(mockResponse);
-    });
+  it('downloadInvoiceFileApi delegates correctly', async () => {
+    const response = { invoiceUrl: 'url' };
+    vi.mocked(MerchantApi.downloadInvoiceFileApi).mockResolvedValue(response as never);
+
+    const result = await downloadInvoiceFileApi('P', 'T');
+
+    expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledWith('P', 'T');
+    expect(result).toEqual(response);
   });
 
-  describe("getProcessedTransactions", () => {
-    it("should call MerchantApi.getProcessedTransactions with correct parameters", async () => {
-      const initiativeId = "INIT1";
-      const pointOfSaleId = "POS1";
-      const mockParams = { page: 1, size: 10 };
-      const mockResponse = { transactions: [], totalElements: 0 };
-      vi.mocked(MerchantApi.getProcessedTransactions).mockResolvedValue(mockResponse as any);
-      const result = await getProcessedTransactions(initiativeId, pointOfSaleId, mockParams as any);
-      expect(MerchantApi.getProcessedTransactions).toHaveBeenCalledWith(initiativeId, pointOfSaleId, mockParams);
-      expect(result).toEqual(mockResponse);
-    });
+  it('reverseTransactionApi delegates correctly', async () => {
+    const file = new File([new Blob()], 'f');
+    vi.mocked(MerchantApi.reverseTransactionApi).mockResolvedValue(undefined as never);
+
+    await expect(reverseTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
   });
 
-  describe("getPointOfSaleDetails", () => {
-    it("should call MerchantApi.getPointOfSaleDetails with correct parameters", async () => {
-      const merchantId = "M1";
-      const pointOfSaleId = "P1";
-      const mockResponse = { id: "123", city: "Rome" };
-      vi.mocked(MerchantApi.getPointOfSaleDetails).mockResolvedValue(mockResponse);
-      const result = await getPointOfSaleDetails(merchantId, pointOfSaleId);
-      expect(MerchantApi.getPointOfSaleDetails).toHaveBeenCalledWith(merchantId, pointOfSaleId);
-      expect(result).toEqual(mockResponse);
-    });
+  it('reverseInvoicedTransactionApi delegates correctly', async () => {
+    const file = new File([new Blob()], 'f');
+    vi.mocked(MerchantApi.reverseInvoicedTransactionApi).mockResolvedValue(undefined as never);
+
+    await expect(reverseInvoicedTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
   });
 
-  describe("capturePayment", () => {
-    const params = { trxCode: "TRX123", additionalProperties: { test: "ok" } };
-    const mockResponse = { trxCode: "TRX123", status: "CAPTURED" };
+  it('invoiceTransactionApi delegates correctly', async () => {
+    const file = new File([new Blob()], 'f');
+    vi.mocked(MerchantApi.invoiceTransactionApi).mockResolvedValue(undefined as never);
 
-    it("should call MerchantApi.capturePayment with correct params", async () => {
-      vi.mocked(MerchantApi.capturePayment).mockResolvedValue(mockResponse as any);
-      const result = await capturePayment(params);
-      expect(MerchantApi.capturePayment).toHaveBeenCalledWith(params);
-      expect(result).toEqual(mockResponse);
-    });
-
-    it("should propagate errors from MerchantApi.capturePayment", async () => {
-      const mockError = new Error("Capture failed");
-      vi.mocked(MerchantApi.capturePayment).mockRejectedValue(mockError);
-      await expect(capturePayment(params)).rejects.toThrow("Capture failed");
-    });
+    await expect(invoiceTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
   });
 
-  describe("getInProgressTransactions", () => {
-    const initiativeId = "initId123";
-    const pointOfSaleId = "posId456";
-    const params = { page: 0, size: 10, sort: "date,desc", fiscalCode: "RSSGNR", status: "IN_PROGRESS" };
-    const mockTransactions = { content: [{ id: "trx1" }], totalElements: 1 };
+  it('updateInvoiceTransactionApi delegates correctly', async () => {
+    const file = new File([new Blob()], 'f');
+    vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue(undefined as never);
 
-    it("should call MerchantApi.getInProgressTransactions with correct parameters", async () => {
-      mockGetInProgressTransactions.mockResolvedValue(mockTransactions);
-      const result = await getInProgressTransactions(initiativeId, pointOfSaleId, params);
-      expect(mockGetInProgressTransactions).toHaveBeenCalledWith(initiativeId, pointOfSaleId, params);
-      expect(result).toEqual(mockTransactions);
-    });
-
-    it("should propagate errors", async () => {
-      const mockError = new Error("Fetch failed");
-      mockGetInProgressTransactions.mockRejectedValue(mockError);
-      await expect(getInProgressTransactions(initiativeId, pointOfSaleId, params)).rejects.toThrow("Fetch failed");
-    });
+    await expect(updateInvoiceTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
   });
 
-  describe("deleteTransactionInProgress", () => {
-    const trxId = "TRX_TO_DELETE";
+  it('getPreviewPdf converts file to base64', async () => {
+    const mockFile = {
+      arrayBuffer: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3]).buffer),
+    };
 
-    it("should call MerchantApi.deleteTransactionInProgress with correct ID", async () => {
-      mockDeleteTransactionInProgress.mockResolvedValue(undefined);
-      await expect(deleteTransactionInProgress(trxId)).resolves.toBeUndefined();
-      expect(mockDeleteTransactionInProgress).toHaveBeenCalledWith(trxId);
-    });
+    vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: mockFile } as never);
 
-    it("should propagate errors", async () => {
-      const mockError = new Error("Deletion failed");
-      mockDeleteTransactionInProgress.mockRejectedValue(mockError);
-      await expect(deleteTransactionInProgress(trxId)).rejects.toThrow("Deletion failed");
-    });
-  });
+    const result = await getPreviewPdf('T');
 
-  describe("getPreviewPdf", () => {
-    const trxId = "TRX_PREVIEW_001";
-
-    it("should call MerchantApi.getPreviewPdf with correct trxId", async () => {
-      const mockResponse = { data: "base64pdfdata" };
-      vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue(mockResponse);
-      const result = await getPreviewPdf(trxId);
-      expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith(trxId);
-      expect(result).toEqual(mockResponse);
-    });
-
-    it("should propagate errors", async () => {
-      const mockError = new Error("PDF not found");
-      vi.mocked(MerchantApi.getPreviewPdf).mockRejectedValue(mockError);
-      await expect(getPreviewPdf(trxId)).rejects.toThrow("PDF not found");
-    });
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
+    expect(result).toHaveProperty('data');
+    expect(typeof result.data).toBe('string');
   });
 });

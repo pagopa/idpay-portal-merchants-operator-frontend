@@ -7,24 +7,21 @@ import {
   Backdrop,
   CircularProgress,
   Typography,
-} from "@mui/material";
-import BreadcrumbsBox from "../../components/BreadcrumbsBox/BreadcrumbsBox";
-import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
-import AcceptDiscountCard from "./AcceptDiscountCard";
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import ModalComponent from "../../components/Modal/ModalComponent";
-import { REQUIRED_FIELD_ERROR } from "../../utils/constants";
-import {
-  getProductsList,
-  previewPayment,
-} from "../../services/merchantService";
-import Autocomplete from "../../components/Autocomplete/AutocompleteComponent";
-import { ProductDTO } from "../../api/generated/merchants/ProductDTO";
-import AlertComponent from "../../components/Alert/AlertComponent";
-import { useNavigate } from "react-router-dom";
-import EuroIcon from "@mui/icons-material/Euro";
-import ROUTES from "../../routes";
+} from '@mui/material';
+import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
+import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
+import AcceptDiscountCard from './AcceptDiscountCard';
+import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
+import ModalComponent from '../../components/Modal/ModalComponent';
+import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { getProductsList, previewPayment } from '../../services/merchantService';
+import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
+import { ProductDTO } from '../../api/generated/data-contracts';
+import AlertComponent from '../../components/Alert/AlertComponent';
+import { useNavigate } from 'react-router-dom';
+import EuroIcon from '@mui/icons-material/Euro';
+import ROUTES from '../../routes';
 
 interface FormData {
   product: ProductDTO | null;
@@ -45,10 +42,10 @@ const AcceptDiscount = () => {
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState<FormData>({
     product: null,
-    totalAmount: "",
-    discountCode: "",
+    totalAmount: '',
+    discountCode: '',
   });
-  const [productsList, setProductsList] = useState<ProductDTO[]>([]);
+  const [productsList, setProductsList] = useState<unknown[]>([]);
   const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
   const [previewIsLoading, setPreviewIsLoading] = useState(false);
@@ -56,13 +53,11 @@ const AcceptDiscount = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (sessionStorage.getItem("discountCoupon")) {
-      const discountCoupon = JSON.parse(
-        sessionStorage.getItem("discountCoupon")!
-      );
+    if (sessionStorage.getItem('discountCoupon')) {
+      const discountCoupon = JSON.parse(sessionStorage.getItem('discountCoupon')!);
       setFormData({
         product: discountCoupon.product,
-        totalAmount: (discountCoupon.originalAmountCents / 100).toString().replace(".", ","),
+        totalAmount: (discountCoupon.originalAmountCents / 100).toString().replace('.', ','),
         discountCode: discountCoupon.trxCode,
       });
     }
@@ -82,7 +77,6 @@ const AcceptDiscount = () => {
       const { content } = await getProductsList({ fullProductName, size: 50 });
       setProductsList([...content]);
     } catch {
-      // console.log(error);
       setProductsList([]);
     }
   };
@@ -111,20 +105,19 @@ const AcceptDiscount = () => {
         const response = await previewPayment({
           productGtin: formData.product!.gtinCode!,
           productName: formData.product!.productName!,
-          amountCents: Math.round(Number(formData.totalAmount.replace(",", ".")) * 100),
+          amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100),
           discountCode: formData.discountCode.trim()!,
         });
         sessionStorage.setItem(
-          "discountCoupon",
+          'discountCoupon',
           JSON.stringify({ ...response, product: formData.product })
         );
         setPreviewIsLoading(false);
-        navigate("/accetta-buono-sconto/riepilogo");
+        navigate('/accetta-buono-sconto/riepilogo');
       } catch (error) {
-        // console.error("Error in previewPayment:", error);
         if (
-          error?.response?.data?.code === "PAYMENT_NOT_FOUND_OR_EXPIRED" ||
-          error?.response?.data?.code === "PAYMENT_ALREADY_AUTHORIZED"
+          error?.response?.data?.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
+          error?.response?.data?.code === 'PAYMENT_ALREADY_AUTHORIZED'
         ) {
           const errors: Record<string, boolean> = {};
           errors.discountCodeWrong = true;
@@ -139,50 +132,55 @@ const AcceptDiscount = () => {
     return isValid;
   };
 
-    const handleFieldChange = (field: keyof FormData, value: string | ProductDTO): void => {
-        const newValue = value;
-        if (field === 'totalAmount' && typeof newValue === 'string') {
-            if (newValue === '') {
-                setFormData(prev => ({
-                    ...prev,
-                    [field]: newValue
-                }));
-                return;
-            }
-        
-            const parts = newValue.split(',');
-            if (parts.length > 2) {
-                return;
-            }
-        
-            const integerPart = parts[0];
-            const decimalPart = parts[1] ?? '';
-        
+  const handleFieldChange = (field: keyof FormData, value: string | ProductDTO): void => {
+    const newValue = value;
+    if (field === 'totalAmount' && typeof newValue === 'string') {
+      if (newValue === '') {
+        setFormData((prev) => ({
+          ...prev,
+          [field]: newValue,
+        }));
+        return;
+      }
 
-            if (integerPart && integerPart.split('').some(ch => ch < '0' || ch > '9')) {
-                return;
-            }
-        
-            if (decimalPart.length > 2 || decimalPart.split('').some(ch => ch < '0' || ch > '9') || integerPart?.length > 5) {
-                return;
-            }
+      const parts = newValue.split(',');
+      if (parts.length > 2) {
+        return;
+      }
 
-            if((newValue === '0' && newValue?.length === 1) || (newValue === ',' && newValue?.length === 1)) {
-                return;
-            }
-        
-            setFormData(prev => ({
-                ...prev,
-                [field]: newValue
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [field]: newValue
-            }));
-        }
+      const integerPart = parts[0];
+      const decimalPart = parts[1] ?? '';
 
-    };
+      if (integerPart && integerPart.split('').some((ch) => ch < '0' || ch > '9')) {
+        return;
+      }
+
+      if (
+        decimalPart.length > 2 ||
+        decimalPart.split('').some((ch) => ch < '0' || ch > '9') ||
+        integerPart?.length > 5
+      ) {
+        return;
+      }
+
+      if (
+        (newValue === '0' && newValue?.length === 1) ||
+        (newValue === ',' && newValue?.length === 1)
+      ) {
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [field]: newValue,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: newValue,
+      }));
+    }
+  };
 
   const handleChangeAutocomplete = (value: string) => {
     fetchProductsList(value);
@@ -197,165 +195,153 @@ const AcceptDiscount = () => {
   };
 
   const handleExitPage = () => {
-    sessionStorage.removeItem("discountCoupon");
+    sessionStorage.removeItem('discountCoupon');
     navigate(ROUTES.BUY_MANAGEMENT);
   };
 
   return (
     <>
-    <Box maxWidth='75%' justifySelf='center'>
-      <Backdrop
-        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
-        open={previewIsLoading}
-        onClick={() => setPreviewIsLoading(false)}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <Box sx={{ margin: "20px" }}>
-        <Box mt={2} mb={4}>
-          <BreadcrumbsBox
-            backLabel={t("commons.exitBtn")}
-            items={[]}
-            active={true}
-            onClickBackButton={() => setModalIsOpen(true)}
-          />
-          <TitleBox
-            title={t("pages.acceptDiscount.title")}
-            mtTitle={2}
-            variantTitle="h4"
-            subTitle={t("pages.acceptDiscount.subtitle")}
-            variantSubTitle="body2"
-          />
-        </Box>
-        <Grid container spacing={2} mb={3}>
-          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-            <AcceptDiscountCard
-              titleBox={t("pages.acceptDiscount.selectProduct")}
-              inputTitle={t("pages.acceptDiscount.selectProductTitle")}
-            >
-              <Autocomplete
-                options={productsList}
-                onChangeDebounce={(value) => handleChangeAutocomplete(value)}
-                onChange={(productObj) =>
-                  handleFieldChange("product", productObj)
-                }
-                inputError={!!fieldErrors.product}
-                value={formData.product}
-                width="86%"
-              />
-            </AcceptDiscountCard>
-          </Grid>
-          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-            <AcceptDiscountCard
-              titleBox={t("pages.acceptDiscount.expenseAmount")}
-              subTitleBox={t("pages.acceptDiscount.insertAmount")}
-            >
-              <TextField
-                variant="outlined"
-                label={t("pages.acceptDiscount.expenditureAmount")}
-                size="small"
-                value={formData.totalAmount}
-                onFocus={handleExpenditureFocus}
-                onBlur={handleExpenditureBlur}
-                sx={{
-                  "& .MuiFormLabel-root.Mui-error": {
-                    color: "#5C6E82 !important",
-                  },
-                }}
-                error={!!fieldErrors.totalAmount}
-                helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ""}
-                onChange={(e) =>
-                  handleFieldChange("totalAmount", e.target.value)
-                }
-                slotProps={{
-                  input: {
-                    startAdornment:
-                      isExpenditureFocused || formData.totalAmount ? (
-                        <InputAdornment position="start">
-                          <EuroIcon fontSize="small" />
-                        </InputAdornment>
-                      ) : null,
-                  },
-                  inputLabel: {
-                    shrink: Boolean(
-                      isExpenditureFocused || formData.totalAmount
-                    ),
-                  },
-                }}
-              />
-            </AcceptDiscountCard>
-          </Grid>
-          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-            <AcceptDiscountCard
-              titleBox={t("pages.acceptDiscount.whatDiscountCode")}
-              subTitleBox={
-                t("pages.acceptDiscount.insertDiscountCode")
-                    .split("\n")
-                    .map((line, i) => <div key={i}>{line}</div>)
-              }
-              inputTitle={"Inserisci codice sconto"}
-            >
-              <TextField
-                variant="outlined"
-                label={t("pages.acceptDiscount.discountCode")}
-                size="small"
-                value={formData.discountCode}
-                sx={{
-                  mt: 2,
-                  "& .MuiFormLabel-root.Mui-error": {
-                    color: "#5C6E82 !important",
-                  },
-                }}
-                error={
-                  !!fieldErrors.discountCode || !!fieldErrors.discountCodeWrong
-                }
-                helperText={
-                  fieldErrors.discountCode
-                    ? REQUIRED_FIELD_ERROR
-                    : fieldErrors.discountCodeWrong
-                    ? "Codice sconto non valido"
-                    : ""
-                }
-                onChange={(e) =>
-                  handleFieldChange("discountCode", e.target.value)
-                }
-              />
-            </AcceptDiscountCard>
-          </Grid>
-        </Grid>
-
-        <Box display={"flex"} justifyContent={"space-between"} gap={2} mt={4}>
-          <Button variant="outlined" onClick={() => setModalIsOpen(true)}>
-            {"Indietro"}
-          </Button>
-          <Button variant="contained" onClick={handleValidateData}>
-            {t("commons.continueBtn")}
-          </Button>
-        </Box>
-        <ModalComponent
-          open={modalIsOpen}
-          onClose={() => setModalIsOpen(false)}
+      <Box maxWidth="75%" justifySelf="center">
+        <Backdrop
+          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+          open={previewIsLoading}
+          onClick={() => setPreviewIsLoading(false)}
         >
-          <Box display={"flex"} flexDirection={"column"} gap={2}>
-            <Typography variant="h6">
-              {t("pages.acceptDiscount.modalTitle")}
-            </Typography>
-            <Typography variant="body1">
-              {t("pages.acceptDiscount.modalDescription")}
-            </Typography>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Box sx={{ margin: '20px' }}>
+          <Box mt={2} mb={4}>
+            <BreadcrumbsBox
+              backLabel={t('commons.exitBtn')}
+              items={[]}
+              active={true}
+              onClickBackButton={() => setModalIsOpen(true)}
+            />
+            <TitleBox
+              title={t('pages.acceptDiscount.title')}
+              mtTitle={2}
+              variantTitle="h4"
+              subTitle={t('pages.acceptDiscount.subtitle')}
+              variantSubTitle="body2"
+            />
           </Box>
-          <Box display={"flex"} justifyContent={"flex-end"} gap={2} mt={1}>
-            <Button variant="outlined" onClick={() => setModalIsOpen(false)}>
-              {"Torna indietro"}
+          <Grid container spacing={2} mb={3}>
+            <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+              <AcceptDiscountCard
+                titleBox={t('pages.acceptDiscount.selectProduct')}
+                inputTitle={t('pages.acceptDiscount.selectProductTitle')}
+              >
+                <Autocomplete
+                  options={productsList as ProductDTO[]}
+                  onChangeDebounce={(value) => handleChangeAutocomplete(value)}
+                  onChange={(productObj) => handleFieldChange('product', productObj)}
+                  inputError={!!fieldErrors.product}
+                  value={formData.product}
+                  width="86%"
+                />
+              </AcceptDiscountCard>
+            </Grid>
+            <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+              <AcceptDiscountCard
+                titleBox={t('pages.acceptDiscount.expenseAmount')}
+                subTitleBox={t('pages.acceptDiscount.insertAmount')}
+              >
+                <TextField
+                  variant="outlined"
+                  label={t('pages.acceptDiscount.expenditureAmount')}
+                  size="small"
+                  value={formData.totalAmount}
+                  onFocus={handleExpenditureFocus}
+                  onBlur={handleExpenditureBlur}
+                  sx={{
+                    '& .MuiFormLabel-root.Mui-error': {
+                      color: '#5C6E82 !important',
+                    },
+                  }}
+                  error={!!fieldErrors.totalAmount}
+                  helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ''}
+                  onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
+                  slotProps={{
+                    input: {
+                      startAdornment:
+                        isExpenditureFocused || formData.totalAmount ? (
+                          <InputAdornment position="start">
+                            <EuroIcon fontSize="small" />
+                          </InputAdornment>
+                        ) : null,
+                    },
+                    inputLabel: {
+                      shrink: Boolean(isExpenditureFocused || formData.totalAmount),
+                    },
+                  }}
+                />
+              </AcceptDiscountCard>
+            </Grid>
+            <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+              <AcceptDiscountCard
+                titleBox={t('pages.acceptDiscount.whatDiscountCode')}
+                subTitleBox={t('pages.acceptDiscount.insertDiscountCode')
+                  .split('\n')
+                  .map((line, i) => (
+                    <div key={i}>{line}</div>
+                  ))}
+                inputTitle={'Inserisci codice sconto'}
+              >
+                <TextField
+                  variant="outlined"
+                  label={t('pages.acceptDiscount.discountCode')}
+                  size="small"
+                  value={formData.discountCode}
+                  sx={{
+                    mt: 2,
+                    '& .MuiFormLabel-root.Mui-error': {
+                      color: '#5C6E82 !important',
+                    },
+                  }}
+                  error={!!fieldErrors.discountCode || !!fieldErrors.discountCodeWrong}
+                  helperText={
+                    fieldErrors.discountCode
+                      ? REQUIRED_FIELD_ERROR
+                      : fieldErrors.discountCodeWrong
+                        ? 'Codice sconto non valido'
+                        : ''
+                  }
+                  onChange={(e) => handleFieldChange('discountCode', e.target.value)}
+                />
+              </AcceptDiscountCard>
+            </Grid>
+          </Grid>
+
+          <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={4}>
+            <Button variant="outlined" onClick={() => setModalIsOpen(true)}>
+              {'Indietro'}
             </Button>
-            <Button variant="contained" onClick={handleExitPage}>
-              {"Esci"}
+            <Button variant="contained" onClick={handleValidateData}>
+              {t('commons.continueBtn')}
             </Button>
           </Box>
-        </ModalComponent>
+          <ModalComponent open={modalIsOpen} onClose={() => setModalIsOpen(false)}>
+            <Box display={'flex'} flexDirection={'column'} gap={2}>
+              <Typography variant="h6">{t('pages.acceptDiscount.modalTitle')}</Typography>
+              <Typography variant="body1">{t('pages.acceptDiscount.modalDescription')}</Typography>
+            </Box>
+            <Box display={'flex'} justifyContent={'flex-end'} gap={2} mt={1}>
+              <Button variant="outlined" onClick={() => setModalIsOpen(false)}>
+                {'Torna indietro'}
+              </Button>
+              <Button variant="contained" onClick={handleExitPage}>
+                {'Esci'}
+              </Button>
+            </Box>
+          </ModalComponent>
+        </Box>
       </Box>
-    </Box>
-      <AlertComponent isOpen={errorAlert} contentStyle={{right: '20px'}} error message={t("pages.acceptDiscount.errorAlert")}/>
+      <AlertComponent
+        isOpen={errorAlert}
+        contentStyle={{ right: '20px' }}
+        error
+        message={t('pages.acceptDiscount.errorAlert')}
+      />
     </>
   );
 };

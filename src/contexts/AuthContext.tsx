@@ -20,14 +20,11 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<JwtUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     const initKeycloak = async () => {
@@ -35,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const authenticated = await keycloak.init({
           onLoad: 'check-sso',
           checkLoginIframe: false,
-          pkceMethod: 'S256'
+          pkceMethod: 'S256',
         });
 
         if (authenticated) {
@@ -43,21 +40,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setToken(keycloak.token || null);
           try {
             const response = await axios.get(
-              `${keycloak.authServerUrl}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
+              `${keycloak.authServerUrl}/realms/${
+                import.meta.env.VITE_KEYCLOAK_REALM
+              }/protocol/openid-connect/userinfo`,
               {
                 headers: {
-                  Authorization: `Bearer ${keycloak.token}`
-                }
+                  Authorization: `Bearer ${keycloak.token}`,
+                },
               }
             );
             setUser(response.data);
           } catch {
-            // console.error('Errore inizializzazione Keycloak:', error);
-            keycloak.logout(); 
+            keycloak.logout();
           }
         }
-      // } catch (error) {
-      //   console.error('Errore inizializzazione Keycloak:', error);
       } finally {
         setLoading(false);
       }
@@ -65,18 +61,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initKeycloak();
 
-    // Automatic refresh token
-     const refreshToken = () => {
+    const refreshToken = () => {
       if (keycloak.authenticated) {
-        keycloak.updateToken(70).then((refreshed) => {
-          if (refreshed) {
-            setToken(keycloak.token || null);
-            // console.log('Token aggiornato');
-          }
-        }).catch(() => {
-          // console.log('Impossibile aggiornare il token');
-          logout();
-        });
+        keycloak
+          .updateToken(70)
+          .then((refreshed) => {
+            if (refreshed) {
+              setToken(keycloak.token || null);
+            }
+          })
+          .catch(() => {
+            logout();
+          });
       }
     };
 
@@ -89,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     keycloak.login({
       redirectUri: window.location.origin + '/esercente/', //return to homepage after login
     });
-  },[]);
+  }, []);
 
   const logout = useCallback(() => {
     keycloak.logout({
@@ -100,14 +96,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
   }, [setIsAuthenticated, setUser, setToken]);
 
-  const value = useMemo(() => ({
-    isAuthenticated,
-    user,
-    token,
-    login,
-    logout,
-    loading
-  }), [isAuthenticated, user, token, login, logout, loading]);
+  const value = useMemo(
+    () => ({
+      isAuthenticated,
+      user,
+      token,
+      login,
+      logout,
+      loading,
+    }),
+    [isAuthenticated, user, token, login, logout, loading]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -117,7 +116,7 @@ export const useAuth = (): AuthContextType => {
   const setLogout = authStore((state) => state.setLogout);
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth deve essere usato all\'interno di un AuthProvider');
+    throw new Error("useAuth deve essere usato all'interno di un AuthProvider");
   }
   setJwtToken(context.token || null);
   setLogout(context.logout);

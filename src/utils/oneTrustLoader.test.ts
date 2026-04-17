@@ -1,12 +1,12 @@
-import { __resetCookieStateForTests, initializeCookieOneTrust } from "./oneTrustLoader";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { __resetCookieStateForTests, initializeCookieOneTrust } from './oneTrustLoader';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.stubEnv('VITE_ONE_TRUST_BASE_URL', 'https://cdn.onetrust.com');
 vi.stubEnv('VITE_ONE_TRUST_DOMAIN_ID', 'test-domain-id');
 
 beforeEach(() => {
   vi.resetModules();
-  __resetCookieStateForTests()
+  __resetCookieStateForTests();
   document.head.innerHTML = '';
 });
 

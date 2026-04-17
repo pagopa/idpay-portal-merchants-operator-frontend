@@ -1,5 +1,5 @@
-import { Card, CardContent, List, ListItem, Typography } from "@mui/material";
-import { theme } from "@pagopa/mui-italia";
+import { Card, CardContent, List, ListItem, Typography } from '@mui/material';
+import { theme } from '@pagopa/mui-italia';
 
 const DetailsCard = ({
   title,
@@ -8,32 +8,36 @@ const DetailsCard = ({
   title?: string;
   item: Record<string, string | number>;
 }) => {
-  const listItems = Object.entries(item).reduce((acc, [key, value]) => [ ...acc, [key, !value ? "-" : value]], [])
+  const listItems = Object.entries(item).reduce(
+    (acc, [key, value]) => [...acc, [key, value === 0 || value ? value : '-']],
+    []
+  );
 
   return (
     <Card
       sx={{
-        height: "fit-content",
-        width: "100%",
+        height: 'fit-content',
+        width: '100%',
         backgroundColor: theme.palette.background.paper,
-        borderRadius: "4px",
+        borderRadius: '4px',
       }}
     >
-      <CardContent
-        sx={{ display: "flex", flexDirection: "column", rowGap: "1rem" }}
-      >
-        {title && <Typography variant="h6" fontWeight="fontWeightBold">
-          {title}
-        </Typography>}
-        <List data-testid = "list-test"
-          sx={{ display: "flex", flexDirection: "column", rowGap: "0.5rem" }}
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
+        {title && (
+          <Typography variant="h6" fontWeight="fontWeightBold">
+            {title}
+          </Typography>
+        )}
+        <List
+          data-testid="list-test"
+          sx={{ display: 'flex', flexDirection: 'column', rowGap: '0.5rem' }}
           disablePadding
         >
           {listItems.map(([key, value], index) => {
             return (
               <ListItem
                 disablePadding
-                sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)" }}
+                sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}
                 key={index}
               >
                 <Typography variant="body2">{key}</Typography>

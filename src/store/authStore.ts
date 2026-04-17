@@ -3,7 +3,7 @@ import { create } from 'zustand';
 interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
-  user:unknown;
+  user: unknown;
   logoutFn: (() => void) | null;
   setJwtToken: (token: string | null) => void;
   setLogout: (logoutFn: () => void) => void;
