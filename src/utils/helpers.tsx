@@ -1,72 +1,76 @@
-import { Chip, Tooltip, Typography } from "@mui/material";
-import { MISSING_DATA_PLACEHOLDER } from "./constants";
+import { Chip, Tooltip, Typography } from '@mui/material';
+import { MISSING_DATA_PLACEHOLDER } from './constants';
+import { GridRenderCellParams } from '@mui/x-data-grid';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getStatusChip(t: any, status: string) {
-  switch (status) {
-    case 'AUTHORIZED':
-      return <Chip
-        label={t('pages.refundManagement.authorized')}
-        size="small"
-        sx={{ backgroundColor: '#EEEEEE !important', color: '#17324D !important' }
-        }
-      />
-    case 'REFUNDED':
-      return <Chip
-        label={t('pages.refundManagement.refunded')}
-        size="small"
-        sx={{ backgroundColor: '#C4DCF5 !important', color: '#17324D !important' }}
-      />
-    case 'CANCELLED':
-      return <Chip
-        label={t('pages.refundManagement.cancelled')}
-        size="small"
-        sx={{ backgroundColor: '#FFE0E0 !important', color: '#761F1F !important' }}
-      />
-    case 'CAPTURED':
-      return <Chip
-        label={t('pages.refundManagement.captured')}
-        size="small"
-        sx={{ backgroundColor: '#FFF5DA !important', color: '#614C16 !important' }}
-      />
-    case 'REWARDED':
-      return <Chip
-        label={t('pages.refundManagement.rewarded')}
-        size="small"
-        sx={{ backgroundColor: '#E1F4E1 !important', color: '#224021 !important' }}
-      />
-    case 'INVOICED':
-      return <Chip
-        label={t('pages.refundManagement.invoiced')}
-        size="small"
-        sx={{ backgroundColor: '#E1F5FE !important', color: '#215C76 !important' }}
-      />
-    default:
-      return <Chip
-        label="Errore"
-        size="small"
-        sx={{ backgroundColor: '#E1F4E1 !important', color: '#17324D !important' }}
-      />
-  }
-};
+  const statusMap: Record<string, { label: string; backgroundColor: string; color: string }> = {
+    AUTHORIZED: {
+      label: t('pages.refundManagement.authorized'),
+      backgroundColor: '#EEEEEE !important',
+      color: '#17324D !important',
+    },
+    REFUNDED: {
+      label: t('pages.refundManagement.refunded'),
+      backgroundColor: '#C4DCF5 !important',
+      color: '#17324D !important',
+    },
+    CANCELLED: {
+      label: t('pages.refundManagement.cancelled'),
+      backgroundColor: '#FFE0E0 !important',
+      color: '#761F1F !important',
+    },
+    CAPTURED: {
+      label: t('pages.refundManagement.captured'),
+      backgroundColor: '#FFF5DA !important',
+      color: '#614C16 !important',
+    },
+    REWARDED: {
+      label: t('pages.refundManagement.rewarded'),
+      backgroundColor: '#E1F4E1 !important',
+      color: '#224021 !important',
+    },
+    INVOICED: {
+      label: t('pages.refundManagement.invoiced'),
+      backgroundColor: '#E1F5FE !important',
+      color: '#215C76 !important',
+    },
+  };
+
+  const config = statusMap[status] ?? {
+    label: 'Errore',
+    backgroundColor: '#E1F4E1 !important',
+    color: '#17324D !important',
+  };
+
+  return (
+    <Chip
+      label={config.label}
+      size="small"
+      sx={{
+        backgroundColor: config.backgroundColor,
+        color: config.color,
+      }}
+    />
+  );
+}
 
 export function formatEuro(value: number) {
   return (
-    (value / 100).toLocaleString("it-IT", {
+    (value / 100).toLocaleString('it-IT', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }) + "€"
+    }) + '€'
   );
 }
 
 export function filterInputWithSpaceRule(value: string): string {
   const alnumCount = (value.match(/[a-zA-Z0-9]/g) || []).length;
   if (alnumCount < 5) {
-    return value.replace(/\s/g, "");
+    return value.replace(/\s/g, '');
   }
   return Array.from(value).reduce(
     (acc, char) => {
-      if (char === " ") {
+      if (char === ' ') {
         if (acc.result.length === 0) {
           return { ...acc, prevSpace: true };
         }
@@ -74,7 +78,7 @@ export function filterInputWithSpaceRule(value: string): string {
           return acc;
         }
         return {
-          result: acc.result + " ",
+          result: acc.result + ' ',
           prevSpace: true,
         };
       } else {
@@ -84,10 +88,9 @@ export function filterInputWithSpaceRule(value: string): string {
         };
       }
     },
-    { result: "", prevSpace: false }
+    { result: '', prevSpace: false }
   ).result;
 }
-
 
 export function downloadFileFromBase64(base64: string, fileName: string) {
   const base64Data = base64.replace(/^data:application\/pdf;base64,/, '');
@@ -114,74 +117,117 @@ export const handleCodeChange = (event, formik, length, codeName) => {
   const { value } = event.target;
   const alphanumericRegex = /^[a-zA-Z0-9]*$/;
 
-  if (!(value.includes(" ") || value.length > length)) {
+  if (!(value.includes(' ') || value.length > length)) {
     if (!alphanumericRegex.test(value)) {
       return `Il codice ${codeName} deve contenere al massimo ${length} caratteri alfanumerici.`;
     }
 
     formik.handleChange(event);
-    return "";
+    return '';
   }
 };
 
-export const renderCellWithTooltip = (value: any) => {
+export const renderCellWithTooltip = (value: unknown) => {
+  const renderableValue =
+    value === null || value === undefined
+      ? ''
+      : typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+        ? String(value)
+        : value instanceof Date
+          ? value.toISOString()
+          : typeof value === 'object'
+            ? JSON.stringify(value)
+            : String(value);
+
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      height: '100%',
-      width: '100%'
-    }}>
-      <Tooltip title={value}>
-        <Typography sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
-        }}>
-          {value}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        height: '100%',
+        width: '100%',
+      }}
+    >
+      <Tooltip title={renderableValue}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {renderableValue}
         </Typography>
       </Tooltip>
     </div>
-  )
+  );
 };
 
 export const renderMissingDataWithTooltip = () => {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%',
-      width: '100%'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%',
+      }}
+    >
       <Tooltip title={MISSING_DATA_PLACEHOLDER}>
-        <Typography sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
-        }}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
           {MISSING_DATA_PLACEHOLDER}
         </Typography>
       </Tooltip>
     </div>
-  )
-}
+  );
+};
 
 export const checkTooltipValue = (params, key?: string) => {
   if (key) {
-    if (params?.value?.[key]) {
-      return renderCellWithTooltip(params.value?.[key]);
+    const v = params?.value?.[key];
+    if (v === null || v === undefined || v === '') {
+      return renderMissingDataWithTooltip();
     }
+    return renderCellWithTooltip(v);
   }
-  if (params?.value) {
-    return renderCellWithTooltip(params.value);
+
+  if (params?.value === null || params?.value === undefined || params?.value === '') {
+    return renderMissingDataWithTooltip();
+  }
+
+  return renderCellWithTooltip(params.value);
+};
+
+export const checkEuroTooltip = (params: GridRenderCellParams) => {
+  if (params?.value || params?.value === 0) {
+    return renderCellWithTooltip(formatEuro(params.value as number));
   }
   return renderMissingDataWithTooltip();
 };
 
-export const checkEuroTooltip = (params) => {
-    if (params?.value || params?.value === 0) {
-        return renderCellWithTooltip(formatEuro(params.value));
-    }
+export const checkDateTooltip = (
+  params: GridRenderCellParams,
+  locale: string = 'it-IT',
+  options: Intl.DateTimeFormatOptions = {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+) => {
+  if (!params?.value) {
     return renderMissingDataWithTooltip();
+  }
+  const formattedDate = new Date(params.value as string | number | Date)
+    .toLocaleDateString(locale, options)
+    .replace(',', '');
+  return renderCellWithTooltip(formattedDate);
 };

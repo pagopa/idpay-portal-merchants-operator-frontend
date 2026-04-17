@@ -16,7 +16,6 @@ declare global {
 let cookieInitialized = false;
 let cookieInitializationPromise: Promise<void> | null = null;
 
-
 export const initializeCookieOneTrust = (): Promise<void> => {
   if (cookieInitialized) {
     return Promise.resolve();

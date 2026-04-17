@@ -31,6 +31,9 @@ jobs:
           corepack enable
           yarn install --immutable --check-cache || yarn install --force
 
+      - name: Generate OpenAPI client
+        run: yarn generate:api
+
       - name: 'Run Vitest with Coverage'
         run: yarn test:coverage
 
