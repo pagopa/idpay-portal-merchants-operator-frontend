@@ -732,7 +732,7 @@ describe('Products Component', () => {
     await waitFor(() => {
       expect(mockGetProductsList).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          sort: '',
+          "status": "APPROVED",
           page: 1,
           size: 10,
         })

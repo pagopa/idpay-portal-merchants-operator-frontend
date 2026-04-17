@@ -163,10 +163,16 @@ const Products = () => {
   const fetchProducts = useCallback(async (params: GetProductsParams) => {
     setProductsListIsLoading(true);
     try {
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(
+          ([_ /* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) =>
+            value !== undefined && value !== '' && value !== null
+        )
+      );
       const { content, pageNo, pageSize, totalElements } = await getProductsList({
         size: import.meta.env.VITE_PAGINATION_SIZE,
         status: 'APPROVED',
-        ...params,
+        ...cleanParams,
       });
       setProductsList([...content]);
       setPaginationModel({
@@ -215,7 +221,7 @@ const Products = () => {
     const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
       const value = filtersObj[key];
       if (value !== '' && value !== null && value !== undefined) {
-        acc[key] = value;
+        acc[key] = String(value).trim();
       }
       return acc;
     }, {});
