@@ -178,17 +178,26 @@ describe('merchantService', () => {
     expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
   });
 
-  it('getPreviewPdf converts file to base64', async () => {
-    const mockFile = {
-      arrayBuffer: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3]).buffer),
-    };
-
-    vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: mockFile } as never);
+  it('getPreviewPdf returns base64 when API already returns a base64 string', async () => {
+    vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: 'BASE64PDF' } as never);
 
     const result = await getPreviewPdf('T');
 
     expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
-    expect(result).toHaveProperty('data');
+    expect(result).toEqual({ data: 'BASE64PDF' });
+  });
+
+  it('getPreviewPdf converts file-like (arrayBuffer()) to base64', async () => {
+    const mockFileLike = {
+      arrayBuffer: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3]).buffer),
+    };
+
+    vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: mockFileLike } as never);
+
+    const result = await getPreviewPdf('T');
+
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
     expect(typeof result.data).toBe('string');
+    expect(result.data.length).toBeGreaterThan(0);
   });
 });

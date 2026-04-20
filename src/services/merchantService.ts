@@ -117,8 +117,17 @@ export const getPreviewPdf = async (trxId: string): Promise<{ data: string }> =>
     return { data: rawData };
   }
 
-  if (rawData instanceof Blob) {
-    const arrayBuffer = await rawData.arrayBuffer();
+  if (
+    rawData instanceof Blob ||
+    (typeof rawData === 'object' && 'arrayBuffer' in rawData && typeof (rawData as {
+      arrayBuffer?: unknown
+    }).arrayBuffer === 'function')
+  ) {
+    const arrayBuffer =
+      rawData instanceof Blob
+        ? await rawData.arrayBuffer()
+        : await (rawData as { arrayBuffer: () => Promise<ArrayBuffer> }).arrayBuffer();
+
     const base64 = btoa(
       new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
     );
