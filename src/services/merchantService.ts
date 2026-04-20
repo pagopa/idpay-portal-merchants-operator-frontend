@@ -107,16 +107,36 @@ export const updateInvoiceTransactionApi = async (
 
 export const getPreviewPdf = async (trxId: string): Promise<{ data: string }> => {
   const report = await MerchantApi.getPreviewPdf(trxId);
+  const rawData = (report as unknown as { data?: unknown })?.data;
 
-  const file = report?.data;
-  if (!file) {
+  if (!rawData) {
     return { data: '' };
   }
 
-  const arrayBuffer = await file.arrayBuffer();
-  const base64 = btoa(
-    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-  );
+  if (typeof rawData === 'string') {
+    return { data: rawData };
+  }
 
-  return { data: base64 };
+  if (
+    rawData instanceof Blob ||
+    (typeof rawData === 'object' &&
+      'arrayBuffer' in rawData &&
+      typeof (
+        rawData as {
+          arrayBuffer?: unknown;
+        }
+      ).arrayBuffer === 'function')
+  ) {
+    const arrayBuffer =
+      rawData instanceof Blob
+        ? await rawData.arrayBuffer()
+        : await (rawData as { arrayBuffer: () => Promise<ArrayBuffer> }).arrayBuffer();
+
+    const base64 = btoa(
+      new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
+    return { data: base64 };
+  }
+
+  return { data: '' };
 };
