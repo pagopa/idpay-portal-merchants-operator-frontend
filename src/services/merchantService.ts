@@ -119,9 +119,13 @@ export const getPreviewPdf = async (trxId: string): Promise<{ data: string }> =>
 
   if (
     rawData instanceof Blob ||
-    (typeof rawData === 'object' && 'arrayBuffer' in rawData && typeof (rawData as {
-      arrayBuffer?: unknown
-    }).arrayBuffer === 'function')
+    (typeof rawData === 'object' &&
+      'arrayBuffer' in rawData &&
+      typeof (
+        rawData as {
+          arrayBuffer?: unknown;
+        }
+      ).arrayBuffer === 'function')
   ) {
     const arrayBuffer =
       rawData instanceof Blob
