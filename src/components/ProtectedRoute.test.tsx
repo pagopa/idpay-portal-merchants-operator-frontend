@@ -1,16 +1,16 @@
-import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import ProtectedRoute from "./ProtectedRoute";
+import { render, screen } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import ProtectedRoute from './ProtectedRoute';
 
 let mockUseAuth: ReturnType<typeof vi.fn>;
 
-vi.mock("../contexts/AuthContext", () => ({
+vi.mock('../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 const TestChild = () => <div>Contenuto Protetto</div>;
 
-describe("ProtectedRoute", () => {
+describe('ProtectedRoute', () => {
   beforeAll(() => {
     mockUseAuth = vi.fn();
   });
@@ -27,7 +27,7 @@ describe("ProtectedRoute", () => {
     mockUseAuth.mockClear();
   });
 
-  it("render CircularProgress when loading is true", () => {
+  it('render CircularProgress when loading is true', () => {
     setupMock(false, true, () => {});
 
     render(
@@ -36,10 +36,10 @@ describe("ProtectedRoute", () => {
       </ProtectedRoute>
     );
 
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it("render redirect message if isAuthenticated eq false and loading eq true", () => {
+  it('render redirect message if isAuthenticated eq false and loading eq true', () => {
     setupMock(false, false, () => {});
 
     render(
@@ -48,12 +48,10 @@ describe("ProtectedRoute", () => {
       </ProtectedRoute>
     );
 
-    expect(
-      screen.getByText("Reindirizzamento al login...")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Reindirizzamento al login...')).toBeInTheDocument();
   });
 
-  it("render children if isAuthenticated = true and loading = false", () => {
+  it('render children if isAuthenticated = true and loading = false', () => {
     setupMock(true, false, () => {});
 
     render(
@@ -62,6 +60,6 @@ describe("ProtectedRoute", () => {
       </ProtectedRoute>
     );
 
-    expect(screen.getByText("Contenuto Protetto")).toBeInTheDocument();
+    expect(screen.getByText('Contenuto Protetto')).toBeInTheDocument();
   });
 });

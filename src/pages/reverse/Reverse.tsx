@@ -1,24 +1,24 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import {
   reverseTransactionApi,
   reverseInvoicedTransactionApi,
-} from "../../services/merchantService";
-import FileUploadAction from "../../components/FileUploadAction/FileUploadAction";
-import styles from "./reverse.module.css";
-import ROUTES from "../../routes.ts";
-import { useLocation } from "react-router-dom";
+} from '../../services/merchantService';
+import FileUploadAction from '../../components/FileUploadAction/FileUploadAction';
+import styles from './reverse.module.css';
+import ROUTES from '../../routes.ts';
+import { useLocation } from 'react-router-dom';
 
 const CONTEXTS = {
   [ROUTES.REFUNDS_MANAGEMENT]: {
     breadcrumb: (t) => ({
-      label: t("routes.refundManagement"),
+      label: t('routes.refundManagement'),
       path: ROUTES.REFUNDS_MANAGEMENT,
     }),
     apiCall: reverseInvoicedTransactionApi,
   },
   [ROUTES.BUY_MANAGEMENT]: {
     breadcrumb: (t) => ({
-      label: t("routes.buyManagement"),
+      label: t('routes.buyManagement'),
       path: ROUTES.BUY_MANAGEMENT,
     }),
     apiCall: reverseTransactionApi,
@@ -63,13 +63,13 @@ const Reverse = () => {
       i18nBlockKey="pages.reverse"
       apiCall={apiCall}
       successStateKey="reverseUploadSuccess"
-      breadcrumbsLabelKey={t("routes.reverse")}
+      breadcrumbsLabelKey={t('routes.reverse')}
       breadcrumbsProp={breadcrumbsProp}
       manualLink={import.meta.env.VITE_MANUAL_LINK}
       styleClass={styles.uploadFileContainer}
-      docNumberTitle={t("pages.reverse.creditNoteTitle")}
-      docNumberInsert={t("pages.reverse.insertCreditNote")}
-      docNumberLabel={t("pages.reverse.creditNoteLabel")}
+      docNumberTitle={t('pages.reverse.creditNoteTitle')}
+      docNumberInsert={t('pages.reverse.insertCreditNote')}
+      docNumberLabel={t('pages.reverse.creditNoteLabel')}
     />
   );
 };

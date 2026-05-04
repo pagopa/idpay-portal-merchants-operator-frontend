@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import AcceptDiscountCard from './AcceptDiscountCard';
 
 describe('AcceptDiscountCard', () => {
-
   it('renders without crashing', () => {
     render(<AcceptDiscountCard />);
   });
@@ -25,7 +24,6 @@ describe('AcceptDiscountCard', () => {
   it('renders inputTitle prop correctly', () => {
     const inputTitle = 'Input Title';
     render(<AcceptDiscountCard inputTitle={inputTitle} />);
-    expect(screen.getByText(inputTitle)).toHaveStyle('font-weight: 700;'); 
+    expect(screen.getByText(inputTitle)).toHaveStyle('font-weight: 700;');
   });
-
 });

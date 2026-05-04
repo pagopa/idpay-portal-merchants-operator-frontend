@@ -8,7 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-src/api/generated/merchants
+src/api/generated
 build
 dist
 dist-ssr

@@ -2,11 +2,11 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import AlertComponent from './AlertComponent';
 
-const errorSetup = ( isOpen: boolean, message: string) => {
+const errorSetup = (isOpen: boolean, message: string) => {
   render(<AlertComponent isOpen={isOpen} error={true} message={message} />);
 };
 
-const successSetup = ( isOpen: boolean, message: string) => {
+const successSetup = (isOpen: boolean, message: string) => {
   render(<AlertComponent isOpen={isOpen} error={false} message={message} />);
 };
 

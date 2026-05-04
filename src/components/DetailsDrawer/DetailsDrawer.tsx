@@ -1,17 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import {
-  Divider,
-  Grid,
-  Typography,
-  Box,
-  Drawer,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { theme } from "@pagopa/mui-italia";
-import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
-import { ReceiptLong } from "@mui/icons-material";
+import { useState, useEffect, useRef } from 'react';
+import { Divider, Grid, Typography, Box, Drawer, Button, CircularProgress } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { theme } from '@pagopa/mui-italia';
+import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
+import { ReceiptLong } from '@mui/icons-material';
 
 type ButtonProps = {
   label: string;
@@ -29,7 +21,7 @@ type Props = {
   item: unknown;
   primaryButton?: ButtonProps;
   secondaryButton?: ButtonProps;
-  invoiceStatus?: "INVOICED" | "REWARDED" | "REFUNDED" | "CANCELLED";
+  invoiceStatus?: 'INVOICED' | 'REWARDED' | 'REFUNDED' | 'CANCELLED';
   onFileDownloadCallback?: () => void;
 };
 
@@ -49,10 +41,7 @@ export const DetailsDrawer = ({
   const [isScrollable, setIsScrollable] = useState(false);
 
   useEffect(() => {
-    if (
-      isOpen &&
-      (invoiceStatus === "INVOICED")
-    ) {
+    if (isOpen && invoiceStatus === 'INVOICED') {
       setTimeout(() => {
         checkHeight();
       }, 100);
@@ -62,11 +51,8 @@ export const DetailsDrawer = ({
   }, [isOpen, invoiceStatus]);
 
   const itemsEntries = Object.entries(item).reduce(
-    (acc, [key, value]) => [
-      ...acc,
-      [key, !value ? MISSING_DATA_PLACEHOLDER : value],
-    ],
-    [],
+    (acc, [key, value]) => [...acc, [key, !value ? MISSING_DATA_PLACEHOLDER : value]],
+    []
   );
 
   const checkHeight = () => {
@@ -82,23 +68,23 @@ export const DetailsDrawer = ({
       anchor="right"
       open={isOpen}
       sx={{
-        "& .MuiDrawer-paper": {
+        '& .MuiDrawer-paper': {
           width: 375,
-          boxSizing: "border-box",
+          boxSizing: 'border-box',
         },
       }}
     >
-      <Box p={"1.5rem"} sx={{ position: "relative" }}>
+      <Box p={'1.5rem'} sx={{ position: 'relative' }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            cursor: "pointer",
+            display: 'flex',
+            justifyContent: 'flex-end',
+            cursor: 'pointer',
           }}
           mb={2}
         >
           <CloseIcon
-            sx={{ color: "#5C6F82" }}
+            sx={{ color: '#5C6F82' }}
             data-testid="close-details-drawer-button"
             onClick={() => setIsOpen(false)}
           />
@@ -113,7 +99,7 @@ export const DetailsDrawer = ({
               <Typography
                 sx={{
                   fontWeight: theme.typography.fontWeightBold,
-                  fontSize: "14px",
+                  fontSize: '14px',
                 }}
               >
                 {subtitle}
@@ -127,23 +113,19 @@ export const DetailsDrawer = ({
           spacing={2}
           ref={gridRef}
           sx={{
-            overflowY: isScrollable ? "auto" : "visible",
-            maxHeight: isScrollable ? "calc(100vh - 250px)" : "none",
-            maxWidth: "100%",
+            overflowY: isScrollable ? 'auto' : 'visible',
+            maxHeight: isScrollable ? 'calc(100vh - 250px)' : 'none',
+            maxWidth: '100%',
           }}
           data-testid="item-test"
         >
           {itemsEntries.map(([key, value], index) => {
-            const isDownload = key === "Fattura" || key === "Nota di credito";
+            const isDownload = key === 'Fattura' || key === 'Nota di credito';
 
             return (
-              key !== "id" &&
-              key !== "cancelled" && (
-                <Grid
-                  key={index}
-                  size={{ xs: 12, md: 12, lg: 12 }}
-                  sx={{ wordWrap: "break-word" }}
-                >
+              key !== 'id' &&
+              key !== 'cancelled' && (
+                <Grid key={index} size={{ xs: 12, md: 12, lg: 12 }} sx={{ wordWrap: 'break-word' }}>
                   <Typography
                     variant="body2"
                     sx={{
@@ -157,27 +139,23 @@ export const DetailsDrawer = ({
                     <Button
                       data-testid="btn-test"
                       sx={{
-                        padding: "0",
-                        alignItems: "flex-start",
+                        padding: '0',
+                        alignItems: 'flex-start',
                       }}
                       onClick={() => {
                         if (onFileDownloadCallback) onFileDownloadCallback();
                       }}
                     >
                       {isLoading ? (
-                        <CircularProgress
-                          color="inherit"
-                          size={20}
-                          data-testid="item-loader"
-                        />
+                        <CircularProgress color="inherit" size={20} data-testid="item-loader" />
                       ) : (
                         <span
                           style={{
-                            display: "flex",
-                            alignItems: "flex-start",
-                            textAlign: "left",
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            textAlign: 'left',
                             gap: 6,
-                            width: "100%",
+                            width: '100%',
                             marginTop: 2,
                           }}
                         >
@@ -186,8 +164,8 @@ export const DetailsDrawer = ({
                             component="span"
                             variant="inherit"
                             sx={{
-                              whiteSpace: "normal",
-                              wordBreak: "break-word",
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
                               lineHeight: 1.4,
                             }}
                           >
@@ -202,7 +180,7 @@ export const DetailsDrawer = ({
                       variant="body2"
                       sx={{
                         fontWeight: theme.typography.fontWeightMedium,
-                        wordWrap: "break-word",
+                        wordWrap: 'break-word',
                       }}
                     >
                       {value}
@@ -218,36 +196,34 @@ export const DetailsDrawer = ({
       {(primaryButton || secondaryButton) && (
         <Box
           sx={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 0,
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            padding: "1.5rem",
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '1.5rem',
           }}
         >
-          {primaryButton &&
-            (invoiceStatus === "INVOICED") && (
-              <Button
-                onClick={primaryButton?.onClick}
-                href={primaryButton?.url}
-                variant="contained"
-                disabled={primaryButton?.disabled}
-              >
-                {primaryButton.label}
-              </Button>
-            )}
-          {secondaryButton &&
-            (invoiceStatus === "INVOICED") && (
-              <Button
-                onClick={secondaryButton?.onClick}
-                sx={{ marginTop: "10px" }}
-                href={primaryButton?.url}
-                disabled={secondaryButton?.disabled}
-              >
-                {secondaryButton.label}
-              </Button>
-            )}
+          {primaryButton && invoiceStatus === 'INVOICED' && (
+            <Button
+              onClick={primaryButton?.onClick}
+              href={primaryButton?.url}
+              variant="contained"
+              disabled={primaryButton?.disabled}
+            >
+              {primaryButton.label}
+            </Button>
+          )}
+          {secondaryButton && invoiceStatus === 'INVOICED' && (
+            <Button
+              onClick={secondaryButton?.onClick}
+              sx={{ marginTop: '10px' }}
+              href={primaryButton?.url}
+              disabled={secondaryButton?.disabled}
+            >
+              {secondaryButton.label}
+            </Button>
+          )}
         </Box>
       )}
     </Drawer>
