@@ -166,4 +166,21 @@ export const MerchantApi = {
     const response = await pointOfSaleIdApi.downloadInvoiceFile(pointOfSaleId, trxId);
     return response.data;
   },
+
+  // MOCK WIP
+  getInitiativesList: async () => {
+    const response = [
+      {
+        initiativeId: 'bonus1',
+        initiativeName: 'Bonus Elettrodomestici',
+        startDate: '2025'
+      },
+      {
+        initiativeId: 'bonus2',
+        initiativeName: 'Bonus Decoder',
+        startDate: '2026'
+      }
+    ]
+    return response
+  }
 };

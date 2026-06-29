@@ -14,8 +14,22 @@ import Refund from './pages/refund/Refund.tsx';
 import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy.tsx';
 import TermsOfService from './pages/tos/TOS.tsx';
 import ModifyDocument from './pages/modifyDocument/ModifyDocument.tsx';
+import { getInitiativesList } from './services/merchantService.ts';
+import { initiativesListSelector, setInitiativesList } from './redux/slices/initiativesSlice.ts';
+import { useAppDispatch, useAppSelector } from './redux/hooks.ts';
+import { buildNamespaceKey } from './utils/buildNamespaceKey.ts';
+import { initI18n } from './locale/index.ts';
+import { useEffect } from 'react';
 
 function App() {
+  const namespaces = useAppSelector(initiativesListSelector).map(({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate))
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    getInitiativesList().then((data) => dispatch(setInitiativesList(data)))
+  }, [dispatch])
+
+  initI18n(namespaces)
   return (
     <div className="min-h-screen bg-gray-100">
       <Routes>
