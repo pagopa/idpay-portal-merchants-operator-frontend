@@ -172,13 +172,19 @@ export const MerchantApi = {
     const response = [
       {
         initiativeId: 'bonus1',
+        organizationName: 'Organizzazione di test',
         initiativeName: 'Bonus Elettrodomestici',
-        startDate: '2025'
+        status: 'CLOSED',
+        startDate: '2025',
+        endDate: '2026'
       },
       {
         initiativeId: 'bonus2',
+        organizationName: 'Organizzazione di test',
         initiativeName: 'Bonus Decoder',
-        startDate: '2026'
+        status: 'PUBLISHED',
+        startDate: '2026',
+        endDate: '2027'
       }
     ]
     return response

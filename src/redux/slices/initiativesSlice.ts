@@ -9,14 +9,21 @@ interface InitiativesState {
   list?: InitiativeDTOArray;
 }
 
-const initialState: InitiativesState = {list: []};
+const initialState: InitiativesState = { list: [] };
 
 export const initiativesSlice = createSlice({
   name: 'initiatives',
   initialState,
   reducers: {
     setInitiativesList: (state, action: PayloadAction<InitiativeDTOArray>) => {
-      state.list = action.payload;
+      state.list = action.payload.map((initiative) => {
+        const spendingPeriod = initiative.startDate && initiative.endDate
+          ? `${new Date(initiative.startDate).toLocaleDateString('fr-FR')} - ${new Date(
+            initiative.endDate
+          ).toLocaleDateString('fr-FR')}`
+          : '';
+          return { ...initiative, spendingPeriod}
+      })
     },
   },
 });
@@ -47,8 +54,8 @@ export const currentInitiativeSelector = createSelector(
     const spendingPeriod =
       initiative.startDate && initiative.endDate
         ? `${new Date(initiative.startDate).toLocaleDateString('fr-FR')} - ${new Date(
-            initiative.endDate
-          ).toLocaleDateString('fr-FR')}`
+          initiative.endDate
+        ).toLocaleDateString('fr-FR')}`
         : '';
 
     return {
