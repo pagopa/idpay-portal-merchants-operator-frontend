@@ -8,7 +8,7 @@ import { theme } from '@pagopa/mui-italia';
 import styles from './SideMenu.module.css';
 import { useAppSelector } from '../../redux/hooks';
 import { initiativesListSelector } from '../../redux/slices/initiativesSlice'
-import { SideNavAccordion } from './SidenavAccordion';
+import { SideNavAccordion } from './SideNavAccordion';
 import { useTranslation } from 'react-i18next';
 
 /** The side menu of the application */
@@ -38,6 +38,15 @@ export default function SideMenu({
     >
       <Box gridColumn="auto">
         <List data-testid="first-list-test">
+          <SideNavItem
+            title={t('sideMenu.initiatives')}
+            handleClick={() => navigate(ROUTES.HOME, { replace: true })}
+            isSelected={location.pathname === ROUTES.HOME}
+            icon={MenuIcon}
+            level={0}
+            data-testid="initiativeList-click-test"
+            hideLabels={!isOpen}
+          />
           {initiativesList &&
             initiativesList.map((item) => (
               <SideNavAccordion

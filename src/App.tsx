@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from './redux/hooks.ts';
 import { buildNamespaceKey } from './utils/buildNamespaceKey.ts';
 import { initI18n } from './locale/index.ts';
 import { useEffect } from 'react';
+import { Initiatives } from './pages/initiativesList/InitiativesList.tsx';
 
 function App() {
   const namespaces = useAppSelector(initiativesListSelector).map(({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate))
@@ -43,7 +44,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Navigate to={ROUTES.BUY_MANAGEMENT} />
+                <Initiatives />
               </Layout>
             </ProtectedRoute>
           }
@@ -143,7 +144,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Navigate to={ROUTES.BUY_MANAGEMENT} replace />
+                <Navigate to={ROUTES.HOME} replace />
               </Layout>
             </ProtectedRoute>
           }

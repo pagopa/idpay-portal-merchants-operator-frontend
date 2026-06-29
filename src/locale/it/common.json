@@ -37,6 +37,7 @@
     "title": "Portale Esercenti"
   },
   "sideMenu": {
+    "initiatives": "Iniziative",
     "purchaseManagement": "Gestione acquisti",
     "profile": "Profilo",
     "refundManagement": "Storico rimborsi",
@@ -59,6 +60,10 @@
     },
     "privacyPolicyStatic": {
       "title": "Privacy Policy"
+    },
+    "initiatives": {
+      "title": "Iniziative",
+      "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito."
     },
     "acceptNewDiscount": {
       "discountAccepted": "Buono sconto accettato",
