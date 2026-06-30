@@ -3,10 +3,10 @@ import { StatusChip } from "../../components/StatusChip/StatusChip";
 import { NavigationLink } from "../../components/NavigationLink/NavigationLink";
 import ROUTES from "../../routes";
 
-export const columns = [
+export const columns = (t: (key: string) => string) => [
     {
         field: 'initiativeName',
-        headerName: 'Nome',
+        headerName: t('commons.pages.initiatives.tableHeaders.initiativeName'),
         flex: 1,
         sortable: true,
         disableColumnMenu: true,
@@ -15,7 +15,7 @@ export const columns = [
     },
     {
         field: 'organizationName',
-        headerName: 'Creata da',
+        headerName: t('commons.pages.initiatives.tableHeaders.organizationName'),
         flex: 1,
         sortable: true,
         disableColumnMenu: true,
@@ -24,7 +24,7 @@ export const columns = [
     },
     {
         field: 'spendingPeriod',
-        headerName: 'Periodo di spesa',
+        headerName: t('commons.pages.initiatives.tableHeaders.spendingPeriod'),
         flex: 1,
         sortable: true,
         disableColumnMenu: true,
@@ -33,7 +33,7 @@ export const columns = [
     },
     {
         field: 'status',
-        headerName: 'Stato',
+        headerName: t('commons.pages.initiatives.tableHeaders.status'),
         flex: 1,
         sortable: true,
         disableColumnMenu: true,

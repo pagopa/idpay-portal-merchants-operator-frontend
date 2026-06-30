@@ -40,8 +40,8 @@ export default function SideMenu({
         <List data-testid="first-list-test">
           <SideNavItem
             title={t('commons.sideMenu.initiatives')}
-            handleClick={() => navigate(ROUTES.HOME, { replace: true })}
-            isSelected={location.pathname === ROUTES.HOME}
+            handleClick={() => navigate(ROUTES.INITIATIVES_LIST, { replace: true })}
+            isSelected={location.pathname === ROUTES.INITIATIVES_LIST}
             icon={MenuIcon}
             level={0}
             data-testid="initiativeList-click-test"

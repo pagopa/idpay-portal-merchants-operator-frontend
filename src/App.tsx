@@ -44,6 +44,16 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
+                <Navigate to={ROUTES.INITIATIVES_LIST} />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.INITIATIVES_LIST}
+          element={
+            <ProtectedRoute>
+              <Layout>
                 <InitiativesList />
               </Layout>
             </ProtectedRoute>
@@ -144,7 +154,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Navigate to={ROUTES.HOME} replace />
+                <Navigate to={ROUTES.INITIATIVES_LIST} replace />
               </Layout>
             </ProtectedRoute>
           }

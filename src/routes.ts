@@ -1,5 +1,6 @@
 const ROUTES = {
   HOME: '/',
+  INITIATIVES_LIST: '/iniziative',
   ACCEPT_DISCOUNT: '/:initiativeId/accetta-buono-sconto',
   ACCEPT_DISCOUNT_SUMMARY: '/:initiativeId/accetta-buono-sconto/riepilogo',
   TOS: '/terms-of-service',

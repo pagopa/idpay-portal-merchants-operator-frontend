@@ -80,7 +80,7 @@ export const InitiativesList = () => {
             <Typography variant="body2">{t('commons.pages.initiatives.emptyList')}</Typography>
           </Paper> :
           <DataGrid
-            columns={columns}
+            columns={columns(t)}
             rows={initiativeListFiltered}
             getRowId={row => row.initiativeId}
             sortModel={sortModel}
