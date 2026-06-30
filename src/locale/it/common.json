@@ -31,7 +31,6 @@
     "initiativeStatusEnum": {
       "closed": "Terminata",
       "published": "In corso"
-
     },
     "removeFiltersBtn": "Rimuovi filtri",
     "sendBtn": "Invia",
@@ -43,14 +42,22 @@
         "emptyList": "Non è stata trovata nessuna iniziativa.",
         "search": "Cerca per nome dell'iniziativa."
       }
+    },
+    "sideMenu": {
+      "initiatives": "Iniziative",
+      "purchaseManagement": "Gestione acquisti",
+      "profile": "Profilo",
+      "refundManagement": "Storico rimborsi",
+      "products": "Prodotti"
+    },
+    "footer": {
+      "postLoginLinks": {
+        "privacyPolicy": "Informativa Privacy",
+        "protectionofpersonaldata": "Diritto alla protezione dei dati personali",
+        "termsandconditions": "Termini e Condizioni",
+        "accessibility": "Accessibilità"
+      }
     }
-  },
-  "sideMenu": {
-    "initiatives": "Iniziative",
-    "purchaseManagement": "Gestione acquisti",
-    "profile": "Profilo",
-    "refundManagement": "Storico rimborsi",
-    "products": "Prodotti"
   },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",

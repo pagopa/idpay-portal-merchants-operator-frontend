@@ -3,7 +3,7 @@ import { Accordion, AccordionDetails, AccordionSummary, List, ListItemText, Tool
 import { config } from './config';
 import SideNavItem from './SideNavItem';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 type Props = {
     item: Record<string, string>;
@@ -13,7 +13,7 @@ type Props = {
 export const SideNavAccordion = ({ item, isOpen }: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { t } = useTranslation();
+    const { t } = useScopedTranslation();
     const { initiativeId, initiativeName } = item;
     const capitalLetters = initiativeName.split('').filter((letter) => letter.match(/[A-Z]/)).join('')
 

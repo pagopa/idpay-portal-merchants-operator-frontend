@@ -15,21 +15,21 @@ type ConfigProps = {
 export const config: Array<ConfigProps> = [
   {
     key: 'purchaseManagement',
-    title: 'sideMenu.purchaseManagement',
+    title: 'commons.sideMenu.purchaseManagement',
     route: ROUTES.BUY_MANAGEMENT,
     icon: ConfirmationNumberIcon,
     dataTestId: 'initiativeList-click-test',
   },
   {
     key: 'refundManagement',
-    title: 'sideMenu.refundManagement',
+    title: 'commons.sideMenu.refundManagement',
     route: ROUTES.REFUNDS_MANAGEMENT,
     icon: PaymentsIcon,
     dataTestId: 'initiativeList-click-test',
   },
   {
     key: 'products',
-    title: 'sideMenu.products',
+    title: 'commons.sideMenu.products',
     route: ROUTES.PRODUCTS,
     icon: InventoryIcon,
     dataTestId: 'initiativeList-click-test',

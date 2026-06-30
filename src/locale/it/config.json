@@ -1,8 +1,14 @@
 {
     "commons": {
         "initiativeStatusEnum": {
-            "closed": "default",
-            "published": "success"
+            "closed": {
+                "label": "commons.initiativeStatusEnum.closed",
+                "color": "default"
+            },
+            "published": {
+                "label": "commons.initiativeStatusEnum.published",
+                "color": "success"
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ import styles from './SideMenu.module.css';
 import { useAppSelector } from '../../redux/hooks';
 import { initiativesListSelector } from '../../redux/slices/initiativesSlice'
 import { SideNavAccordion } from './SideNavAccordion';
-import { useTranslation } from 'react-i18next';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 /** The side menu of the application */
 export default function SideMenu({
@@ -19,7 +19,7 @@ export default function SideMenu({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useScopedTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const initiativesList = useAppSelector(initiativesListSelector)
@@ -39,7 +39,7 @@ export default function SideMenu({
       <Box gridColumn="auto">
         <List data-testid="first-list-test">
           <SideNavItem
-            title={t('sideMenu.initiatives')}
+            title={t('commons.sideMenu.initiatives')}
             handleClick={() => navigate(ROUTES.HOME, { replace: true })}
             isSelected={location.pathname === ROUTES.HOME}
             icon={MenuIcon}
@@ -57,7 +57,7 @@ export default function SideMenu({
             ))}
           <Divider sx={{ margin: '1rem 0' }} orientation="horizontal" />
           <SideNavItem
-            title={t('sideMenu.profile')}
+            title={t('commons.sideMenu.profile')}
             handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
             isSelected={location.pathname === ROUTES.PROFILE}
             icon={Person}
