@@ -94,7 +94,16 @@ export const InitiativesList = () => {
                 '&:hover': {
                   backgroundColor: theme.palette.background.paper,
                 },
-              }
+              },
+              '& .MuiDataGrid-cell:focus': {
+                outline: 'none',
+              },
+              '& .MuiDataGrid-cell:focus-within': {
+                outline: 'none',
+              },
+              '& .MuiDataGrid-columnHeader:focus': {
+                outline: 'none',
+              },
             }}
           />}
       </Box>
