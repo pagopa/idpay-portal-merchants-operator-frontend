@@ -19,7 +19,7 @@ import { getProductsList, previewPayment } from '../../services/merchantService'
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/data-contracts';
 import AlertComponent from '../../components/Alert/AlertComponent';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EuroIcon from '@mui/icons-material/Euro';
 import ROUTES from '../../routes';
 
@@ -38,6 +38,7 @@ interface FormErrors {
 
 const AcceptDiscount = () => {
   const { t } = useTranslation();
+  const {initiativeId} = useParams();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState<FormData>({
@@ -113,7 +114,7 @@ const AcceptDiscount = () => {
           JSON.stringify({ ...response, product: formData.product })
         );
         setPreviewIsLoading(false);
-        navigate('/accetta-buono-sconto/riepilogo');
+        navigate(ROUTES.ACCEPT_DISCOUNT_SUMMARY.replace(':initiativeId', initiativeId));
       } catch (error) {
         if (
           error?.response?.data?.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
@@ -196,7 +197,7 @@ const AcceptDiscount = () => {
 
   const handleExitPage = () => {
     sessionStorage.removeItem('discountCoupon');
-    navigate(ROUTES.BUY_MANAGEMENT);
+    navigate(ROUTES.BUY_MANAGEMENT.replace(':initiativeId', initiativeId));
   };
 
   return (

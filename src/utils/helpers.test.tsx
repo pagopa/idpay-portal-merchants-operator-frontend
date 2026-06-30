@@ -13,6 +13,7 @@ import {
   checkDateTooltip,
   handleCodeChange,
   downloadFileFromBase64,
+  replaceValues,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -497,3 +498,7 @@ describe('helpers direct call coverage', () => {
     checkDateTooltip({ ...minimalParams, value: Date.now() });
   });
 });
+
+describe('replaceValues', () => {
+  expect(replaceValues('test:replacement', {':replacement': ' replaced'})).toBe('rest replaced')
+})

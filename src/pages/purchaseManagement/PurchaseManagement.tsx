@@ -2,7 +2,7 @@ import { Box, Button, Drawer, Typography, Grid, CircularProgress } from '@mui/ma
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import ROUTES from '../../routes';
 import {
   getInProgressTransactions,
@@ -21,6 +21,7 @@ import {
   checkEuroTooltip,
   checkTooltipValue,
   checkDateTooltip,
+  replaceValues,
 } from '../../utils/helpers';
 import { utilsStore } from '../../store/utilsStore';
 import ModalComponent from '../../components/Modal/ModalComponent';
@@ -30,6 +31,7 @@ import { getPreviewPdf } from '../../services/merchantService';
 import { downloadFileFromBase64 } from '../../utils/helpers';
 
 const PurchaseManagement = () => {
+  const {initiativeId} = useParams();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [errorDeleteTransaction, setErrorDeleteTransaction] = useState(false);
@@ -52,6 +54,11 @@ const PurchaseManagement = () => {
   const gridRef = useRef(null);
 
   const [isScrollable, setIsScrollable] = useState(false);
+
+  const replaceValuesObj = {
+    ':initiativeId': initiativeId,
+    ':trxId': selectedTransaction?.id
+  }
 
   useEffect(() => {
     if (transactionAuthorized) {
@@ -224,11 +231,11 @@ const PurchaseManagement = () => {
   };
 
   const handleReverseTransaction = async () => {
-    navigate('/storna-transazione/' + selectedTransaction?.id);
+    navigate(replaceValues(ROUTES.REVERSE, replaceValuesObj));
   };
 
   const handleRequestRefund = async () => {
-    navigate('/richiedi-rimborso/' + selectedTransaction?.id);
+    navigate(replaceValues(ROUTES.REFUND, replaceValuesObj));
   };
 
   const handlePreviewPdf = async () => {
@@ -255,7 +262,7 @@ const PurchaseManagement = () => {
         additionalButton={{
           label: 'Accetta buono sconto',
           icon: <QrCodeIcon />,
-          onClick: () => navigate(ROUTES.ACCEPT_DISCOUNT),
+          onClick: () => navigate(ROUTES.ACCEPT_DISCOUNT.replace(':initiativeId', initiativeId)),
         }}
         alerts={[
           [errorDeleteTransaction, setErrorDeleteTransaction],

@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback, useEffect } from 'react';
 import { GridRenderCellParams } from '@mui/x-data-grid';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
@@ -13,6 +13,7 @@ import {
   renderMissingDataWithTooltip,
   checkEuroTooltip,
   checkTooltipValue,
+  replaceValues,
 } from '../../utils/helpers';
 import { DetailsDrawer } from '../../components/DetailsDrawer/DetailsDrawer';
 import TransactionsLayout from '../../components/TransactionsLayout/TransactionsLayout';
@@ -86,6 +87,7 @@ const mapTransactionToDrawerItem = (
 };
 
 const RefundManagement = () => {
+  const { initiativeId } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -128,10 +130,14 @@ const RefundManagement = () => {
   );
 
   const handleReverseTransaction = useCallback(() => {
-    navigate(`/storna-transazione/${selectedTransaction?.id}`, {
-      state: { backTo: ROUTES.REFUNDS_MANAGEMENT },
+  const replaceValuesObj = {
+    ':initiativeId': initiativeId,
+    ':trxId': selectedTransaction?.id
+  }
+    navigate(replaceValues(ROUTES.REVERSE, replaceValuesObj), {
+      state: { backTo: ROUTES.REFUNDS_MANAGEMENT.replace(':initiativeId', initiativeId) },
     });
-  }, [navigate, selectedTransaction]);
+  }, [initiativeId, navigate, selectedTransaction?.id]);
 
   const handleDownloadInvoice = useCallback(async () => {
     const decodedToken: DecodedJwtToken = jwtDecode(token);
@@ -270,9 +276,9 @@ const RefundManagement = () => {
           secondaryButton={
             invoiceStatus === 'INVOICED' || invoiceStatus === 'REWARDED'
               ? {
-                  label: t('pages.refundManagement.drawer.refund'),
-                  onClick: handleReverseTransaction,
-                }
+                label: t('pages.refundManagement.drawer.refund'),
+                onClick: handleReverseTransaction,
+              }
               : undefined
           }
           onFileDownloadCallback={handleDownloadInvoice}

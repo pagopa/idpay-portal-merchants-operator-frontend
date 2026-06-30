@@ -1,7 +1,6 @@
 import { Chip, Tooltip, Typography } from '@mui/material';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 import { GridRenderCellParams } from '@mui/x-data-grid';
-import { StatusChip } from '../components/StatusChip/StatusChip';
 
 export function getStatusChip(t: any, status: string) {
   const statusMap: Record<string, { label: string; backgroundColor: string; color: string }> = {
@@ -232,3 +231,7 @@ export const checkDateTooltip = (
     .replace(',', '');
   return renderCellWithTooltip(formattedDate);
 };
+
+export const replaceValues = (string: string, values: Record<string, string>) => {
+  return Object.entries(values).reduce((acc, [key, value]) => acc + string.replace(key, value), '')
+}

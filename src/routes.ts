@@ -11,7 +11,7 @@ const ROUTES = {
   PROFILE: '/profilo',
   REVERSE: '/:initiativeId/storna-transazione/:trxId',
   REFUND: '/:initiativeId/richiedi-rimborso/:trxId',
-  MODIFY_DOCUMENT: '/:initiativeId/modifica-documento/:trxId/:fileDocNumber',
+  MODIFY_DOCUMENT: '/modifica-documento/:trxId/:fileDocNumber',
 };
 
 export default ROUTES;
