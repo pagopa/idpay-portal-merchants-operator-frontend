@@ -39,7 +39,9 @@
     "pages": {
       "initiatives": {
         "title": "Iniziative",
-        "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito."
+        "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito.",
+        "emptyList": "Non è stata trovata nessuna iniziativa.",
+        "search": "Cerca per nome dell'iniziativa."
       }
     }
   },

@@ -232,5 +232,3 @@ export const checkDateTooltip = (
     .replace(',', '');
   return renderCellWithTooltip(formattedDate);
 };
-
-export const renderStatusChip = (key: string) => <StatusChip value={key} />
