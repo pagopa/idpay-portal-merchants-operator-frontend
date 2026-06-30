@@ -39,7 +39,7 @@ export const InitiativesList = () => {
 
   return (
     <Box>
-      <Box mt={2} mb={4} display={'flex'} flexDirection="column">
+      <Box mt={2} mb={4} display={'flex'} flexDirection="column" rowGap="1.5rem">
         <TitleBox
           title={t('commons.pages.initiatives.title')}
           variantTitle="h4"
