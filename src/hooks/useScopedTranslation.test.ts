@@ -12,9 +12,13 @@ const mocks = vi.hoisted(() => ({
   translation: vi.fn((key: string) => key),
 }));
 
-vi.mock('react-router-dom', () => ({
-  useParams: () => ({ initiativeId: 'initiative-1' }),
-}));
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useParams: () => ({ initiativeId: 'initiative-1' }),
+  }
+});
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

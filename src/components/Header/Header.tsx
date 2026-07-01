@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
 import { useEffect, useState } from 'react';
 import { authStore } from '../../store/authStore.ts';
-import { useScopedTranslation } from '../../hooks/useScopedTranslation.ts';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
   userProps?: LoggedUser & { merchant_id?: string };
@@ -17,7 +17,7 @@ const Header = ({ userProps }: HeaderProps) => {
   const { user } = userProps ? { user: userProps } : useAuth();
   const token = authStore.getState().token;
   const [franchiseName, setFranchiseName] = useState<string>('');
-  const {t} = useScopedTranslation()
+  const {t} = useTranslation()
 
   const loggedUser: LoggedUser = {
     id: userProps ? userProps.id : user.id,

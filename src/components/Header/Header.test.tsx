@@ -102,7 +102,7 @@ describe('Header Component - Basic Rendering', () => {
     render(<Header userProps={mockUserProps} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('product-title')).toHaveTextContent('Bonus Elettrodomestici');
+      expect(screen.getByTestId('product-title')).toHaveTextContent('commons.headerTitle');
     });
   });
 
