@@ -233,5 +233,5 @@ export const checkDateTooltip = (
 };
 
 export const replaceValues = (string: string, values: Record<string, string>) => {
-  return Object.entries(values).reduce((acc, [key, value]) => acc + string.replace(key, value), '')
+  return Object.entries(values).reduce((acc, [key, value]) => acc.replace(key, value), string)
 }

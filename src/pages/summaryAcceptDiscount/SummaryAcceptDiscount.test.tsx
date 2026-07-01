@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SummaryAcceptDiscount from './SummaryAcceptDiscount';
-import ROUTES from '../../routes';
 
 vi.mock('react-i18next', async (importOriginal) => {
   const actual = await importOriginal();
@@ -14,9 +13,14 @@ vi.mock('react-i18next', async (importOriginal) => {
 });
 
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useParams: () => ({ initiativeId: 'Init-1' })
+  };
+});
 
 const mockAuthPayment = vi.fn();
 vi.mock('../../services/merchantService', () => ({
@@ -115,7 +119,7 @@ describe('SummaryAcceptDiscount', () => {
   it("click 'Indietro' navigates to ACCEPT_DISCOUNT", () => {
     render(<SummaryAcceptDiscount />);
     fireEvent.click(screen.getByText('Indietro'));
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.ACCEPT_DISCOUNT);
+    expect(mockNavigate).toHaveBeenCalledWith('/Init-1/accetta-buono-sconto');
   });
 
   it.skip('errorAlert hides after timeout', async () => {

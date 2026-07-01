@@ -7,10 +7,12 @@ import ROUTES from '../../routes';
 import { getProductsList, previewPayment } from '../../services/merchantService';
 import { ProductDTO } from '../../api/generated/data-contracts';
 import AcceptDiscount from './AcceptDiscount';
+import { useParams } from 'react-router-dom';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+  useParams: () => ({initiativeId: 'Init-1'})
 }));
 
 vi.mock('../../services/merchantService', () => ({
@@ -137,7 +139,7 @@ describe('AcceptDiscount', () => {
     });
 
     expect(window.sessionStorage.setItem).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith('/accetta-buono-sconto/riepilogo');
+    expect(mockNavigate).toHaveBeenCalledWith('/Init-1/accetta-buono-sconto/riepilogo');
   });
 
   it('handles discountCodeWrong error', async () => {
@@ -191,7 +193,7 @@ describe('AcceptDiscount', () => {
     fireEvent.click(screen.getByText('Esci'));
 
     expect(window.sessionStorage.removeItem).toHaveBeenCalledWith('discountCoupon');
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT);
+    expect(mockNavigate).toHaveBeenCalledWith('/Init-1/gestione-acquisti');
   });
 
   it('loads form data from sessionStorage on mount', () => {

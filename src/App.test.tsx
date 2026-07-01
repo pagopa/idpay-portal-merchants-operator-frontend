@@ -1,8 +1,29 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import ROUTES from './routes';
+import { useAppSelector } from './redux/hooks';
+import { getInitiativesList } from './services/merchantService';
+
+const mockInitiatives = [
+  { initiativeName: 'Bonus Elettrodomestici', startDate: '2025' }
+];
+
+const mockDispatch = vi.fn();
+vi.mock('./redux/hooks.ts', () => ({
+  useAppSelector: vi.fn(),
+  useAppDispatch: () => mockDispatch,
+}));
+
+vi.mock('./services/merchantService.ts', () => ({
+  getInitiativesList: vi.fn(),
+}));
+
+vi.mock('./redux/slices/initiativesSlice.ts', () => ({
+  setInitiativesList: vi.fn((data) => ({ type: 'SET_INITIATIVES', payload: data })),
+  initiativesListSelector: vi.fn(),
+}));
 
 vi.mock('./components/Layout/Layout', () => ({
   default: ({ children }: { children: React.ReactNode }) => (
@@ -14,6 +35,10 @@ vi.mock('./components/ProtectedRoute', () => ({
   default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="protected">{children}</div>
   ),
+}));
+
+vi.mock('./pages/initiativesList/InitiativesList', () => ({
+  InitiativesList: () => <div>InitiativesListPage</div>,
 }));
 
 vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({
@@ -51,12 +76,20 @@ vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({
 }));
 
 describe('App routing', () => {
+  vi.mocked(getInitiativesList).mockResolvedValue(mockInitiatives)
+  vi.mocked(useAppSelector).mockReturnValue(mockInitiatives);
+
   const renderWithRoute = (route: string) =>
     render(
       <MemoryRouter initialEntries={[route]}>
         <App />
       </MemoryRouter>
     );
+
+  it('should render initiativesList', () => {
+    renderWithRoute(ROUTES.INITIATIVES_LIST)
+    expect(screen.getByText('InitiativesListPage')).toBeInTheDocument();
+  });
 
   it('renders privacy policy (public)', () => {
     renderWithRoute(ROUTES.PRIVACY_POLICY);
@@ -68,9 +101,9 @@ describe('App routing', () => {
     expect(screen.getByText('TermsOfServicePage')).toBeInTheDocument();
   });
 
-  it('redirects HOME to BUY_MANAGEMENT', () => {
+  it('redirects HOME to INITIATIVES_LIST', () => {
     renderWithRoute(ROUTES.HOME);
-    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
+    expect(screen.getByText('InitiativesListPage')).toBeInTheDocument();
   });
 
   it('renders accept discount', () => {
@@ -118,8 +151,8 @@ describe('App routing', () => {
     expect(screen.getByText('ModifyDocumentPage')).toBeInTheDocument();
   });
 
-  it('redirects unknown route to BUY_MANAGEMENT', () => {
+  it('redirects unknown route to INITIATIVES_LIST', () => {
     renderWithRoute('/unknown');
-    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
+    expect(screen.getByText('InitiativesListPage')).toBeInTheDocument();
   });
 });

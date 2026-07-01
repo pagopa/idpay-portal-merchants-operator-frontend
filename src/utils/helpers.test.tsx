@@ -500,5 +500,5 @@ describe('helpers direct call coverage', () => {
 });
 
 describe('replaceValues', () => {
-  expect(replaceValues('test:replacement', {':replacement': ' replaced'})).toBe('rest replaced')
+  expect(replaceValues('test:replacement', {':replacement': ' replaced'})).toBe('test replaced')
 })

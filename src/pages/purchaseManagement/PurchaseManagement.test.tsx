@@ -13,12 +13,14 @@ const {
   mockDownload,
   mockAuthorized,
   mockCaptured,
+  mockParams
 } = vi.hoisted(() => ({
   mockedNavigate: vi.fn(),
   mockDelete: vi.fn(),
   mockCapture: vi.fn(),
   mockPreview: vi.fn(),
   mockDownload: vi.fn(),
+  mockParams: { initiativeId: 'Init-1' },
   mockAuthorized: {
     id: '1',
     trxCode: 'trx',
@@ -106,6 +108,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => mockedNavigate,
     useLocation: () => mockedLocation,
+    useParams: () => mockParams
   };
 });
 
@@ -116,7 +119,10 @@ vi.mock('../../services/merchantService', () => ({
   getPreviewPdf: mockPreview,
 }));
 
-vi.mock('../../utils/helpers', () => ({
+vi.mock('../../utils/helpers', async () => {
+  const actual = await vi.importActual('../../utils/helpers')
+  return {
+    ...actual,
   getStatusChip: vi.fn((_, status: string) => <div data-testid="status-chip">{status}</div>),
   formatEuro: vi.fn((v: number) => `€${v}`),
   downloadFileFromBase64: mockDownload,
@@ -124,8 +130,8 @@ vi.mock('../../utils/helpers', () => ({
     p?.value !== undefined ? `€${p.value}` : '---'
   ),
   checkTooltipValue: vi.fn((p: { value?: unknown }) => p?.value ?? '---'),
-  checkDateTooltip: vi.fn(() => 'date'),
-}));
+  checkDateTooltip: vi.fn(() => 'date')
+}});
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
   default: (props: {
@@ -202,7 +208,7 @@ describe('PurchaseManagement coverage completion', () => {
   it('navigates to accept discount', () => {
     renderPage();
     fireEvent.click(screen.getByTestId('btn-add'));
-    expect(mockedNavigate).toHaveBeenCalledWith(ROUTES.ACCEPT_DISCOUNT);
+    expect(mockedNavigate).toHaveBeenCalledWith('/Init-1/accetta-buono-sconto');
   });
 
   it('renders AUTHORIZED drawer branch', async () => {
@@ -380,14 +386,14 @@ describe('PurchaseManagement coverage completion', () => {
     fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
     await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
     fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
-    expect(mockedNavigate).toHaveBeenCalledWith('/storna-transazione/2');
+    expect(mockedNavigate).toHaveBeenCalledWith('/Init-1/storna-transazione/2');
   });
 
   it('covers handleRequestRefund navigate from CAPTURED', async () => {
     renderPage();
     await openCapturedDrawer();
     fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.requestRefund'));
-    expect(mockedNavigate).toHaveBeenCalledWith('/richiedi-rimborso/2');
+    expect(mockedNavigate).toHaveBeenCalledWith('/Init-1/richiedi-rimborso/2');
   });
 
   it('covers location state refundUploadSuccess', () => {

@@ -1,33 +1,39 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { StatusChip } from './StatusChip';
-
-vi.mock('@mui/material', () => ({
-  Chip: ({ label, color }: { label: string; color: string }) => (
-    <span data-color={color}>{label}</span>
-  ),
-}));
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 vi.mock('../../hooks/useScopedTranslation', () => ({
-  useScopedTranslation: () => ({
-    t: (key: string) => `translated:${key}`,
-    config: (key: string) =>
-      key === 'commons.initiativeStatusEnum.PUBLISHED' ? 'success' : 'default',
-  }),
+  useScopedTranslation: vi.fn(),
 }));
 
 describe('StatusChip', () => {
-  it('renders the translated status label', () => {
-    render(<StatusChip value="PUBLISHED" />);
+  const mockT = vi.fn();
+  const mockConfig = vi.fn();
 
-    expect(
-      screen.getByText('translated:commons.initiativeStatusEnum.PUBLISHED')
-    ).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useScopedTranslation).mockReturnValue({
+      t: mockT,
+      config: mockConfig,
+    });
   });
 
-  it('applies the color configured for the status', () => {
-    render(<StatusChip value="PUBLISHED" />);
+  it('should show correct chip label and color', () => {
+    mockT.mockReturnValue('In corso');
+    mockConfig.mockReturnValue('success');
 
-    expect(screen.getByText(/PUBLISHED/)).toHaveAttribute('data-color', 'success');
+    render(<StatusChip field="initiative" value="published" />);
+
+    expect(mockT).toHaveBeenCalledWith('commons.statusEnum.initiative.published');
+
+    expect(mockConfig).toHaveBeenCalledWith('commons.statusEnum.initiative.published.color');
+
+    const chipLabel = screen.getByText('In corso');
+    expect(chipLabel).toBeInTheDocument();
+
+    const chipContainer = chipLabel.closest('.MuiChip-root');
+    expect(chipContainer).toHaveClass('MuiChip-colorSuccess');
+    expect(chipContainer).toHaveClass('MuiChip-sizeSmall');
   });
 });
