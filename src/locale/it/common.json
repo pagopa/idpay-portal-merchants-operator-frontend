@@ -16,6 +16,12 @@
     "statusFilterPlaceholer": "Stato",
     "trxCodeFilterPlaceholer": "Cerca per codice sconto",
     "fileSizeError": "Il file supera la dimensione massima di 20MB",
+    "statusEnum": {
+      "initiative": {
+        "closed": "Terminata",
+        "published": "In corso"
+      }
+    },
     "discountStatusEnum": {
       "authorized": "Autorizzato",
       "authorizationRequested": "Autorizzazione in corso",
@@ -28,15 +34,11 @@
     "downloadQrBtn": "Scarica codice QR",
     "exitBtn": "Esci",
     "filterBtn": "Filtra",
-    "initiativeStatusEnum": {
-      "closed": "Terminata",
-      "published": "In corso"
-    },
     "removeFiltersBtn": "Rimuovi filtri",
     "sendBtn": "Invia",
     "title": "Portale Esercenti",
     "pages": {
-      "initiatives": {
+      "initiativesList": {
         "title": "Iniziative",
         "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito.",
         "emptyList": "Non è stata trovata nessuna iniziativa.",

@@ -1,13 +1,67 @@
 {
     "commons": {
-        "initiativeStatusEnum": {
-            "closed": {
-                "label": "commons.initiativeStatusEnum.closed",
-                "color": "default"
-            },
-            "published": {
-                "label": "commons.initiativeStatusEnum.published",
-                "color": "success"
+        "statusEnum": {
+            "initiative": {
+                "closed": {
+                    "label": "commons.initiativeStatusEnum.closed",
+                    "color": "default"
+                },
+                "published": {
+                    "label": "commons.initiativeStatusEnum.published",
+                    "color": "success"
+                }
+            }
+        },
+        "pages": {
+            "initiativesList": {
+                "initiativeTable": {
+                    "columns": [
+                        {
+                            "field": "initiativeName",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.initiativeName",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "link"
+                            }
+                        },
+                        {
+                            "field": "organizationName",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.organizationName",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "text"
+                            }
+                        },
+                        {
+                            "field": "spendingPeriod",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.spendingPeriod",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "text"
+                            }
+                        },
+                        {
+                            "field": "status",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.status",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "chip"
+                            }
+                        }
+                    ]
+                }
             }
         }
     }

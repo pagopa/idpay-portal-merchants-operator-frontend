@@ -2,29 +2,34 @@ import { Box } from "@mui/system";
 import { TitleBox } from "@pagopa/selfcare-common-frontend/lib";
 import { useAppSelector } from "../../redux/hooks";
 import { initiativesListSelector } from "../../redux/slices/initiativesSlice";
-import { columns } from "./columns";
 import { useScopedTranslation } from "../../hooks/useScopedTranslation";
-import { useEffect, useState } from "react";
-import { DataGrid, GridSortModel } from "@mui/x-data-grid";
-import { theme } from "@pagopa/mui-italia";
-import { InputAdornment, Paper, TextField, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { GridColDef, GridSortModel } from "@mui/x-data-grid";
+import { InputAdornment, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+import { DynamicTable } from "../../components/DynamicTable/DynamicTable";
+import ROUTES from "../../routes";
 
 export const InitiativesList = () => {
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'initiativeName', sort: 'asc' }]);
   const [initiativeListFiltered, setInitiativeListFiltered] = useState([]);
-  const { t } = useScopedTranslation();
+  const { t, config } = useScopedTranslation();
+  const columns = config('commons.pages.initiativesList.initiativeTable.columns') as Array<GridColDef & { cell: Record<string, string> }>
   const initiativesList = useAppSelector(initiativesListSelector);
+  const mappedInitiativesList = useMemo(() =>
+    initiativesList.map((initiative) =>
+      ({ ...initiative, key: 'initiative', route: ROUTES.BUY_MANAGEMENT.replace(':initiativeId', initiative.initiativeId) })),
+    [initiativesList])
 
   useEffect(() => {
-    setInitiativeListFiltered(initiativesList);
-  }, [initiativesList]);
+    setInitiativeListFiltered(mappedInitiativesList);
+  }, [initiativesList, mappedInitiativesList]);
 
   const handleSearchInitiatives = (s: string) => {
     const search = s.toLocaleLowerCase();
     if (search.length > 0) {
       const listFiltered = [];
-      initiativesList?.forEach((record) => {
+      mappedInitiativesList?.forEach((record) => {
         if (record?.initiativeName?.toLowerCase().includes(search)) {
           listFiltered.push(record);
         }
@@ -41,9 +46,9 @@ export const InitiativesList = () => {
     <Box>
       <Box mt={2} mb={4} display={'flex'} flexDirection="column" rowGap="1.5rem">
         <TitleBox
-          title={t('commons.pages.initiatives.title')}
+          title={t('commons.pages.initiativesList.title')}
           variantTitle="h4"
-          subTitle={t('commons.pages.initiatives.subtitle')}
+          subTitle={t('commons.pages.initiativesList.subtitle')}
           variantSubTitle="body2"
           mbTitle={2}
           mtTitle={0}
@@ -51,7 +56,7 @@ export const InitiativesList = () => {
         />
         <TextField
           id="search-initiative"
-          placeholder={t('commons.pages.initiatives.search')}
+          placeholder={t('commons.pages.initiativesList.search')}
           variant="outlined"
           size="small"
           data-testid='search-initiatives'
@@ -66,46 +71,16 @@ export const InitiativesList = () => {
             handleSearchInitiatives(e.target.value);
           }}
         />
-        {!initiativeListFiltered.length ?
-          <Paper
-            sx={{
-              my: 4,
-              p: 3,
-              textAlign: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Typography variant="body2">{t('commons.pages.initiatives.emptyList')}</Typography>
-          </Paper> :
-          <DataGrid
-            columns={columns(t)}
-            rows={initiativeListFiltered}
-            getRowId={row => row.initiativeId}
-            sortModel={sortModel}
-            onSortModelChange={setSortModel}
-            sortingOrder={['asc', 'desc']}
-            hideFooterPagination
-            disableRowSelectionOnClick
-            sx={{
-              '& .MuiDataGrid-row': {
-                backgroundColor: theme.palette.background.paper,
-                '&:hover': {
-                  backgroundColor: theme.palette.background.paper,
-                },
-              },
-              '& .MuiDataGrid-cell:focus': {
-                outline: 'none',
-              },
-              '& .MuiDataGrid-cell:focus-within': {
-                outline: 'none',
-              },
-              '& .MuiDataGrid-columnHeader:focus': {
-                outline: 'none',
-              },
-            }}
-          />}
+        <DynamicTable
+          columnsDef={columns}
+          rows={initiativeListFiltered}
+          getRowId={row => row.initiativeId}
+          emptyText='commons.pages.initiativesList.emptyList'
+          isEmpty={!initiativeListFiltered.length}
+          sortModel={sortModel}
+          onSortModelChange={setSortModel}
+          sortingOrder={['asc', 'desc']}
+          hideFooterPagination />
       </Box>
     </Box>
   );
