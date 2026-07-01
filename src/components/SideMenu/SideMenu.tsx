@@ -53,6 +53,7 @@ export default function SideMenu({
                 key={item?.initiativeId}
                 item={item}
                 isOpen={isOpen}
+                defaultOpen={!(initiativesList.length - 1)}
               />
             ))}
           <Divider sx={{ margin: '1rem 0' }} orientation="horizontal" />

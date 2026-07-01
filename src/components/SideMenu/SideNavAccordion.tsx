@@ -4,20 +4,22 @@ import { config } from './config';
 import SideNavItem from './SideNavItem';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
+import { PointOfSaleInitiativeDetailedDTO } from '../../api/generated/data-contracts';
 
 type Props = {
-    item: Record<string, string>;
+    item: PointOfSaleInitiativeDetailedDTO;
     isOpen?: boolean
+    defaultOpen?: boolean
 };
 
-export const SideNavAccordion = ({ item, isOpen }: Props) => {
+export const SideNavAccordion = ({ item, isOpen, defaultOpen }: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useScopedTranslation();
     const { initiativeId, initiativeName } = item;
     const capitalLetters = initiativeName.split('').filter((letter) => letter.match(/[A-Z]/)).join('')
 
-    const isAccordionExpanded = location.pathname.includes(`/${initiativeId}`)
+    const isAccordionExpanded = location.pathname.includes(`/${initiativeId}`) || defaultOpen
 
     return (
         <Accordion
