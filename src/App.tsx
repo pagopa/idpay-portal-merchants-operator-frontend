@@ -27,7 +27,7 @@ function App() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    getInitiativesList().then((data) => dispatch(setInitiativesList(data)))
+    getInitiativesList().then((data) => dispatch(setInitiativesList(data.initiatives)))
   }, [dispatch])
 
   initI18n(namespaces)

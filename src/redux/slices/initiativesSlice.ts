@@ -1,12 +1,10 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 
 import { RootState } from '../store';
-// import { InitiativeDTO } from '../../api/generated/merchants/data-contracts';
-
-type InitiativeDTOArray = Array<Record<string, string>>;
+import { PointOfSaleInitiativeDetailedDTO } from '../../api/generated/data-contracts';
 
 interface InitiativesState {
-  list?: InitiativeDTOArray;
+  list?: Array<PointOfSaleInitiativeDetailedDTO>;
 }
 
 const initialState: InitiativesState = { list: [] };
@@ -15,7 +13,7 @@ export const initiativesSlice = createSlice({
   name: 'initiatives',
   initialState,
   reducers: {
-    setInitiativesList: (state, action: PayloadAction<InitiativeDTOArray>) => {
+    setInitiativesList: (state, action: PayloadAction<Array<PointOfSaleInitiativeDetailedDTO>>) => {
       state.list = action.payload.map((initiative) => {
         const spendingPeriod = initiative.startDate && initiative.endDate
           ? `${new Date(initiative.startDate).toLocaleDateString('fr-FR')} - ${new Date(
@@ -31,10 +29,10 @@ export const initiativesSlice = createSlice({
 export const { setInitiativesList } = initiativesSlice.actions;
 export const initiativesReducer = initiativesSlice.reducer;
 
-export const initiativesListSelector = (state: RootState): InitiativeDTOArray | undefined =>
+export const initiativesListSelector = (state: RootState): Array<PointOfSaleInitiativeDetailedDTO> | undefined =>
   state.initiatives.list;
 
-export type InitiativeExtended = Record<string, string> & {
+export type InitiativeExtended = PointOfSaleInitiativeDetailedDTO & {
   spendingPeriod: string;
 };
 

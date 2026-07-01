@@ -12,12 +12,14 @@ import type {
   AuthBarCodePaymentDTO,
 } from './generated/data-contracts';
 import { createApiConfig, getAuthToken } from './BaseApiClient';
+import { PointOfSales } from './generated/PointOfSales';
 
 const productsApi = new Products<string>(createApiConfig());
 const transactionsApi = new Transactions<string>(createApiConfig());
 const initiativesApi = new Initiatives<string>(createApiConfig());
 const merchantIdApi = new MerchantId<string>(createApiConfig());
 const pointOfSaleIdApi = new PointOfSaleId<string>(createApiConfig());
+const pointOfSalesApi = new PointOfSales<string>(createApiConfig());
 
 const applySecurity = () => {
   const token = getAuthToken();
@@ -26,6 +28,7 @@ const applySecurity = () => {
   initiativesApi.setSecurityData(token);
   merchantIdApi.setSecurityData(token);
   pointOfSaleIdApi.setSecurityData(token);
+  pointOfSalesApi.setSecurityData(token);
 };
 
 export const MerchantApi = {
@@ -167,26 +170,9 @@ export const MerchantApi = {
     return response.data;
   },
 
-  // MOCK WIP
   getInitiativesList: async () => {
-    const response = [
-      {
-        initiativeId: 'bonus1',
-        organizationName: 'Organizzazione di test',
-        initiativeName: 'Bonus Elettrodomestici',
-        status: 'CLOSED',
-        startDate: '2025',
-        endDate: '2026'
-      },
-      {
-        initiativeId: 'bonus2',
-        organizationName: 'Organizzazione di test',
-        initiativeName: 'Bonus Decoder',
-        status: 'PUBLISHED',
-        startDate: '2026',
-        endDate: '2027'
-      }
-    ]
-    return response
+    applySecurity();
+    const response = await pointOfSalesApi.getPointOfSaleInitiativesDetailed();
+    return response.data;
   }
 };
