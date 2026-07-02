@@ -21,13 +21,13 @@ describe('StatusChip', () => {
 
   it('should show correct chip label and color', () => {
     mockT.mockReturnValue('In corso');
-    mockConfig.mockReturnValue('success');
+    mockConfig.mockReturnValue({label: 'commons.statusEnum.initiative.published', color: 'success'});
 
     render(<StatusChip field="initiative" value="published" />);
 
     expect(mockT).toHaveBeenCalledWith('commons.statusEnum.initiative.published');
 
-    expect(mockConfig).toHaveBeenCalledWith('commons.statusEnum.initiative.published.color');
+    expect(mockConfig).toHaveBeenCalledWith('commons.statusEnum.initiative.published');
 
     const chipLabel = screen.getByText('In corso');
     expect(chipLabel).toBeInTheDocument();

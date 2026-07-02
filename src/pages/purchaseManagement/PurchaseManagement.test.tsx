@@ -98,8 +98,8 @@ vi.mock('@pagopa/mui-italia', () => ({
   },
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string) => k }),
+vi.mock('../../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: () => ({ t: (k: string) => k }),
 }));
 
 vi.mock('react-router-dom', async () => {

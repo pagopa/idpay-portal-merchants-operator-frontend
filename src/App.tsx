@@ -30,7 +30,10 @@ function App() {
 
   useEffect(() => {
     if (!isAuthenticated || !token) {
-      return; 
+      return;
+    }
+    if (isLoaded) {
+      return;
     }
     const initializeApp = async () => {
       try {
@@ -45,7 +48,7 @@ function App() {
       }
     }
     initializeApp();
-  }, [dispatch, isAuthenticated, token])
+  }, [dispatch, isAuthenticated, isLoaded, token])
 
   if (!isLoaded) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento iniziative...</div>;

@@ -9,15 +9,16 @@ const mocks = vi.hoisted(() => ({
     startDate: '2025-09-01',
   },
   hasResourceBundle: vi.fn(),
-  translation: vi.fn((key: string) => key),
+  translation: vi.fn(),
+  buildNamespaceKey: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal()
+  const actual = await importOriginal();
   return {
     ...actual,
     useParams: () => ({ initiativeId: 'initiative-1' }),
-  }
+  };
 });
 
 vi.mock('react-i18next', () => ({
@@ -37,6 +38,10 @@ vi.mock('../locale', () => ({
   },
 }));
 
+vi.mock('../utils/buildNamespaceKey', () => ({
+  buildNamespaceKey: () => mocks.buildNamespaceKey(),
+}));
+
 describe('useScopedTranslation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,7 +50,10 @@ describe('useScopedTranslation', () => {
       initiativeName: 'Bonus Elettrodomestici',
       startDate: '2025-09-01',
     };
-    mocks.translation.mockImplementation((key: string) => key);
+    
+    mocks.buildNamespaceKey.mockReturnValue('bonusElettrodomestici2025');
+    
+    mocks.translation.mockImplementation((key: string) => `translated_${key}`);
   });
 
   it('uses initiative copy and config namespaces when resource bundles exist', () => {
@@ -82,7 +90,7 @@ describe('useScopedTranslation', () => {
     });
   });
 
-  it('uses common namespaces for commons keys', () => {
+  it('uses common namespaces for commons keys directly', () => {
     mocks.hasResourceBundle.mockReturnValue(true);
 
     const { result } = renderHook(() => useScopedTranslation());
@@ -96,6 +104,22 @@ describe('useScopedTranslation', () => {
     expect(mocks.translation).toHaveBeenNthCalledWith(2, 'commons.status', {
       ns: 'config',
       returnObjects: true,
+    });
+  });
+
+  it('falls back to common namespace if specific translation is missing (returns key)', () => {
+    mocks.hasResourceBundle.mockReturnValue(true);
+    
+    mocks.translation.mockImplementation((key: string) => key); 
+
+    const { result } = renderHook(() => useScopedTranslation());
+
+    result.current.t('missing.key');
+    expect(mocks.translation).toHaveBeenNthCalledWith(1, 'missing.key', {
+      ns: 'bonusElettrodomestici2025/copy',
+    });
+    expect(mocks.translation).toHaveBeenNthCalledWith(2, 'missing.key', {
+      ns: 'common',
     });
   });
 });
