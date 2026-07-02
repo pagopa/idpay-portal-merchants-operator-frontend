@@ -79,6 +79,14 @@ vi.mock('./generated/PointOfSaleId', () => ({
   },
 }));
 
+vi.mock('./generated/PointOfSales', () => ({
+  PointOfSales: class {
+    setSecurityData = vi.fn();
+    getPointOfSaleInitiativesDetailed = () =>
+      mockGet(`/point-of-sales/initiatives`);
+  },
+}));
+
 vi.mock('../store/authStore', () => ({
   authStore: {
     getState: vi.fn(() => ({ token: 'mocked_token' })),
@@ -86,6 +94,7 @@ vi.mock('../store/authStore', () => ({
 }));
 
 import { MerchantApi } from './MerchantsApiClient';
+import { Initiatives } from './generated/Initiatives';
 
 describe('MerchantApi', () => {
   afterEach(() => {
@@ -583,4 +592,13 @@ describe('MerchantApi', () => {
       expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('getInitiativesList', () => {
+    it('should call getInitiativesList', async () => {
+      const mockResponse = { data: { Initiatives: [{ initiativeId: 'id-1', initiativeName: 'Test Initiative' }] } }
+      mockGet.mockResolvedValue(mockResponse)
+      const result = await MerchantApi.getInitiativesList()
+      expect(result).toEqual(mockResponse.data)
+    })
+  })
 });
