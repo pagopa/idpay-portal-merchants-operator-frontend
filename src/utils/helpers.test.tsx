@@ -392,7 +392,7 @@ describe('downloadFileFromBase64', () => {
 
     // Mock URL.createObjectURL and revokeObjectURL
     const createObjectURLMock = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:url');
-    const revokeObjectURLMock = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const revokeObjectURLMock = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => { });
 
     // Mock click on anchor element
     const clickMock = vi.fn();
@@ -405,7 +405,7 @@ describe('downloadFileFromBase64', () => {
         download: '',
         click: clickMock,
         style: {},
-        setAttribute: () => {},
+        setAttribute: () => { },
         remove: removeMock,
       } as unknown as HTMLAnchorElement;
     });
@@ -500,5 +500,7 @@ describe('helpers direct call coverage', () => {
 });
 
 describe('replaceValues', () => {
-  expect(replaceValues('test:replacement', {':replacement': ' replaced'})).toBe('test replaced')
+  it('replaceValues', () => {
+    expect(replaceValues('test:replacement', { ':replacement': ' replaced' })).toBe('test replaced')
+  })
 })
