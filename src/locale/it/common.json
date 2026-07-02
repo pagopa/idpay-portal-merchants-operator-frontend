@@ -20,6 +20,14 @@
       "initiative": {
         "closed": "Terminata",
         "published": "In corso"
+      },
+      "transaction": {
+        "cancelled": "Annullato",
+        "refunded": "Stornato",
+        "rewarded": "Rimborso richiesto",
+        "invoiced": "Preso in carico",
+        "authorized": "Da autorizzare",
+        "captured": "Fattura da caricare"
       }
     },
     "discountStatusEnum": {

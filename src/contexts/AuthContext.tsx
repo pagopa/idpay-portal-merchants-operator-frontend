@@ -26,6 +26,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const setJwtToken = authStore((state) => state.setJwtToken);
+  const setLogout = authStore((state) => state.setLogout);
+
   useEffect(() => {
     const initKeycloak = async () => {
       try {
@@ -96,6 +99,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
   }, [setIsAuthenticated, setUser, setToken]);
 
+  useEffect(() => {
+    setJwtToken(token);
+  }, [token, setJwtToken]);
+
+  useEffect(() => {
+    setLogout(logout);
+  }, [logout, setLogout]);
+
   const value = useMemo(
     () => ({
       isAuthenticated,
@@ -112,13 +123,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 };
 
 export const useAuth = (): AuthContextType => {
-  const setJwtToken = authStore((state) => state.setJwtToken);
-  const setLogout = authStore((state) => state.setLogout);
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth deve essere usato all'interno di un AuthProvider");
   }
-  setJwtToken(context.token || null);
-  setLogout(context.logout);
   return context;
 };

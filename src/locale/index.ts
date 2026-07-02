@@ -12,8 +12,8 @@ const defaultResources = {
   config: 'default/config'
 }
 
-export const initI18n = (namespaces: Array<string>) => {
-  void i18n.use(initReactI18next).init({
+export const initI18n = async (namespaces: Array<string>) => {
+  await i18n.use(initReactI18next).init({
     lng: DEFAULT_LANG,
     fallbackLng: DEFAULT_LANG,
     defaultNS: 'common',
@@ -35,7 +35,7 @@ export const initI18n = (namespaces: Array<string>) => {
     },
   });
 
-  void Promise.all(
+  await Promise.all(
     namespaces.map(async (ns) => {
       const copy = await import(`./it/${ns}/copy.json`);
       const config = await import(`./it/${ns}/config.json`);

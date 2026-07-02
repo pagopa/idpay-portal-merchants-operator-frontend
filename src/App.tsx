@@ -15,22 +15,41 @@ import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy.tsx';
 import TermsOfService from './pages/tos/TOS.tsx';
 import ModifyDocument from './pages/modifyDocument/ModifyDocument.tsx';
 import { getInitiativesList } from './services/merchantService.ts';
-import { initiativesListSelector, setInitiativesList } from './redux/slices/initiativesSlice.ts';
-import { useAppDispatch, useAppSelector } from './redux/hooks.ts';
+import { setInitiativesList } from './redux/slices/initiativesSlice.ts';
+import { useAppDispatch } from './redux/hooks.ts';
 import { buildNamespaceKey } from './utils/buildNamespaceKey.ts';
 import { initI18n } from './locale/index.ts';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { InitiativesList } from './pages/initiativesList/InitiativesList.tsx';
+import { useAuth } from './contexts/AuthContext.tsx';
 
 function App() {
-  const namespaces = useAppSelector(initiativesListSelector).map(({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate))
+  const { isAuthenticated, token } = useAuth()
+  const [isLoaded, setIsLoaded] = useState(false)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    getInitiativesList().then((data) => dispatch(setInitiativesList(data.initiatives)))
-  }, [dispatch])
+    if (!isAuthenticated || !token) {
+      return; 
+    }
+    const initializeApp = async () => {
+      try {
+        const data = await getInitiativesList();
+        dispatch(setInitiativesList(data.initiatives));
+        const namespaces = data.initiatives.map(
+          ({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate)
+        );
+        await initI18n(namespaces);
+      } finally {
+        setIsLoaded(true)
+      }
+    }
+    initializeApp();
+  }, [dispatch, isAuthenticated, token])
 
-  initI18n(namespaces)
+  if (!isLoaded) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento iniziative...</div>;
+  }
   return (
     <div className="min-h-screen bg-gray-100">
       <Routes>

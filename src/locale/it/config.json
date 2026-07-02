@@ -3,12 +3,38 @@
         "statusEnum": {
             "initiative": {
                 "closed": {
-                    "label": "commons.initiativeStatusEnum.closed",
+                    "label": "commons.statusEnum.initiative.closed",
                     "color": "default"
                 },
                 "published": {
-                    "label": "commons.initiativeStatusEnum.published",
+                    "label": "commons.statusEnum.initiative.published",
                     "color": "success"
+                }
+            },
+            "transaction": {
+                "cancelled": {
+                    "label": "commons.statusEnum.transaction.cancelled",
+                    "color": "error"
+                },
+                "refunded": {
+                    "label": "commons.statusEnum.transaction.refunded",
+                    "color": "indigo"
+                },
+                "rewarded": {
+                    "label": "commons.statusEnum.transaction.rewarded",
+                    "color": "success"
+                },
+                "invoiced": {
+                    "label": "commons.statusEnum.transaction.invoiced",
+                    "color": "info"
+                },
+                "authorized": {
+                    "label": "commons.statusEnum.transaction.authorized",
+                    "color": "default"
+                },
+                "captured": {
+                    "label": "commons.statusEnum.transaction.captured",
+                    "color": "warning"
                 }
             }
         },

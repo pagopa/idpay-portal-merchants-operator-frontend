@@ -1,5 +1,4 @@
 import { Box, Button, Drawer, Typography, Grid, CircularProgress } from '@mui/material';
-import { useTranslation } from 'react-i18next';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
@@ -29,15 +28,17 @@ import TransactionsLayout from '../../components/TransactionsLayout/Transactions
 import DescriptionIcon from '@mui/icons-material/Description';
 import { getPreviewPdf } from '../../services/merchantService';
 import { downloadFileFromBase64 } from '../../utils/helpers';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
+import { StatusChip } from '../../components/StatusChip/StatusChip';
 
 const PurchaseManagement = () => {
-  const {initiativeId} = useParams();
+  const { initiativeId } = useParams();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [errorDeleteTransaction, setErrorDeleteTransaction] = useState(false);
   const [errorCaptureTransaction, setErrorCaptureTransaction] = useState(false);
   const [transactionCaptured, setTransactionCaptured] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useScopedTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
@@ -98,7 +99,7 @@ const PurchaseManagement = () => {
   const columns = [
     {
       field: 'additionalProperties',
-      headerName: 'Elettrodomestico',
+      headerName: t('pages.purchaseManagement.table.headers.additionalProperties'),
       flex: 2.5,
       disableColumnMenu: true,
       align: 'center',
@@ -109,14 +110,14 @@ const PurchaseManagement = () => {
     },
     {
       field: 'trxChargeDate',
-      headerName: 'Data e ora',
+      headerName: t('pages.purchaseManagement.table.headers.trxChargeDate'),
       flex: 1.5,
       disableColumnMenu: true,
       renderCell: (params: GridRenderCellParams) => checkDateTooltip(params),
     },
     {
       field: 'fiscalCode',
-      headerName: 'Beneficiario',
+      headerName: t('pages.purchaseManagement.table.headers.fiscalCode'),
       flex: 1.2,
       disableColumnMenu: true,
       sortable: false,
@@ -126,7 +127,7 @@ const PurchaseManagement = () => {
     },
     {
       field: 'effectiveAmountCents',
-      headerName: 'Totale della spesa',
+      headerName: t('pages.purchaseManagement.table.headers.effectiveAmountCents'),
       flex: 1.2,
       type: 'number',
       headerAlign: 'left',
@@ -139,7 +140,7 @@ const PurchaseManagement = () => {
     },
     {
       field: 'rewardAmountCents',
-      headerName: 'Sconto applicato',
+      headerName: t('pages.purchaseManagement.table.headers.rewardAmountCents'),
       flex: 1.2,
       type: 'number',
       headerAlign: 'left',
@@ -152,7 +153,7 @@ const PurchaseManagement = () => {
     },
     {
       field: 'residualAmountCents',
-      headerName: 'Importo autorizzato',
+      headerName: t('pages.purchaseManagement.table.headers.residualAmountCents'),
       flex: 1.2,
       type: 'number',
       headerAlign: 'left',
@@ -165,14 +166,14 @@ const PurchaseManagement = () => {
     },
     {
       field: 'status',
-      headerName: 'Stato',
+      headerName: t('pages.purchaseManagement.table.headers.status'),
       flex: 1.5,
       disableColumnMenu: true,
       sortable: true,
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            {getStatusChip(t, params.value)}
+            <StatusChip field='transaction' value={params.value.toLowerCase()}/>
           </Box>
         );
       },
@@ -275,7 +276,7 @@ const PurchaseManagement = () => {
           [transactionDeleteSuccess, setTransactionDeleteSuccess],
         ]}
         alertMessages={{
-          error: t('pages.refundManagement.errorAlert'),
+          error: t('pages.purchaseManagement.errorAlert'),
           transactionAuthorized: t('pages.purchaseManagement.alertSuccess'),
           transactionCaptured: t('pages.purchaseManagement.paymentSuccess'),
           errorDeleteTransaction: t(
@@ -285,11 +286,11 @@ const PurchaseManagement = () => {
             'pages.purchaseManagement.captureTransactionModal.errorCaptureTransaction'
           ),
           errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf'),
-          transactionRefundSuccess: t('pages.refundManagement.refundSuccessUpload'),
-          transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload'),
+          transactionRefundSuccess: t('pages.purchaseManagement.refundSuccessUpload'),
+          transactionReverseSuccess: t('pages.purchaseManagement.reverseSuccessUpload'),
           transactionDeleteSuccess: t('pages.purchaseManagement.transactionDeleteSuccess'),
         }}
-        noDataMessage={t('pages.refundManagement.noTransactions')}
+        noDataMessage={t('pages.purchaseManagement.noTransactions')}
         triggerFetchTransactions={triggerFetchTransactions}
         onRowAction={handleRowAction}
         DrawerComponent={
@@ -446,7 +447,7 @@ const PurchaseManagement = () => {
                     sx={{ fontWeight: theme.typography.fontWeightMedium }}
                   >
                     {selectedTransaction?.effectiveAmountCents !== null &&
-                    selectedTransaction?.effectiveAmountCents !== undefined
+                      selectedTransaction?.effectiveAmountCents !== undefined
                       ? formatEuro(selectedTransaction?.effectiveAmountCents)
                       : MISSING_DATA_PLACEHOLDER}
                   </Typography>
@@ -466,7 +467,7 @@ const PurchaseManagement = () => {
                     sx={{ fontWeight: theme.typography.fontWeightMedium }}
                   >
                     {selectedTransaction?.rewardAmountCents !== null &&
-                    selectedTransaction?.rewardAmountCents !== undefined
+                      selectedTransaction?.rewardAmountCents !== undefined
                       ? formatEuro(selectedTransaction?.rewardAmountCents)
                       : MISSING_DATA_PLACEHOLDER}
                   </Typography>
@@ -486,7 +487,7 @@ const PurchaseManagement = () => {
                     sx={{ fontWeight: theme.typography.fontWeightMedium }}
                   >
                     {selectedTransaction?.residualAmountCents !== null &&
-                    selectedTransaction?.residualAmountCents !== undefined
+                      selectedTransaction?.residualAmountCents !== undefined
                       ? formatEuro(selectedTransaction?.residualAmountCents)
                       : MISSING_DATA_PLACEHOLDER}
                   </Typography>
@@ -513,54 +514,54 @@ const PurchaseManagement = () => {
                 </Grid>
                 {(selectedTransaction?.status === 'AUTHORIZED' ||
                   selectedTransaction?.status === 'CAPTURED') && (
-                  <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                    <Typography
-                      variant="body2"
-                      mb={1}
-                      sx={{
-                        fontWeight: theme.typography.fontWeightRegular,
-                        color: theme.palette.text.secondary,
-                        margin: 0,
-                      }}
-                    >
-                      {t('pages.purchaseManagement.drawer.document')}
-                    </Typography>
-                    <Button
-                      data-testid="btn-test"
-                      sx={{
-                        padding: '0',
-                        fontWeight: theme.typography.fontWeightMedium,
-                        fontSize: '18px',
-                        minHeight: 'fit-content',
-                        height: 'auto',
-                      }}
-                      onClick={handlePreviewPdf}
-                    >
-                      {isPreviewPdfLoading ? (
-                        <CircularProgress color="inherit" size={20} data-testid="item-loader" />
-                      ) : (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            gap: 0,
-                            alignItems: 'start',
-                            textAlign: 'left',
-                          }}
-                        >
-                          <DescriptionIcon />
-                          <div
-                            style={{
-                              marginLeft: '8px',
-                              wordBreak: 'break-all',
+                    <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+                      <Typography
+                        variant="body2"
+                        mb={1}
+                        sx={{
+                          fontWeight: theme.typography.fontWeightRegular,
+                          color: theme.palette.text.secondary,
+                          margin: 0,
+                        }}
+                      >
+                        {t('pages.purchaseManagement.drawer.document')}
+                      </Typography>
+                      <Button
+                        data-testid="btn-test"
+                        sx={{
+                          padding: '0',
+                          fontWeight: theme.typography.fontWeightMedium,
+                          fontSize: '18px',
+                          minHeight: 'fit-content',
+                          height: 'auto',
+                        }}
+                        onClick={handlePreviewPdf}
+                      >
+                        {isPreviewPdfLoading ? (
+                          <CircularProgress color="inherit" size={20} data-testid="item-loader" />
+                        ) : (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              gap: 0,
+                              alignItems: 'start',
+                              textAlign: 'left',
                             }}
                           >
-                            {selectedTransaction?.trxCode}_preautorizzazione.pdf
-                          </div>
-                        </Box>
-                      )}
-                    </Button>
-                  </Grid>
-                )}
+                            <DescriptionIcon />
+                            <div
+                              style={{
+                                marginLeft: '8px',
+                                wordBreak: 'break-all',
+                              }}
+                            >
+                              {selectedTransaction?.trxCode}_preautorizzazione.pdf
+                            </div>
+                          </Box>
+                        )}
+                      </Button>
+                    </Grid>
+                  )}
               </Grid>
               <Box
                 sx={{
@@ -592,9 +593,9 @@ const PurchaseManagement = () => {
                     selectedTransaction?.status === 'AUTHORIZED'
                       ? handleCancelTransaction
                       : () => {
-                          setRefundTransactionModal(true);
-                          setOpenDrawer(false);
-                        }
+                        setRefundTransactionModal(true);
+                        setOpenDrawer(false);
+                      }
                   }
                   sx={{
                     color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#',
@@ -637,14 +638,14 @@ const PurchaseManagement = () => {
           <Typography variant="body1">
             {captureTransactionModal
               ? `${t('pages.purchaseManagement.captureTransactionModal.description1')} ${formatEuro(
-                  selectedTransaction?.residualAmountCents
-                )}
+                selectedTransaction?.residualAmountCents
+              )}
                                 ${t(
-                                  'pages.purchaseManagement.captureTransactionModal.description2'
-                                )}${selectedTransaction?.additionalProperties?.productName}
+                'pages.purchaseManagement.captureTransactionModal.description2'
+              )}${selectedTransaction?.additionalProperties?.productName}
                                 ${t(
-                                  'pages.purchaseManagement.captureTransactionModal.description3'
-                                )}`
+                'pages.purchaseManagement.captureTransactionModal.description3'
+              )}`
               : `${t('pages.purchaseManagement.cancelTransactionModal.description')}`}
             {captureTransactionModal && (
               <Typography display="inline" fontWeight="bold">
