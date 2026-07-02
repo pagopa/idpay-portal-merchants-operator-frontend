@@ -15,7 +15,7 @@ vi.mock('./locale/index.ts', () => ({
   initI18n: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('./utils/buildNamespaceKey.ts', () => ({
+vi.mock('./utils/helpers.tsx', () => ({
   buildNamespaceKey: vi.fn().mockReturnValue('mock-namespace-key'),
 }));
 
@@ -36,6 +36,11 @@ vi.mock('./services/merchantService.ts', () => ({
 vi.mock('./redux/slices/initiativesSlice.ts', () => ({
   setInitiativesList: vi.fn((data) => ({ type: 'SET_INITIATIVES', payload: data })),
   initiativesListSelector: vi.fn(),
+  currentInitiativeSelector: vi.fn(),
+}));
+
+vi.mock('./decorators/WithInitiativeGuard.tsx', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('./components/Layout/Layout', () => ({
@@ -53,40 +58,17 @@ vi.mock('./components/ProtectedRoute', () => ({
 vi.mock('./pages/initiativesList/InitiativesList', () => ({
   InitiativesList: () => <div>InitiativesListPage</div>,
 }));
-
-vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({
-  default: () => <div>AcceptDiscountPage</div>,
-}));
-vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({
-  default: () => <div>SummaryAcceptDiscountPage</div>,
-}));
-vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({
-  default: () => <div>RefundManagementPage</div>,
-}));
-vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({
-  default: () => <div>PurchaseManagementPage</div>,
-}));
-vi.mock('./pages/profile/Profile.tsx', () => ({
-  default: () => <div>ProfilePage</div>,
-}));
-vi.mock('./pages/products/Products.tsx', () => ({
-  default: () => <div>ProductsPage</div>,
-}));
-vi.mock('./pages/reverse/Reverse.tsx', () => ({
-  default: () => <div>ReversePage</div>,
-}));
-vi.mock('./pages/refund/Refund.tsx', () => ({
-  default: () => <div>RefundPage</div>,
-}));
-vi.mock('./pages/privacyPolicy/PrivacyPolicy.tsx', () => ({
-  default: () => <div>PrivacyPolicyPage</div>,
-}));
-vi.mock('./pages/tos/TOS.tsx', () => ({
-  default: () => <div>TermsOfServicePage</div>,
-}));
-vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({
-  default: () => <div>ModifyDocumentPage</div>,
-}));
+vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({ default: () => <div>AcceptDiscountPage</div> }));
+vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({ default: () => <div>SummaryAcceptDiscountPage</div> }));
+vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({ default: () => <div>RefundManagementPage</div> }));
+vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({ default: () => <div>PurchaseManagementPage</div> }));
+vi.mock('./pages/profile/Profile.tsx', () => ({ default: () => <div>ProfilePage</div> }));
+vi.mock('./pages/products/Products.tsx', () => ({ default: () => <div>ProductsPage</div> }));
+vi.mock('./pages/reverse/Reverse.tsx', () => ({ default: () => <div>ReversePage</div> }));
+vi.mock('./pages/refund/Refund.tsx', () => ({ default: () => <div>RefundPage</div> }));
+vi.mock('./pages/privacyPolicy/PrivacyPolicy.tsx', () => ({ default: () => <div>PrivacyPolicyPage</div> }));
+vi.mock('./pages/tos/TOS.tsx', () => ({ default: () => <div>TermsOfServicePage</div> }));
+vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({ default: () => <div>ModifyDocumentPage</div> }));
 
 describe('App routing', () => {
   beforeEach(() => {

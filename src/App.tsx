@@ -17,11 +17,12 @@ import ModifyDocument from './pages/modifyDocument/ModifyDocument.tsx';
 import { getInitiativesList } from './services/merchantService.ts';
 import { setInitiativesList } from './redux/slices/initiativesSlice.ts';
 import { useAppDispatch } from './redux/hooks.ts';
-import { buildNamespaceKey } from './utils/buildNamespaceKey.ts';
 import { initI18n } from './locale/index.ts';
 import { useEffect, useState } from 'react';
 import { InitiativesList } from './pages/initiativesList/InitiativesList.tsx';
 import { useAuth } from './contexts/AuthContext.tsx';
+import { buildNamespaceKey } from './utils/helpers.tsx';
+import WithInitiativeGuard from './decorators/WithInitiativeGuard.tsx';
 
 function App() {
   const { isAuthenticated, token } = useAuth()
@@ -29,10 +30,7 @@ function App() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (!isAuthenticated || !token) {
-      return;
-    }
-    if (isLoaded) {
+    if ((!isAuthenticated || !token) || isLoaded) {
       return;
     }
     const initializeApp = async () => {
@@ -86,7 +84,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <AcceptDiscount />
+                <WithInitiativeGuard>
+                  <AcceptDiscount />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -96,7 +96,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <SummaryAcceptDiscount />
+                <WithInitiativeGuard>
+                  <SummaryAcceptDiscount />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -106,7 +108,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <RefundManagement />
+                <WithInitiativeGuard>
+                  <RefundManagement />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -116,7 +120,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <PurchaseManagement />
+                <WithInitiativeGuard>
+                  <PurchaseManagement />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -136,7 +142,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Products />
+                <WithInitiativeGuard>
+                  <Products />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -146,7 +154,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Reverse />
+                <WithInitiativeGuard>
+                  <Reverse />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -156,7 +166,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Refund />
+                <WithInitiativeGuard>
+                  <Refund />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -166,7 +178,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <ModifyDocument />
+                <WithInitiativeGuard>
+                  <ModifyDocument />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }

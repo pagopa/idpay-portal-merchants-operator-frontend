@@ -38,7 +38,7 @@ vi.mock('../locale', () => ({
   },
 }));
 
-vi.mock('../utils/buildNamespaceKey', () => ({
+vi.mock('../utils/helpers.tsx', () => ({
   buildNamespaceKey: () => mocks.buildNamespaceKey(),
 }));
 

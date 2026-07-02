@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next"
 import { useAppSelector } from "../redux/hooks"
 import { currentInitiativeSelector } from "../redux/slices/initiativesSlice"
 import { useParams } from "react-router-dom"
-import { buildNamespaceKey } from "../utils/buildNamespaceKey"
 import { DEFAULT_LANG, i18n } from "../locale"
+import { buildNamespaceKey } from "../utils/helpers"
 
 export const useScopedTranslation = () => {
     const { initiativeId } = useParams();
