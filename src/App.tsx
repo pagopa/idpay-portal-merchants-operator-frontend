@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react';
 import { InitiativesList } from './pages/initiativesList/InitiativesList.tsx';
 import { useAuth } from './contexts/AuthContext.tsx';
 import { buildNamespaceKey } from './utils/helpers.tsx';
-import WithInitiativeGuard from './decorators/WithInitiativeGuard.tsx';
+import WithInitiativeGuard from './decorators/withInitiativeGuard.tsx';
 
 function App() {
   const { isAuthenticated, token } = useAuth()
@@ -30,7 +30,7 @@ function App() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if ((!isAuthenticated || !token) || isLoaded) {
+    if (!isAuthenticated || !token || isLoaded) {
       return;
     }
     const initializeApp = async () => {
@@ -39,8 +39,10 @@ function App() {
         dispatch(setInitiativesList(data.initiatives));
         const namespaces = data.initiatives.map(
           ({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate)
-        );
+        )
         await initI18n(namespaces);
+      } catch {
+        await initI18n([])
       } finally {
         setIsLoaded(true)
       }
