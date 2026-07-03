@@ -18,7 +18,7 @@
                 },
                 "refunded": {
                     "label": "commons.statusEnum.transaction.refunded",
-                    "color": "indigo"
+                    "color": "primary"
                 },
                 "rewarded": {
                     "label": "commons.statusEnum.transaction.rewarded",
