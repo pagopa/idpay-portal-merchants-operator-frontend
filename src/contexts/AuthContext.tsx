@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initKeycloak = async () => {
       try {
         const authenticated = await keycloak.init({
-          onLoad: 'login-required',
+          onLoad: 'check-sso',
           checkLoginIframe: false,
           pkceMethod: 'S256',
         });
