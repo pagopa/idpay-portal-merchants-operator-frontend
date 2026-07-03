@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { useParams, Navigate } from 'react-router-dom';
 import { currentInitiativeSelector, initiativesListSelector } from '../redux/slices/initiativesSlice';
 import ROUTES from '../routes';
-import WithInitiativeGuard from './WithInitiativeGuard';
+import WithInitiativeGuard from './withInitiativeGuard';
 
 vi.mock('react-router-dom', () => ({
     useParams: vi.fn(),
