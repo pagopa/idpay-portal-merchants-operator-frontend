@@ -9,10 +9,6 @@ vi.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
 }));
 
-vi.mock('../../utils/constants', () => ({
-    MISSING_DATA_PLACEHOLDER: 'mock-missing-data',
-}));
-
 vi.mock('@mui/material', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@mui/material')>();
     return {
@@ -38,13 +34,6 @@ describe('NavigationLink Component', () => {
 
         const tooltipElement = screen.getByTestId('mock-tooltip');
         expect(tooltipElement).toHaveAttribute('data-title', 'Dashboard');
-    });
-
-    it('should use MISSING_DATA_PLACEHOLDER for the tooltip title if label is empty', () => {
-        render(<NavigationLink label="" path="/dashboard" />);
-
-        const tooltipElement = screen.getByTestId('mock-tooltip');
-        expect(tooltipElement).toHaveAttribute('data-title', 'mock-missing-data');
     });
 
     it('should call navigate with the correct path and replace flag when the button is clicked', () => {

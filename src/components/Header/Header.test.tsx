@@ -5,6 +5,10 @@ import keycloak from '../../config/keycloak';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
 import { jwtDecode } from 'jwt-decode';
 
+vi.mock('../../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: () => ({ t: (key: string) => key }),
+}));
+
 vi.mock('../../config/keycloak', () => ({
   default: {
     logout: vi.fn(),
