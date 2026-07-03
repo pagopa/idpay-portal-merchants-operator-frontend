@@ -14,8 +14,49 @@ import Refund from './pages/refund/Refund.tsx';
 import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy.tsx';
 import TermsOfService from './pages/tos/TOS.tsx';
 import ModifyDocument from './pages/modifyDocument/ModifyDocument.tsx';
+import { getInitiativesList } from './services/merchantService.ts';
+import { setInitiativesList } from './redux/slices/initiativesSlice.ts';
+import { useAppDispatch } from './redux/hooks.ts';
+import { initI18n } from './locale/index.ts';
+import { useEffect, useState } from 'react';
+import { InitiativesList } from './pages/initiativesList/InitiativesList.tsx';
+import { useAuth } from './contexts/AuthContext.tsx';
+import { buildNamespaceKey } from './utils/helpers.tsx';
+import WithInitiativeGuard from './decorators/withInitiativeGuard.tsx';
 
 function App() {
+  const { isAuthenticated, token } = useAuth()
+  const [isLoaded, setIsLoaded] = useState(false)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if(isLoaded) {
+      return
+    }
+    if (!isAuthenticated || !token) {
+      setIsLoaded(true)
+      return;
+    }
+    const initializeApp = async () => {
+      try {
+        const data = await getInitiativesList();
+        dispatch(setInitiativesList(data.initiatives));
+        const namespaces = data.initiatives.map(
+          ({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate)
+        )
+        await initI18n(namespaces);
+      } catch {
+        await initI18n([])
+      } finally {
+        setIsLoaded(true)
+      }
+    }
+    initializeApp();
+  }, [dispatch, isAuthenticated, isLoaded, token])
+
+  if (!isLoaded) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento...</div>;
+  }
   return (
     <div className="min-h-screen bg-gray-100">
       <Routes>
@@ -29,7 +70,17 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Navigate to={ROUTES.BUY_MANAGEMENT} />
+                <Navigate to={ROUTES.INITIATIVES_LIST} />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.INITIATIVES_LIST}
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InitiativesList />
               </Layout>
             </ProtectedRoute>
           }
@@ -39,7 +90,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <AcceptDiscount />
+                <WithInitiativeGuard>
+                  <AcceptDiscount />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -49,7 +102,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <SummaryAcceptDiscount />
+                <WithInitiativeGuard>
+                  <SummaryAcceptDiscount />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -59,7 +114,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <RefundManagement />
+                <WithInitiativeGuard>
+                  <RefundManagement />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -69,7 +126,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <PurchaseManagement />
+                <WithInitiativeGuard>
+                  <PurchaseManagement />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -89,7 +148,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Products />
+                <WithInitiativeGuard>
+                  <Products />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -99,7 +160,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Reverse />
+                <WithInitiativeGuard>
+                  <Reverse />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -109,7 +172,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Refund />
+                <WithInitiativeGuard>
+                  <Refund />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -119,7 +184,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <ModifyDocument />
+                <WithInitiativeGuard>
+                  <ModifyDocument />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -129,7 +196,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Navigate to={ROUTES.BUY_MANAGEMENT} replace />
+                <Navigate to={ROUTES.INITIATIVES_LIST} replace />
               </Layout>
             </ProtectedRoute>
           }

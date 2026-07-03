@@ -1,0 +1,66 @@
+{
+    "initiativeName": "Bonus Elettrodomestici",
+    "pages": {
+        "purchaseManagement": {
+            "title": "Gestione acquisti",
+            "subtitle": "Gestisci e verifica gli acquisti degli utenti effettuati con il Bonus Elettrodomestici",
+            "noTransactions": "Non ci sono transazioni per questa iniziativa",
+            "tableTitle": "Buoni sconto",
+            "alertSuccess": "La transazione è andata a buon fine.",
+            "paymentSuccess": "Il pagamento è stato confermato.",
+            "table": {
+                "headers": {
+                    "additionalProperties": "Elettrodomestico",
+                    "trxChargeDate": "Data e ora",
+                    "fiscalCode": "Beneficiario",
+                    "effectiveAmountCents": "Totale della spesa",
+                    "rewardAmountCents": "Sconto applicato",
+                    "residualAmountCents": "Importo autorizzato",
+                    "status": "Stato"
+                }
+            },
+            "drawer": {
+                "title": "Dettaglio transazione",
+                "product": "Prodotto",
+                "totalAmount": "Totale della spesa",
+                "authorizedAmount": "Importo autorizzato",
+                "rewardAmount": "Sconto applicato",
+                "status": "Stato",
+                "fiscalCode": "Codice fiscale",
+                "trxDate": "Data e ora",
+                "brand": "Modello",
+                "category": "Categoria",
+                "confirmPayment": "Conferma pagamento",
+                "cancellPayment": "Annulla transazione",
+                "requestRefund": "Carica fattura",
+                "refund": "Storna",
+                "householdAppliance": "Elettrodomestico",
+                "document": "Documento di pre-autorizzazione",
+                "transactionId": "ID transazione",
+                "trxCode": "Codice sconto"
+            },
+            "cancelTransactionModal": {
+                "title": "Annulla transazione",
+                "description": "Sei sicuro di voler annullare questa transazione? L’utente potrà continuare a usufruire del buono sconto",
+                "errorDeleteTransaction": "Non è stato possibile annullare la transazione. Riprova."
+            },
+            "captureTransactionModal": {
+                "title": "Hai ricevuto il pagamento del bene?",
+                "description1": "Hai ricevuto",
+                "description2": " dal cliente per il prodotto ",
+                "description3": "? Confermando, la transazione passerà nello stato ",
+                "errorCaptureTransaction": "Non è stato possibile confermare la transazione. Riprova."
+            },
+            "refundTransactionModal": {
+                "title": "Storna transazione",
+                "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+                "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
+            },
+            "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
+            "errorPreviewPdf": "Si è verificato un errore nel download del PDF, riprova.",
+            "transactionDeleteSuccess": "La transazione è stata annullata con successo.",
+            "refundSuccessUpload": "Richiesta inviata correttamente",
+            "reverseSuccessUpload": "Richiesta inviata correttamente"
+        }
+    }
+}

@@ -1,0 +1,94 @@
+{
+    "commons": {
+        "statusEnum": {
+            "initiative": {
+                "closed": {
+                    "label": "commons.statusEnum.initiative.closed",
+                    "color": "default"
+                },
+                "published": {
+                    "label": "commons.statusEnum.initiative.published",
+                    "color": "success"
+                }
+            },
+            "transaction": {
+                "cancelled": {
+                    "label": "commons.statusEnum.transaction.cancelled",
+                    "color": "error"
+                },
+                "refunded": {
+                    "label": "commons.statusEnum.transaction.refunded",
+                    "color": "primary"
+                },
+                "rewarded": {
+                    "label": "commons.statusEnum.transaction.rewarded",
+                    "color": "success"
+                },
+                "invoiced": {
+                    "label": "commons.statusEnum.transaction.invoiced",
+                    "color": "info"
+                },
+                "authorized": {
+                    "label": "commons.statusEnum.transaction.authorized",
+                    "color": "default"
+                },
+                "captured": {
+                    "label": "commons.statusEnum.transaction.captured",
+                    "color": "warning"
+                }
+            }
+        },
+        "pages": {
+            "initiativesList": {
+                "initiativeTable": {
+                    "columns": [
+                        {
+                            "field": "initiativeName",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.initiativeName",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "link"
+                            }
+                        },
+                        {
+                            "field": "organizationName",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.organizationName",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "text"
+                            }
+                        },
+                        {
+                            "field": "spendingPeriod",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.spendingPeriod",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "text"
+                            }
+                        },
+                        {
+                            "field": "status",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.status",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "chip"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

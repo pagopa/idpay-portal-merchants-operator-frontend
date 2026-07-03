@@ -1,15 +1,16 @@
 const ROUTES = {
   HOME: '/',
-  ACCEPT_DISCOUNT: '/accetta-buono-sconto',
-  ACCEPT_DISCOUNT_SUMMARY: '/accetta-buono-sconto/riepilogo',
+  INITIATIVES_LIST: '/iniziative',
+  ACCEPT_DISCOUNT: '/:initiativeId/accetta-buono-sconto',
+  ACCEPT_DISCOUNT_SUMMARY: '/:initiativeId/accetta-buono-sconto/riepilogo',
   TOS: '/terms-of-service',
   PRIVACY_POLICY: '/privacy-policy',
-  PRODUCTS: '/prodotti',
-  BUY_MANAGEMENT: '/gestione-acquisti',
-  REFUNDS_MANAGEMENT: '/gestione-rimborsi',
+  PRODUCTS: '/:initiativeId/prodotti',
+  BUY_MANAGEMENT: '/:initiativeId/gestione-acquisti',
+  REFUNDS_MANAGEMENT: '/:initiativeId/gestione-rimborsi',
   PROFILE: '/profilo',
-  REVERSE: '/storna-transazione/:trxId',
-  REFUND: '/richiedi-rimborso/:trxId',
+  REVERSE: '/:initiativeId/storna-transazione/:trxId',
+  REFUND: '/:initiativeId/richiedi-rimborso/:trxId',
   MODIFY_DOCUMENT: '/modifica-documento/:trxId/:fileDocNumber',
 };
 

@@ -1,103 +1,114 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi, Mock } from 'vitest';
+import SideMenu from './SideMenu';
+import { useAppSelector } from '../../redux/hooks';
 
 const mockNavigate = vi.fn();
+const mockSetIsOpen = vi.fn();
 
 vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-  useLocation: vi.fn(() => ({ pathname: '' })),
+    useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: '/mock-path' }),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
+vi.mock('../../hooks/useScopedTranslation', () => ({
+    useScopedTranslation: () => ({ t: (key: string) => key }),
+}));
+
+vi.mock('../../redux/hooks', () => ({
+    useAppSelector: vi.fn(),
+}));
+
+vi.mock('../../redux/slices/initiativesSlice', () => ({
+    initiativesListSelector: vi.fn(),
+}));
+
+vi.mock('../../routes', () => ({
+    default: {
+        INITIATIVES_LIST: '/initiatives-route',
+        PROFILE: '/profile-route',
+    },
+}));
+
+vi.mock('@pagopa/mui-italia', () => ({
+    theme: {
+        palette: {
+            text: { primary: '#000000' },
+        },
+    },
+}));
+
+vi.mock('./SideMenu.module.css', () => ({
+    default: {
+        sideMenuBurger: 'mock-burger-class',
+    },
 }));
 
 vi.mock('./SideNavItem', () => ({
-  default: ({ title, handleClick, isSelected, icon: Icon }: any) => (
-    <div data-testid={`sidenav-item-${title}`} data-selected={isSelected} onClick={handleClick}>
-      {title}
-      <Icon />
-    </div>
-  ),
+    default: (props: any) => (
+        <button
+            data-testid={`sidenav-item-${props.title}`}
+            onClick={props.handleClick}
+        >
+            {props.title}
+        </button>
+    ),
 }));
 
-vi.mock('@mui/icons-material/ConfirmationNumber', () => ({
-  default: () => <div />,
+vi.mock('./SideNavAccordion', () => ({
+    SideNavAccordion: (props: any) => (
+        <div data-testid={`accordion-${props.item.initiativeId}`} />
+    ),
 }));
-vi.mock('@mui/icons-material/Payments', () => ({ default: () => <div /> }));
-vi.mock('../../routes', () => ({
-  default: {
-    BUY_MANAGEMENT: '/gestione-acquisti',
-    HOME: '/home',
-  },
-}));
-
-import SideMenu from './SideMenu';
-import ROUTES from '../../routes';
 
 describe('SideMenu Component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should render both menu items', () => {
-    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
-
-    expect(screen.getByText('sideMenu.purchaseManagement')).toBeInTheDocument();
-    expect(screen.getByText('sideMenu.refundManagement')).toBeInTheDocument();
-  });
-
-  it('should navigate to purchase management on click', async () => {
-    const user = userEvent.setup();
-    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
-
-    const purchaseItem = screen.getByText('sideMenu.purchaseManagement');
-    await user.click(purchaseItem);
-
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT, {
-      replace: true,
+    beforeEach(() => {
+        vi.clearAllMocks();
+        (useAppSelector as Mock).mockReturnValue(null);
     });
-  });
 
-  it('should navigate to refund management on click', async () => {
-    const user = userEvent.setup();
-    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
-
-    const refundItem = screen.getByText('sideMenu.refundManagement');
-    await user.click(refundItem);
-
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.REFUNDS_MANAGEMENT, {
-      replace: true,
+    it('renders correctly when isOpen is true', () => {
+        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        
+        expect(screen.getByTestId('first-list-test')).toBeInTheDocument();
+        expect(screen.getByTestId('sidenav-item-commons.sideMenu.initiatives')).toBeInTheDocument();
+        expect(screen.getByTestId('sidenav-item-commons.sideMenu.profile')).toBeInTheDocument();
     });
-  });
 
-  it('should navigate to profile on click', async () => {
-    const user = userEvent.setup();
-    render(<SideMenu isOpen={true} setIsOpen={() => {}} />);
-
-    const profileItem = screen.getByText('sideMenu.profile');
-    await user.click(profileItem);
-
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.PROFILE, {
-      replace: true,
+    it('renders correctly when isOpen is false', () => {
+        render(<SideMenu isOpen={false} setIsOpen={mockSetIsOpen} />);
+        
+        expect(screen.getByTestId('first-list-test')).toBeInTheDocument();
     });
-  });
 
-  it('should toggle menu on click', async () => {
-    const user = userEvent.setup();
-    const setIsOpen = vi.fn();
-    render(<SideMenu isOpen={true} setIsOpen={setIsOpen} />);
+    it('navigates to initiatives list when the initiatives item is clicked', () => {
+        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        
+        const initiativesButton = screen.getByTestId('sidenav-item-commons.sideMenu.initiatives');
+        fireEvent.click(initiativesButton);
+        
+        expect(mockNavigate).toHaveBeenCalledWith('/initiatives-route', { replace: true });
+    });
 
-    const toggleButton = screen.getByTestId('MenuIcon');
-    await user.click(toggleButton);
+    it('navigates to profile when the profile item is clicked', () => {
+        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        
+        const profileButton = screen.getByTestId('sidenav-item-commons.sideMenu.profile');
+        fireEvent.click(profileButton);
+        
+        expect(mockNavigate).toHaveBeenCalledWith('/profile-route', { replace: true });
+    });
 
-    expect(setIsOpen).toHaveBeenCalledTimes(1);
-    expect(setIsOpen).toHaveBeenCalledWith(false);
-  });
+    it('renders SideNavAccordion for each initiative in the list', () => {
+        const mockInitiativesList = [
+            { initiativeId: 'id-1', initiativeName: 'Initiative 1' },
+            { initiativeId: 'id-2', initiativeName: 'Initiative 2' },
+        ];
+        (useAppSelector as Mock).mockReturnValue(mockInitiativesList);
+
+        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        
+        expect(screen.getByTestId('accordion-id-1')).toBeInTheDocument();
+        expect(screen.getByTestId('accordion-id-2')).toBeInTheDocument();
+    });
 });

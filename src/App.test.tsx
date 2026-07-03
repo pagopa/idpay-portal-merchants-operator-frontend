@@ -1,8 +1,47 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import ROUTES from './routes';
+import { useAppSelector } from './redux/hooks';
+import { getInitiativesList } from './services/merchantService';
+import { useAuth } from './contexts/AuthContext';
+
+vi.mock('./contexts/AuthContext.tsx', () => ({
+  useAuth: vi.fn(),
+}));
+
+vi.mock('./locale/index.ts', () => ({
+  initI18n: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('./utils/helpers.tsx', () => ({
+  buildNamespaceKey: vi.fn().mockReturnValue('mock-namespace-key'),
+}));
+
+const mockInitiatives = [
+  { initiativeId: 'Init-1', initiativeName: 'Bonus Elettrodomestici', startDate: '2025' }
+];
+
+const mockDispatch = vi.fn();
+vi.mock('./redux/hooks.ts', () => ({
+  useAppSelector: vi.fn(),
+  useAppDispatch: () => mockDispatch,
+}));
+
+vi.mock('./services/merchantService.ts', () => ({
+  getInitiativesList: vi.fn(),
+}));
+
+vi.mock('./redux/slices/initiativesSlice.ts', () => ({
+  setInitiativesList: vi.fn((data) => ({ type: 'SET_INITIATIVES', payload: data })),
+  initiativesListSelector: vi.fn(),
+  currentInitiativeSelector: vi.fn(),
+}));
+
+vi.mock('./decorators/withInitiativeGuard.tsx', () => ({
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 vi.mock('./components/Layout/Layout', () => ({
   default: ({ children }: { children: React.ReactNode }) => (
@@ -16,41 +55,35 @@ vi.mock('./components/ProtectedRoute', () => ({
   ),
 }));
 
-vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({
-  default: () => <div>AcceptDiscountPage</div>,
+vi.mock('./pages/initiativesList/InitiativesList', () => ({
+  InitiativesList: () => <div>InitiativesListPage</div>,
 }));
-vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({
-  default: () => <div>SummaryAcceptDiscountPage</div>,
-}));
-vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({
-  default: () => <div>RefundManagementPage</div>,
-}));
-vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({
-  default: () => <div>PurchaseManagementPage</div>,
-}));
-vi.mock('./pages/profile/Profile.tsx', () => ({
-  default: () => <div>ProfilePage</div>,
-}));
-vi.mock('./pages/products/Products.tsx', () => ({
-  default: () => <div>ProductsPage</div>,
-}));
-vi.mock('./pages/reverse/Reverse.tsx', () => ({
-  default: () => <div>ReversePage</div>,
-}));
-vi.mock('./pages/refund/Refund.tsx', () => ({
-  default: () => <div>RefundPage</div>,
-}));
-vi.mock('./pages/privacyPolicy/PrivacyPolicy.tsx', () => ({
-  default: () => <div>PrivacyPolicyPage</div>,
-}));
-vi.mock('./pages/tos/TOS.tsx', () => ({
-  default: () => <div>TermsOfServicePage</div>,
-}));
-vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({
-  default: () => <div>ModifyDocumentPage</div>,
-}));
+vi.mock('./pages/acceptDiscount/AcceptDiscount.tsx', () => ({ default: () => <div>AcceptDiscountPage</div> }));
+vi.mock('./pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx', () => ({ default: () => <div>SummaryAcceptDiscountPage</div> }));
+vi.mock('./pages/refundManagement/RefundManagement.tsx', () => ({ default: () => <div>RefundManagementPage</div> }));
+vi.mock('./pages/purchaseManagement/PurchaseManagement.tsx', () => ({ default: () => <div>PurchaseManagementPage</div> }));
+vi.mock('./pages/profile/Profile.tsx', () => ({ default: () => <div>ProfilePage</div> }));
+vi.mock('./pages/products/Products.tsx', () => ({ default: () => <div>ProductsPage</div> }));
+vi.mock('./pages/reverse/Reverse.tsx', () => ({ default: () => <div>ReversePage</div> }));
+vi.mock('./pages/refund/Refund.tsx', () => ({ default: () => <div>RefundPage</div> }));
+vi.mock('./pages/privacyPolicy/PrivacyPolicy.tsx', () => ({ default: () => <div>PrivacyPolicyPage</div> }));
+vi.mock('./pages/tos/TOS.tsx', () => ({ default: () => <div>TermsOfServicePage</div> }));
+vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({ default: () => <div>ModifyDocumentPage</div> }));
 
 describe('App routing', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      token: 'fake-jwt-token',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+
+    vi.mocked(getInitiativesList).mockResolvedValue({ initiatives: mockInitiatives });
+    vi.mocked(useAppSelector).mockReturnValue(mockInitiatives);
+  });
+
   const renderWithRoute = (route: string) =>
     render(
       <MemoryRouter initialEntries={[route]}>
@@ -58,68 +91,78 @@ describe('App routing', () => {
       </MemoryRouter>
     );
 
-  it('renders privacy policy (public)', () => {
+  it('should render loading state initially', () => {
+    renderWithRoute(ROUTES.INITIATIVES_LIST);
+    expect(screen.getByText('Caricamento...')).toBeInTheDocument();
+  });
+
+  it('should render initiativesList', async () => {
+    renderWithRoute(ROUTES.INITIATIVES_LIST);
+    expect(await screen.findByText('InitiativesListPage')).toBeInTheDocument();
+  });
+
+  it('renders privacy policy (public)', async () => {
     renderWithRoute(ROUTES.PRIVACY_POLICY);
-    expect(screen.getByText('PrivacyPolicyPage')).toBeInTheDocument();
+    expect(await screen.findByText('PrivacyPolicyPage')).toBeInTheDocument();
   });
 
-  it('renders terms of service (public)', () => {
+  it('renders terms of service (public)', async () => {
     renderWithRoute(ROUTES.TOS);
-    expect(screen.getByText('TermsOfServicePage')).toBeInTheDocument();
+    expect(await screen.findByText('TermsOfServicePage')).toBeInTheDocument();
   });
 
-  it('redirects HOME to BUY_MANAGEMENT', () => {
+  it('redirects HOME to INITIATIVES_LIST', async () => {
     renderWithRoute(ROUTES.HOME);
-    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
+    expect(await screen.findByText('InitiativesListPage')).toBeInTheDocument();
   });
 
-  it('renders accept discount', () => {
+  it('renders accept discount', async () => {
     renderWithRoute(ROUTES.ACCEPT_DISCOUNT);
-    expect(screen.getByText('AcceptDiscountPage')).toBeInTheDocument();
+    expect(await screen.findByText('AcceptDiscountPage')).toBeInTheDocument();
   });
 
-  it('renders accept discount summary', () => {
+  it('renders accept discount summary', async () => {
     renderWithRoute(ROUTES.ACCEPT_DISCOUNT_SUMMARY);
-    expect(screen.getByText('SummaryAcceptDiscountPage')).toBeInTheDocument();
+    expect(await screen.findByText('SummaryAcceptDiscountPage')).toBeInTheDocument();
   });
 
-  it('renders refunds management', () => {
+  it('renders refunds management', async () => {
     renderWithRoute(ROUTES.REFUNDS_MANAGEMENT);
-    expect(screen.getByText('RefundManagementPage')).toBeInTheDocument();
+    expect(await screen.findByText('RefundManagementPage')).toBeInTheDocument();
   });
 
-  it('renders buy management', () => {
+  it('renders buy management', async () => {
     renderWithRoute(ROUTES.BUY_MANAGEMENT);
-    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
+    expect(await screen.findByText('PurchaseManagementPage')).toBeInTheDocument();
   });
 
-  it('renders profile', () => {
+  it('renders profile', async () => {
     renderWithRoute(ROUTES.PROFILE);
-    expect(screen.getByText('ProfilePage')).toBeInTheDocument();
+    expect(await screen.findByText('ProfilePage')).toBeInTheDocument();
   });
 
-  it('renders products', () => {
+  it('renders products', async () => {
     renderWithRoute(ROUTES.PRODUCTS);
-    expect(screen.getByText('ProductsPage')).toBeInTheDocument();
+    expect(await screen.findByText('ProductsPage')).toBeInTheDocument();
   });
 
-  it('renders reverse', () => {
+  it('renders reverse', async () => {
     renderWithRoute(ROUTES.REVERSE);
-    expect(screen.getByText('ReversePage')).toBeInTheDocument();
+    expect(await screen.findByText('ReversePage')).toBeInTheDocument();
   });
 
-  it('renders refund', () => {
+  it('renders refund', async () => {
     renderWithRoute(ROUTES.REFUND);
-    expect(screen.getByText('RefundPage')).toBeInTheDocument();
+    expect(await screen.findByText('RefundPage')).toBeInTheDocument();
   });
 
-  it('renders modify document', () => {
+  it('renders modify document', async () => {
     renderWithRoute(ROUTES.MODIFY_DOCUMENT);
-    expect(screen.getByText('ModifyDocumentPage')).toBeInTheDocument();
+    expect(await screen.findByText('ModifyDocumentPage')).toBeInTheDocument();
   });
 
-  it('redirects unknown route to BUY_MANAGEMENT', () => {
+  it('redirects unknown route to INITIATIVES_LIST', async () => {
     renderWithRoute('/unknown');
-    expect(screen.getByText('PurchaseManagementPage')).toBeInTheDocument();
+    expect(await screen.findByText('InitiativesListPage')).toBeInTheDocument();
   });
 });
