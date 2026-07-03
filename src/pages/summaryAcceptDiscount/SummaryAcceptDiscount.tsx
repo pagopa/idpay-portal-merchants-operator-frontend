@@ -13,7 +13,7 @@ import { theme } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
 import BreadcrumbsBox from '../../components/BreadcrumbsBox/BreadcrumbsBox';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { authPaymentBarCode } from '../../services/merchantService';
 import ROUTES from '../../routes';
 import { useEffect, useState } from 'react';
@@ -55,7 +55,7 @@ const SummaryAcceptDiscount = () => {
       sessionStorage.removeItem('discountCoupon');
       setAuthorizeIsLoading(false);
       setTransactionAuthorized(true);
-      navigate(ROUTES.BUY_MANAGEMENT.replace(':initiativeId', initiativeId));
+      navigate(generatePath(ROUTES.BUY_MANAGEMENT, {initiativeId: initiativeId}));
     } catch {
       setErrorAlert(true);
       setAuthorizeIsLoading(false);
@@ -345,7 +345,7 @@ const SummaryAcceptDiscount = () => {
             </Grid>
           </Grid>
           <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={4}>
-            <Button variant="outlined" onClick={() => navigate(ROUTES.ACCEPT_DISCOUNT.replace(':initiativeId', initiativeId))}>
+            <Button variant="outlined" onClick={() => navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, {initiativeId: initiativeId}))}>
               {'Indietro'}
             </Button>
             <Button variant="contained" onClick={handleAuthorizeDiscount}>

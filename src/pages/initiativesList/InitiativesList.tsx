@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { DynamicTable } from "../../components/DynamicTable/DynamicTable";
 import ROUTES from "../../routes";
 import { ColumnConfigDef } from "../../utils/types";
+import { generatePath } from "react-router-dom";
 
 export const InitiativesList = () => {
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'initiativeName', sort: 'asc' }]);
@@ -19,7 +20,7 @@ export const InitiativesList = () => {
   const initiativesList = useAppSelector(initiativesListSelector);
   const mappedInitiativesList = useMemo(() =>
     initiativesList.map((initiative) =>
-      ({ ...initiative, key: 'initiative', route: ROUTES.BUY_MANAGEMENT.replace(':initiativeId', initiative.initiativeId) })),
+      ({ ...initiative, key: 'initiative', route: generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiative.initiativeId }) })),
     [initiativesList])
 
   useEffect(() => {

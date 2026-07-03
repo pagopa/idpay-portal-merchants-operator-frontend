@@ -1,7 +1,7 @@
 import { Box, Button, Drawer, Typography, Grid, CircularProgress } from '@mui/material';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, generatePath } from 'react-router-dom';
 import ROUTES from '../../routes';
 import {
   getInProgressTransactions,
@@ -20,7 +20,6 @@ import {
   checkEuroTooltip,
   checkTooltipValue,
   checkDateTooltip,
-  replaceValues,
 } from '../../utils/helpers';
 import { utilsStore } from '../../store/utilsStore';
 import ModalComponent from '../../components/Modal/ModalComponent';
@@ -57,8 +56,8 @@ const PurchaseManagement = () => {
   const [isScrollable, setIsScrollable] = useState(false);
 
   const replaceValuesObj = {
-    ':initiativeId': initiativeId,
-    ':trxId': selectedTransaction?.id
+    initiativeId: initiativeId,
+    trxId: selectedTransaction?.id
   }
 
   useEffect(() => {
@@ -232,11 +231,11 @@ const PurchaseManagement = () => {
   };
 
   const handleReverseTransaction = async () => {
-    navigate(replaceValues(ROUTES.REVERSE, replaceValuesObj));
+    navigate(generatePath(ROUTES.REVERSE, replaceValuesObj));
   };
 
   const handleRequestRefund = async () => {
-    navigate(replaceValues(ROUTES.REFUND, replaceValuesObj));
+    navigate(generatePath(ROUTES.REFUND, replaceValuesObj));
   };
 
   const handlePreviewPdf = async () => {
@@ -263,7 +262,7 @@ const PurchaseManagement = () => {
         additionalButton={{
           label: 'Accetta buono sconto',
           icon: <QrCodeIcon />,
-          onClick: () => navigate(ROUTES.ACCEPT_DISCOUNT.replace(':initiativeId', initiativeId)),
+          onClick: () => navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, {initiativeId: initiativeId})),
         }}
         alerts={[
           [errorDeleteTransaction, setErrorDeleteTransaction],

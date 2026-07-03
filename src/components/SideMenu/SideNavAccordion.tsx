@@ -2,7 +2,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, List, ListItemText, Tooltip } from '@mui/material';
 import { config } from './config';
 import SideNavItem from './SideNavItem';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { generatePath, useLocation, useNavigate } from 'react-router-dom';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { PointOfSaleInitiativeDetailedDTO } from '../../api/generated/data-contracts';
 
@@ -33,7 +33,7 @@ export const SideNavAccordion = ({ item, isOpen, defaultOpen }: Props) => {
             }}
             onChange={(e) => {
                 e.stopPropagation();
-                navigate(config[0].route.replace(':initiativeId', initiativeId), { replace: true })
+                navigate(generatePath(config[0].route, {initiativeId: initiativeId}), { replace: true })
             }}
             data-testid="accordion-click-test"
         >
@@ -52,7 +52,7 @@ export const SideNavAccordion = ({ item, isOpen, defaultOpen }: Props) => {
             <AccordionDetails sx={{ p: 0 }}>
                 <List disablePadding>
                     {config.map(({ key, title, route, icon, dataTestId }) => {
-                        const path = route.replace(':initiativeId', initiativeId)
+                        const path = generatePath(route, {initiativeId: initiativeId})
                         return <SideNavItem
                             key={key}
                             title={t(title)}
