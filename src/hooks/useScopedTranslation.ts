@@ -18,13 +18,13 @@ export const useScopedTranslation = () => {
     }
 
     const t = (key: string) => {
-        const res = translation(key, { ns: key.startsWith('commons') ? 'common' : existentNamespaces.copy })
+        const res = key ? translation(key, { ns: key.startsWith('commons') ? 'common' : existentNamespaces.copy }) : ''
         if (res === key) {
             return translation(key, { ns: 'common' })
         }
         return res
     }
-    const config = (key: string) => translation(key, { ns: key.startsWith('commons') ? 'config' : existentNamespaces.config, returnObjects: true })
+    const config = (key: string) => key ? translation(key, { ns: key.startsWith('commons') ? 'config' : existentNamespaces.config, returnObjects: true }) : {}
 
     return { t, config }
 }

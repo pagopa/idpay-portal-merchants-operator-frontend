@@ -23,7 +23,7 @@ export const initI18n = async (namespaces: Array<string>) => {
       escapeValue: false,
     },
     react: {
-      useSuspense: true,
+      useSuspense: false,
     },
     resources: {
       [DEFAULT_LANG]: {
