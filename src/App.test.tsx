@@ -92,7 +92,7 @@ describe('App routing', () => {
 
   it('should render loading state initially', () => {
     renderWithRoute(ROUTES.INITIATIVES_LIST);
-    expect(screen.getByText('Caricamento iniziative...')).toBeInTheDocument();
+    expect(screen.getByText('Caricamento...')).toBeInTheDocument();
   });
 
   it('should render initiativesList', async () => {
