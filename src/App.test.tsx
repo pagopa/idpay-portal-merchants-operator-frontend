@@ -77,6 +77,7 @@ describe('App routing', () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       token: 'fake-jwt-token',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     vi.mocked(getInitiativesList).mockResolvedValue({ initiatives: mockInitiatives });
