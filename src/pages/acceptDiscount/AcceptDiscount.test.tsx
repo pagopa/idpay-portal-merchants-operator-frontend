@@ -10,10 +10,16 @@ import AcceptDiscount from './AcceptDiscount';
 import { useParams } from 'react-router-dom';
 
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-  useParams: () => ({initiativeId: 'Init-1'})
-}));
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: vi.fn(),
+    useParams: () => ({ initiativeId: 'Init-1' })
+  }
+});
 
 vi.mock('../../services/merchantService', () => ({
   getProductsList: vi.fn(),
@@ -242,7 +248,7 @@ describe('AcceptDiscount', () => {
 
     fireEvent.click(screen.getByText('commons.continueBtn'));
 
-    await act(async () => {});
+    await act(async () => { });
 
     expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
 
@@ -251,7 +257,7 @@ describe('AcceptDiscount', () => {
       vi.runOnlyPendingTimers();
     });
 
-    await act(async () => {});
+    await act(async () => { });
 
     expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
 
@@ -271,7 +277,7 @@ describe('AcceptDiscount', () => {
 
     fireEvent.click(screen.getByText('commons.continueBtn'));
 
-    await act(async () => {});
+    await act(async () => { });
 
     expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
 

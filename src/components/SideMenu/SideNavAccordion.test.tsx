@@ -6,10 +6,14 @@ import { PointOfSaleInitiativeDetailedDTO } from '../../api/generated/data-contr
 
 const mockNavigate = vi.fn();
 
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => mockNavigate,
-    useLocation: vi.fn(),
-}));
+vi.mock('react-router-dom', async (importOriginal) => {
+    const actual = await importOriginal()
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+        useLocation: vi.fn(),
+    }
+});
 
 vi.mock('../../hooks/useScopedTranslation', () => ({
     useScopedTranslation: () => ({ t: (key: string) => key }),
@@ -67,11 +71,11 @@ describe('SideNavAccordion', () => {
     it('calls navigate with the first config route when accordion is changed', () => {
         render(<SideNavAccordion item={mockItem} />);
         const accordionClickArea = screen.getByTestId('accordion-click-test').querySelector('.MuiAccordionSummary-root');
-        
+
         if (accordionClickArea) {
             fireEvent.click(accordionClickArea);
         }
-        
+
         expect(mockNavigate).toHaveBeenCalledWith('/base/init-123/route1', { replace: true });
     });
 
