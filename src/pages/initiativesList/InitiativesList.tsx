@@ -4,17 +4,18 @@ import { useAppSelector } from "../../redux/hooks";
 import { initiativesListSelector } from "../../redux/slices/initiativesSlice";
 import { useScopedTranslation } from "../../hooks/useScopedTranslation";
 import { useEffect, useMemo, useState } from "react";
-import { GridColDef, GridSortModel } from "@mui/x-data-grid";
+import { GridSortModel } from "@mui/x-data-grid";
 import { InputAdornment, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { DynamicTable } from "../../components/DynamicTable/DynamicTable";
 import ROUTES from "../../routes";
+import { ColumnsConfigDef } from "../../utils/types";
 
 export const InitiativesList = () => {
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'initiativeName', sort: 'asc' }]);
   const [initiativeListFiltered, setInitiativeListFiltered] = useState([]);
   const { t, config } = useScopedTranslation();
-  const columns = config('commons.pages.initiativesList.initiativeTable.columns') as Array<GridColDef & { cell: Record<string, string> }>
+  const columns = config<ColumnsConfigDef>('commons.pages.initiativesList.initiativeTable.columns')
   const initiativesList = useAppSelector(initiativesListSelector);
   const mappedInitiativesList = useMemo(() =>
     initiativesList.map((initiative) =>

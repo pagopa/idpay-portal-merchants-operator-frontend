@@ -24,7 +24,10 @@ export const useScopedTranslation = () => {
         }
         return res
     }
-    const config = (key: string) => key ? translation(key, { ns: key.startsWith('commons') ? 'config' : existentNamespaces.config, returnObjects: true }) : {}
+    function config<T>(key: string) {
+        const res = key ? translation(key, { ns: key.startsWith('commons') ? 'config' : existentNamespaces.config, returnObjects: true }) : {}
+        return res as T
+    }
 
     return { t, config }
 }
