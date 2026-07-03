@@ -105,6 +105,6 @@ export interface transactionInProgreessDTO {
   updateDate: string;
 }
 
-export type ColumnsConfigDef = Array<GridColDef<Omit<GridColDef, 'renderCell'>> & { cell: Record<string, string> }>
+export type ColumnConfigDef = Omit<GridColDef, 'renderCell'> & { cell: Record<string, string> }
 
 export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>

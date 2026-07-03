@@ -1,11 +1,12 @@
 import { Box, CircularProgress, Paper, Typography } from "@mui/material"
-import { DataGrid, DataGridProps, GridColDef } from "@mui/x-data-grid"
+import { DataGrid, DataGridProps } from "@mui/x-data-grid"
 import { theme } from "@pagopa/mui-italia"
 import { useScopedTranslation } from "../../hooks/useScopedTranslation"
 import { columnsConfig } from "./columnsConfig"
+import { ColumnConfigDef } from "../../utils/types"
 
 type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
-    columnsDef: Array<GridColDef & { cell: Record<string, string> }>
+    columnsDef: Array<ColumnConfigDef>
     emptyText?: string
     isEmpty?: boolean
     isLoading?: boolean
