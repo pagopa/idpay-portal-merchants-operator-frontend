@@ -20,7 +20,7 @@ vi.mock('./utils/helpers.tsx', () => ({
 }));
 
 const mockInitiatives = [
-  { intiativeId: 'Init-1', initiativeName: 'Bonus Elettrodomestici', startDate: '2025' }
+  { initiativeId: 'Init-1', initiativeName: 'Bonus Elettrodomestici', startDate: '2025' }
 ];
 
 const mockDispatch = vi.fn();
