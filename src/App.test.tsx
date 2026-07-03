@@ -39,7 +39,7 @@ vi.mock('./redux/slices/initiativesSlice.ts', () => ({
   currentInitiativeSelector: vi.fn(),
 }));
 
-vi.mock('./decorators/WithInitiativeGuard.tsx', () => ({
+vi.mock('./decorators/withInitiativeGuard.tsx', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
