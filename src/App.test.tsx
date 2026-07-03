@@ -77,6 +77,7 @@ describe('App routing', () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       token: 'fake-jwt-token',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     vi.mocked(getInitiativesList).mockResolvedValue({ initiatives: mockInitiatives });
@@ -92,7 +93,7 @@ describe('App routing', () => {
 
   it('should render loading state initially', () => {
     renderWithRoute(ROUTES.INITIATIVES_LIST);
-    expect(screen.getByText('Caricamento iniziative...')).toBeInTheDocument();
+    expect(screen.getByText('Caricamento...')).toBeInTheDocument();
   });
 
   it('should render initiativesList', async () => {

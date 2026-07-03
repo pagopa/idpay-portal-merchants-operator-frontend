@@ -30,7 +30,11 @@ function App() {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (!isAuthenticated || !token || isLoaded) {
+    if(isLoaded) {
+      return
+    }
+    if (!isAuthenticated || !token) {
+      setIsLoaded(true)
       return;
     }
     const initializeApp = async () => {
@@ -51,7 +55,7 @@ function App() {
   }, [dispatch, isAuthenticated, isLoaded, token])
 
   if (!isLoaded) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento iniziative...</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento...</div>;
   }
   return (
     <div className="min-h-screen bg-gray-100">

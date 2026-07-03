@@ -38,8 +38,8 @@ export const InitiativesList = () => {
       });
       setInitiativeListFiltered([...listFiltered]);
     } else {
-      if (Array.isArray(initiativesList)) {
-        setInitiativeListFiltered([...initiativesList]);
+      if (Array.isArray(mappedInitiativesList)) {
+        setInitiativeListFiltered([...mappedInitiativesList]);
       }
     }
   };
