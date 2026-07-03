@@ -18,7 +18,7 @@
     "fileSizeError": "Il file supera la dimensione massima di 20MB",
     "statusEnum": {
       "initiative": {
-        "closed": "Terminata",
+        "closed": "Conclusa",
         "published": "In corso"
       },
       "transaction": {
