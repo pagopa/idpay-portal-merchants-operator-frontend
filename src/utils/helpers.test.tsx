@@ -13,6 +13,8 @@ import {
   checkDateTooltip,
   handleCodeChange,
   downloadFileFromBase64,
+  replaceValues,
+  buildNamespaceKey,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -391,7 +393,7 @@ describe('downloadFileFromBase64', () => {
 
     // Mock URL.createObjectURL and revokeObjectURL
     const createObjectURLMock = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:url');
-    const revokeObjectURLMock = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const revokeObjectURLMock = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => { });
 
     // Mock click on anchor element
     const clickMock = vi.fn();
@@ -404,7 +406,7 @@ describe('downloadFileFromBase64', () => {
         download: '',
         click: clickMock,
         style: {},
-        setAttribute: () => {},
+        setAttribute: () => { },
         remove: removeMock,
       } as unknown as HTMLAnchorElement;
     });
@@ -495,5 +497,34 @@ describe('helpers direct call coverage', () => {
     checkDateTooltip({ ...minimalParams, value: null });
     checkDateTooltip({ ...minimalParams, value: new Date() });
     checkDateTooltip({ ...minimalParams, value: Date.now() });
+  });
+});
+
+describe('replaceValues', () => {
+  it('replaceValues', () => {
+    expect(replaceValues('test:replacement', { ':replacement': ' replaced' })).toBe('test replaced')
+  })
+})
+
+describe('buildNamespaceKey', () => {
+  it('builds a camelCase namespace key with the start year', () => {
+    expect(buildNamespaceKey('Bonus Elettrodomestici', '2025-09-01')).toBe(
+      'bonusElettrodomestici2025'
+    );
+  });
+
+  it('normalizes punctuation and numbers in the initiative name', () => {
+    expect(buildNamespaceKey('Bonus Decoder 2026!', '2026-01-15')).toBe(
+      'bonusDecoder20262026'
+    );
+  });
+
+  it('returns an empty key when name or date is missing', () => {
+    expect(buildNamespaceKey('', '2026-01-15')).toBe('');
+    expect(buildNamespaceKey('Bonus Decoder', '')).toBe('');
+  });
+
+  it('returns an empty key when the name has no supported words', () => {
+    expect(buildNamespaceKey('!!!', '2026-01-15')).toBe('');
   });
 });

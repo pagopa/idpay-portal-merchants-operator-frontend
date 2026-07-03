@@ -12,12 +12,14 @@ import type {
   AuthBarCodePaymentDTO,
 } from './generated/data-contracts';
 import { createApiConfig, getAuthToken } from './BaseApiClient';
+import { PointOfSales } from './generated/PointOfSales';
 
 const productsApi = new Products<string>(createApiConfig());
 const transactionsApi = new Transactions<string>(createApiConfig());
 const initiativesApi = new Initiatives<string>(createApiConfig());
 const merchantIdApi = new MerchantId<string>(createApiConfig());
 const pointOfSaleIdApi = new PointOfSaleId<string>(createApiConfig());
+const pointOfSalesApi = new PointOfSales<string>(createApiConfig());
 
 const applySecurity = () => {
   const token = getAuthToken();
@@ -26,6 +28,7 @@ const applySecurity = () => {
   initiativesApi.setSecurityData(token);
   merchantIdApi.setSecurityData(token);
   pointOfSaleIdApi.setSecurityData(token);
+  pointOfSalesApi.setSecurityData(token);
 };
 
 export const MerchantApi = {
@@ -166,4 +169,10 @@ export const MerchantApi = {
     const response = await pointOfSaleIdApi.downloadInvoiceFile(pointOfSaleId, trxId);
     return response.data;
   },
+
+  getInitiativesList: async () => {
+    applySecurity();
+    const response = await pointOfSalesApi.getPointOfSaleInitiativesDetailed();
+    return response.data;
+  }
 };

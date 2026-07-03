@@ -29,3 +29,28 @@
 // export type RootState = ReturnType<typeof store.getState>;
 // // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 // export type AppDispatch = typeof store.dispatch;
+
+import { configureStore } from '@reduxjs/toolkit';
+import type { Middleware } from 'redux';
+import logger from 'redux-logger';
+import { LOG_REDUX_ACTIONS } from '../utils/constants';
+import { initiativesReducer } from './slices/initiativesSlice';
+
+const additionalMiddlewares: Array<Middleware> = LOG_REDUX_ACTIONS ? [logger] : [];
+
+export const createStore = () =>
+  configureStore({
+    reducer: {
+      initiatives: initiativesReducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({ serializableCheck: false })
+        .concat(...additionalMiddlewares.filter(Boolean)),
+  });
+
+export const store = createStore();
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>;
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch;

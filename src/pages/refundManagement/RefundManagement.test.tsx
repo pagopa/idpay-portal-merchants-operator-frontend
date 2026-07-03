@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useParams } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import RefundManagement from './RefundManagement';
 
@@ -14,6 +14,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => navigateMock,
     useLocation: () => ({ state: mockLocationState }),
+    useParams: () => ({ initiativeId: 'Init-1' })
   };
 });
 
@@ -78,14 +79,18 @@ vi.mock('../../components/DetailsDrawer/DetailsDrawer', () => ({
 const renderMissingDataWithTooltipMock = vi.fn(() => 'MISSING');
 const renderCellWithTooltipMock = vi.fn((v: string) => v);
 
-vi.mock('../../utils/helpers', () => ({
-  getStatusChip: vi.fn((_: unknown, status: string) => status),
-  formatEuro: vi.fn((v: number) => `€${v}`),
-  renderCellWithTooltip: (v: string) => renderCellWithTooltipMock(v),
-  renderMissingDataWithTooltip: () => renderMissingDataWithTooltipMock(),
-  checkEuroTooltip: vi.fn(),
-  checkTooltipValue: vi.fn(),
-}));
+vi.mock('../../utils/helpers', async () => {
+  const actual = await import('../../utils/helpers')
+  return {
+    ...actual,
+    getStatusChip: vi.fn((_: unknown, status: string) => status),
+    formatEuro: vi.fn((v: number) => `€${v}`),
+    renderCellWithTooltip: (v: string) => renderCellWithTooltipMock(v),
+    renderMissingDataWithTooltip: () => renderMissingDataWithTooltipMock(),
+    checkEuroTooltip: vi.fn(),
+    checkTooltipValue: vi.fn(),
+  }
+});
 
 let capturedColumns: Array<{
   field: string;
@@ -263,8 +268,8 @@ describe('RefundManagement', () => {
       if (tag === 'a') {
         return {
           click: clickSpy,
-          set href(_v: string) {},
-          set download(_v: string) {},
+          set href(_v: string) { },
+          set download(_v: string) { },
         } as unknown as HTMLAnchorElement;
       }
       return originalCreateElement(tag);
@@ -284,9 +289,9 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('open-invoiced'));
     fireEvent.click(screen.getByTestId('secondary-button'));
     expect(navigateMock).toHaveBeenCalledWith(
-      '/storna-transazione/trx-invoiced',
+      '/Init-1/storna-transazione/trx-invoiced',
       expect.objectContaining({
-        state: { backTo: expect.any(String) },
+        state: { backTo: '/Init-1/gestione-rimborsi' },
       })
     );
   });

@@ -140,3 +140,5 @@ export const getPreviewPdf = async (trxId: string): Promise<{ data: string }> =>
 
   return { data: '' };
 };
+
+export const getInitiativesList = async () => await MerchantApi.getInitiativesList()

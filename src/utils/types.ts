@@ -1,3 +1,6 @@
+import { GridColDef } from "@mui/x-data-grid";
+import { StatusChipConfigProps } from "../components/StatusChip/StatusChip";
+
 export interface JwtUser {
   id?: string;
   username?: string;
@@ -101,3 +104,7 @@ export interface transactionInProgreessDTO {
   trxExpirationSeconds: number;
   updateDate: string;
 }
+
+export type ColumnConfigDef = Omit<GridColDef, 'renderCell'> & { cell: Record<string, string> }
+
+export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>

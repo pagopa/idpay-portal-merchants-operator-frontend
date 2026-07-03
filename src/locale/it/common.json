@@ -1,6 +1,6 @@
 {
   "commons": {
-    "headerTitle": "Portale Esercenti",
+    "headerTitle": "Portale Punto Vendita",
     "backBtn": "Indietro",
     "cancelBtn": "Torna indietro",
     "closeBtn": "Chiudi",
@@ -16,6 +16,20 @@
     "statusFilterPlaceholer": "Stato",
     "trxCodeFilterPlaceholer": "Cerca per codice sconto",
     "fileSizeError": "Il file supera la dimensione massima di 20MB",
+    "statusEnum": {
+      "initiative": {
+        "closed": "Conclusa",
+        "published": "In corso"
+      },
+      "transaction": {
+        "cancelled": "Annullato",
+        "refunded": "Stornato",
+        "rewarded": "Rimborso richiesto",
+        "invoiced": "Preso in carico",
+        "authorized": "Da autorizzare",
+        "captured": "Fattura da caricare"
+      }
+    },
     "discountStatusEnum": {
       "authorized": "Autorizzato",
       "authorizationRequested": "Autorizzazione in corso",
@@ -28,19 +42,38 @@
     "downloadQrBtn": "Scarica codice QR",
     "exitBtn": "Esci",
     "filterBtn": "Filtra",
-    "initiativeStatusEnum": {
-      "closed": "Terminata",
-      "published": "In corso"
-    },
     "removeFiltersBtn": "Rimuovi filtri",
     "sendBtn": "Invia",
-    "title": "Portale Esercenti"
-  },
-  "sideMenu": {
-    "purchaseManagement": "Gestione acquisti",
-    "profile": "Profilo",
-    "refundManagement": "Storico rimborsi",
-    "products": "Prodotti"
+    "title": "Portale Esercenti",
+    "pages": {
+      "initiativesList": {
+        "title": "Iniziative",
+        "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito.",
+        "emptyList": "Non è stata trovata nessuna iniziativa.",
+        "search": "Cerca per nome dell'iniziativa.",
+        "tableHeaders": {
+          "initiativeName": "Nome",
+          "organizationName": "Creata da",
+          "spendingPeriod": "Periodo di spesa",
+          "status": "Stato"
+        }
+      }
+    },
+    "sideMenu": {
+      "initiatives": "Iniziative",
+      "purchaseManagement": "Gestione acquisti",
+      "profile": "Profilo",
+      "refundManagement": "Storico rimborsi",
+      "products": "Prodotti"
+    },
+    "footer": {
+      "postLoginLinks": {
+        "privacyPolicy": "Informativa Privacy",
+        "protectionofpersonaldata": "Diritto alla protezione dei dati personali",
+        "termsandconditions": "Termini e Condizioni",
+        "accessibility": "Accessibilità"
+      }
+    }
   },
   "errors": {
     "contactAdmin": "Contatta l'assistenza",
@@ -89,8 +122,8 @@
       "spendingDataStepperTitle": "Inserisci i dati della spesa"
     },
     "modifyDocument": {
-      "title":"Carica la fattura",
-      "replaceFile":"Sostituisci",
+      "title": "Carica la fattura",
+      "replaceFile": "Sostituisci",
       "creditNote": "Carica il documento",
       "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica.",
       "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
@@ -101,12 +134,12 @@
       "insertInvoice": "Inserisci il numero della fattura",
       "invoiceLabel": "Numero della fattura"
     },
-    "refund":{
-      "title":"Carica la fattura",
-      "subtitle":"Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
+    "refund": {
+      "title": "Carica la fattura",
+      "subtitle": "Carica la documentazione necessaria per avviare la richiesta di rimborso. ",
       "creditNote": "Carica il documento",
       "creditNoteSubtitle": "Carica il file della fattura elettronica relativa a questo acquisto. Assicurati che il documento sia in formato .xml o .pdf e conforme agli standard della fatturazione elettronica.",
-      "replaceFile":"Sostituisci",
+      "replaceFile": "Sostituisci",
       "manualLink": "Dubbi? Vai sul manuale",
       "fileNotSupported": "Tipologia di file non supportata, caricare un file PDF o XML",
       "uploadFile": "Trascina qui il file .xml o .pdf della fattura da caricare o ",
@@ -229,7 +262,7 @@
     "profile": {
       "title": "Profilo",
       "subtitle": "Consulta i dati identificativi dell’azienda.",
-      "errorAlert":"Non è stato possibile recuperare i dati. Riprova."
+      "errorAlert": "Non è stato possibile recuperare i dati. Riprova."
     },
     "purchaseManagement": {
       "title": "Gestione acquisti",
@@ -266,9 +299,9 @@
       "captureTransactionModal": {
         "title": "Hai ricevuto il pagamento del bene?",
         "description1": "Hai ricevuto",
-        "description2":" dal cliente per il prodotto ",
-        "description3":"? Confermando, la transazione passerà nello stato ",
-        "errorCaptureTransaction" : "Non è stato possibile confermare la transazione. Riprova."
+        "description2": " dal cliente per il prodotto ",
+        "description3": "? Confermando, la transazione passerà nello stato ",
+        "errorCaptureTransaction": "Non è stato possibile confermare la transazione. Riprova."
       },
       "refundTransactionModal": {
         "title": "Storna transazione",
@@ -331,7 +364,6 @@
         "energyClass": "Classe energetica",
         "productionCountry": "Paese di produzione"
       }
-      
     },
     "reverse": {
       "title": "Storna transazione",
@@ -350,9 +382,7 @@
       "creditNoteTitle": "Qual è il numero della nota di credito?",
       "insertCreditNote": "Inserisci il numero della nota di credito",
       "creditNoteLabel": "Numero della nota di credito"
-
     }
-
   },
   "roles": {
     "admin": "Amministratore"

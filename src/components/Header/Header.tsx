@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
 import { useEffect, useState } from 'react';
 import { authStore } from '../../store/authStore.ts';
-
+import { useScopedTranslation } from '../../hooks/useScopedTranslation.ts';
 interface HeaderProps {
   userProps?: LoggedUser & { merchant_id?: string };
 }
@@ -16,6 +16,7 @@ const Header = ({ userProps }: HeaderProps) => {
   const { user } = userProps ? { user: userProps } : useAuth();
   const token = authStore.getState().token;
   const [franchiseName, setFranchiseName] = useState<string>('');
+  const {t} = useScopedTranslation()
 
   const loggedUser: LoggedUser = {
     id: userProps ? userProps.id : user.id,
@@ -36,7 +37,7 @@ const Header = ({ userProps }: HeaderProps) => {
 
   const welfareProduct: ProductEntity = {
     id: 'prod-idpay-merchants',
-    title: 'Bonus Elettrodomestici',
+    title: t('commons.headerTitle'),
     productUrl: 'test',
     linkType: 'internal',
   };

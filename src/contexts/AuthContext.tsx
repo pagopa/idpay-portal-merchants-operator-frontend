@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
 import type { JwtUser } from '../utils/types';
@@ -7,7 +7,7 @@ import axios from 'axios';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: JwtUser;
+  user: JwtUser | null;
   token: string | null;
   login: () => void;
   logout: () => void;
@@ -26,7 +26,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isInitialized = useRef(false)
+
+  const setJwtToken = authStore((state) => state.setJwtToken);
+  const setLogout = authStore((state) => state.setLogout);
+
+  const login = useCallback(() => {
+    keycloak.login({
+      redirectUri: window.location.origin + '/esercente/', //return to homepage after login
+    });
+  }, []);
+
+  const logout = useCallback(() => {
+    keycloak.logout({
+      redirectUri: window.location.origin + '/esercente/', //return to homepage after logout
+    });
+    setIsAuthenticated(false);
+    setUser(null);
+    setToken(null);
+  }, [setIsAuthenticated, setUser, setToken]);
+
   useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
     const initKeycloak = async () => {
       try {
         const authenticated = await keycloak.init({
@@ -40,8 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setToken(keycloak.token || null);
           try {
             const response = await axios.get(
-              `${keycloak.authServerUrl}/realms/${
-                import.meta.env.VITE_KEYCLOAK_REALM
+              `${keycloak.authServerUrl}/realms/${import.meta.env.VITE_KEYCLOAK_REALM
               }/protocol/openid-connect/userinfo`,
               {
                 headers: {
@@ -81,20 +102,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const login = useCallback(() => {
-    keycloak.login({
-      redirectUri: window.location.origin + '/esercente/', //return to homepage after login
-    });
-  }, []);
+  useEffect(() => {
+    setJwtToken(token);
+  }, [token, setJwtToken]);
 
-  const logout = useCallback(() => {
-    keycloak.logout({
-      redirectUri: window.location.origin + '/esercente/', //return to homepage after logout
-    });
-    setIsAuthenticated(false);
-    setUser(null);
-    setToken(null);
-  }, [setIsAuthenticated, setUser, setToken]);
+  useEffect(() => {
+    setLogout(logout);
+  }, [logout, setLogout]);
 
   const value = useMemo(
     () => ({
@@ -108,17 +122,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [isAuthenticated, user, token, login, logout, loading]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
-  const setJwtToken = authStore((state) => state.setJwtToken);
-  const setLogout = authStore((state) => state.setLogout);
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth deve essere usato all'interno di un AuthProvider");
   }
-  setJwtToken(context.token || null);
-  setLogout(context.logout);
   return context;
 };
