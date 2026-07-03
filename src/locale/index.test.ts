@@ -1,12 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { waitFor } from '@testing-library/react';
 import i18n from '@pagopa/selfcare-common-frontend/lib/locale/locale-utils';
 import { DEFAULT_LANG, initI18n } from '.';
 
 vi.mock('@pagopa/selfcare-common-frontend/lib/locale/locale-utils', () => {
   const i18nMock = {
     use: vi.fn().mockReturnThis(),
-    init: vi.fn(),
+    init: vi.fn().mockResolvedValue(undefined), 
     addResourceBundle: vi.fn(),
   };
   return { default: i18nMock };
@@ -30,10 +29,10 @@ describe('initI18n', () => {
     vi.clearAllMocks();
   });
 
-  it('should call i18n.use and i18n.init with the correct configuration', () => {
+  it('should call i18n.use and i18n.init', async () => {
     const namespaces = ['bonusElettrodomestici2025'];
 
-    initI18n(namespaces);
+    await initI18n(namespaces);
 
     expect(i18n.use).toHaveBeenCalledWith('mock-initReactI18next');
     
@@ -45,39 +44,37 @@ describe('initI18n', () => {
         ns: ['bonusElettrodomestici2025/copy', 'bonusElettrodomestici2025/config'], 
         fallbackNS: 'default',
         interpolation: { escapeValue: false },
-        react: { useSuspense: true },
+        react: { useSuspense: false }
       })
     );
   });
 
-  it('should dynamically import the namespaces and add them as resource bundles', async () => {
+  it('should dynamically import namespaces', async () => {
     const namespaces = ['bonusElettrodomestici2025'];
 
-    initI18n(namespaces);
+    await initI18n(namespaces);
 
-    await waitFor(() => {
-      expect(i18n.addResourceBundle).toHaveBeenCalledTimes(2);
+    expect(i18n.addResourceBundle).toHaveBeenCalledTimes(2);
 
-      expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-        DEFAULT_LANG,
-        'bonusElettrodomestici2025/copy',
-        { bonusElettrodomestici2025Copy: 'test' },
-        true,
-        true
-      );
+    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+      DEFAULT_LANG,
+      'bonusElettrodomestici2025/copy',
+      { bonusElettrodomestici2025Copy: 'test' },
+      true,
+      true
+    );
 
-      expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-        DEFAULT_LANG,
-        'bonusElettrodomestici2025/config',
-        { bonusElettrodomestici2025Config: 'test' },
-        true,
-        true
-      );
-    });
+    expect(i18n.addResourceBundle).toHaveBeenCalledWith(
+      DEFAULT_LANG,
+      'bonusElettrodomestici2025/config',
+      { bonusElettrodomestici2025Config: 'test' },
+      true,
+      true
+    );
   });
 
-  it('should handle an empty array of namespaces', () => {
-    initI18n([]);
+  it('should handle empty array', async () => {
+    await initI18n([]);
 
     expect(i18n.init).toHaveBeenCalledWith(
       expect.objectContaining({
