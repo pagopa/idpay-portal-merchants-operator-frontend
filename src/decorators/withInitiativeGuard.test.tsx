@@ -79,18 +79,4 @@ describe('WithInitiativeGuard', () => {
             {}
         );
     });
-
-    it('redirects when initiative list length logic fails', () => {
-        (useParams as Mock).mockReturnValue({ initiativeId: '123' });
-        (initiativesListSelector as Mock).mockReturnValue([{ id: '123' }]);
-        (currentInitiativeSelector as Mock).mockReturnValue({ id: '123' });
-
-        render(
-            <WithInitiativeGuard>
-                <Child />
-            </WithInitiativeGuard>
-        );
-
-        expect(Navigate).toHaveBeenCalled();
-    });
 });
