@@ -14,7 +14,7 @@ const WithInitiativeGuard: React.FC<Props> = ({ children }) => {
     const selectedInitiative = useAppSelector((state) => currentInitiativeSelector(state, initiativeId));
 
     useEffect(() => {
-        if (initiativeId && (!selectedInitiative || !(initiatives.length - 1))) {
+        if (initiativeId && (!selectedInitiative)) {
             setIsValidRoute(false)
         }
     }, [initiativeId, initiatives.length, selectedInitiative]);
