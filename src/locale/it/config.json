@@ -61,7 +61,7 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "text"
+                                "type": "tooltip"
                             }
                         },
                         {
@@ -72,7 +72,7 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "text"
+                                "type": "tooltip"
                             }
                         },
                         {

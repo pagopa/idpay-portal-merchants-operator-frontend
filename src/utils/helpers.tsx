@@ -255,3 +255,13 @@ export function buildNamespaceKey(name: string, startDate: string): string {
 
   return `${camelCaseName}${year}`;
 }
+
+export const normalizeObj = (obj: Record<string, any>, parentKey?: string) => {
+  const isObj = Object.prototype.toString.call(obj) === "[object Object]" &&
+    Object.getPrototypeOf(obj) === Object.prototype;
+
+  return isObj ? Object.entries(obj).reduce((acc, [key, value]) => {
+    const objKey = parentKey ? `${parentKey}.${key}` : key
+    return { ...acc, ...normalizeObj(value, objKey)}
+  }, {}) : parentKey ? {[parentKey]: obj} : obj
+}

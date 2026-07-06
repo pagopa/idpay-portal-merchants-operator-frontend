@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { columnsConfig } from './columnsConfig';
-import { checkTooltipValue } from '../../utils/helpers';
+import { fieldsConfig } from './fieldsConfig';
+import { checkTooltipValue } from './helpers';
 
 vi.mock('../../utils/helpers', () => ({
     checkTooltipValue: vi.fn(() => 'mocked-tooltip-value'),
@@ -24,10 +24,10 @@ vi.mock('../StatusChip/StatusChip', () => ({
     ),
 }));
 
-describe('columnsConfig', () => {
+describe('fieldsConfig', () => {
     it('should call checkTooltipValue when text function is executed', () => {
         const mockParams = { value: 'text-value' };
-        const result = columnsConfig.text(mockParams);
+        const result = fieldsConfig.text(mockParams);
 
         expect(checkTooltipValue).toHaveBeenCalledWith(mockParams);
         expect(result).toBe('mocked-tooltip-value');
@@ -39,7 +39,7 @@ describe('columnsConfig', () => {
             row: { route: '/dashboard' },
         };
 
-        render(columnsConfig.link(mockParams));
+        render(fieldsConfig.link(mockParams));
 
         const linkElement = screen.getByTestId('navigation-link');
         expect(linkElement).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('columnsConfig', () => {
             row: { key: 'status-key' },
         };
 
-        render(columnsConfig.chip(mockParams));
+        render(fieldsConfig.chip(mockParams));
 
         const chipElement = screen.getByTestId('status-chip');
         expect(chipElement).toBeInTheDocument();

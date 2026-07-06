@@ -61,6 +61,32 @@
             "transactionDeleteSuccess": "La transazione è stata annullata con successo.",
             "refundSuccessUpload": "Richiesta inviata correttamente",
             "reverseSuccessUpload": "Richiesta inviata correttamente"
+        },
+        "products": {
+            "title": "Prodotti",
+            "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
+            "noProducts": "Non ci sono prodotti per questa iniziativa",
+            "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+            "drawer": {
+                "subtitle": "SCHEDA PRODOTTO",
+                "eprelCode": "Codice EPREL",
+                "gtinCode": "Codice GTIN/EAN",
+                "productCode": "Codice prodotto",
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "capacity": "Capacità",
+                "energyClass": "Classe energetica",
+                "countryOfProduction": "Paese di produzione"
+            },
+            "tableHeaders": {
+                "eprelCode": "Codice EPREL",
+                "gtinCode": "Codice GTIN/EAN",
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "productCode": "Codice prodotto"
+            }
         }
     }
 }

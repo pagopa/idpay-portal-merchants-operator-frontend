@@ -1,1 +1,113 @@
-{}
+{
+    "pages": {
+        "products": {
+            "drawer": [
+                {
+                    "field": "category",
+                    "headerName": "pages.products.drawer.category",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "brand",
+                    "headerName": "pages.products.drawer.brand",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "model",
+                    "headerName": "pages.products.drawer.model",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "gtinCode",
+                    "headerName": "pages.products.drawer.gtinCode",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "productCode",
+                    "headerName": "pages.products.drawer.productCode",
+                    "cell": {
+                        "type": "text"
+                    }
+                }
+            ],
+            "productsTable": {
+                "filters": [],
+                "columns": [
+                    {
+                        "field": "category",
+                        "headerName": "pages.products.tableHeaders.category",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "tooltip"
+                        }
+                    },
+                    {
+                        "field": "brand",
+                        "headerName": "pages.products.tableHeaders.brand",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "tooltip"
+                        }
+                    },
+                    {
+                        "field": "model",
+                        "headerName": "pages.products.tableHeaders.model",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "tooltip"
+                        }
+                    },
+                    {
+                        "field": "gtinCode",
+                        "headerName": "pages.products.tableHeaders.gtinCode",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "tooltip"
+                        }
+                    },
+                    {
+                        "field": "productCode",
+                        "headerName": "pages.products.tableHeaders.productCode",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "tooltip"
+                        }
+                    },
+                    {
+                        "field": "action",
+                        "sortable": false,
+                        "filterable": false,
+                        "disableColumnMenu": true,
+                        "flex": 0.5,
+                        "cell": {
+                            "type": "action"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -2,11 +2,11 @@ import { Box, CircularProgress, Paper, Typography } from "@mui/material"
 import { DataGrid, DataGridProps } from "@mui/x-data-grid"
 import { theme } from "@pagopa/mui-italia"
 import { useScopedTranslation } from "../../hooks/useScopedTranslation"
-import { columnsConfig } from "./columnsConfig"
-import { ColumnConfigDef } from "../../utils/types"
+import { FieldConfigDef } from "../../utils/types"
+import { fieldsConfig } from "../../utils/fieldsConfig"
 
 type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
-    columnsDef: Array<ColumnConfigDef>
+    columnsDef: Array<FieldConfigDef>
     emptyText?: string
     isEmpty?: boolean
     isLoading?: boolean
@@ -15,7 +15,7 @@ type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
 export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, ...props }: Props) => {
     const { t } = useScopedTranslation()
     const mappedColumns = columnsDef.map(({ cell, ...column }) =>
-        ({ ...column, headerName: t(column.headerName), renderCell: columnsConfig[cell?.type] }))
+        ({ ...column, headerName: t(column.headerName), renderCell: fieldsConfig[cell?.type] }))
 
     return (isLoading ?
         <Box
@@ -45,6 +45,7 @@ export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, ...pro
                 {...props}
                 columns={mappedColumns}
                 disableRowSelectionOnClick
+                sortingOrder={['asc', 'desc']}
                 sx={{
                     '& .MuiDataGrid-row': {
                         backgroundColor: theme.palette.background.paper,
