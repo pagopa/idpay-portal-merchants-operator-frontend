@@ -47,11 +47,15 @@ export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, ...pro
                 disableRowSelectionOnClick
                 sortingOrder={['asc', 'desc']}
                 sx={{
+                    border: 'none',
                     '& .MuiDataGrid-row': {
                         backgroundColor: theme.palette.background.paper,
                         '&:hover': {
                             backgroundColor: theme.palette.background.paper,
                         },
+                    },
+                    '& .MuiDataGrid-columnSeparator': {
+                        display: 'none',
                     },
                     '& .MuiDataGrid-cell:focus': {
                         outline: 'none',
@@ -64,6 +68,21 @@ export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, ...pro
                     },
                     '& .MuiDataGrid-columnHeader:focus-within': {
                         outline: 'none',
+                    },
+                    '& .MuiDataGrid-iconButtonContainer button': {
+                        backgroundColor: 'transparent',
+                    },
+                    '& .MuiDataGrid-columnHeader': {
+                        backgroundColor: theme.palette.grey[100],
+                    },
+                    '& .MuiDataGrid-footerContainer': {
+                        backgroundColor: theme.palette.grey[100],
+                    },
+                    '& .MuiTablePagination-root': {
+                        overflowY: 'hidden',
+                        '& button': {
+                            backgroundColor: 'transparent !important',
+                        },
                     },
                 }}
             />)

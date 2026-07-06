@@ -81,7 +81,10 @@ export const InitiativesList = () => {
           isEmpty={!initiativeListFiltered.length}
           sortModel={sortModel}
           onSortModelChange={setSortModel}
-          hideFooterPagination />
+          sortingOrder={['asc', 'desc']}
+          hideFooterPagination
+          hideFooter
+          />
       </Box>
     </Box>
   );
