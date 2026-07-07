@@ -1,5 +1,14 @@
 {
     "initiativeName": "Bonus Decoder",
+    "templates": {
+        "categories": {
+            "ds": "Satellitare",
+            "dt": "Terrestre",
+            "dtc": "Terrestre via cavo",
+            "dts": "Terrestre e Satellitare",
+            "dtsc": "Terrestre, Satellitare e via cavo"
+        }
+    },
     "pages": {
         "purchaseManagement": {
             "title": "Gestione acquisti",
@@ -74,6 +83,13 @@
                 "category": "Categoria",
                 "brand": "Marca",
                 "model": "Modello"
+            },
+            "filters": {
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "productCode": "Codice prodotto",
+                "gtinCode": "Codice GTIN/EAN"
             },
             "tableHeaders": {
                 "gtinCode": "Codice GTIN/EAN",

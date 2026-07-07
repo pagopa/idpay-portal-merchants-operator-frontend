@@ -3,7 +3,7 @@ import { DownloadFile } from "../components/DownloadFile/DownloadFile";
 import { NavigationLink } from "../components/NavigationLink/NavigationLink";
 import { StatusChip } from "../components/StatusChip/StatusChip";
 import { checkTooltipValue, renderMissingDataWithTooltip } from "./helpers";
-import { IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
@@ -36,8 +36,18 @@ export const fieldsConfig = {
             {params.value}
         </Typography> :
         renderMissingDataWithTooltip(),
-    action: (params) => {
-        <IconButton onClick={() => params?.value?.onClick(params.row)}>
-            {actionIcons[params?.value?.icon]}
-        </IconButton>}
+    action: (params) =>
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'end',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+            }}
+        >
+            <IconButton onClick={() => params?.value?.onClick(params.row)}>
+                {actionIcons[params?.value?.icon]}
+            </IconButton>
+        </Box>
 }

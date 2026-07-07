@@ -1,5 +1,8 @@
 {
     "initiativeName": "Bonus Default",
+    "templates": {
+        "categories": {}
+    },
     "pages": {
         "purchaseManagement": {
             "title": "Gestione acquisti",
@@ -74,6 +77,13 @@
                 "category": "Categoria",
                 "brand": "Marca",
                 "model": "Modello"
+            },
+            "filters": {
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "productCode": "Codice prodotto",
+                "gtinCode": "Codice GTIN/EAN"
             },
             "tableHeaders": {
                 "gtinCode": "Codice GTIN/EAN",

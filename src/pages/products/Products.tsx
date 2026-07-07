@@ -74,11 +74,6 @@ const Products = () => {
     },
   });
 
-  useEffect(() => {
-    fetchProducts({});
-    setProductsListIsLoading(true);
-  }, []);
-
   const fetchProducts = useCallback(async (params: GetProductsParams) => {
     setProductsListIsLoading(true);
     try {
@@ -168,6 +163,11 @@ const Products = () => {
       formik.values.gtinCode.length > 0
     );
   };
+
+  useEffect(() => {
+    fetchProducts({});
+    setProductsListIsLoading(true);
+  }, [fetchProducts]);
 
   return (
     <Box>
@@ -282,11 +282,10 @@ const Products = () => {
             </FiltersForm>
           )}
       </Box>
-
       <Box>
         <>
           <DynamicTable
-            emptyText='pages.products.noProducts'
+            emptyText={t('pages.products.noProducts')}
             columnsDef={columnsDef}
             isEmpty={!mappedProductsList?.length}
             isLoading={productsListIsLoading}

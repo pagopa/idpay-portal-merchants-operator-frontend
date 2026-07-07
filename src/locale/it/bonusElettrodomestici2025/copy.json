@@ -1,5 +1,17 @@
 {
     "initiativeName": "Bonus Elettrodomestici",
+    "templates": {
+        "categories": {
+            "washingmachines": "Lavatrici",
+            "tumbledryers": "Asciugatrici",
+            "ovens": "Forni",
+            "rangehoods": "Cappe da cucina",
+            "dishwashers": "Lavastoviglie",
+            "washerdriers": "Lavasciuga",
+            "refrigeratingappl": "Apparecchi di refrigerazione",
+            "cookinghobs": "Piani cottura"
+        }
+    },
     "pages": {
         "purchaseManagement": {
             "title": "Gestione acquisti",
@@ -78,6 +90,13 @@
                 "capacity": "Capacità",
                 "energyClass": "Classe energetica",
                 "countryOfProduction": "Paese di produzione"
+            },
+            "filters": {
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "eprelCode": "Codice EPREL",
+                "gtinCode": "Codice GTIN/EAN"
             },
             "tableHeaders": {
                 "eprelCode": "Codice EPREL",

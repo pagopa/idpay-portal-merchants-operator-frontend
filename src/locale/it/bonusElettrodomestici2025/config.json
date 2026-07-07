@@ -1,4 +1,40 @@
 {
+    "templates": {
+        "categories": [
+            {
+                "value": "REFRIGERATINGAPPL",
+                "label": "templates.categories.refrigeratingappl"
+            },
+            {
+                "value": "TUMBLEDRYERS",
+                "label": "templates.categories.tumbledryers"
+            },
+            {
+                "value": "RANGEHOODS",
+                "label": "templates.categories.rangehoods"
+            },
+            {
+                "value": "OVENS",
+                "label": "templates.categories.ovens"
+            },
+            {
+                "value": "WASHERDRIERS",
+                "label": "templates.categories.washerdriers"
+            },
+            {
+                "value": "DISHWASHERS",
+                "label": "templates.categories.dishwashers"
+            },
+            {
+                "value": "WASHINGMACHINES",
+                "label": "templates.categories.washingmachines"
+            },
+            {
+                "value": "COOKINGHOBS",
+                "label": "templates.categories.cookinghobs"
+            }
+        ]
+    },
     "pages": {
         "products": {
             "drawer": [
@@ -67,7 +103,44 @@
                 }
             ],
             "productsTable": {
-                "filters": [],
+                "filters": [
+                    {
+                        "id": "category",
+                        "type": "select",
+                        "label": "pages.products.filters.category",
+                        "template": "categories"
+                    },
+                    {
+                        "id": "brand",
+                        "type": "text",
+                        "label": "pages.products.filters.brand"
+                    },
+                    {
+                        "id": "model",
+                        "type": "text",
+                        "label": "pages.products.filters.model"
+                    },
+                    {
+                        "id": "eprelCode",
+                        "type": "text",
+                        "label": "tables.products.filters.eprelCode",
+                        "regEx": "^[0-9]{1,12}$",
+                        "message": "tables.products.filters.errors.eprelCode",
+                        "inputProps": {
+                            "maxLength": 12
+                        }
+                    },
+                    {
+                        "id": "gtinCode",
+                        "type": "text",
+                        "label": "tables.products.filters.gtinCode",
+                        "regEx": "^[a-zA-Z0-9]{1,14}$",
+                        "message": "tables.products.filters.errors.gtinCode",
+                        "inputProps": {
+                            "maxLength": 14
+                        }
+                    }
+                ],
                 "columns": [
                     {
                         "field": "category",

@@ -1,4 +1,7 @@
 {
+    "templates": {
+        "categories": []
+    },
     "pages": {
         "products": {
             "drawer": [

@@ -1,4 +1,28 @@
 {
+    "templates": {
+        "categories": [
+            {
+                "value": "DS",
+                "label": "templates.categories.ds"
+            },
+            {
+                "value": "DT",
+                "label": "templates.categories.dt"
+            },
+            {
+                "value": "DTC",
+                "label": "templates.categories.dtc"
+            },
+            {
+                "value": "DTS",
+                "label": "templates.categories.dts"
+            },
+            {
+                "value": "DTSC",
+                "label": "templates.categories.dtsc"
+            }
+        ]
+    },
     "pages": {
         "products": {
             "drawer": [
@@ -39,7 +63,39 @@
                 }
             ],
             "productsTable": {
-                "filters": [],
+                "filters": [
+                    {
+                        "id": "category",
+                        "type": "select",
+                        "label": "pages.products.filters.category",
+                        "template": "categories"
+                    },
+                    {
+                        "id": "brand",
+                        "type": "text",
+                        "label": "pages.products.filters.brand"
+                    },
+                    {
+                        "id": "model",
+                        "type": "text",
+                        "label": "pages.products.filters.model"
+                    },
+                    {
+                        "id": "productCode",
+                        "type": "text",
+                        "label": "tables.products.filters.productCode"
+                    },
+                    {
+                        "id": "gtinCode",
+                        "type": "text",
+                        "label": "tables.products.filters.gtinCode",
+                        "regEx": "^[a-zA-Z0-9]{1,14}$",
+                        "message": "tables.products.filters.errors.gtinCode",
+                        "inputProps": {
+                            "maxLength": 14
+                        }
+                    }
+                ],
                 "columns": [
                     {
                         "field": "category",

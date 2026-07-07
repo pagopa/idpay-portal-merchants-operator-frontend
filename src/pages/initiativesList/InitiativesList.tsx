@@ -77,7 +77,7 @@ export const InitiativesList = () => {
           columnsDef={columns}
           rows={initiativeListFiltered}
           getRowId={row => row.initiativeId}
-          emptyText='commons.pages.initiativesList.emptyList'
+          emptyText={t('commons.pages.initiativesList.emptyList')}
           isEmpty={!initiativeListFiltered.length}
           sortModel={sortModel}
           onSortModelChange={setSortModel}

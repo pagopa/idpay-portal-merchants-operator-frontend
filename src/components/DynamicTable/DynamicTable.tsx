@@ -39,7 +39,7 @@ export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, ...pro
                     justifyContent: 'center',
                 }}
             >
-                <Typography variant="body2">{t(emptyText)}</Typography>
+                <Typography variant="body2">{emptyText}</Typography>
             </Paper> :
             <DataGrid
                 {...props}

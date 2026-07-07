@@ -108,3 +108,17 @@ export interface transactionInProgreessDTO {
 export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: Record<string, string> }
 
 export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>
+
+export type TemplateConfigDef = Array<{value: string, label: string}>
+
+export type FilterConfigDef = {
+  id: string;
+  type: 'select' | 'text';
+  label?: string;
+  template?: string;
+  defaultValue?: string;
+  regEx?: string;
+  message?: string;
+  inputProps?: Record<string, unknown>;
+  options?: Array<Record<string, string>>;
+}
