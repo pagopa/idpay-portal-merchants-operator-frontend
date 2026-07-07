@@ -1,4 +1,4 @@
-import { Box, MenuItem, Select, TextField } from '@mui/material';
+import { MenuItem, Select, TextField } from '@mui/material';
 import { FilterConfigDef, TemplateConfigDef } from '../../utils/types';
 
 type Props = {
@@ -24,20 +24,10 @@ export const filtersConfig: Record<
                     id={`${id}-filter-select`}
                     label={t(label ?? '')}
                     value={filters?.[id] ?? ''}
-                    renderValue={() => (
-                        <Box
-                            sx={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                            }}
-                        >
-                            {filters?.[id] ?? ''}
-                        </Box>
-                    )}
-                    onChange={(e) =>
+                    name={id}
+                    onChange={(e) =>{
                         setFilters(id, e.target.value)
-                    }
+                    }}
                 >
                     {templateDef.map(({ label, value }) => (
                         <MenuItem key={value} value={value}> {t(label)}</MenuItem>
