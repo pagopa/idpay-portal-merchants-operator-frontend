@@ -13,6 +13,7 @@ import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
+import { theme } from '@pagopa/mui-italia';
 
 const initialPagination = {
   page: 0,
@@ -38,7 +39,7 @@ const Products = () => {
   const [errorAlert, setErrorAlert] = useState(false);
 
   useAutoResetBanner([[errorAlert, setErrorAlert]]);
-  
+
   const mappedProductsList = useMemo(() =>
     productsList.map((product) =>
     ({
@@ -161,7 +162,7 @@ const Products = () => {
           filtersDef={filtersDef}
           onFiltersApply={handleFiltersApplied}
           onFiltersReset={handleFiltersReset}
-          />
+        />
       </Box>
       <Box>
         <DynamicTable
@@ -173,9 +174,11 @@ const Products = () => {
           getRowId={row => row.gtinCode}
           paginationModel={paginationModel}
           onPaginationModelChange={handlePaginationChange}
+          rowCount={paginationModel?.totalElements || 0}
           sortModel={sortModel}
           onSortModelChange={handleSortModelChange}
           pageSizeOptions={ELEMENT_PER_PAGE}
+          rowsDividerColor={theme.palette.divider}
         />
         <DynamicDrawer
           setIsOpen={() => setOpenDrawer(false)}
