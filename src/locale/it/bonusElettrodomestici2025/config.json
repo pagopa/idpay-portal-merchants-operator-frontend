@@ -123,9 +123,9 @@
                     {
                         "id": "eprelCode",
                         "type": "text",
-                        "label": "tables.products.filters.eprelCode",
+                        "label": "pages.products.filters.eprelCode",
                         "regEx": "^[0-9]{1,12}$",
-                        "message": "tables.products.filters.errors.eprelCode",
+                        "message": "pages.products.filters.errors.eprelCode",
                         "inputProps": {
                             "maxLength": 12
                         }
@@ -133,9 +133,9 @@
                     {
                         "id": "gtinCode",
                         "type": "text",
-                        "label": "tables.products.filters.gtinCode",
+                        "label": "pages.products.filters.gtinCode",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
-                        "message": "tables.products.filters.errors.gtinCode",
+                        "message": "pages.products.filters.errors.gtinCode",
                         "inputProps": {
                             "maxLength": 14
                         }

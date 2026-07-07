@@ -83,14 +83,14 @@
                     {
                         "id": "productCode",
                         "type": "text",
-                        "label": "tables.products.filters.productCode"
+                        "label": "pages.products.filters.productCode"
                     },
                     {
                         "id": "gtinCode",
                         "type": "text",
-                        "label": "tables.products.filters.gtinCode",
+                        "label": "pages.products.filters.gtinCode",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
-                        "message": "tables.products.filters.errors.gtinCode",
+                        "message": "pages.products.filters.errors.gtinCode",
                         "inputProps": {
                             "maxLength": 14
                         }

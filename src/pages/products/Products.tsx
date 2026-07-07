@@ -1,37 +1,18 @@
-import {
-  Box,
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-} from '@mui/material';
+import { Box, Button } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import FiltersForm from '../../components/FiltersForm/FiltersForm';
-import { useFormik } from 'formik';
 import { ELEMENT_PER_PAGE } from '../../utils/constants';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { getProductsList } from '../../services/merchantService';
-import { FieldConfigDef, GetProductsParams } from '../../utils/types';
+import { FieldConfigDef, FilterConfigDef, GetProductsParams } from '../../utils/types';
 import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import { PaginationExtendedModel } from '../../utils/types';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
-import { handleCodeChange } from '../../utils/helpers';
 import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
-
-const initialValues = {
-  category: '',
-  brand: '',
-  model: '',
-  eprelCode: '',
-  gtinCode: '',
-};
+import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 
 const initialPagination = {
   page: 0,
@@ -40,20 +21,24 @@ const initialPagination = {
 }
 
 const Products = () => {
-  const [gtinError, setGtinError] = useState<string>('');
+  const { t, config } = useScopedTranslation();
+  const filtersDef = config<Array<FilterConfigDef>>('pages.products.productsTable.filters')
+  const fieldsDef = config<Array<FieldConfigDef>>('pages.products.drawer')
+  const columnsDef = config<Array<FieldConfigDef>>('pages.products.productsTable.columns')
+
   const [productsList, setProductsList] = useState([]);
   const [productsListIsLoading, setProductsListIsLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const [filters, setFilters] = useState({});
+  const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>(initialPagination);
+  const [sortModel, setSortModel] = useState<GridSortModel>([]);
+
   const [openDrawer, setOpenDrawer] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
-  const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>(initialPagination);
-  const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState(initialValues);
-  const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  const { t, config } = useScopedTranslation();
-  const fieldsDef = config<Array<FieldConfigDef>>('pages.products.drawer')
-  const columnsDef = config<Array<FieldConfigDef>>('pages.products.productsTable.columns')
+
   useAutoResetBanner([[errorAlert, setErrorAlert]]);
+  
   const mappedProductsList = useMemo(() =>
     productsList.map((product) =>
     ({
@@ -66,13 +51,6 @@ const Products = () => {
       }
     })),
     [productsList])
-
-  const formik = useFormik({
-    initialValues,
-    onSubmit: async (values) => {
-      handleFiltersApplied(values);
-    },
-  });
 
   const fetchProducts = useCallback(async (params: GetProductsParams) => {
     setProductsListIsLoading(true);
@@ -113,7 +91,7 @@ const Products = () => {
       page: newPaginationModel.page,
       size: newPaginationModel.pageSize,
       sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-      ...appliedFilters,
+      ...filters,
     });
   };
 
@@ -124,23 +102,15 @@ const Products = () => {
         sort: model[0].field + ',' + model[0].sort,
         page: paginationModel.page,
         size: paginationModel.pageSize,
-        ...appliedFilters,
+        ...filters,
       });
     }
   };
 
-  const handleFiltersApplied = (filtersObj: typeof initialValues) => {
-    setFiltersAppliedOnce(true);
-    setAppliedFilters(filtersObj);
-    const queryParams = Object.keys(filtersObj).reduce((acc, key) => {
-      const value = filtersObj[key];
-      if (value !== '' && value !== null && value !== undefined) {
-        acc[key] = String(value).trim();
-      }
-      return acc;
-    }, {});
+  const handleFiltersApplied = (filtersObj: typeof filters) => {
+    setFilters(filtersObj);
     fetchProducts({
-      ...queryParams,
+      ...filtersObj,
       page: 0,
       size: paginationModel.pageSize || 10,
       sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
@@ -148,20 +118,8 @@ const Products = () => {
   };
 
   const handleFiltersReset = () => {
-    setFiltersAppliedOnce(false);
-    setAppliedFilters(initialValues);
-    formik.resetForm();
+    setFilters({});
     fetchProducts({});
-  };
-
-  const areFiltersApplied = () => {
-    return (
-      formik.values.category.length > 0 ||
-      formik.values.brand.length > 0 ||
-      formik.values.model.length > 0 ||
-      formik.values.eprelCode.length > 0 ||
-      formik.values.gtinCode.length > 0
-    );
   };
 
   useEffect(() => {
@@ -198,114 +156,35 @@ const Products = () => {
         </Button>
       </Box>
       <Box>
-        {((productsList && productsList?.length > 0) ||
-          (productsList.length === 0 &&
-            (formik.values.category.length > 0 ||
-              formik.values.brand.length > 0 ||
-              formik.values.model.length > 0 ||
-              formik.values.eprelCode.length > 0 ||
-              formik.values.gtinCode.length > 0)) ||
-          filtersAppliedOnce) && (
-            <FiltersForm
-              formik={formik}
-              onFiltersApplied={formik.handleSubmit}
-              onFiltersReset={handleFiltersReset}
-              filtersApplied={areFiltersApplied()}
-              filtersAppliedOnce={filtersAppliedOnce}
-            >
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="pos-type-label">Categoria</InputLabel>
-                  <Select
-                    labelId="pos-type-label"
-                    id="pos-type-select"
-                    label="Categoria"
-                    name="category"
-                    value={formik.values.category}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  >
-                    <MenuItem value="REFRIGERATINGAPPL">Apparecchi di refrigerazione</MenuItem>
-                    <MenuItem value="TUMBLEDRYERS">Asciugatrici</MenuItem>
-                    <MenuItem value="RANGEHOODS">Cappe da cucina</MenuItem>
-                    <MenuItem value="OVENS">Forni</MenuItem>
-                    <MenuItem value="WASHERDRIERS">Lavasciuga</MenuItem>
-                    <MenuItem value="DISHWASHERS">Lavastoviglie</MenuItem>
-                    <MenuItem value="WASHINGMACHINES">Lavatrici</MenuItem>
-                    <MenuItem value="COOKINGHOBS">Piani cottura</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                <TextField
-                  name="brand"
-                  label="Marca"
-                  size="small"
-                  fullWidth
-                  value={formik.values.brand}
-                  onChange={formik.handleChange}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                <TextField
-                  name="model"
-                  label="Modello"
-                  size="small"
-                  fullWidth
-                  value={formik.values.model}
-                  onChange={formik.handleChange}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                <TextField
-                  name="eprelCode"
-                  label="Codice EPREL"
-                  size="small"
-                  fullWidth
-                  value={formik.values.eprelCode}
-                  onChange={formik.handleChange}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }}>
-                <TextField
-                  name="gtinCode"
-                  label="Codice GTIN/EAN"
-                  size="small"
-                  fullWidth
-                  value={formik.values.gtinCode}
-                  onChange={(e) => setGtinError(handleCodeChange(e, formik, 14, 'GTIN/EAN'))}
-                  onBlur={() => setGtinError('')}
-                  error={!!gtinError}
-                  helperText={gtinError}
-                />
-              </Grid>
-            </FiltersForm>
-          )}
+        <DynamicFilters
+          filters={filters}
+          filtersDef={filtersDef}
+          onFiltersApply={handleFiltersApplied}
+          onFiltersReset={handleFiltersReset}
+          />
       </Box>
       <Box>
-        <>
-          <DynamicTable
-            emptyText={t('pages.products.noProducts')}
-            columnsDef={columnsDef}
-            isEmpty={!mappedProductsList?.length}
-            isLoading={productsListIsLoading}
-            rows={mappedProductsList}
-            getRowId={row => row.gtinCode}
-            paginationModel={paginationModel}
-            onPaginationModelChange={handlePaginationChange}
-            sortModel={sortModel}
-            onSortModelChange={handleSortModelChange}
-            pageSizeOptions={ELEMENT_PER_PAGE}
-          />
-          <DynamicDrawer
-            setIsOpen={() => setOpenDrawer(false)}
-            title={`${selectedProduct?.productName} - ${selectedProduct?.productCode}`}
-            subtitle={t('pages.products.drawer.subtitle')}
-            fieldsValues={selectedProduct}
-            fieldsDef={fieldsDef}
-            isOpen={openDrawer}
-          />
-        </>
+        <DynamicTable
+          emptyText={t('pages.products.noProducts')}
+          columnsDef={columnsDef}
+          isEmpty={!mappedProductsList?.length}
+          isLoading={productsListIsLoading}
+          rows={mappedProductsList}
+          getRowId={row => row.gtinCode}
+          paginationModel={paginationModel}
+          onPaginationModelChange={handlePaginationChange}
+          sortModel={sortModel}
+          onSortModelChange={handleSortModelChange}
+          pageSizeOptions={ELEMENT_PER_PAGE}
+        />
+        <DynamicDrawer
+          setIsOpen={() => setOpenDrawer(false)}
+          title={`${selectedProduct?.productName} - ${selectedProduct?.productCode}`}
+          subtitle={t('pages.products.drawer.subtitle')}
+          fieldsValues={selectedProduct}
+          fieldsDef={fieldsDef}
+          isOpen={openDrawer}
+        />
       </Box>
       <AlertComponent isOpen={errorAlert} error message={t('pages.products.errorAlert')} />
     </Box>

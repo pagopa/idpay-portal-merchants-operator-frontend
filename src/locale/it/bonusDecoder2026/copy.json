@@ -89,7 +89,10 @@
                 "brand": "Marca",
                 "model": "Modello",
                 "productCode": "Codice prodotto",
-                "gtinCode": "Codice GTIN/EAN"
+                "gtinCode": "Codice GTIN/EAN",
+                "errors": {
+                    "gtinCode": "Il codice deve avere 14 caratteri"
+                }
             },
             "tableHeaders": {
                 "gtinCode": "Codice GTIN/EAN",
