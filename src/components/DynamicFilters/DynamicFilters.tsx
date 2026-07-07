@@ -68,7 +68,7 @@ export const DynamicFilters = ({
           config
         }
         return (
-          <FormControl key={filter.id} fullWidth size="small" margin="normal" variant="outlined">
+          <FormControl key={filter.id} fullWidth size='small' variant="outlined">
             {type === 'select' && (
               <InputLabel id={`${filter.id}-filter-select-label`}>
                 {t(filter.label ?? '')}

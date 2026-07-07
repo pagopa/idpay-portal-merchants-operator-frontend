@@ -1,4 +1,4 @@
-import { MenuItem, Select, TextField } from '@mui/material';
+import { Box, MenuItem, Select, TextField } from '@mui/material';
 import { FilterConfigDef, TemplateConfigDef } from '../../utils/types';
 
 type Props = {
@@ -18,21 +18,33 @@ export const filtersConfig: Record<
     select: ({ item, t, config, filters, setFilters }) => {
         const { id, label, template } = item;
         const templateDef = config(`templates.${template}`)
+        const templateLabels = templateDef.reduce((acc, {value, label}) => ({ ...acc, [value]: label}), {})
         return (
-                <Select
-                    labelId={`${id}-filter-select-label`}
-                    id={`${id}-filter-select`}
-                    label={t(label ?? '')}
-                    value={filters?.[id] ?? ''}
-                    name={id}
-                    onChange={(e) =>{
-                        setFilters(id, e.target.value)
-                    }}
-                >
-                    {templateDef.map(({ label, value }) => (
-                        <MenuItem key={value} value={value}> {t(label)}</MenuItem>
-                    ))}
-                </Select>
+            <Select
+                labelId={`${id}-filter-select-label`}
+                id={`${id}-filter-select`}
+                label={t(label ?? '')}
+                value={filters?.[id] ?? ''}
+                name={id}
+                onChange={(e) => {
+                    setFilters(id, e.target.value)
+                }}
+                renderValue={(value) => (
+                    <Box
+                        sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {t(templateLabels[value])}
+                    </Box>
+                )}
+            >
+                {templateDef.map(({ label, value }) => (
+                    <MenuItem key={value} value={value}> {t(label)}</MenuItem>
+                ))}
+            </Select>
         );
     },
     text: ({ item, t, filters, setFilters, errors, setErrors }) => {
@@ -41,8 +53,8 @@ export const filtersConfig: Record<
         return (
             <TextField
                 fullWidth
+                size='small'
                 id={`${id}-text`}
-                size="small"
                 label={t(label ?? '')}
                 variant="outlined"
                 value={filters?.[id] ?? ''}

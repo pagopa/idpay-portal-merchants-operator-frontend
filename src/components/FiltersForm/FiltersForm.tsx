@@ -1,5 +1,4 @@
-import { Box, Button, Grid } from '@mui/material';
-import { ButtonNaked } from '@pagopa/mui-italia';
+import { Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import React, { cloneElement, isValidElement } from 'react';
 import { FormikProps } from 'formik';
@@ -64,6 +63,7 @@ const FiltersForm = <T extends Record<string, any>>({
     <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="center">
       {enhancedChildren}
       <Button
+        sx={{minWidth: 'fit-content'}}
         variant="outlined"
         onClick={handleApplyFilters}
         disabled={formik.isSubmitting || !filtersApplied}
@@ -72,6 +72,7 @@ const FiltersForm = <T extends Record<string, any>>({
         {t('commons.filterBtn')}
       </Button>
       <Button
+        sx={{minWidth: 'fit-content'}}
         variant="naked"
         onClick={handleResetFilters}
         disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce)}
