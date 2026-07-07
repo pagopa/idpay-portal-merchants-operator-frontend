@@ -18,7 +18,7 @@
     "fileSizeError": "Il file supera la dimensione massima di 20MB",
     "statusEnum": {
       "initiative": {
-        "closed": "Conclusa",
+        "closed": "Terminata",
         "published": "In corso"
       },
       "transaction": {
@@ -50,11 +50,11 @@
         "title": "Iniziative",
         "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito.",
         "emptyList": "Non è stata trovata nessuna iniziativa.",
-        "search": "Cerca per nome dell'iniziativa.",
+        "search": "Cerca per nome dell'iniziativa",
         "tableHeaders": {
           "initiativeName": "Nome",
           "organizationName": "Creata da",
-          "spendingPeriod": "Periodo di spesa",
+          "spendingPeriod": "Periodo di Validità",
           "status": "Stato"
         }
       }

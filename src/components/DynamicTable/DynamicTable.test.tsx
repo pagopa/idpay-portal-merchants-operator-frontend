@@ -15,16 +15,6 @@ vi.mock('./columnsConfig', () => ({
     },
 }));
 
-vi.mock('@pagopa/mui-italia', () => ({
-    theme: {
-        palette: {
-            background: {
-                paper: '#ffffff',
-            },
-        },
-    },
-}));
-
 describe('DynamicTable Component', () => {
     const mockColumnsDef = [
         { field: 'id', headerName: 'table.id', cell: { type: 'textType' } },
