@@ -126,6 +126,10 @@
                         "label": "pages.products.filters.eprelCode",
                         "regEx": "^[0-9]{1,12}$",
                         "message": "pages.products.filters.errors.eprelCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
                         "inputProps": {
                             "maxLength": 12
                         }
@@ -136,6 +140,10 @@
                         "label": "pages.products.filters.gtinCode",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
                         "message": "pages.products.filters.errors.gtinCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
                         "inputProps": {
                             "maxLength": 14
                         }

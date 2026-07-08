@@ -118,6 +118,7 @@ export type FilterConfigDef = {
   template?: string;
   defaultValue?: string;
   regEx?: string;
+  pattern?: {value: string, flag?: string};
   message?: string;
   inputProps?: Record<string, unknown>;
   options?: Array<Record<string, string>>;

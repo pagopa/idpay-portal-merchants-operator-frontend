@@ -91,6 +91,10 @@
                         "label": "pages.products.filters.gtinCode",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
                         "message": "pages.products.filters.errors.gtinCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
                         "inputProps": {
                             "maxLength": 14
                         }

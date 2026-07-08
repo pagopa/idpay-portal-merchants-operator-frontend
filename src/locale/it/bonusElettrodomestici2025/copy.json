@@ -98,8 +98,8 @@
                 "eprelCode": "Codice EPREL",
                 "gtinCode": "Codice GTIN/EAN",
                 "errors": {
-                    "eprelCode": "Il codice EPREL deve essere numerico",
-                    "gtinCode": "Il codice deve avere 14 caratteri"
+                    "eprelCode": "Il codice EPREL deve essere numerico.",
+                    "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici."
                 }
             },
             "tableHeaders": {

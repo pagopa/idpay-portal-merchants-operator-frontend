@@ -91,7 +91,7 @@
                 "productCode": "Codice prodotto",
                 "gtinCode": "Codice GTIN/EAN",
                 "errors": {
-                    "gtinCode": "Il codice deve avere 14 caratteri"
+                    "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici."
                 }
             },
             "tableHeaders": {

@@ -48,7 +48,7 @@ export const filtersConfig: Record<
         );
     },
     text: ({ item, t, filters, setFilters, errors, setErrors }) => {
-        const { id, label, regEx, message, inputProps } = item;
+        const { id, label, regEx, pattern, message, inputProps } = item;
         const isError = !!filters?.[id] && errors?.includes(id);
         return (
             <TextField
@@ -59,17 +59,18 @@ export const filtersConfig: Record<
                 variant="outlined"
                 value={filters?.[id] ?? ''}
                 onChange={(e) => {
-                    const isError = !!e.target.value && !RegExp(regEx || '').test(e.target.value);
-                    setFilters(id, e.target.value);
+                    const text = pattern ? e.target.value.replace(RegExp(pattern.value, pattern?.flag), '') : e.target.value
+                    const isError = !!text && !RegExp(regEx || '').test(text);
+                    setFilters(id, text);
                     setErrors(id, isError);
                 }}
                 error={isError}
                 helperText={message && isError && t(message ?? '')}
                 onPaste={(e) => {
                     e.preventDefault();
-                    const text = e.clipboardData.getData('text').replace(/\s+/g, '');
+                    const text = pattern ? e.clipboardData.getData('text').replace(RegExp(pattern.value, pattern?.flag), '') : e.clipboardData.getData('text');
                     const isError = !!text && !RegExp(regEx || '').test(text);
-                    setFilters(id, text);
+                    setFilters(id, text.trim());
                     setErrors(id, isError);
                 }}
                 slotProps={{ htmlInput: inputProps }}
