@@ -60,26 +60,28 @@ const FiltersForm = <T extends Record<string, any>>({
   });
 
   return (
-    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="center">
-      {enhancedChildren}
-      <Button
-        sx={{minWidth: 'fit-content'}}
-        variant="outlined"
-        onClick={handleApplyFilters}
-        disabled={formik.isSubmitting || !filtersApplied}
-        data-testid="apply-filters-test"
-      >
-        {t('commons.filterBtn')}
-      </Button>
-      <Button
-        sx={{minWidth: 'fit-content'}}
-        variant="naked"
-        onClick={handleResetFilters}
-        disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce)}
-        data-testid="reset-filters-test"
-      >
-        {t('commons.removeFiltersBtn')}
-      </Button>
+    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%">
+        {enhancedChildren}
+      <Box display="flex" flexDirection="row" alignItems="center" columnGap="1rem" minWidth="fit-content">
+        <Button
+          sx={{ minWidth: 'fit-content' }}
+          variant="outlined"
+          onClick={handleApplyFilters}
+          disabled={formik.isSubmitting || !filtersApplied}
+          data-testid="apply-filters-test"
+        >
+          {t('commons.filterBtn')}
+        </Button>
+        <Button
+          sx={{ minWidth: 'fit-content' }}
+          variant="naked"
+          onClick={handleResetFilters}
+          disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce)}
+          data-testid="reset-filters-test"
+        >
+          {t('commons.removeFiltersBtn')}
+        </Button>
+      </Box>
     </Box>
   );
 };
