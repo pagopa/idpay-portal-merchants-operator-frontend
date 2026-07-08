@@ -1,5 +1,6 @@
 import { Box, MenuItem, Select, TextField } from '@mui/material';
 import { FilterConfigDef, TemplateConfigDef } from '../../utils/types';
+import { StatusChip } from '../StatusChip/StatusChip';
 
 type Props = {
     item: Omit<FilterConfigDef, 'type'>;
@@ -18,7 +19,7 @@ export const filtersConfig: Record<
     select: ({ item, t, config, filters, setFilters }) => {
         const { id, label, template } = item;
         const templateDef = config(`templates.${template}`)
-        const templateLabels = templateDef.reduce((acc, {value, label}) => ({ ...acc, [value]: label}), {})
+        const templateLabels = templateDef.reduce((acc, { value, label }) => ({ ...acc, [value]: label }), {})
         return (
             <Select
                 labelId={`${id}-filter-select-label`}
@@ -42,7 +43,11 @@ export const filtersConfig: Record<
                 )}
             >
                 {templateDef.map(({ label, value }) => (
-                    <MenuItem key={value} value={value}> {t(label)}</MenuItem>
+                    <MenuItem key={value} value={value}>
+                        {id === "status" ?
+                            <StatusChip field="transactions" value={value?.toLowerCase()} /> :
+                            t(label)}
+                    </MenuItem>
                 ))}
             </Select>
         );
