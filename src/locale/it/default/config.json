@@ -52,7 +52,8 @@
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
-                            "type": "tooltip"
+                            "type": "text",
+                            "tooltip": true
                         }
                     },
                     {
@@ -63,7 +64,8 @@
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
-                            "type": "tooltip"
+                            "type": "text",
+                            "tooltip": true
                         }
                     },
                     {
@@ -74,7 +76,8 @@
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
-                            "type": "tooltip"
+                            "type": "text",
+                            "tooltip": true
                         }
                     },
                     {
@@ -85,7 +88,8 @@
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
-                            "type": "tooltip"
+                            "type": "text",
+                            "tooltip": true
                         }
                     },
                     {
@@ -96,7 +100,8 @@
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
-                            "type": "tooltip"
+                            "type": "text",
+                            "tooltip": true
                         }
                     },
                     {

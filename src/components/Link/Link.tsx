@@ -1,22 +1,21 @@
-import { Tooltip, Typography } from "@mui/material"
+import { Link as MUILink, Tooltip, Typography } from "@mui/material"
 import { theme } from "@pagopa/mui-italia"
-import { useNavigate } from "react-router-dom"
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants"
 
-export const NavigationLink = ({ label, path, tooltip }: { label: string, path: string, tooltip?: boolean }) => {
-    const navigate = useNavigate()
-    return <Tooltip title={tooltip && (label || MISSING_DATA_PLACEHOLDER)}>
+export const Link = ({ label, href, tooltip }: { label: string, href: string, tooltip?: boolean }) =>
+    <Tooltip title={tooltip && (label || MISSING_DATA_PLACEHOLDER)}>
         {label ?
-            <Typography
+            <MUILink
                 sx={{
                     color: theme.palette.primary.main,
                     fontWeight: theme.typography.fontWeightMedium,
-                    cursor: "pointer"
+                    textDecoration: 'none'
                 }}
-                onClick={() => navigate(path, { replace: true })}
+                href={href}
+                target="_blank"
             >
                 {label}
-            </Typography> :
+            </MUILink> :
             <Typography
                 sx={{
                     overflow: 'hidden',
@@ -28,4 +27,3 @@ export const NavigationLink = ({ label, path, tooltip }: { label: string, path: 
             </Typography>
         }
     </Tooltip>
-}

@@ -43,7 +43,9 @@ const Products = () => {
   const mappedProductsList = useMemo(() =>
     productsList.map((product) =>
     ({
-      ...product, action: {
+      ...product,
+      link: product?.linkEprel,
+      action: {
         icon: "arrow",
         onClick: (row) => {
           setOpenDrawer(true);

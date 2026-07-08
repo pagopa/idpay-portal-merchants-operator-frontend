@@ -50,7 +50,8 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "link"
+                                "type": "navigation",
+                                "tooltip": true
                             }
                         },
                         {
@@ -61,7 +62,8 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "tooltip"
+                                "type": "text",
+                                "tooltip": true
                             }
                         },
                         {
@@ -72,7 +74,8 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "tooltip"
+                                "type": "text",
+                                "tooltip": true
                             }
                         },
                         {
@@ -83,7 +86,8 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "chip"
+                                "type": "chip",
+                                "tooltip": true
                             }
                         }
                     ]

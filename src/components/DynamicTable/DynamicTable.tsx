@@ -3,7 +3,7 @@ import { DataGrid, DataGridProps } from "@mui/x-data-grid"
 import { theme } from "@pagopa/mui-italia"
 import { useScopedTranslation } from "../../hooks/useScopedTranslation"
 import { FieldConfigDef } from "../../utils/types"
-import { fieldsConfig } from "../../utils/fieldsConfig"
+import { renderFields } from "../../utils/renderFields"
 import { useMemo } from "react"
 
 type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
@@ -16,9 +16,10 @@ type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
 
 export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, sx, rowsDividerColor, ...props }: Props) => {
     const { t } = useScopedTranslation()
-    const mappedColumns = columnsDef.map(({ cell, ...column }) =>
-        ({ ...column, headerName: t(column.headerName), renderCell: fieldsConfig[cell?.type] }))
-
+    const mappedColumns = columnsDef.map(({ cell, ...column }) =>{
+        const fieldConfig = renderFields(cell?.tooltip)
+        return { ...column, headerName: t(column.headerName), renderCell: fieldConfig[cell?.type] }
+})
     const tableStyle = useMemo(() => ({
         border: 'none',
         '& .MuiDataGrid-row': {

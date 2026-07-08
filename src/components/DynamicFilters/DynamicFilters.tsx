@@ -52,10 +52,7 @@ export const DynamicFilters = ({
       formik={formik}
       filtersApplied={!!Object.keys(draftFilters).length}
       onFiltersApplied={formik.handleSubmit}
-      onFiltersReset={() => {
-        formik.resetForm();
-        onFiltersReset()
-      }}
+      onFiltersReset={onFiltersReset}
     >
       {filtersDef.map(({ type, ...filter }) => {
         const props = {

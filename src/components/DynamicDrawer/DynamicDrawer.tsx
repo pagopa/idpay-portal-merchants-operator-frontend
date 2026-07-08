@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { theme } from '@pagopa/mui-italia';
 import { FieldConfigDef } from '../../utils/types';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
-import { fieldsConfig } from '../../utils/fieldsConfig';
+import { renderFields } from '../../utils/renderFields';
 import { normalizeObj } from '../../utils/helpers';
 
 export type DynamicDrawerProps = {
@@ -39,8 +39,10 @@ export default function DynamicDrawer({
   buttons,
 }: DynamicDrawerProps) {
   const { t } = useScopedTranslation()
-  const mappedFields = fieldsDef.map(({ cell, ...field }) =>
-    ({ ...field, headerName: t(field.headerName), renderCell: fieldsConfig[cell?.type] }))
+  const mappedFields = fieldsDef.map(({ cell, ...field }) => {
+    const fieldsConfig = renderFields()
+    return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[cell?.type] }
+  })
   const normalizedFields = normalizeObj(fieldsValues);
   return (
     <Drawer anchor="right" open={isOpen} data-testid="detail-drawer">
@@ -62,14 +64,6 @@ export default function DynamicDrawer({
             </IconButton>
           </Box>
         </Box>
-          {subtitle &&
-            <Typography
-              variant="body2"
-              fontWeight={theme.typography.fontWeightBold}
-              color={theme.palette.text.secondary}
-            >
-              {subtitle.toUpperCase()}
-            </Typography>}
         <Box
           display="flex"
           flexDirection="column"
@@ -82,6 +76,14 @@ export default function DynamicDrawer({
             width="100%"
             rowGap="1rem"
           >
+            {subtitle &&
+              <Typography
+                variant="body2"
+                fontWeight={theme.typography.fontWeightBold}
+                color={theme.palette.text.secondary}
+              >
+                {subtitle.toUpperCase()}
+              </Typography>}
             {mappedFields.map(({ field, headerName, renderCell }) => {
               const params = {
                 row: normalizedFields,

@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Tooltip, Typography } from "@mui/material"
 import { ReactNode } from "react"
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
 
@@ -6,11 +6,12 @@ type Props = {
     isLoading: boolean;
     onClick: () => void;
     icon?: ReactNode;
-    text?: string
+    text?: string;
+    tooltip?: boolean;
 }
 
-export const DownloadFile = ({isLoading, onClick, icon, text}: Props) => {
-    return (
+export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props) => {
+    return (text ?
         <Button
             data-testid="btn-test"
             sx={{
@@ -26,15 +27,13 @@ export const DownloadFile = ({isLoading, onClick, icon, text}: Props) => {
                     data-testid="item-loader"
                 />
             ) : (
-                <span
-                    style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        textAlign: "left",
-                        gap: 6,
-                        width: "100%",
-                        marginTop: 2,
-                    }}
+                <Box
+                    display="flex"
+                    alignItems="start"
+                    textAlign="left"
+                    columnGap={6}
+                    width="100%"
+                    marginTop={2}
                 >
                     {icon}
                     <Typography
@@ -46,10 +45,21 @@ export const DownloadFile = ({isLoading, onClick, icon, text}: Props) => {
                             lineHeight: 1.4,
                         }}
                     >
-                        {text ?? MISSING_DATA_PLACEHOLDER}
+                        {text}
                     </Typography>
-                </span>
+                </Box>
             )}
-        </Button>
+        </Button> :
+        <Tooltip title={tooltip && MISSING_DATA_PLACEHOLDER}>
+            <Typography
+                sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                }}
+            >
+                {MISSING_DATA_PLACEHOLDER}
+            </Typography>
+        </Tooltip>
     )
 }
