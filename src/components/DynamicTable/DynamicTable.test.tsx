@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import React from 'react';
 import { DynamicTable } from './DynamicTable';
+import { renderFields } from '../../utils/renderFields';
 
 vi.mock('../../hooks/useScopedTranslation', () => ({
     useScopedTranslation: () => ({
@@ -9,15 +10,24 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
     }),
 }));
 
-vi.mock('./columnsConfig', () => ({
-    columnsConfig: {
-        textType: () => <span>Custom Cell Content</span>,
+vi.mock('../../utils/renderFields', () => ({
+    renderFields: vi.fn(() => ({
+        textType: () => <span data-testid="custom-cell">Custom Cell Content</span>,
+    })),
+}));
+
+vi.mock('@pagopa/mui-italia', () => ({
+    theme: {
+        palette: {
+            background: { paper: '#ffffff' },
+            grey: { 100: '#f5f5f5' },
+        },
     },
 }));
 
 describe('DynamicTable Component', () => {
     const mockColumnsDef = [
-        { field: 'id', headerName: 'table.id', cell: { type: 'textType' } },
+        { field: 'id', headerName: 'table.id', cell: { type: 'textType', tooltip: true } },
         { field: 'name', headerName: 'table.name', cell: { type: 'textType' } }
     ];
 
@@ -25,12 +35,16 @@ describe('DynamicTable Component', () => {
         { id: 1, name: 'Item 1' }
     ];
 
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     it('should render circular progress when isLoading is true', () => {
         render(
             <DynamicTable
                 isLoading={true}
                 isEmpty={false}
-                columnsDef={mockColumnsDef}
+                columnsDef={mockColumnsDef as any}
                 rows={mockRows}
             />
         );
@@ -45,7 +59,7 @@ describe('DynamicTable Component', () => {
                 isLoading={false}
                 isEmpty={true}
                 emptyText="table.emptyMessage"
-                columnsDef={mockColumnsDef}
+                columnsDef={mockColumnsDef as any}
                 rows={[]}
             />
         );
@@ -54,18 +68,23 @@ describe('DynamicTable Component', () => {
         expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     });
 
-    it('should render DataGrid with mapped columns and rows when loading and empty states are false', () => {
+    it('should render DataGrid with mapped columns and correctly call renderFields', () => {
         render(
             <DynamicTable
                 isLoading={false}
                 isEmpty={false}
-                columnsDef={mockColumnsDef}
+                columnsDef={mockColumnsDef as any}
                 rows={mockRows}
+                rowsDividerColor="#000000"
             />
         );
 
         expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+        
         expect(screen.getByText('table.id')).toBeInTheDocument();
         expect(screen.getByText('table.name')).toBeInTheDocument();
+
+        expect(renderFields).toHaveBeenCalledWith(true);
+        expect(renderFields).toHaveBeenCalledWith(undefined);
     });
 });
