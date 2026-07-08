@@ -15,6 +15,14 @@ export const getProductsList = async (params: GetProductsParams): Promise<Produc
   return response;
 };
 
+export const getInitiativeProductsList = async (initiativeId: string, params: GetProductsParams): Promise<ProductListDTO> => {
+  const response = await MerchantApi.getInitiativeProducts(initiativeId,
+    params as Parameters<typeof MerchantApi.getInitiativeProducts>[1]
+  );
+
+  return response;
+};
+
 export const previewPayment = async (params: {
   productGtin: string;
   productName: string;

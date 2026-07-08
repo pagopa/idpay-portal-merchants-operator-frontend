@@ -40,6 +40,15 @@ export const MerchantApi = {
     return response.data;
   },
 
+  getInitiativeProducts: async (
+    initiativeId: string,
+    params: Parameters<typeof initiativesApi.getProducts>[1]
+  ): Promise<ProductListDTO> => {
+    applySecurity();
+    const response = await initiativesApi.getProducts(initiativeId, params);
+    return response.data;
+  },
+
   previewPayment: async (params: {
     productGtin: string;
     productName: string;

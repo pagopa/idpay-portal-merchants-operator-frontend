@@ -14,12 +14,14 @@ import {
   updateInvoiceTransactionApi,
   getPreviewPdf,
   reverseInvoicedTransactionApi,
+  getInitiativeProductsList,
 } from './merchantService';
 import { MerchantApi } from '../api/MerchantsApiClient';
 
 vi.mock('../api/MerchantsApiClient', () => ({
   MerchantApi: {
     getProducts: vi.fn(),
+    getInitiativeProducts: vi.fn(),
     previewPayment: vi.fn(),
     authPaymentBarCode: vi.fn(),
     getProcessedTransactions: vi.fn(),
@@ -48,6 +50,16 @@ describe('merchantService', () => {
     const result = await getProductsList({} as never);
 
     expect(MerchantApi.getProducts).toHaveBeenCalled();
+    expect(result).toEqual(response);
+  });
+
+  it('getInitiativeProductsList delegates to MerchantApi.getInitiativeProducts', async () => {
+    const response = { products: [], total: 0 };
+    vi.mocked(MerchantApi.getInitiativeProducts).mockResolvedValue(response as never);
+
+    const result = await getInitiativeProductsList('init-123', {} as never);
+
+    expect(MerchantApi.getInitiativeProducts).toHaveBeenCalled();
     expect(result).toEqual(response);
   });
 

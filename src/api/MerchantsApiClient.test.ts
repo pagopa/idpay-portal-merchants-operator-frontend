@@ -43,6 +43,10 @@ vi.mock('./generated/Transactions', () => ({
 vi.mock('./generated/Initiatives', () => ({
   Initiatives: class {
     setSecurityData = vi.fn();
+    getProducts = (initiativeId: string, params: Record<string, unknown>) =>
+      mockGet(initiativeId, {
+        params: Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined)),
+      });
     getPointOfSaleTransactions = (
       initiativeId: string,
       pointOfSaleId: string,
@@ -94,7 +98,6 @@ vi.mock('../store/authStore', () => ({
 }));
 
 import { MerchantApi } from './MerchantsApiClient';
-import { Initiatives } from './generated/Initiatives';
 
 describe('MerchantApi', () => {
   afterEach(() => {
@@ -114,6 +117,36 @@ describe('MerchantApi', () => {
       });
 
       expect(mockGet).toHaveBeenCalledWith('/products', {
+        params: {
+          page: 1,
+          size: 10,
+          status: 'ACTIVE',
+        },
+      });
+
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it('should throw error if API fails', async () => {
+      mockGet.mockRejectedValue(new Error('API Error'));
+
+      await expect(MerchantApi.getProducts({})).rejects.toThrow('API Error');
+    });
+  });
+
+  describe('getInitiativeProducts', () => {
+    it('should call GET /products with correct parameters', async () => {
+      const mockResponse = { data: { products: [], total: 0 } };
+      mockGet.mockResolvedValue(mockResponse);
+
+      const result = await MerchantApi.getInitiativeProducts('init-123', {
+        page: 1,
+        size: 10,
+        status: 'ACTIVE',
+        eprelCode: undefined,
+      });
+
+      expect(mockGet).toHaveBeenCalledWith('init-123', {
         params: {
           page: 1,
           size: 10,

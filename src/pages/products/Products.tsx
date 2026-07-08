@@ -3,7 +3,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { ELEMENT_PER_PAGE } from '../../utils/constants';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { getProductsList } from '../../services/merchantService';
+import { getInitiativeProductsList } from '../../services/merchantService';
 import { FieldConfigDef, FilterConfigDef, GetProductsParams } from '../../utils/types';
 import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import { PaginationExtendedModel } from '../../utils/types';
@@ -14,6 +14,7 @@ import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { theme } from '@pagopa/mui-italia';
+import { useParams } from 'react-router-dom';
 
 const initialPagination = {
   page: 0,
@@ -22,6 +23,7 @@ const initialPagination = {
 }
 
 const Products = () => {
+  const {initiativeId} = useParams();
   const { t, config } = useScopedTranslation();
   const filtersDef = config<Array<FilterConfigDef>>('pages.products.productsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.products.drawer')
@@ -64,7 +66,7 @@ const Products = () => {
             value !== undefined && value !== '' && value !== null
         )
       );
-      const { content, pageNo, pageSize, totalElements } = await getProductsList({
+      const { content, pageNo, pageSize, totalElements } = await getInitiativeProductsList(initiativeId, {
         size: import.meta.env.VITE_PAGINATION_SIZE,
         status: 'APPROVED',
         ...cleanParams,
@@ -80,7 +82,7 @@ const Products = () => {
       setProductsListIsLoading(false);
       setErrorAlert(true);
     }
-  }, []);
+  }, [initiativeId]);
 
   const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
     if (
@@ -166,7 +168,7 @@ const Products = () => {
           onFiltersReset={handleFiltersReset}
         />
       </Box>
-      <Box>
+      <Box marginTop="1rem">
         <DynamicTable
           emptyText={t('pages.products.noProducts')}
           columnsDef={columnsDef}
