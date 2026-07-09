@@ -1,4 +1,4 @@
-import { Products } from './generated/Products';
+// import { Products } from './generated/Products';
 import { Transactions } from './generated/Transactions';
 import { Initiatives } from './generated/Initiatives';
 import { MerchantId } from './generated/MerchantId';
@@ -14,7 +14,7 @@ import type {
 import { createApiConfig, getAuthToken } from './BaseApiClient';
 import { PointOfSales } from './generated/PointOfSales';
 
-const productsApi = new Products<string>(createApiConfig());
+// const productsApi = new Products<string>(createApiConfig());
 const transactionsApi = new Transactions<string>(createApiConfig());
 const initiativesApi = new Initiatives<string>(createApiConfig());
 const merchantIdApi = new MerchantId<string>(createApiConfig());
@@ -23,7 +23,7 @@ const pointOfSalesApi = new PointOfSales<string>(createApiConfig());
 
 const applySecurity = () => {
   const token = getAuthToken();
-  productsApi.setSecurityData(token);
+  // productsApi.setSecurityData(token);
   transactionsApi.setSecurityData(token);
   initiativesApi.setSecurityData(token);
   merchantIdApi.setSecurityData(token);
@@ -32,13 +32,13 @@ const applySecurity = () => {
 };
 
 export const MerchantApi = {
-  getProducts: async (
-    params: Parameters<typeof productsApi.getProducts>[0]
-  ): Promise<ProductListDTO> => {
-    applySecurity();
-    const response = await productsApi.getProducts(params);
-    return response.data;
-  },
+  // getProducts: async (
+  //   params: Parameters<typeof productsApi.getProducts>[0]
+  // ): Promise<ProductListDTO> => {
+  //   applySecurity();
+  //   const response = await productsApi.getProducts(params);
+  //   return response.data;
+  // },
 
   getInitiativeProducts: async (
     initiativeId: string,
