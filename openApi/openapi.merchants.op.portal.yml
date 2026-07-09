@@ -1511,6 +1511,116 @@ paths:
               $ref: '#/components/headers/X-RateLimit-Reset'
             Retry-After:
               $ref: '#/components/headers/Retry-After'
+  /point-of-sales/initiatives:
+    get:
+      tags:
+        - point-of-sales
+      summary: Retrieve detailed initiatives linked to a point of sale
+      description: >
+        ENG: Returns the initiatives linked to the specified point of sale, including
+        extended initiative information (name, organization, status, validity period).
+        IT: Ritorna le iniziative collegate al punto vendita specificato, con informazioni
+        estese sull'iniziativa (nome, organizzazione, stato, periodo di validità).
+      operationId: getPointOfSaleInitiativesDetailed
+      responses:
+        "200":
+          description: Successful response with linked initiatives (extended)
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleInitiativeDetailedListDTO"
+        "400":
+          description: Bad request - Invalid query parameters
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_BAD_REQUEST
+                message: Something went wrong handling request
+        "401":
+          description: Unauthorized - Authentication Failed
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_UNAUTHORIZED
+                message: Authentication Failed
+        "404":
+          description: Not Found
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_NOT_FOUND
+                message: Point of sale with id 123 not found.
+        "429":
+          description: Too many Request - Rate limit exceeded
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/Access-Control-Allow-Origin'
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            X-RateLimit-Reset:
+              $ref: '#/components/headers/X-RateLimit-Reset'
+            Retry-After:
+              $ref: '#/components/headers/Retry-After'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_TOO_MANY_REQUESTS
+                message: Too many requests
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointOfSaleErrorDTO"
+              example:
+                code: POINT_OF_SALE_GENERIC_ERROR
+                message: An error occurred during file reading
 components:
   headers:
     X-RateLimit-Limit:
@@ -2479,6 +2589,58 @@ components:
           type: string
           maxLength: 100
           pattern: "^[a-zA-Z0-9]+$"
+    PointOfSaleInitiativeDetailedListDTO:
+      type: object
+      properties:
+        initiatives:
+          type: array
+          items:
+            $ref: "#/components/schemas/PointOfSaleInitiativeDetailedDTO"
+    PointOfSaleInitiativeDetailedDTO:
+      type: object
+      properties:
+        initiativeId:
+          type: string
+          description: "ENG: The ID of the initiative <br> IT: L'ID dell'iniziativa"
+        initiativeName:
+          type: string
+          description: "ENG: The name of the initiative <br> IT: Il nome dell'iniziativa"
+        organizationName:
+          type: string
+          description: "ENG: The name of the organization owning the initiative <br> IT: Il nome dell'organizzazione proprietaria dell'iniziativa"
+        status:
+          type: string
+          enum:
+            - PUBLISHED
+            - APPROVED
+            - IN_REVISION
+            - TO_CHECK
+            - SUSPENDED
+            - DRAFT
+            - CLOSED
+          description: "ENG: Status of the initiative <br> IT: Stato dell'iniziativa"
+        startDate:
+          type: string
+          format: date
+          description: "ENG: Initiative start date <br> IT: Data di inizio dell'iniziativa"
+        endDate:
+          type: string
+          format: date
+          description: "ENG: Initiative end date <br> IT: Data di fine dell'iniziativa"
+        serviceId:
+          type: string
+          description: "ENG: Service ID associated to the initiative <br> IT: ID del servizio associato all'iniziativa"
+        enabled:
+          type: boolean
+          description: "ENG: Whether the initiative is enabled <br> IT: Indica se l'iniziativa è abilitata"
+        createdAt:
+          type: string
+          format: date-time
+          description: "ENG: Date when the point of sale was linked to the initiative <br> IT: Data di associazione del punto vendita all'iniziativa"
+        updatedAt:
+          type: string
+          format: date-time
+          description: "ENG: Last update date of the link <br> IT: Data di ultimo aggiornamento dell'associazione"
   securitySchemes:
     Bearer:
       type: apiKey
