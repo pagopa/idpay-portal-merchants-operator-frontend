@@ -49,6 +49,14 @@ vi.mock("../../hooks/useAutoResetBanner", () => ({
   useAutoResetBanner: vi.fn()
 }));
 
+vi.mock("../../components/DynamicFilters/DynamicFilters", () => ({
+  DynamicFilters: ({ setFilters }: any) => (
+    <button data-testid="mock-filter-button" onClick={() => setFilters({ category: "OVENS" })}>
+      Apply Filter Mock
+    </button>
+  )
+}));
+
 describe("Products Component", () => {
   const mockApiResponse = {
     content: [
@@ -103,7 +111,8 @@ describe("Products Component", () => {
 
     await waitFor(() => {
       expect(getInitiativeProductsList).toHaveBeenCalledWith("mock-initiative-123", {
-        size: "10",
+        page: 0,
+        size: 10,
         status: "APPROVED"
       });
     });
@@ -144,5 +153,29 @@ describe("Products Component", () => {
         expect(screen.getByText("pages.products.drawer.subtitle")).toBeInTheDocument();
       });
     }
+  });
+
+  it("should update filters and re-fetch products when setFilters is called", async () => {
+    render(<Products />);
+
+    await waitFor(() => {
+      expect(getInitiativeProductsList).toHaveBeenCalledWith("mock-initiative-123", {
+        page: 0,
+        size: 10,
+        status: "APPROVED"
+      });
+    });
+
+    const filterButton = screen.getByTestId("mock-filter-button");
+    fireEvent.click(filterButton);
+
+    await waitFor(() => {
+      expect(getInitiativeProductsList).toHaveBeenCalledWith("mock-initiative-123", {
+        size: 10,
+        status: "APPROVED",
+        category: "OVENS",
+        page: 0
+      });
+    });
   });
 });

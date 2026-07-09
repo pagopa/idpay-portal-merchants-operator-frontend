@@ -20,22 +20,6 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
     })
 }));
 
-vi.mock('../FiltersForm/FiltersForm', () => ({
-    default: ({ children, onFiltersApplied, onFiltersReset }: any) => (
-        <form 
-            data-testid="mock-filters-form" 
-            onSubmit={(e) => { 
-                e.preventDefault(); 
-                onFiltersApplied(); 
-            }}
-        >
-            {children}
-            <button type="submit" data-testid="apply-btn">Apply</button>
-            <button type="button" onClick={onFiltersReset} data-testid="reset-btn">Reset</button>
-        </form>
-    )
-}));
-
 vi.mock('../StatusChip/StatusChip', () => ({
     StatusChip: () => <span data-testid="status-chip" />
 }));
@@ -64,8 +48,7 @@ const mockFiltersDef: Array<FilterConfigDef> = [
 ];
 
 describe('DynamicFilters Component', () => {
-    const mockOnFiltersApply = vi.fn();
-    const mockOnFiltersReset = vi.fn();
+    const mockSetFilters = vi.fn();
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -76,13 +59,11 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{}} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
         expect(screen.getByLabelText('pages.products.filters.eprelCode')).toBeInTheDocument();
-        // Usiamo getAllByText perché MUI renderizza la label due volte (nella label vera e propria e nel legend dell'outline)
         expect(screen.getAllByText('pages.products.filters.category').length).toBeGreaterThan(0);
     });
 
@@ -91,8 +72,7 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{}} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
@@ -111,8 +91,7 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{}} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
@@ -129,12 +108,10 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{}} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
-        // Selezioniamo il primo elemento text trovato per evitare l'errore di elementi multipli
         const selectLabel = screen.getAllByText('pages.products.filters.category')[0];
         const selectContainer = selectLabel.parentElement?.querySelector('[role="combobox"]');
         
@@ -144,10 +121,10 @@ describe('DynamicFilters Component', () => {
         const option = screen.getByText('templates.categories.refrigeratingappl');
         fireEvent.click(option);
 
-        fireEvent.click(screen.getByTestId('apply-btn'));
+        fireEvent.click(screen.getByTestId('apply-filters-test'));
 
         await waitFor(() => {
-            expect(mockOnFiltersApply).toHaveBeenCalledWith({ category: 'REFRIGERATINGAPPL' });
+            expect(mockSetFilters).toHaveBeenCalledWith({ category: 'REFRIGERATINGAPPL' });
         });
     });
 
@@ -156,36 +133,34 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{ category: 'OVENS' }} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
         const textInput = screen.getByLabelText('pages.products.filters.eprelCode');
         await userEvent.type(textInput, '987');
 
-        fireEvent.click(screen.getByTestId('apply-btn'));
+        fireEvent.click(screen.getByTestId('apply-filters-test'));
 
         await waitFor(() => {
-            expect(mockOnFiltersApply).toHaveBeenCalledWith({ 
+            expect(mockSetFilters).toHaveBeenCalledWith({ 
                 category: 'OVENS', 
                 eprelCode: '987' 
             });
         });
     });
 
-    it('should trigger onFiltersReset callback when reset button is clicked', () => {
+    it('should trigger setFilters with empty object when reset button is clicked', () => {
         render(
             <DynamicFilters 
-                filters={{}} 
+                filters={{ category: 'OVENS' }} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
-        fireEvent.click(screen.getByTestId('reset-btn'));
-        expect(mockOnFiltersReset).toHaveBeenCalledTimes(1);
+        fireEvent.click(screen.getByTestId('reset-filters-test'));
+        expect(mockSetFilters).toHaveBeenCalledWith({});
     });
 
     it('should update draft filters if initial filters prop changes', () => {
@@ -193,8 +168,7 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{}} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
@@ -205,11 +179,25 @@ describe('DynamicFilters Component', () => {
             <DynamicFilters 
                 filters={{ eprelCode: '111' }} 
                 filtersDef={mockFiltersDef} 
-                onFiltersApply={mockOnFiltersApply} 
-                onFiltersReset={mockOnFiltersReset} 
+                setFilters={mockSetFilters} 
             />
         );
 
         expect(textInput).toHaveValue('111');
+    });
+
+    it('should disable apply button when there are validation errors', async () => {
+        render(
+            <DynamicFilters 
+                filters={{ category: 'OVENS' }} 
+                filtersDef={mockFiltersDef} 
+                setFilters={mockSetFilters} 
+            />
+        );
+        
+        const textInput = screen.getByLabelText('pages.products.filters.eprelCode');
+        
+        await userEvent.type(textInput, 'abc');
+        expect(screen.getByTestId('apply-filters-test')).toBeDisabled();
     });
 });

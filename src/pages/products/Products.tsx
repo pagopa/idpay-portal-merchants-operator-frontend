@@ -16,9 +16,11 @@ import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { theme } from '@pagopa/mui-italia';
 import { useParams } from 'react-router-dom';
 
+const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
+
 const initialPagination = {
   page: 0,
-  pageSize: parseInt(import.meta.env.VITE_PAGINATION_SIZE)
+  pageSize: isNaN(initialPageSize) ? 10 : initialPageSize
 }
 
 const Products = () => {
