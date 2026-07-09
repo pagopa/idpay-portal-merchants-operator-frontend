@@ -41,15 +41,7 @@ export const renderFields = (tooltip?: boolean) => ({
             />
         </Box>,
     action: (params) =>
-        <Box
-            sx={{
-                display: 'flex',
-                justifyContent: 'end',
-                alignItems: 'center',
-                width: '100%',
-                height: '100%',
-            }}
-        >
+        <Box display="flex" alignItems="center" justifyContent="end" height="100%">
             <IconButton onClick={() => params?.value?.onClick(params.row)}>
                 {actionIcons[params?.value?.icon]}
             </IconButton>

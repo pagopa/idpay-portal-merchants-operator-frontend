@@ -8,8 +8,7 @@ export const Link = ({ label, href, tooltip }: { label: string, href: string, to
             <MUILink
                 sx={{
                     color: theme.palette.primary.main,
-                    fontWeight: theme.typography.fontWeightMedium,
-                    textDecoration: 'none'
+                    fontWeight: theme.typography.fontWeightMedium
                 }}
                 href={href}
                 target="_blank"
@@ -20,7 +19,7 @@ export const Link = ({ label, href, tooltip }: { label: string, href: string, to
                 sx={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    whiteSpace: 'nowrap'
                 }}
             >
                 {MISSING_DATA_PLACEHOLDER}

@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import { Button, ButtonProps, IconButton, Typography } from '@mui/material';
+import { Button, ButtonProps, Divider, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { theme } from '@pagopa/mui-italia';
 import { FieldConfigDef } from '../../utils/types';
@@ -25,7 +25,7 @@ const drawerStyle = {
   maxHeight: "100vh",
   rowGap: "1rem",
   maxWidth: 375,
-  padding: "1rem",
+  padding: "1.5rem",
   height: "100%"
 }
 
@@ -49,20 +49,16 @@ export default function DynamicDrawer({
       <Box sx={drawerStyle}>
         <Box
           display="flex"
-          flexDirection="row"
-          justifyContent="space-between"
+          justifyContent="end"
           alignItems="center"
         >
-          <Typography variant="h5" sx={{ wordWrap: "break-word" }}>{title}</Typography>
-          <Box height="100%">
-            <IconButton
-              data-testid="close-button"
-              onClick={setIsOpen}
-              sx={{ color: theme.palette.text.primary }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
+          <IconButton
+            data-testid="close-button"
+            onClick={setIsOpen}
+            sx={{ color: theme.palette.text.primary }}
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
         <Box
           display="flex"
@@ -76,14 +72,19 @@ export default function DynamicDrawer({
             width="100%"
             rowGap="1rem"
           >
+            <Typography variant="h5" sx={{ wordWrap: "break-word" }}>{title}</Typography>
             {subtitle &&
-              <Typography
-                variant="body2"
-                fontWeight={theme.typography.fontWeightBold}
-                color={theme.palette.text.secondary}
-              >
-                {subtitle.toUpperCase()}
-              </Typography>}
+              <>
+                <Divider />
+                <Typography
+                  variant="body2"
+                  fontWeight={theme.typography.fontWeightBold}
+                  color={theme.palette.text.primary}
+                >
+                  {subtitle.toUpperCase()}
+                </Typography>
+              </>
+            }
             {mappedFields.map(({ field, headerName, renderCell }) => {
               const params = {
                 row: normalizedFields,
@@ -94,7 +95,6 @@ export default function DynamicDrawer({
                 flexDirection="column"
               >
                 <Typography
-                  variant="body2"
                   fontWeight={theme.typography.fontWeightRegular}
                   color={theme.palette.text.secondary}
                 >
