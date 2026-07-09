@@ -91,6 +91,7 @@ export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, sx, ro
                 disableRowSelectionOnClick
                 sortingOrder={['asc', 'desc']}
                 sx={{ ...tableStyle, ...sx }}
+                paginationMode="server"
                 localeText={{
                     footerTotalRows: 'Totale righe:',
                     paginationRowsPerPage: 'Elementi per pagina:',

@@ -5,7 +5,7 @@ import { ELEMENT_PER_PAGE } from '../../utils/constants';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { getInitiativeProductsList } from '../../services/merchantService';
 import { FieldConfigDef, FilterConfigDef, GetProductsParams } from '../../utils/types';
-import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import { GridSortModel } from '@mui/x-data-grid';
 import { PaginationExtendedModel } from '../../utils/types';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
@@ -18,8 +18,7 @@ import { useParams } from 'react-router-dom';
 
 const initialPagination = {
   page: 0,
-  pageSize: import.meta.env.VITE_PAGINATION_SIZE,
-  totalElements: 0,
+  pageSize: parseInt(import.meta.env.VITE_PAGINATION_SIZE)
 }
 
 const Products = () => {
@@ -33,9 +32,10 @@ const Products = () => {
   const [productsListIsLoading, setProductsListIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<Record<string, string>>({});
   const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>(initialPagination);
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
+  const [totalElements, setTotalElements] = useState(0)
 
   const [openDrawer, setOpenDrawer] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
@@ -60,71 +60,36 @@ const Products = () => {
   const fetchProducts = useCallback(async (params: GetProductsParams) => {
     setProductsListIsLoading(true);
     try {
-      const cleanParams = Object.fromEntries(
-        Object.entries(params).filter(
-          ([_ /* eslint-disable-line @typescript-eslint/no-unused-vars */, value]) =>
-            value !== undefined && value !== '' && value !== null
-        )
-      );
-      const { content, pageNo, pageSize, totalElements } = await getInitiativeProductsList(initiativeId, {
-        size: import.meta.env.VITE_PAGINATION_SIZE,
+      const { content, totalElements } = await getInitiativeProductsList(initiativeId, {
+        size: paginationModel.pageSize,
         status: 'APPROVED',
-        ...cleanParams,
+        ...params,
       });
-      setProductsList([...content]);
-      setPaginationModel({
-        page: pageNo || 0,
-        pageSize: pageSize || 10,
-        totalElements: totalElements || 0,
-      });
+      setProductsList(content);
+      setTotalElements(totalElements)
     } catch {
       setErrorAlert(true);
     } finally {
       setProductsListIsLoading(false)
     }
-  }, [initiativeId]);
+  }, [initiativeId, paginationModel.pageSize]);
 
-  const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
-    if (
-      newPaginationModel.page === paginationModel.page &&
-      newPaginationModel.pageSize === paginationModel.pageSize
-    ) {
-      return;
-    }
-
-    fetchProducts({
-      page: newPaginationModel.page,
-      size: newPaginationModel.pageSize,
-      sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-      ...filters,
-    });
-  };
-
-  const handleSortModelChange = (model: GridSortModel) => {
-    if (model.length > 0) {
-      setSortModel(model);
-      fetchProducts({
-        sort: model[0].field + ',' + model[0].sort,
-        page: paginationModel.page,
-        size: paginationModel.pageSize,
-        ...filters,
-      });
-    }
-  };
-
-  const handleFiltersApplied = (filtersObj: typeof filters) => {
+  const handleFilters = (filtersObj: typeof filters) => {
     setFilters(filtersObj);
-    fetchProducts({
-      ...filtersObj,
-      page: 0,
-      size: paginationModel.pageSize || 10,
-      sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-    });
+    setPaginationModel(prev => ({ ...prev, page: 0 }))
   };
 
   useEffect(() => {
-    fetchProducts({});
-  }, [fetchProducts]);
+    const [model] = sortModel
+    const {pageSize, ...paginationModelRest} = paginationModel
+    const params = {
+      size: pageSize,
+      ...filters,
+      ...paginationModelRest,
+      ...(sortModel.length ? {sort: `${model?.field},${model?.sort}`} : {})
+    }
+    fetchProducts(params);
+  }, [fetchProducts, filters, paginationModel, sortModel]);
 
   return (
     <Box>
@@ -158,7 +123,7 @@ const Products = () => {
         <DynamicFilters
           filters={filters}
           filtersDef={filtersDef}
-          setFilters={handleFiltersApplied}
+          setFilters={handleFilters}
         />
       </Box>
       <Box marginTop="1rem">
@@ -170,10 +135,10 @@ const Products = () => {
           rows={mappedProductsList}
           getRowId={row => row.gtinCode}
           paginationModel={paginationModel}
-          onPaginationModelChange={handlePaginationChange}
-          rowCount={paginationModel?.totalElements || 0}
+          onPaginationModelChange={newPaginationModel => setPaginationModel(prev => ({ ...prev, ...newPaginationModel }))}
+          rowCount={totalElements || 0}
           sortModel={sortModel}
-          onSortModelChange={handleSortModelChange}
+          onSortModelChange={model => setSortModel(model)}
           pageSizeOptions={ELEMENT_PER_PAGE}
           rowsDividerColor={theme.palette.divider}
         />

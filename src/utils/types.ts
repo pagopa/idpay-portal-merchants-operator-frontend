@@ -50,7 +50,7 @@ export interface GetProcessedTransactionsFilters {
 export interface PaginationExtendedModel {
   page: number;
   pageSize: number;
-  totalElements: number;
+  totalElements?: number;
 }
 
 export interface DecodedJwtToken {

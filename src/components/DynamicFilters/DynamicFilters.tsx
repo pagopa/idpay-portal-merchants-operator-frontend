@@ -73,7 +73,11 @@ export const DynamicFilters = ({
           variant="naked"
           onClick={() => {
             setErrors([])
-            setFilters({})
+            if(Object.keys(filters).length) {
+              setFilters({})
+            } else {
+              setDraftFilters({})
+            }
           }}
           disabled={!Object.keys(draftFilters).length}
           data-testid="reset-filters-test"
