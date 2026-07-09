@@ -42,7 +42,37 @@
                 }
             ],
             "productsTable": {
-                "filters": [],
+                "filters": [
+                    {
+                        "id": "brand",
+                        "type": "text",
+                        "label": "pages.products.filters.brand"
+                    },
+                    {
+                        "id": "model",
+                        "type": "text",
+                        "label": "pages.products.filters.model"
+                    },
+                    {
+                        "id": "productCode",
+                        "type": "text",
+                        "label": "pages.products.filters.productCode"
+                    },
+                    {
+                        "id": "gtinCode",
+                        "type": "text",
+                        "label": "pages.products.filters.gtinCode",
+                        "regEx": "^[a-zA-Z0-9]{1,14}$",
+                        "message": "pages.products.filters.errors.gtinCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
+                        "inputProps": {
+                            "maxLength": 14
+                        }
+                    }
+                ],
                 "columns": [
                     {
                         "field": "category",
