@@ -23,14 +23,14 @@ const initialPagination = {
 }
 
 const Products = () => {
-  const {initiativeId} = useParams();
+  const { initiativeId } = useParams();
   const { t, config } = useScopedTranslation();
   const filtersDef = config<Array<FilterConfigDef>>('pages.products.productsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.products.drawer')
   const columnsDef = config<Array<FieldConfigDef>>('pages.products.productsTable.columns')
 
   const [productsList, setProductsList] = useState([]);
-  const [productsListIsLoading, setProductsListIsLoading] = useState(false);
+  const [productsListIsLoading, setProductsListIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [filters, setFilters] = useState({});
@@ -77,10 +77,10 @@ const Products = () => {
         pageSize: pageSize || 10,
         totalElements: totalElements || 0,
       });
-      setProductsListIsLoading(false);
     } catch {
-      setProductsListIsLoading(false);
       setErrorAlert(true);
+    } finally {
+      setProductsListIsLoading(false)
     }
   }, [initiativeId]);
 
@@ -122,14 +122,8 @@ const Products = () => {
     });
   };
 
-  const handleFiltersReset = () => {
-    setFilters({});
-    fetchProducts({});
-  };
-
   useEffect(() => {
     fetchProducts({});
-    setProductsListIsLoading(true);
   }, [fetchProducts]);
 
   return (
@@ -164,8 +158,7 @@ const Products = () => {
         <DynamicFilters
           filters={filters}
           filtersDef={filtersDef}
-          onFiltersApply={handleFiltersApplied}
-          onFiltersReset={handleFiltersReset}
+          setFilters={handleFiltersApplied}
         />
       </Box>
       <Box marginTop="1rem">

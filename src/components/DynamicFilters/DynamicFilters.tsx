@@ -1,35 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
-import FiltersForm from '../FiltersForm/FiltersForm';
 import { filtersConfig } from './filtersConfig';
 import { FilterConfigDef } from '../../utils/types';
-import { useFormik } from 'formik';
-import { FormControl, InputLabel } from '@mui/material';
+import { Box, Button, FormControl, InputLabel } from '@mui/material';
 
 type Props = {
   filters: Record<string, string>;
+  setFilters: (filters: Record<string, string>) => void
   filtersDef: Array<FilterConfigDef>;
-  onFiltersApply: (filters: Record<string, string>) => void
-  onFiltersReset: () => void
 };
 
 export const DynamicFilters = ({
   filters,
-  filtersDef,
-  onFiltersApply,
-  onFiltersReset
+  setFilters,
+  filtersDef
 }: Props) => {
   const { t, config } = useScopedTranslation();
-  const [draftFilters, setDraftFilters] =
-    useState<Record<string, string>>(filters);
+  const [draftFilters, setDraftFilters] = useState<Record<string, string>>(filters);
   const [errors, setErrors] = useState<Array<string>>([]);
-
-  const formik = useFormik({
-    initialValues: draftFilters,
-    onSubmit: async () => {
-      onFiltersApply(draftFilters);
-    }
-  });
 
   useEffect(() => setDraftFilters(filters), [filters]);
 
@@ -48,12 +36,7 @@ export const DynamicFilters = ({
   );
 
   return (
-    <FiltersForm
-      formik={formik}
-      filtersApplied={!!Object.keys(draftFilters).length}
-      onFiltersApplied={formik.handleSubmit}
-      onFiltersReset={onFiltersReset}
-    >
+    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%">
       {filtersDef.map(({ type, ...filter }) => {
         const props = {
           item: filter,
@@ -75,6 +58,29 @@ export const DynamicFilters = ({
           </FormControl>
         )
       })}
-    </FiltersForm>
+      <Box display="flex" flexDirection="row" alignItems="center" columnGap="1rem" minWidth="fit-content">
+        <Button
+          sx={{ minWidth: 'fit-content' }}
+          variant="outlined"
+          onClick={() => setFilters(draftFilters)}
+          disabled={!Object.keys(draftFilters).length || !!errors.length}
+          data-testid="apply-filters-test"
+        >
+          {t('commons.filterBtn')}
+        </Button>
+        <Button
+          sx={{ minWidth: 'fit-content' }}
+          variant="naked"
+          onClick={() => {
+            setErrors([])
+            setFilters({})
+          }}
+          disabled={!Object.keys(draftFilters).length}
+          data-testid="reset-filters-test"
+        >
+          {t('commons.removeFiltersBtn')}
+        </Button>
+      </Box>
+    </Box>
   );
 }
