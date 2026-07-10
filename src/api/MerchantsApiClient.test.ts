@@ -4,16 +4,6 @@ const mockPut = vi.fn();
 const mockPost = vi.fn();
 const mockDelete = vi.fn();
 
-// vi.mock('./generated/Products', () => ({
-//   Products: class {
-//     setSecurityData = vi.fn();
-//     getProducts = (params: Record<string, unknown>) =>
-//       mockGet('/products', {
-//         params: Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined)),
-//       });
-//   },
-// }));
-
 vi.mock('./generated/Transactions', () => ({
   Transactions: class {
     setSecurityData = vi.fn();
@@ -103,36 +93,6 @@ describe('MerchantApi', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
-
-  // describe('getProducts', () => {
-  //   it('should call GET /products with correct parameters', async () => {
-  //     const mockResponse = { data: { products: [], total: 0 } };
-  //     mockGet.mockResolvedValue(mockResponse);
-
-  //     const result = await MerchantApi.getProducts({
-  //       page: 1,
-  //       size: 10,
-  //       status: 'ACTIVE',
-  //       eprelCode: undefined,
-  //     });
-
-  //     expect(mockGet).toHaveBeenCalledWith('/products', {
-  //       params: {
-  //         page: 1,
-  //         size: 10,
-  //         status: 'ACTIVE',
-  //       },
-  //     });
-
-  //     expect(result).toEqual(mockResponse.data);
-  //   });
-
-  //   it('should throw error if API fails', async () => {
-  //     mockGet.mockRejectedValue(new Error('API Error'));
-
-  //     await expect(MerchantApi.getProducts({})).rejects.toThrow('API Error');
-  //   });
-  // });
 
   describe('getInitiativeProducts', () => {
     it('should call GET /products with correct parameters', async () => {

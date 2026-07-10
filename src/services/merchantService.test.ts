@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  // getProductsList,
   previewPayment,
   authPaymentBarCode,
   getProcessedTransactions,
@@ -20,7 +19,6 @@ import { MerchantApi } from '../api/MerchantsApiClient';
 
 vi.mock('../api/MerchantsApiClient', () => ({
   MerchantApi: {
-    // getProducts: vi.fn(),
     getInitiativeProducts: vi.fn(),
     previewPayment: vi.fn(),
     authPaymentBarCode: vi.fn(),
@@ -42,16 +40,6 @@ describe('merchantService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
-  // it('getProductsList delegates to MerchantApi.getProducts', async () => {
-  //   const response = { products: [], total: 0 };
-  //   vi.mocked(MerchantApi.getProducts).mockResolvedValue(response as never);
-
-  //   const result = await getProductsList({} as never);
-
-  //   expect(MerchantApi.getProducts).toHaveBeenCalled();
-  //   expect(result).toEqual(response);
-  // });
 
   it('getInitiativeProductsList delegates to MerchantApi.getInitiativeProducts', async () => {
     const response = { products: [], total: 0 };
