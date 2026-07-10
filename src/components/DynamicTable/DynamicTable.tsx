@@ -4,7 +4,7 @@ import { theme } from "@pagopa/mui-italia"
 import { useScopedTranslation } from "../../hooks/useScopedTranslation"
 import { FieldConfigDef } from "../../utils/types"
 import { renderFields } from "../../utils/renderFields"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 
 type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
     columnsDef: Array<FieldConfigDef>
@@ -21,8 +21,12 @@ export const DynamicTable = ({
     emptyText,
     sx,
     rowsDividerColor,
+    onSortModelChange,
+    onPaginationModelChange,
     ...props }: Props) => {
     const { t } = useScopedTranslation()
+
+    const ref = useRef(false)
 
     const mappedColumns = useMemo(() => columnsDef.map(({ cell, ...column }) => {
         const fieldConfig = renderFields(cell?.tooltip)
@@ -96,6 +100,15 @@ export const DynamicTable = ({
             </Paper> :
             <DataGrid
                 {...props}
+                onSortModelChange={(model, details) => {
+                    ref.current = true
+                    onSortModelChange(model, details)
+                    setTimeout(() => ref.current = false, 0)
+                }}
+                onPaginationModelChange={(model, details) => {
+                    if(ref.current) return
+                    onPaginationModelChange(model, details)
+                }}
                 columns={mappedColumns}
                 disableRowSelectionOnClick
                 sortingOrder={['asc', 'desc']}

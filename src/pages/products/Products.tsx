@@ -141,10 +141,7 @@ const Products = () => {
           sortModel={sortModel}
           sortingMode='server'
           paginationMode="server"
-          onSortModelChange={model => {
-            setPage(0)
-            setSortModel(model)
-          }}
+          onSortModelChange={setSortModel}
           pageSizeOptions={ELEMENT_PER_PAGE}
           rowsDividerColor={theme.palette.divider}
         />
