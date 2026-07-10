@@ -6,7 +6,6 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { getInitiativeProductsList } from '../../services/merchantService';
 import { FieldConfigDef, FilterConfigDef, GetProductsParams } from '../../utils/types';
 import { GridSortModel } from '@mui/x-data-grid';
-import { PaginationExtendedModel } from '../../utils/types';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
 import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
@@ -35,7 +34,8 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>(initialPagination);
+  const [page, setPage] = useState(initialPagination.page)
+  const [pageSize, setPageSize] = useState(initialPagination.pageSize)
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const [totalElements, setTotalElements] = useState(0)
 
@@ -63,7 +63,6 @@ const Products = () => {
     setProductsListIsLoading(true);
     try {
       const { content, totalElements } = await getInitiativeProductsList(initiativeId, {
-        size: paginationModel.pageSize,
         status: 'APPROVED',
         ...params,
       });
@@ -74,24 +73,18 @@ const Products = () => {
     } finally {
       setProductsListIsLoading(false)
     }
-  }, [initiativeId, paginationModel.pageSize]);
-
-  const handleFilters = (filtersObj: typeof filters) => {
-    setFilters(filtersObj);
-    setPaginationModel(prev => ({ ...prev, page: 0 }))
-  };
+  }, [initiativeId]);
 
   useEffect(() => {
     const [model] = sortModel
-    const {pageSize, ...paginationModelRest} = paginationModel
     const params = {
       size: pageSize,
+      page,
       ...filters,
-      ...paginationModelRest,
-      ...(sortModel.length ? {sort: `${model?.field},${model?.sort}`} : {})
+      ...(sortModel.length ? { sort: `${model?.field},${model?.sort}` } : {}),
     }
     fetchProducts(params);
-  }, [fetchProducts, filters, paginationModel, sortModel]);
+  }, [fetchProducts, filters, page, pageSize, sortModel]);
 
   return (
     <Box>
@@ -125,7 +118,10 @@ const Products = () => {
         <DynamicFilters
           filters={filters}
           filtersDef={filtersDef}
-          setFilters={handleFilters}
+          setFilters={newFilters => {
+            setPage(0)
+            setFilters(newFilters);
+          }}
         />
       </Box>
       <Box marginTop="1rem">
@@ -136,11 +132,19 @@ const Products = () => {
           isLoading={productsListIsLoading}
           rows={mappedProductsList}
           getRowId={row => row.gtinCode}
-          paginationModel={paginationModel}
-          onPaginationModelChange={newPaginationModel => setPaginationModel(prev => ({ ...prev, ...newPaginationModel }))}
+          paginationModel={{page, pageSize}}
+          onPaginationModelChange={model => {
+            setPage(model.page)
+            setPageSize(model.pageSize)
+          }}
           rowCount={totalElements || 0}
           sortModel={sortModel}
-          onSortModelChange={model => setSortModel(model)}
+          sortingMode='server'
+          paginationMode="server"
+          onSortModelChange={model => {
+            setPage(0)
+            setSortModel(model)
+          }}
           pageSizeOptions={ELEMENT_PER_PAGE}
           rowsDividerColor={theme.palette.divider}
         />

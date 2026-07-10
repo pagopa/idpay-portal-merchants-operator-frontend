@@ -7,6 +7,7 @@ import { FieldConfigDef } from '../../utils/types';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { renderFields } from '../../utils/renderFields';
 import { normalizeObj } from '../../utils/helpers';
+import { useMemo } from 'react';
 
 export type DynamicDrawerProps = {
   isOpen: boolean;
@@ -39,11 +40,14 @@ export default function DynamicDrawer({
   buttons,
 }: DynamicDrawerProps) {
   const { t } = useScopedTranslation()
-  const mappedFields = fieldsDef.map(({ cell, ...field }) => {
+
+  const mappedFields = useMemo( () => fieldsDef.map(({ cell, ...field }) => {
     const fieldsConfig = renderFields()
     return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[cell?.type] }
-  })
-  const normalizedFields = normalizeObj(fieldsValues);
+  }), [fieldsDef, t])
+
+  const normalizedFields = useMemo(() => normalizeObj(fieldsValues), [fieldsValues]);
+
   return (
     <Drawer anchor="right" open={isOpen} data-testid="detail-drawer">
       <Box sx={drawerStyle}>

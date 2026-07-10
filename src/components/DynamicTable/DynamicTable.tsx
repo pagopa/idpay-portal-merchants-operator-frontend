@@ -14,12 +14,21 @@ type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
     rowsDividerColor?: string
 }
 
-export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, sx, rowsDividerColor, ...props }: Props) => {
+export const DynamicTable = ({
+    isEmpty,
+    isLoading,
+    columnsDef,
+    emptyText,
+    sx,
+    rowsDividerColor,
+    ...props }: Props) => {
     const { t } = useScopedTranslation()
-    const mappedColumns = columnsDef.map(({ cell, ...column }) => {
+
+    const mappedColumns = useMemo(() => columnsDef.map(({ cell, ...column }) => {
         const fieldConfig = renderFields(cell?.tooltip)
         return { ...column, headerName: t(column.headerName), renderCell: fieldConfig[cell?.type] }
-    })
+    }), [columnsDef, t])
+
     const tableStyle = useMemo(() => ({
         border: 'none',
         '& .MuiDataGrid-row': {
@@ -91,7 +100,6 @@ export const DynamicTable = ({ isEmpty, isLoading, columnsDef, emptyText, sx, ro
                 disableRowSelectionOnClick
                 sortingOrder={['asc', 'desc']}
                 sx={{ ...tableStyle, ...sx }}
-                paginationMode="server"
                 localeText={{
                     footerTotalRows: 'Totale righe:',
                     paginationRowsPerPage: 'Elementi per pagina:',
