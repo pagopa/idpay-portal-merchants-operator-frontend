@@ -24,9 +24,8 @@ const drawerStyle = {
   flexDirection: "column",
   overflow: "hidden",
   maxHeight: "100vh",
-  rowGap: "1rem",
   maxWidth: 375,
-  padding: "1.5rem",
+  padding: "1rem",
   height: "100%"
 }
 
@@ -59,7 +58,7 @@ export default function DynamicDrawer({
           <IconButton
             data-testid="close-button"
             onClick={setIsOpen}
-            sx={{ color: theme.palette.text.primary }}
+            sx={{ color: theme.palette.text.secondary }}
           >
             <CloseIcon />
           </IconButton>
@@ -68,6 +67,7 @@ export default function DynamicDrawer({
           display="flex"
           flexDirection="column"
           height="100%"
+          padding="0.5rem"
           sx={{ overflowY: 'auto' }}
         >
           <Box
@@ -76,12 +76,12 @@ export default function DynamicDrawer({
             width="100%"
             rowGap="1rem"
           >
-            <Typography variant="h5" sx={{ wordWrap: "break-word" }}>{title}</Typography>
+            <Typography variant="h6" sx={{ wordWrap: "break-word" }}>{title}</Typography>
             {subtitle &&
               <>
                 <Divider />
                 <Typography
-                  variant="body2"
+                  variant="caption"
                   fontWeight={theme.typography.fontWeightBold}
                   color={theme.palette.text.primary}
                 >
@@ -99,6 +99,7 @@ export default function DynamicDrawer({
                 flexDirection="column"
               >
                 <Typography
+                  variant="body2"
                   fontWeight={theme.typography.fontWeightRegular}
                   color={theme.palette.text.secondary}
                 >

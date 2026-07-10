@@ -16,7 +16,7 @@ export const renderText = (text: string, tooltip?: boolean) => {
     </Typography>
   </Tooltip> :
     <Typography
-      component="div"
+      variant="body2"
       sx={{
         fontWeight: theme.typography.fontWeightMedium,
         wordWrap: "break-word",

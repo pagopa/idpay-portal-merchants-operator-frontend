@@ -36,7 +36,7 @@ export const DynamicFilters = ({
   );
 
   return (
-    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%">
+    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%" paddingY="2rem">
       {filtersDef.map(({ type, ...filter }) => {
         const props = {
           item: filter,
@@ -62,7 +62,7 @@ export const DynamicFilters = ({
         <Button
           sx={{ minWidth: 'fit-content' }}
           variant="outlined"
-          onClick={() => setFilters(Object.entries(draftFilters).reduce((acc, [key, value]) => ({ ...acc, [key]: value.trim()}) , {}))}
+          onClick={() => setFilters(Object.entries(draftFilters).reduce((acc, [key, value]) => ({ ...acc, [key]: value.trim() }), {}))}
           disabled={!Object.keys(draftFilters).length || !!errors.length}
           data-testid="apply-filters-test"
         >
@@ -73,7 +73,7 @@ export const DynamicFilters = ({
           variant="naked"
           onClick={() => {
             setErrors([])
-            if(Object.keys(filters).length) {
+            if (Object.keys(filters).length) {
               setFilters({})
             } else {
               setDraftFilters({})
