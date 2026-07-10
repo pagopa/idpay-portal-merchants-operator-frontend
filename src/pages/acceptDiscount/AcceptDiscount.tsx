@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
-import { getProductsList, previewPayment } from '../../services/merchantService';
+import { getInitiativeProductsList, previewPayment } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/data-contracts';
 import AlertComponent from '../../components/Alert/AlertComponent';
@@ -75,7 +75,7 @@ const AcceptDiscount = () => {
 
   const fetchProductsList = async (fullProductName?: string) => {
     try {
-      const { content } = await getProductsList({ fullProductName, size: 50 });
+      const { content } = await getInitiativeProductsList(initiativeId, { fullProductName, size: 50 });
       setProductsList([...content]);
     } catch {
       setProductsList([]);

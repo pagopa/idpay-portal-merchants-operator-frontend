@@ -50,7 +50,7 @@ export interface GetProcessedTransactionsFilters {
 export interface PaginationExtendedModel {
   page: number;
   pageSize: number;
-  totalElements: number;
+  totalElements?: number;
 }
 
 export interface DecodedJwtToken {
@@ -105,6 +105,21 @@ export interface transactionInProgreessDTO {
   updateDate: string;
 }
 
-export type ColumnConfigDef = Omit<GridColDef, 'renderCell'> & { cell: Record<string, string> }
+export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: {type: string, tooltip?: boolean} }
 
 export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>
+
+export type TemplateConfigDef = Array<{value: string, label: string}>
+
+export type FilterConfigDef = {
+  id: string;
+  type: 'select' | 'text';
+  label?: string;
+  template?: string;
+  defaultValue?: string;
+  regEx?: string;
+  pattern?: {value: string, flag?: string};
+  message?: string;
+  inputProps?: Record<string, unknown>;
+  options?: Array<Record<string, string>>;
+}

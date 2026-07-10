@@ -15,6 +15,7 @@ import {
   downloadFileFromBase64,
   replaceValues,
   buildNamespaceKey,
+  normalizeObj,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -528,3 +529,31 @@ describe('buildNamespaceKey', () => {
     expect(buildNamespaceKey('!!!', '2026-01-15')).toBe('');
   });
 });
+
+describe("normalizeObj", () => {
+  it("should normalize object", () => {
+    const nestedObject = {
+      key1: "lv1",
+      key2: {
+        key3: {
+          key4: "lv4"
+        }
+      },
+      key5: [1, 2, 3],
+      key6: {
+        key7: null
+      }
+    }
+
+    const plainObject = normalizeObj(nestedObject)
+    expect(plainObject).toStrictEqual({
+      key1: "lv1",
+      "key2.key3.key4": "lv4",
+      key5: [1, 2, 3],
+      "key6.key7": null
+    })
+
+    const differentValue = normalizeObj(123)
+    expect(differentValue).toBe(123)
+  })
+})

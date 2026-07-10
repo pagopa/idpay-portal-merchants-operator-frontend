@@ -1,6 +1,31 @@
 import { Chip, Tooltip, Typography } from '@mui/material';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 import { GridRenderCellParams } from '@mui/x-data-grid';
+import { theme } from '@pagopa/mui-italia';
+
+export const renderText = (text: string, tooltip?: boolean) => {
+  return tooltip ? <Tooltip title={text || MISSING_DATA_PLACEHOLDER}>
+    <Typography
+      sx={{
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {text || MISSING_DATA_PLACEHOLDER}
+    </Typography>
+  </Tooltip> :
+    <Typography
+      variant="body2"
+      sx={{
+        fontWeight: theme.typography.fontWeightMedium,
+        wordWrap: "break-word",
+        maxWidth: "100%"
+      }}
+    >
+      {text || MISSING_DATA_PLACEHOLDER}
+    </Typography>
+}
 
 export function getStatusChip(t: any, status: string) {
   const statusMap: Record<string, { label: string; backgroundColor: string; color: string }> = {
@@ -254,4 +279,14 @@ export function buildNamespaceKey(name: string, startDate: string): string {
     .join('');
 
   return `${camelCaseName}${year}`;
+}
+
+export const normalizeObj = (obj: Record<string, any>, parentKey?: string) => {
+  const isObj = Object.prototype.toString.call(obj) === "[object Object]" &&
+    Object.getPrototypeOf(obj) === Object.prototype;
+
+  return isObj ? Object.entries(obj).reduce((acc, [key, value]) => {
+    const objKey = parentKey ? `${parentKey}.${key}` : key
+    return { ...acc, ...normalizeObj(value, objKey) }
+  }, {}) : parentKey ? { [parentKey]: obj } : obj
 }

@@ -366,36 +366,40 @@ paths:
               example:
                 code: PAYMENT_GENERIC_ERROR
                 message: "A generic error occurred"
-  /products:
+  /initiatives/{initiativeId}/products:
     get:
       tags:
         - products
       summary: Returns the products list
-      description: "ENG: Returns product list <br> IT: Lista prodotti"
+      description: 'ENG: Returns product list <br> IT: Lista prodotti'
       operationId: getProducts
       parameters:
-        - $ref: "#/components/parameters/page_query"
-        - $ref: "#/components/parameters/size_query"
-        - $ref: "#/components/parameters/sort_query"
-        - $ref: "#/components/parameters/category_query"
-        - $ref: "#/components/parameters/eprelCode_query"
-        - $ref: "#/components/parameters/gtinCode_query"
-        - $ref: "#/components/parameters/productFileId_query"
-        - $ref: "#/components/parameters/productName_query"
+        - $ref: '#/components/parameters/initiativeId_path'
+        - $ref: '#/components/parameters/page_query'
+        - $ref: '#/components/parameters/size_query'
+        - $ref: '#/components/parameters/sort_query'
+        - $ref: '#/components/parameters/category_query'
+        - $ref: '#/components/parameters/brand_query'
+        - $ref: '#/components/parameters/model_query'
+        - $ref: '#/components/parameters/eprelCode_query'
+        - $ref: '#/components/parameters/gtinCode_query'
+        - $ref: '#/components/parameters/productCode_query'
+        - $ref: '#/components/parameters/productFileId_query'
+        - $ref: '#/components/parameters/productName_query'
         - $ref: '#/components/parameters/fullProductName_query'
-        - $ref: "#/components/parameters/status_query"
-        - $ref: "#/components/parameters/organizationId_query"
+        - $ref: '#/components/parameters/status_query'
+        - $ref: '#/components/parameters/organizationId_query'
       responses:
-        "200":
-          $ref: "#/components/responses/GET_products_200_Response"
-        "400":
-          $ref: "#/components/responses/GET_products_400_Response"
-        "401":
-          $ref: "#/components/responses/GET_products_401_Response"
-        "429":
-          $ref: "#/components/responses/GET_products_429_Response"
-        "500":
-          $ref: "#/components/responses/GET_products_500_Response"
+        '200':
+          $ref: '#/components/responses/GET_products_200_Response'
+        '400':
+          $ref: '#/components/responses/GET_products_400_Response'
+        '401':
+          $ref: '#/components/responses/GET_products_401_Response'
+        '429':
+          $ref: '#/components/responses/GET_products_429_Response'
+        '500':
+          $ref: '#/components/responses/GET_products_500_Response'
   /transactions/bar-code/{trxCode}/authorize:
     put:
       tags:
@@ -3036,6 +3040,22 @@ components:
           - gtinCode, asc
           - eprelCode, asc
           - status, asc
+    brand_query:
+      name: brand
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\d+$
+    model_query:
+      name: model
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\d+$
     eprelCode_query:
       name: eprelCode
       in: query
@@ -3052,6 +3072,14 @@ components:
         type: string
         maxLength: 14
         pattern: ^[a-zA-Z0-9]{1,14}$
+    productCode_query:
+      name: productCode
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^[a-zA-Z0-9]{1,100}$
     productFileId_query:
       name: productFileId
       in: query

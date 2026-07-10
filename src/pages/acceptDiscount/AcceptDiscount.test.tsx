@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import ROUTES from '../../routes';
-import { getProductsList, previewPayment } from '../../services/merchantService';
+import { getInitiativeProductsList, previewPayment } from '../../services/merchantService';
 import { ProductDTO } from '../../api/generated/data-contracts';
 import AcceptDiscount from './AcceptDiscount';
 import { useParams } from 'react-router-dom';
@@ -22,7 +22,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
 });
 
 vi.mock('../../services/merchantService', () => ({
-  getProductsList: vi.fn(),
+  getInitiativeProductsList: vi.fn(),
   previewPayment: vi.fn(),
 }));
 
@@ -108,7 +108,7 @@ const fillForm = () => {
 describe('AcceptDiscount', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (getProductsList as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({
+    (getInitiativeProductsList as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({
       content: [mockProduct],
     });
   });
@@ -391,7 +391,7 @@ describe('AcceptDiscount', () => {
       vi.runOnlyPendingTimers();
     });
 
-    expect(getProductsList).toHaveBeenCalled();
+    expect(getInitiativeProductsList).toHaveBeenCalled();
 
     vi.useRealTimers();
   });
@@ -399,7 +399,7 @@ describe('AcceptDiscount', () => {
   it('sets productsList to empty array when getProductsList throws', async () => {
     vi.useFakeTimers();
 
-    (getProductsList as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue(
+    (getInitiativeProductsList as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue(
       new Error('fetch error')
     );
 
@@ -412,7 +412,7 @@ describe('AcceptDiscount', () => {
       vi.runOnlyPendingTimers();
     });
 
-    expect(getProductsList).toHaveBeenCalled();
+    expect(getInitiativeProductsList).toHaveBeenCalled();
 
     vi.useRealTimers();
   });

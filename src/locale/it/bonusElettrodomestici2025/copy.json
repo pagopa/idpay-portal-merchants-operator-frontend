@@ -1,5 +1,17 @@
 {
     "initiativeName": "Bonus Elettrodomestici",
+    "templates": {
+        "categories": {
+            "washingmachines": "Lavatrici",
+            "tumbledryers": "Asciugatrici",
+            "ovens": "Forni",
+            "rangehoods": "Cappe da cucina",
+            "dishwashers": "Lavastoviglie",
+            "washerdriers": "Lavasciuga",
+            "refrigeratingappl": "Apparecchi di refrigerazione",
+            "cookinghobs": "Piani cottura"
+        }
+    },
     "pages": {
         "purchaseManagement": {
             "title": "Gestione acquisti",
@@ -61,6 +73,43 @@
             "transactionDeleteSuccess": "La transazione è stata annullata con successo.",
             "refundSuccessUpload": "Richiesta inviata correttamente",
             "reverseSuccessUpload": "Richiesta inviata correttamente"
+        },
+        "products": {
+            "title": "Prodotti",
+            "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
+            "noProducts": "Non ci sono prodotti per questa iniziativa",
+            "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+            "drawer": {
+                "subtitle": "SCHEDA PRODOTTO",
+                "eprelCode": "Codice EPREL",
+                "gtinCode": "Codice GTIN/EAN",
+                "productCode": "Codice prodotto",
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "capacity": "Capacità",
+                "energyClass": "Classe energetica",
+                "countryOfProduction": "Paese di produzione"
+            },
+            "filters": {
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "eprelCode": "Codice EPREL",
+                "gtinCode": "Codice GTIN/EAN",
+                "errors": {
+                    "eprelCode": "Il codice EPREL deve essere numerico.",
+                    "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici."
+                }
+            },
+            "tableHeaders": {
+                "eprelCode": "Codice EPREL",
+                "gtinCode": "Codice GTIN/EAN",
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "productCode": "Codice prodotto"
+            }
         }
     }
 }
