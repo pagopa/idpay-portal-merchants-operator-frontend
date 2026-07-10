@@ -62,7 +62,7 @@ export const DynamicFilters = ({
         <Button
           sx={{ minWidth: 'fit-content' }}
           variant="outlined"
-          onClick={() => setFilters(draftFilters)}
+          onClick={() => setFilters(Object.entries(draftFilters).reduce((acc, [key, value]) => ({ ...acc, [key]: value.trim()}) , {}))}
           disabled={!Object.keys(draftFilters).length || !!errors.length}
           data-testid="apply-filters-test"
         >

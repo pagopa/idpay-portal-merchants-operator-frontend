@@ -83,7 +83,13 @@
                     {
                         "id": "productCode",
                         "type": "text",
-                        "label": "pages.products.filters.productCode"
+                        "label": "pages.products.filters.productCode",
+                        "regEx": "^[a-zA-Z0-9]{1,100}$",
+                        "message": "pages.products.filters.errors.productCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        }
                     },
                     {
                         "id": "gtinCode",

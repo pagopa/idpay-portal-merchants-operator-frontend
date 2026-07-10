@@ -66,7 +66,7 @@ export const filtersConfig: Record<
                 onChange={(e) => {
                     const text = pattern ? e.target.value.replace(RegExp(pattern.value, pattern?.flag), '') : e.target.value
                     const isError = !!text && !RegExp(regEx || '').test(text);
-                    setFilters(id, text);
+                    setFilters(id, text.trimStart());
                     setErrors(id, isError);
                 }}
                 error={isError}

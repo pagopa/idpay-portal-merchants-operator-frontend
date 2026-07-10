@@ -56,7 +56,13 @@
                     {
                         "id": "productCode",
                         "type": "text",
-                        "label": "pages.products.filters.productCode"
+                        "label": "pages.products.filters.productCode",
+                        "message": "pages.products.filters.errors.productCode",
+                        "regEx": "^[a-zA-Z0-9]{1,100}$",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        }
                     },
                     {
                         "id": "gtinCode",
