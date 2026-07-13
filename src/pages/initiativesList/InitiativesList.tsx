@@ -9,14 +9,14 @@ import { InputAdornment, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { DynamicTable } from "../../components/DynamicTable/DynamicTable";
 import ROUTES from "../../routes";
-import { ColumnConfigDef } from "../../utils/types";
+import { FieldConfigDef } from "../../utils/types";
 import { generatePath } from "react-router-dom";
 
 export const InitiativesList = () => {
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'initiativeName', sort: 'asc' }]);
   const [initiativeListFiltered, setInitiativeListFiltered] = useState([]);
   const { t, config } = useScopedTranslation();
-  const columns = config<Array<ColumnConfigDef>>('commons.pages.initiativesList.initiativeTable.columns')
+  const columns = config<Array<FieldConfigDef>>('commons.pages.initiativesList.initiativeTable.columns')
   const initiativesList = useAppSelector(initiativesListSelector);
   const mappedInitiativesList = useMemo(() =>
     initiativesList.map((initiative) =>
@@ -77,7 +77,7 @@ export const InitiativesList = () => {
           columnsDef={columns}
           rows={initiativeListFiltered}
           getRowId={row => row.initiativeId}
-          emptyText='commons.pages.initiativesList.emptyList'
+          emptyText={t('commons.pages.initiativesList.emptyList')}
           isEmpty={!initiativeListFiltered.length}
           sortModel={sortModel}
           onSortModelChange={setSortModel}

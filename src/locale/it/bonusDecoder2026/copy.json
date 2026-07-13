@@ -1,5 +1,14 @@
 {
     "initiativeName": "Bonus Decoder",
+    "templates": {
+        "categories": {
+            "ds": "Satellitare",
+            "dt": "Terrestre",
+            "dtc": "Terrestre via cavo",
+            "dts": "Terrestre e Satellitare",
+            "dtsc": "Terrestre, Satellitare e via cavo"
+        }
+    },
     "pages": {
         "purchaseManagement": {
             "title": "Gestione acquisti",
@@ -61,6 +70,38 @@
             "transactionDeleteSuccess": "La transazione è stata annullata con successo.",
             "refundSuccessUpload": "Richiesta inviata correttamente",
             "reverseSuccessUpload": "Richiesta inviata correttamente"
+        },
+        "products": {
+            "title": "Prodotti",
+            "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
+            "noProducts": "Non ci sono prodotti per questa iniziativa",
+            "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+            "drawer": {
+                "subtitle": "SCHEDA PRODOTTO",
+                "gtinCode": "Codice GTIN/EAN",
+                "productCode": "Codice prodotto",
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello"
+            },
+            "filters": {
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "productCode": "Codice prodotto",
+                "gtinCode": "Codice GTIN/EAN",
+                "errors": {
+                    "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.",
+                    "productCode": "Il codice prodotto deve contenere solo caratteri alfanumerici."
+                }
+            },
+            "tableHeaders": {
+                "gtinCode": "Codice GTIN/EAN",
+                "category": "Categoria",
+                "brand": "Marca",
+                "model": "Modello",
+                "productCode": "Codice prodotto"
+            }
         }
     }
 }

@@ -1,1 +1,157 @@
-{}
+{
+    "templates": {
+        "categories": []
+    },
+    "pages": {
+        "products": {
+            "drawer": [
+                {
+                    "field": "category",
+                    "headerName": "pages.products.drawer.category",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "brand",
+                    "headerName": "pages.products.drawer.brand",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "model",
+                    "headerName": "pages.products.drawer.model",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "gtinCode",
+                    "headerName": "pages.products.drawer.gtinCode",
+                    "cell": {
+                        "type": "text"
+                    }
+                },
+                {
+                    "field": "productCode",
+                    "headerName": "pages.products.drawer.productCode",
+                    "cell": {
+                        "type": "text"
+                    }
+                }
+            ],
+            "productsTable": {
+                "filters": [
+                    {
+                        "id": "brand",
+                        "type": "text",
+                        "label": "pages.products.filters.brand"
+                    },
+                    {
+                        "id": "model",
+                        "type": "text",
+                        "label": "pages.products.filters.model"
+                    },
+                    {
+                        "id": "productCode",
+                        "type": "text",
+                        "label": "pages.products.filters.productCode",
+                        "message": "pages.products.filters.errors.productCode",
+                        "regEx": "^[a-zA-Z0-9]{1,100}$",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        }
+                    },
+                    {
+                        "id": "gtinCode",
+                        "type": "text",
+                        "label": "pages.products.filters.gtinCode",
+                        "regEx": "^[a-zA-Z0-9]{1,14}$",
+                        "message": "pages.products.filters.errors.gtinCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
+                        "inputProps": {
+                            "maxLength": 14
+                        }
+                    }
+                ],
+                "columns": [
+                    {
+                        "field": "category",
+                        "headerName": "pages.products.tableHeaders.category",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "brand",
+                        "headerName": "pages.products.tableHeaders.brand",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "model",
+                        "headerName": "pages.products.tableHeaders.model",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "gtinCode",
+                        "headerName": "pages.products.tableHeaders.gtinCode",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "productCode",
+                        "headerName": "pages.products.tableHeaders.productCode",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "action",
+                        "sortable": false,
+                        "filterable": false,
+                        "disableColumnMenu": true,
+                        "flex": 0.5,
+                        "cell": {
+                            "type": "action"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

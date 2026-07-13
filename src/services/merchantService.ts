@@ -7,9 +7,9 @@ import type {
 } from '../api/generated/data-contracts';
 import { GetProductsParams } from '../utils/types';
 
-export const getProductsList = async (params: GetProductsParams): Promise<ProductListDTO> => {
-  const response = await MerchantApi.getProducts(
-    params as Parameters<typeof MerchantApi.getProducts>[0]
+export const getInitiativeProductsList = async (initiativeId: string, params: GetProductsParams): Promise<ProductListDTO> => {
+  const response = await MerchantApi.getInitiativeProducts(initiativeId,
+    params as Parameters<typeof MerchantApi.getInitiativeProducts>[1]
   );
 
   return response;
