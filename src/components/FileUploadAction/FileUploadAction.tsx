@@ -54,7 +54,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   }>();
   const [file, setFile] = useState<File | null>(null);
   const [requiredFileError, setRequiredFileError] = useState<boolean>(false);
-  const [docNumber, setDocNumber] = useState<string>(fileDocNumber);
+  const [docNumber, setDocNumber] = useState<string>(fileDocNumber || '');
   const [docNumberError, setDocNumberError] = useState<boolean>(false);
   const [fileSizeError, setFileSizeError] = useState<boolean>(false);
   const [fileTypeError, setFileTypeError] = useState<boolean>(false);
