@@ -6,55 +6,61 @@ import {
 import FileUploadAction from '../../components/FileUploadAction/FileUploadAction';
 import styles from './reverse.module.css';
 import ROUTES from '../../routes.ts';
-import { useLocation } from 'react-router-dom';
+import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { useMemo } from 'react';
 
-const CONTEXTS = {
-  [ROUTES.REFUNDS_MANAGEMENT]: {
-    breadcrumb: (t) => ({
-      label: t('routes.refundManagement'),
-      path: ROUTES.REFUNDS_MANAGEMENT,
-    }),
-    apiCall: reverseInvoicedTransactionApi,
-  },
-  [ROUTES.BUY_MANAGEMENT]: {
-    breadcrumb: (t) => ({
-      label: t('routes.buyManagement'),
-      path: ROUTES.BUY_MANAGEMENT,
-    }),
-    apiCall: reverseTransactionApi,
-  },
-};
-
-function getContext(location, t) {
+function getContext(routesMap, defaultRoute, location) {
   if (location.state?.breadcrumbsProp) {
     const path = location.state.breadcrumbsProp.path;
-    const context = CONTEXTS[path];
+    const context = routesMap[path];
     return {
       breadcrumbsProp: location.state.breadcrumbsProp,
       apiCall: context ? context.apiCall : reverseTransactionApi,
     };
   }
 
-  if (location.state?.backTo && CONTEXTS[location.state.backTo]) {
-    const context = CONTEXTS[location.state.backTo];
+  if (location.state?.backTo && routesMap[location.state.backTo]) {
+    const context = routesMap[location.state.backTo];
     return {
-      breadcrumbsProp: context.breadcrumb(t),
+      breadcrumbsProp: context.breadcrumb,
       apiCall: context.apiCall,
     };
   }
 
-  const context = CONTEXTS[ROUTES.BUY_MANAGEMENT];
   return {
-    breadcrumbsProp: context.breadcrumb(t),
-    apiCall: context.apiCall,
+    breadcrumbsProp: defaultRoute.breadcrumb,
+    apiCall: defaultRoute.apiCall,
   };
 }
 
 const Reverse = () => {
+  const { initiativeId } = useParams()
   const { t } = useTranslation();
   const location = useLocation();
 
-  const { breadcrumbsProp, apiCall } = getContext(location, t);
+  const routesKeys = useMemo(() => ({
+    refundManagement: generatePath(ROUTES.REFUNDS_MANAGEMENT, { initiativeId: initiativeId }),
+    buyManagement: generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiativeId })
+  }), [initiativeId])
+
+  const routesMap = useMemo(() => ({
+    [routesKeys.refundManagement]: {
+      breadcrumb: {
+        label: t('routes.refundManagement'),
+        path: routesKeys.refundManagement
+      },
+      apiCall: reverseInvoicedTransactionApi,
+    },
+    [routesKeys.buyManagement]: {
+      breadcrumb: {
+        label: t('routes.buyManagement'),
+        path: routesKeys.buyManagement
+      },
+      apiCall: reverseTransactionApi,
+    },
+  }), [routesKeys, t])
+
+  const { breadcrumbsProp, apiCall } = getContext(routesMap, routesMap[routesKeys.buyManagement], location);
 
   return (
     <FileUploadAction

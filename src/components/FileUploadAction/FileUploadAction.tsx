@@ -2,7 +2,7 @@ import { Box, Typography, Link, Stack, Button, Alert, TextField } from '@mui/mat
 import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox';
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import ROUTES from '../../routes';
 import { SingleFileInput, theme } from '@pagopa/mui-italia';
 import { useState, useRef, useEffect } from 'react';
@@ -58,9 +58,10 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { trxId, fileDocNumber } = useParams<{
+  const { trxId, fileDocNumber, initiativeId } = useParams<{
     trxId: string;
     fileDocNumber: string;
+    initiativeId: string
   }>();
 
   useEffect(() => {
@@ -160,7 +161,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           backLabel={t('commons.exitBtn')}
           items={[
             { label: breadcrumbsProp?.label, path: breadcrumbsProp?.path },
-            { label: breadcrumbsLabelKey, path: ROUTES.REVERSE },
+            { label: breadcrumbsLabelKey, path: generatePath(ROUTES.REVERSE, {initiativeId: initiativeId, trxId: trxId}) },
           ]}
           active={true}
           onClickBackButton={() => navigate(breadcrumbsProp?.path)}
