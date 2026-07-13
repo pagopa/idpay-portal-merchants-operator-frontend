@@ -80,11 +80,11 @@ const SummaryAcceptDiscount = () => {
               items={[
                 {
                   label: t('pages.acceptDiscount.title'),
-                  path: ROUTES.ACCEPT_DISCOUNT,
+                  path: generatePath(ROUTES.ACCEPT_DISCOUNT, {initiativeId: initiativeId}),
                 },
                 {
                   label: t('pages.acceptDiscount.summary'),
-                  path: ROUTES.ACCEPT_DISCOUNT_SUMMARY,
+                  path: generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, {initiativeId: initiativeId}),
                 },
               ]}
             />
