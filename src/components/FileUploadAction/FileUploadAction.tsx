@@ -47,9 +47,14 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   docNumberLabel,
   styleClass,
 }) => {
+  const { trxId, fileDocNumber, initiativeId } = useParams<{
+    trxId: string;
+    fileDocNumber: string;
+    initiativeId: string
+  }>();
   const [file, setFile] = useState<File | null>(null);
   const [requiredFileError, setRequiredFileError] = useState<boolean>(false);
-  const [docNumber, setDocNumber] = useState<string>('');
+  const [docNumber, setDocNumber] = useState<string>(fileDocNumber);
   const [docNumberError, setDocNumberError] = useState<boolean>(false);
   const [fileSizeError, setFileSizeError] = useState<boolean>(false);
   const [fileTypeError, setFileTypeError] = useState<boolean>(false);
@@ -58,17 +63,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { trxId, fileDocNumber, initiativeId } = useParams<{
-    trxId: string;
-    fileDocNumber: string;
-    initiativeId: string
-  }>();
-
-  useEffect(() => {
-    if (fileDocNumber) {
-      setDocNumber(atob(fileDocNumber));
-    }
-  }, [fileDocNumber]);
 
   useEffect(() => {
     if (errorAlert) {
@@ -161,7 +155,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           backLabel={t('commons.exitBtn')}
           items={[
             { label: breadcrumbsProp?.label, path: breadcrumbsProp?.path },
-            { label: breadcrumbsLabelKey, path: generatePath(ROUTES.REVERSE, {initiativeId: initiativeId, trxId: trxId}) },
+            { label: breadcrumbsLabelKey, path: generatePath(ROUTES.REVERSE, { initiativeId: initiativeId, trxId: trxId }) },
           ]}
           active={true}
           onClickBackButton={() => navigate(breadcrumbsProp?.path)}
