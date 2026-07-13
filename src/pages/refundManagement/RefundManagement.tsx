@@ -129,12 +129,12 @@ const RefundManagement = () => {
   );
 
   const handleReverseTransaction = useCallback(() => {
-  const replaceValuesObj = {
-    initiativeId: initiativeId,
-    trxId: selectedTransaction?.id
-  }
+    const replaceValuesObj = {
+      initiativeId: initiativeId,
+      trxId: selectedTransaction?.id
+    }
     navigate(generatePath(ROUTES.REVERSE, replaceValuesObj), {
-      state: { backTo: generatePath(ROUTES.REFUNDS_MANAGEMENT, {initiativeId: initiativeId}) },
+      state: { backTo: generatePath(ROUTES.REFUNDS_MANAGEMENT, { initiativeId: initiativeId }) },
     });
   }, [initiativeId, navigate, selectedTransaction?.id]);
 
@@ -265,12 +265,14 @@ const RefundManagement = () => {
           primaryButton={{
             label: 'Modifica documento',
             disabled: isDisabledModDocButton,
-            onClick: () =>
-              navigate(
-                `/modifica-documento/${selectedTransaction?.id}/${btoa(
-                  selectedTransaction['Numero fattura']
-                )}`
-              ),
+            onClick: () => {
+              const replaceValuesObj = {
+                initiativeId: initiativeId,
+                trxId: selectedTransaction?.id,
+                fileDocNumber: btoa(selectedTransaction['Numero fattura']) || ''
+              }
+              navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
+            },
           }}
           secondaryButton={
             invoiceStatus === 'INVOICED' || invoiceStatus === 'REWARDED'

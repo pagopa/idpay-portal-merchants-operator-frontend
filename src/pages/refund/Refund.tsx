@@ -3,9 +3,11 @@ import { invoiceTransactionApi } from '../../services/merchantService';
 import FileUploadAction from '../../components/FileUploadAction/FileUploadAction';
 import styles from '../reverse/reverse.module.css';
 import ROUTES from '../../routes.ts';
+import { generatePath, useParams } from 'react-router-dom';
 
 const Refund = () => {
   const { t } = useTranslation();
+  const {initiativeId} = useParams()
 
   return (
     <FileUploadAction
@@ -17,7 +19,7 @@ const Refund = () => {
       breadcrumbsLabelKey={t('routes.refund')}
       breadcrumbsProp={{
         label: t('routes.buyManagement'),
-        path: ROUTES.BUY_MANAGEMENT,
+        path: generatePath(ROUTES.BUY_MANAGEMENT, {initiativeId: initiativeId}),
       }}
       manualLink={import.meta.env.VITE_MANUAL_LINK}
       styleClass={styles.uploadFileContainer}

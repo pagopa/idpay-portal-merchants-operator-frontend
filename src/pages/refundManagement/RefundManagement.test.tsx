@@ -301,7 +301,7 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('open-invoiced'));
     fireEvent.click(screen.getByTestId('primary-button'));
 
-    expect(navigateMock).toHaveBeenCalledWith(`/modifica-documento/trx-invoiced/${btoa('123')}`);
+    expect(navigateMock).toHaveBeenCalledWith(`/Init-1/modifica-documento/trx-invoiced/${btoa('123')}`);
   });
 
   it('navigates to modify document with btoa-encoded doc number for CANCELLED (covers cancelled label path)', () => {
@@ -310,7 +310,7 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('primary-button'));
 
     expect(navigateMock).toHaveBeenCalledWith(
-      `/modifica-documento/trx-cancelled/${btoa(String(undefined))}`
+      `/Init-1/modifica-documento/trx-cancelled/${btoa(String(undefined))}`
     );
   });
 

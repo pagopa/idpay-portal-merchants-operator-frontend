@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ROUTES from '../../routes';
 import Refund from './Refund';
+import { useParams } from 'react-router-dom';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -22,6 +23,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => navigateMock,
+    useParams: () => ({initiativeId: 'init-1', trxId: 'trx-1'})
   };
 });
 
@@ -48,6 +50,6 @@ describe('Refund component', () => {
     render(<Refund />);
     fireEvent.click(screen.getByText('Esci'));
 
-    expect(navigateMock).toHaveBeenCalledWith(ROUTES.BUY_MANAGEMENT);
+    expect(navigateMock).toHaveBeenCalledWith('/init-1/gestione-acquisti');
   });
 });

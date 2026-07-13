@@ -14,7 +14,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ trxId: 'test-transaction-123' }),
+    useParams: () => ({ initiativeId: 'init-1', trxId: 'test-transaction-123' }),
     useLocation: vi.fn(() => ({ pathname: '' })),
   };
 });
