@@ -67,8 +67,8 @@
                             }
                         },
                         {
-                            "field": "spendingPeriod",
-                            "headerName": "commons.pages.initiativesList.tableHeaders.spendingPeriod",
+                            "field": "onboardingDate",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.onboardingDate",
                             "flex": 1,
                             "sortable": true,
                             "disableColumnMenu": true,

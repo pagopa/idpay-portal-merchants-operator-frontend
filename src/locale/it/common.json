@@ -54,7 +54,8 @@
         "tableHeaders": {
           "initiativeName": "Nome",
           "organizationName": "Creata da",
-          "spendingPeriod": "Periodo di Validità",
+          "spendingPeriod": "Periodo di validità",
+          "onboardingDate": "Data di adesione",
           "status": "Stato"
         }
       }
