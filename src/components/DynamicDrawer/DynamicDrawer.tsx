@@ -41,8 +41,9 @@ export default function DynamicDrawer({
   const { t } = useScopedTranslation()
 
   const mappedFields = useMemo( () => fieldsDef.map(({ cell, ...field }) => {
-    const fieldsConfig = renderFields()
-    return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[cell?.type] }
+    const {type, tooltip, bold} = cell
+    const fieldsConfig = renderFields({tooltip, bold})
+    return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[type] }
   }), [fieldsDef, t])
 
   const normalizedFields = useMemo(() => normalizeObj(fieldsValues), [fieldsValues]);

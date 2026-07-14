@@ -12,8 +12,15 @@ const actionIcons = {
     arrow: <ChevronRightIcon color="primary" fontSize="inherit" />
 }
 
-export const renderFields = (tooltip?: boolean) => ({
-    text: (params) => <Box display="flex" alignItems="center" height="100%">{renderText(params.value, tooltip)}</Box>,
+type Props = {
+    tooltip?: boolean,
+    bold?: boolean
+}
+
+export const renderFields = ({tooltip, bold}: Props) => ({
+    text: (params) => <Box display="flex" alignItems="center" height="100%">
+        {renderText(params.value, tooltip, bold)}
+        </Box>,
     navigation: (params) =>
         <Box display="flex" alignItems="center" height="100%">
             <NavigationLink

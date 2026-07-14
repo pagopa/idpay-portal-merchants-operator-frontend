@@ -84,7 +84,7 @@ describe('DynamicTable Component', () => {
         expect(screen.getByText('table.id')).toBeInTheDocument();
         expect(screen.getByText('table.name')).toBeInTheDocument();
 
-        expect(renderFields).toHaveBeenCalledWith(true);
-        expect(renderFields).toHaveBeenCalledWith(undefined);
+        expect(renderFields).toHaveBeenCalledWith({tooltip: true});
+        expect(renderFields).toHaveBeenCalledWith({tooltip: undefined});
     });
 });

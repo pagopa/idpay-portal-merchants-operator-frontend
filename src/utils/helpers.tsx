@@ -3,28 +3,26 @@ import { MISSING_DATA_PLACEHOLDER } from './constants';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import { theme } from '@pagopa/mui-italia';
 
-export const renderText = (text: string, tooltip?: boolean) => {
-  return tooltip ? <Tooltip title={text || MISSING_DATA_PLACEHOLDER}>
-    <Typography
-      sx={{
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {text || MISSING_DATA_PLACEHOLDER}
-    </Typography>
-  </Tooltip> :
+export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
+  const sx = {
+    ...(tooltip ? {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    } : {
+      wordWrap: "break-word",
+      maxWidth: "100%"
+    }),
+    ...(bold || !text ? { fontWeight: theme.typography.fontWeightMedium } : {}),
+  }
+  return <Tooltip title={tooltip ? text || MISSING_DATA_PLACEHOLDER : ''}>
     <Typography
       variant="body2"
-      sx={{
-        fontWeight: theme.typography.fontWeightMedium,
-        wordWrap: "break-word",
-        maxWidth: "100%"
-      }}
+      sx={sx}
     >
       {text || MISSING_DATA_PLACEHOLDER}
     </Typography>
+  </Tooltip>
 }
 
 export function getStatusChip(t: any, status: string) {
