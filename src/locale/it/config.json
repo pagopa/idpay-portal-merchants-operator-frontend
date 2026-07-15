@@ -74,7 +74,7 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "text",
+                                "type": "date",
                                 "tooltip": true
                             }
                         },

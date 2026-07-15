@@ -86,6 +86,24 @@ export function formatEuro(value: number) {
   );
 }
 
+export const formatDate = (
+  value: string | number | Date,
+  locale: string = 'it-IT',
+  options: Intl.DateTimeFormatOptions = {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+) => {
+  if(!value) return;
+  const formattedDate = new Date(value)
+    .toLocaleDateString(locale, options)
+    .replace(',', '');
+  return formattedDate;
+};
+
 export function filterInputWithSpaceRule(value: string): string {
   const alnumCount = (value.match(/[a-zA-Z0-9]/g) || []).length;
   if (alnumCount < 5) {
@@ -237,21 +255,12 @@ export const checkEuroTooltip = (params: GridRenderCellParams) => {
 
 export const checkDateTooltip = (
   params: GridRenderCellParams,
-  locale: string = 'it-IT',
-  options: Intl.DateTimeFormatOptions = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }
-) => {
+  locale?: string,
+  options?: Intl.DateTimeFormatOptions) => {
   if (!params?.value) {
     return renderMissingDataWithTooltip();
   }
-  const formattedDate = new Date(params.value as string | number | Date)
-    .toLocaleDateString(locale, options)
-    .replace(',', '');
+  const formattedDate = formatDate(params.value, locale, options);
   return renderCellWithTooltip(formattedDate);
 };
 
