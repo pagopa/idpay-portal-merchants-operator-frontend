@@ -67,8 +67,8 @@
                             }
                         },
                         {
-                            "field": "spendingPeriod",
-                            "headerName": "commons.pages.initiativesList.tableHeaders.spendingPeriod",
+                            "field": "createdAt",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.createdAt",
                             "flex": 1,
                             "sortable": true,
                             "disableColumnMenu": true,
