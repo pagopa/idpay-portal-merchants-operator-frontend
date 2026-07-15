@@ -15,7 +15,7 @@ export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
     }),
     ...(bold || !text ? { fontWeight: theme.typography.fontWeightMedium } : {}),
   }
-  return <Tooltip title={tooltip ? text || MISSING_DATA_PLACEHOLDER : ''}>
+  return <Tooltip title={tooltip && (text || MISSING_DATA_PLACEHOLDER)}>
     <Typography
       variant="body2"
       sx={sx}
