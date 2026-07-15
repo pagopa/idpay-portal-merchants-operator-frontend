@@ -29,8 +29,9 @@ export const DynamicTable = ({
     const ref = useRef(false)
 
     const mappedColumns = useMemo(() => columnsDef.map(({ cell, ...column }) => {
-        const fieldConfig = renderFields(cell?.tooltip)
-        return { ...column, headerName: t(column.headerName), renderCell: fieldConfig[cell?.type] }
+        const {type, tooltip} = cell
+        const fieldConfig = renderFields({tooltip})
+        return { ...column, headerName: t(column.headerName), renderCell: fieldConfig[type] }
     }), [columnsDef, t])
 
     const tableStyle = useMemo(() => ({

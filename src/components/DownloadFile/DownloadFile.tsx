@@ -11,55 +11,67 @@ type Props = {
 }
 
 export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props) => {
-    return (text ?
-        <Button
-            data-testid="btn-test"
-            sx={{
-                padding: "0",
-                alignItems: "flex-start",
-            }}
-            onClick={onClick}
-        >
-            {isLoading ? (
-                <CircularProgress
-                    color="inherit"
-                    size={20}
-                    data-testid="item-loader"
-                />
-            ) : (
-                <Box
-                    display="flex"
-                    alignItems="start"
-                    textAlign="left"
-                    columnGap={6}
-                    width="100%"
-                    marginTop={2}
+    const sx = {
+        ...(tooltip ? {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+        } : {
+            wordWrap: "break-word",
+            maxWidth: "100%"
+        }),
+    }
+    return (
+        <Tooltip title={tooltip && (text || MISSING_DATA_PLACEHOLDER)}>
+            {text ?
+                <Button
+                    data-testid="btn-test"
+                    sx={{
+                        padding: "0",
+                        alignItems: "flex-start",
+                    }}
+                    onClick={onClick}
                 >
-                    {icon}
-                    <Typography
-                        component="span"
-                        variant="inherit"
-                        sx={{
-                            whiteSpace: "normal",
-                            wordBreak: "break-word",
-                            lineHeight: 1.4,
-                        }}
-                    >
-                        {text}
-                    </Typography>
-                </Box>
-            )}
-        </Button> :
-        <Tooltip title={tooltip && MISSING_DATA_PLACEHOLDER}>
-            <Typography
-                sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                }}
-            >
-                {MISSING_DATA_PLACEHOLDER}
-            </Typography>
+                    {isLoading ? (
+                        <CircularProgress
+                            color="inherit"
+                            size={20}
+                            data-testid="item-loader"
+                        />
+                    ) : (
+                        <Box
+                            display="flex"
+                            alignItems="start"
+                            textAlign="left"
+                            columnGap={6}
+                            width="100%"
+                            marginTop={2}
+                        >
+                            {icon}
+                            <Typography
+                                component="span"
+                                variant="inherit"
+                                sx={{
+                                    whiteSpace: "normal",
+                                    lineHeight: 1.4,
+                                    ...sx
+                                }}
+                            >
+                                {text}
+                            </Typography>
+                        </Box>
+                    )}
+                </Button> :
+                <Typography
+                    sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
+                    {MISSING_DATA_PLACEHOLDER}
+                </Typography>
+            }
         </Tooltip>
     )
 }
