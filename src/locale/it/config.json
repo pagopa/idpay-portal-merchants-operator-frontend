@@ -75,7 +75,12 @@
                             "resizable": false,
                             "cell": {
                                 "type": "date",
-                                "tooltip": true
+                                "tooltip": true,
+                                "options": {
+                                    "day": "2-digit",
+                                    "month": "2-digit",
+                                    "year": "numeric"
+                                }
                             }
                         },
                         {

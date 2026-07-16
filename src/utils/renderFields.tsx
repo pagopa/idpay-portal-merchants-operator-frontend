@@ -15,15 +15,16 @@ const actionIcons = {
 type Props = {
     tooltip?: boolean,
     bold?: boolean
+    options?: Record<string, string>
 }
 
-export const renderFields = ({tooltip, bold}: Props) => ({
+export const renderFields = ({ tooltip, bold, options }: Props) => ({
     text: (params) => <Box display="flex" alignItems="center" height="100%">
         {renderText(params.value, tooltip, bold)}
-        </Box>,
+    </Box>,
     date: (params) => <Box display="flex" alignItems="center" height="100%">
-        {renderText(formatDate(params.value), tooltip, bold)}
-        </Box>,
+        {renderText(formatDate(params.value, {options}), tooltip, bold)}
+    </Box>,
     navigation: (params) =>
         <Box display="flex" alignItems="center" height="100%">
             <NavigationLink
