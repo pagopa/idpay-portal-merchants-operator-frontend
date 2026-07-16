@@ -67,15 +67,20 @@
                             }
                         },
                         {
-                            "field": "spendingPeriod",
-                            "headerName": "commons.pages.initiativesList.tableHeaders.spendingPeriod",
+                            "field": "createdAt",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.createdAt",
                             "flex": 1,
                             "sortable": true,
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "text",
-                                "tooltip": true
+                                "type": "date",
+                                "tooltip": true,
+                                "options": {
+                                    "day": "2-digit",
+                                    "month": "2-digit",
+                                    "year": "numeric"
+                                }
                             }
                         },
                         {

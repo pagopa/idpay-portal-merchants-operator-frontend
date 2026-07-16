@@ -42,63 +42,81 @@
                     "field": "eprelCode",
                     "headerName": "pages.products.drawer.eprelCode",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "gtinCode",
                     "headerName": "pages.products.drawer.gtinCode",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "productCode",
                     "headerName": "pages.products.drawer.productCode",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "category",
                     "headerName": "pages.products.drawer.category",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "brand",
                     "headerName": "pages.products.drawer.brand",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "model",
                     "headerName": "pages.products.drawer.model",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "capacity",
                     "headerName": "pages.products.drawer.capacity",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "energyClass",
                     "headerName": "pages.products.drawer.energyClass",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 },
                 {
                     "field": "countryOfProduction",
                     "headerName": "pages.products.drawer.countryOfProduction",
                     "cell": {
-                        "type": "text"
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
                     }
                 }
             ],

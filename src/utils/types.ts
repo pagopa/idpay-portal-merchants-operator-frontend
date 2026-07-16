@@ -105,7 +105,12 @@ export interface transactionInProgreessDTO {
   updateDate: string;
 }
 
-export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: {type: string, tooltip?: boolean} }
+export type FormatDateProps = {
+  locale?: string,
+  options?: Record<string, string>
+}
+
+export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: {type: string, tooltip?: boolean, bold?: boolean} }
 
 export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>
 
