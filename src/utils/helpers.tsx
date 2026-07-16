@@ -2,6 +2,7 @@ import { Chip, Tooltip, Typography } from '@mui/material';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import { theme } from '@pagopa/mui-italia';
+import { FormatDateProps } from './types';
 
 export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
   const sx = {
@@ -85,6 +86,26 @@ export function formatEuro(value: number) {
     }) + '€'
   );
 }
+
+export const formatDate = (
+  value: string | number | Date,
+  props: FormatDateProps = {
+    locale: 'it-IT',
+    options: {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }
+  }
+) => {
+  if (!value) return;
+  const formattedDate = new Date(value)
+    .toLocaleDateString(props.locale, props.options)
+    .replace(',', '');
+  return formattedDate;
+};
 
 export function filterInputWithSpaceRule(value: string): string {
   const alnumCount = (value.match(/[a-zA-Z0-9]/g) || []).length;
@@ -237,21 +258,11 @@ export const checkEuroTooltip = (params: GridRenderCellParams) => {
 
 export const checkDateTooltip = (
   params: GridRenderCellParams,
-  locale: string = 'it-IT',
-  options: Intl.DateTimeFormatOptions = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }
-) => {
+  props?: FormatDateProps) => {
   if (!params?.value) {
     return renderMissingDataWithTooltip();
   }
-  const formattedDate = new Date(params.value as string | number | Date)
-    .toLocaleDateString(locale, options)
-    .replace(',', '');
+  const formattedDate = formatDate(params.value, props);
   return renderCellWithTooltip(formattedDate);
 };
 

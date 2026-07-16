@@ -74,8 +74,13 @@
                             "disableColumnMenu": true,
                             "resizable": false,
                             "cell": {
-                                "type": "text",
-                                "tooltip": true
+                                "type": "date",
+                                "tooltip": true,
+                                "options": {
+                                    "day": "2-digit",
+                                    "month": "2-digit",
+                                    "year": "numeric"
+                                }
                             }
                         },
                         {

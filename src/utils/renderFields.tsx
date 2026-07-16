@@ -1,7 +1,7 @@
 import { DownloadFile } from "../components/DownloadFile/DownloadFile";
 import { NavigationLink } from "../components/NavigationLink/NavigationLink";
 import { StatusChip } from "../components/StatusChip/StatusChip";
-import { renderText } from "./helpers";
+import { formatDate, renderText } from "./helpers";
 import { Box, IconButton } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -15,12 +15,16 @@ const actionIcons = {
 type Props = {
     tooltip?: boolean,
     bold?: boolean
+    options?: Record<string, string>
 }
 
-export const renderFields = ({tooltip, bold}: Props) => ({
+export const renderFields = ({ tooltip, bold, options }: Props) => ({
     text: (params) => <Box display="flex" alignItems="center" height="100%">
         {renderText(params.value, tooltip, bold)}
-        </Box>,
+    </Box>,
+    date: (params) => <Box display="flex" alignItems="center" height="100%">
+        {renderText(formatDate(params.value, {options}), tooltip, bold)}
+    </Box>,
     navigation: (params) =>
         <Box display="flex" alignItems="center" height="100%">
             <NavigationLink
