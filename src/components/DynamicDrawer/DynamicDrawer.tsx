@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import { Button, ButtonProps, Divider, IconButton, Typography } from '@mui/material';
+import { Button, ButtonProps, Divider, IconButton, Tooltip, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { theme } from '@pagopa/mui-italia';
 import { FieldConfigDef } from '../../utils/types';
@@ -40,9 +40,9 @@ export default function DynamicDrawer({
 }: DynamicDrawerProps) {
   const { t } = useScopedTranslation()
 
-  const mappedFields = useMemo( () => fieldsDef.map(({ cell, ...field }) => {
-    const {type, tooltip, bold} = cell
-    const fieldsConfig = renderFields({tooltip, bold})
+  const mappedFields = useMemo(() => fieldsDef.map(({ cell, ...field }) => {
+    const { type, tooltip, bold } = cell
+    const fieldsConfig = renderFields({ tooltip, bold })
     return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[type] }
   }), [fieldsDef, t])
 
@@ -77,7 +77,18 @@ export default function DynamicDrawer({
             width="100%"
             rowGap="1rem"
           >
-            <Typography variant="h6" sx={{ wordWrap: "break-word" }}>{title}</Typography>
+            <Tooltip title={title || ''}>
+              <Box sx={{
+                display: "-webkit-box",
+                "-webkit-line-clamp": "2",
+                "-webkit-box-orient": "vertical",
+                overflow: "hidden",
+                whiteSpace: "normal",
+                wordBreak: "break-word"
+              }}>
+                <Typography variant="h6">{title}</Typography>
+              </Box>
+            </Tooltip>
             {subtitle &&
               <>
                 <Divider />
