@@ -2641,6 +2641,10 @@ components:
           type: string
           format: date-time
           description: "ENG: Last update date of the link <br> IT: Data di ultimo aggiornamento dell'associazione"
+        onboardingDate:
+          type: string
+          format: date-time
+          description: "ENG: Last onboarding date <br> IT: Data ultimo adesione all'iniziativa"
   securitySchemes:
     Bearer:
       type: apiKey
