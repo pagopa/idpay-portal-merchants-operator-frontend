@@ -55,7 +55,7 @@
           "initiativeName": "Nome",
           "organizationName": "Creata da",
           "spendingPeriod": "Periodo di validità",
-          "createdAt": "Data di adesione",
+          "onboardingDate": "Data di adesione",
           "status": "Stato"
         }
       }
