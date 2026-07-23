@@ -29,8 +29,8 @@ export const DynamicTable = ({
     const ref = useRef(false)
 
     const mappedColumns = useMemo(() => columnsDef.map(({ cell, ...column }) => {
-        const {type, tooltip} = cell
-        const fieldConfig = renderFields({tooltip})
+        const { type, tooltip } = cell
+        const fieldConfig = renderFields({ tooltip })
         return { ...column, headerName: t(column.headerName), renderCell: fieldConfig[type] }
     }), [columnsDef, t])
 
@@ -101,13 +101,14 @@ export const DynamicTable = ({
             </Paper> :
             <DataGrid
                 {...props}
+                slotProps={{baseIconButton: { title: "" }}}
                 onSortModelChange={(model, details) => {
                     ref.current = true
                     onSortModelChange(model, details)
                     setTimeout(() => ref.current = false, 0)
                 }}
                 onPaginationModelChange={(model, details) => {
-                    if(ref.current) return
+                    if (ref.current) return
                     onPaginationModelChange(model, details)
                 }}
                 columns={mappedColumns}
@@ -115,6 +116,7 @@ export const DynamicTable = ({
                 sortingOrder={['asc', 'desc']}
                 sx={{ ...tableStyle, ...sx }}
                 localeText={{
+                    paginationItemAriaLabel: () => "",
                     footerTotalRows: 'Totale righe:',
                     paginationRowsPerPage: 'Elementi per pagina:',
                     paginationDisplayedRows: ({ from, to, count }) => {
