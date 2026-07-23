@@ -47,10 +47,10 @@ export const MerchantApi = {
     discountCode: string;
   }): Promise<PreviewPaymentDTO> => {
     applySecurity();
-    const response = await initiativesApi.previewPayment(initiativeId, params.discountCode, {
-      productGtin: params.productGtin,
-      productName: params.productName,
-      amountCents: params.amountCents,
+    const response = await initiativesApi.previewPayment(initiativeId, params?.discountCode, {
+      productGtin: params?.productGtin,
+      productName: params?.productName,
+      amountCents: params?.amountCents,
     });
     return response.data;
   },
@@ -65,18 +65,18 @@ export const MerchantApi = {
     applySecurity();
 
     const payload: AuthBarCodePaymentDTO = {
-      amountCents: params.amountCents,
-      idTrxAcquirer: params.idTrxAcquirer,
-      additionalProperties: params.additionalProperties,
+      amountCents: params?.amountCents,
+      idTrxAcquirer: params?.idTrxAcquirer,
+      additionalProperties: params?.additionalProperties,
     };
 
-    const response = await initiativesApi.authPaymentBarCode(initiativeId, params.trxCode, payload);
+    const response = await initiativesApi.authPaymentBarCode(initiativeId, params?.trxCode, payload);
     return response.data;
   },
 
   capturePayment: async (initiativeId: string, params: { trxCode: string }): Promise<TransactionBarCodeResponse> => {
     applySecurity();
-    const response = await initiativesApi.capturePayment(initiativeId, params.trxCode);
+    const response = await initiativesApi.capturePayment(initiativeId, params?.trxCode);
     return response.data;
   },
 

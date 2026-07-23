@@ -95,7 +95,7 @@ describe('SummaryAcceptDiscount', () => {
 
     fireEvent.click(screen.getByText('pages.acceptDiscount.title'));
     await waitFor(() => {
-      expect(mockAuthPayment).toHaveBeenCalledWith({
+      expect(mockAuthPayment).toHaveBeenCalledWith('Init-1', {
         trxCode: 'CODE123',
         amountCents: 1000,
         additionalProperties: { productGtin: 'GTIN' },
