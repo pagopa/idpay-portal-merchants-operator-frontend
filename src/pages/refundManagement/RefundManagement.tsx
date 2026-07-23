@@ -20,6 +20,7 @@ import ROUTES from '../../routes';
 import { authStore } from '../../store/authStore';
 import { DecodedJwtToken } from '../../utils/types';
 import { PointOfSaleTransactionProcessedDTO } from '../../api/generated/data-contracts';
+import { StatusChip } from '../../components/StatusChip/StatusChip';
 
 const formatDateTime = (value?: string) => {
   if (!value) {
@@ -227,7 +228,7 @@ const RefundManagement = () => {
       sortable: true,
       renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          {getStatusChip(t, params.value)}
+          <StatusChip context='commons.statusEnum.transaction' value={params.value.toLowerCase()}/>
         </Box>
       ),
     },

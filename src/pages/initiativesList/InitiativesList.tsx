@@ -20,7 +20,7 @@ export const InitiativesList = () => {
   const initiativesList = useAppSelector(initiativesListSelector);
   const mappedInitiativesList = useMemo(() =>
     initiativesList.map((initiative) =>
-      ({ ...initiative, key: 'initiative', route: generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiative.initiativeId }) })),
+      ({ ...initiative, route: generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiative.initiativeId }) })),
     [initiativesList])
 
   useEffect(() => {

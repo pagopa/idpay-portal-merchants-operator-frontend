@@ -110,7 +110,7 @@ export type FormatDateProps = {
   options?: Record<string, string>
 }
 
-export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: {type: string, tooltip?: boolean, bold?: boolean} }
+export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: {type: string, tooltip?: boolean, bold?: boolean, context?: string} }
 
 export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>
 
@@ -121,6 +121,7 @@ export type FilterConfigDef = {
   type: 'select' | 'text';
   label?: string;
   template?: string;
+  context?: string;
   defaultValue?: string;
   regEx?: string;
   pattern?: {value: string, flag?: string};

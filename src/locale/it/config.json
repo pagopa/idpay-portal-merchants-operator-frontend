@@ -1,5 +1,37 @@
 {
     "commons": {
+        "templates": {
+            "transactions": {
+                "purchaseStatus": [
+                    {
+                        "value": "AUTHORIZED",
+                        "label": ""
+                    },
+                    {
+                        "value": "CAPTURED",
+                        "label": ""
+                    }
+                ],
+                "refundStatus": [
+                    {
+                        "value": "CANCELLED",
+                        "label": "commons.statusEnum.transaction.cancelled"
+                    },
+                    {
+                        "value": "REFUNDED",
+                        "label": "commons.statusEnum.transaction.refunded"
+                    },
+                    {
+                        "value": "REWARDED",
+                        "label": "commons.statusEnum.transaction.rewarded"
+                    },
+                    {
+                        "value": "INVOICED",
+                        "label": "commons.statusEnum.transaction.invoiced"
+                    }
+                ]
+            }
+        },
         "statusEnum": {
             "initiative": {
                 "closed": {
@@ -12,6 +44,14 @@
                 }
             },
             "transaction": {
+                "authorized": {
+                    "label": "commons.statusEnum.transaction.authorized",
+                    "color": "default"
+                },
+                "captured": {
+                    "label": "commons.statusEnum.transaction.captured",
+                    "color": "warning"
+                },
                 "cancelled": {
                     "label": "commons.statusEnum.transaction.cancelled",
                     "color": "error"
@@ -27,14 +67,6 @@
                 "invoiced": {
                     "label": "commons.statusEnum.transaction.invoiced",
                     "color": "info"
-                },
-                "authorized": {
-                    "label": "commons.statusEnum.transaction.authorized",
-                    "color": "default"
-                },
-                "captured": {
-                    "label": "commons.statusEnum.transaction.captured",
-                    "color": "warning"
                 }
             }
         },
@@ -92,7 +124,8 @@
                             "resizable": false,
                             "cell": {
                                 "type": "chip",
-                                "tooltip": true
+                                "tooltip": true,
+                                "context": "commons.statusEnum.initiative"
                             }
                         }
                     ]

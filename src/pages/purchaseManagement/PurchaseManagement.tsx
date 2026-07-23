@@ -172,7 +172,7 @@ const PurchaseManagement = () => {
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <StatusChip field='transaction' value={params.value.toLowerCase()}/>
+            <StatusChip context='commons.statusEnum.transaction' value={params.value.toLowerCase()}/>
           </Box>
         );
       },

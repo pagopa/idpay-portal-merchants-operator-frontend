@@ -189,6 +189,108 @@
                     }
                 ]
             }
+        },
+        "purchaseManagement": {
+            "drawer": [
+                {
+                    "field": "trxChargeDate",
+                    "headerName": "pages.purchaseManagement.drawer.trxDate",
+                    "cell": {
+                        "type": "date",
+                        "tooltip": true,
+                        "bold": true,
+                        "options": {
+                            "day": "2-digit",
+                            "month": "2-digit",
+                            "year": "numeric",
+                            "hour": "2-digit",
+                            "minute": "2-digit"
+                        }
+                    }
+                },
+                {
+                    "field": "additionalProperties.productName",
+                    "headerName": "pages.purchaseManagement.drawer.householdAppliance",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "fiscalCode",
+                    "headerName": "pages.purchaseManagement.drawer.fiscalCode",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "id",
+                    "headerName": "pages.purchaseManagement.drawer.transactionId",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "trxCode",
+                    "headerName": "pages.purchaseManagement.drawer.trxCode",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "effectiveAmountCents",
+                    "headerName": "pages.purchaseManagement.drawer.totalAmount",
+                    "cell": {
+                        "type": "euro",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "rewardAmountCents",
+                    "headerName": "pages.purchaseManagement.drawer.rewardAmount",
+                    "cell": {
+                        "type": "euro",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "residualAmountCents",
+                    "headerName": "pages.purchaseManagement.drawer.authorizedAmount",
+                    "cell": {
+                        "type": "euro",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "status",
+                    "headerName": "pages.purchaseManagement.drawer.status",
+                    "cell": {
+                        "type": "chip",
+                        "tooltip": true,
+                        "bold": true,
+                        "context": "commons.statusEnum.transaction.purchase"
+                    }
+                },
+                {
+                    "field": "trxCode",
+                    "headerName": "pages.purchaseManagement.drawer.document",
+                    "cell": {
+                        "type": "download",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                }
+            ]
         }
     }
 }

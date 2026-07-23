@@ -1,7 +1,7 @@
 import { DownloadFile } from "../components/DownloadFile/DownloadFile";
 import { NavigationLink } from "../components/NavigationLink/NavigationLink";
 import { StatusChip } from "../components/StatusChip/StatusChip";
-import { formatDate, renderText } from "./helpers";
+import { formatDate, formatEuro, renderText } from "./helpers";
 import { Box, IconButton } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -16,14 +16,18 @@ type Props = {
     tooltip?: boolean,
     bold?: boolean
     options?: Record<string, string>
+    context?: string
 }
 
-export const renderFields = ({ tooltip, bold, options }: Props) => ({
+export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
     text: (params) => <Box display="flex" alignItems="center" height="100%">
         {renderText(params.value, tooltip, bold)}
     </Box>,
     date: (params) => <Box display="flex" alignItems="center" height="100%">
         {renderText(formatDate(params.value, {options}), tooltip, bold)}
+    </Box>,
+    euro: (params) => <Box display="flex" alignItems="center" height="100%">
+        {renderText(formatEuro(params.value), tooltip, bold)}
     </Box>,
     navigation: (params) =>
         <Box display="flex" alignItems="center" height="100%">
@@ -39,7 +43,7 @@ export const renderFields = ({ tooltip, bold, options }: Props) => ({
         </Box>,
     chip: (params) =>
         <Box display="flex" alignItems="center" height="100%">
-            <StatusChip tooltip={tooltip} field={params?.row?.key} value={params?.value?.toLowerCase()} />
+            <StatusChip tooltip={tooltip} context={context} value={params?.value?.toLowerCase()} />
         </Box>,
     download: (params) =>
         <Box display="flex" alignItems="center" height="100%">
