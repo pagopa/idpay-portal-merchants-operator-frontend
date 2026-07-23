@@ -103,7 +103,7 @@ const AcceptDiscount = () => {
     if (isValid) {
       setPreviewIsLoading(true);
       try {
-        const response = await previewPayment({
+        const response = await previewPayment(initiativeId, {
           productGtin: formData.product!.gtinCode!,
           productName: formData.product!.productName!,
           amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100),

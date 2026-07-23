@@ -45,7 +45,7 @@ const SummaryAcceptDiscount = () => {
   const handleAuthorizeDiscount = async () => {
     setAuthorizeIsLoading(true);
     try {
-      await authPaymentBarCode({
+      await authPaymentBarCode(initiativeId, {
         trxCode: summaryDataObj?.trxCode,
         amountCents: summaryDataObj?.originalAmountCents,
         additionalProperties: {

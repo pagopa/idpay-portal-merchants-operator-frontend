@@ -21,7 +21,7 @@ tags:
   - name: point-of-sales
     description: Operations on merchant points of sale
 paths:
-  /transactions/bar-code/{trxCode}/capture:
+  /initiatives/{initiativeId}/transactions/bar-code/{trxCode}/capture:
     put:
       tags:
         - transaction
@@ -29,6 +29,14 @@ paths:
       description: Capture the transaction
       operationId: capturePayment
       parameters:
+        - name: initiativeId
+          in: path
+          description: "ENG: The initiative's id - IT: Id dell'iniziativa"
+          required: true
+          schema:
+            type: string
+            maxLength: 24
+            pattern: "^[A-Za-z0-9_-]+$"
         - name: trxCode
           in: path
           description: "ENG: The transaction's code - IT: Codice della transazione"
@@ -142,7 +150,7 @@ paths:
               example:
                 code: "PAYMENT_GENERIC_ERROR"
                 message: "Application error"
-  /transactions/bar-code/{trxCode}/preview:
+  /initiatives/{initiativeId}/transactions/bar-code/{trxCode}/preview:
     put:
       tags:
         - transaction
@@ -169,6 +177,14 @@ paths:
           - schema response di riferimento: `PreviewPaymentResponseV2DTO`
       operationId: previewPayment
       parameters:
+        - name: initiativeId
+          in: path
+          description: "ENG: The initiative's id - IT: Id dell'iniziativa"
+          required: true
+          schema:
+            type: string
+            maxLength: 24
+            pattern: "^[A-Za-z0-9_-]+$"
         - name: trxCode
           in: path
           description: "ENG: The transaction's code - IT: Codice della transazione"
@@ -400,7 +416,7 @@ paths:
           $ref: '#/components/responses/GET_products_429_Response'
         '500':
           $ref: '#/components/responses/GET_products_500_Response'
-  /transactions/bar-code/{trxCode}/authorize:
+  /initiatives/{initiativeId}/transactions/bar-code/{trxCode}/authorize:
     put:
       tags:
         - transaction
@@ -408,6 +424,14 @@ paths:
       description: "ENG: Authorize payment <br> IT: Autorizzazione pagamento"
       operationId: authPaymentBarCode
       parameters:
+        - name: initiativeId
+          in: path
+          description: "ENG: The transaction's code - IT: Codice della transazione"
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+            pattern: "^[a-zA-Z0-9]+$"
         - name: trxCode
           in: path
           description: "ENG: The transaction's code - IT: Codice della transazione"
@@ -634,7 +658,7 @@ paths:
           $ref: "#/components/responses/GET_download_invoice_file_429_Response"
         "500":
           $ref: "#/components/responses/GET_download_invoice_file_500_Response"
-  /transactions/{transactionId}:
+  /initiatives/{initiativeId}/transactions/{transactionId}:
     delete:
       tags:
         - transaction
@@ -642,6 +666,14 @@ paths:
       operationId: deleteTransaction
       description: "ENG: Delete a transaction associated to a point of sale - IT: Elimina una transazione associata ad un punto vendita"
       parameters:
+        - name: initiativeId
+          in: path
+          description: "ENG: The initiative's id - IT: Id dell'iniziativa"
+          required: true
+          schema:
+            type: string
+            maxLength: 24
+            pattern: "^[A-Za-z0-9_-]+$"
         - name: transactionId
           in: path
           description: The transaction ID

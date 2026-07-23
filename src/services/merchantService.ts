@@ -15,23 +15,25 @@ export const getInitiativeProductsList = async (initiativeId: string, params: Ge
   return response;
 };
 
-export const previewPayment = async (params: {
+export const previewPayment = async (initiativeId: string,
+  params: {
   productGtin: string;
   productName: string;
   amountCents: number;
   discountCode: string;
 }): Promise<PreviewPaymentDTO> => {
-  return MerchantApi.previewPayment(params);
+  return MerchantApi.previewPayment(initiativeId, params);
 };
 
-export const authPaymentBarCode = async (params: {
+export const authPaymentBarCode = async (initiativeId: string,
+  params: {
   trxCode: string;
   amountCents: number;
   additionalProperties?: Record<string, string>;
 }): Promise<AuthPaymentResponseDTO> => {
   const idTrxAcquirer = crypto.randomUUID();
 
-  return MerchantApi.authPaymentBarCode({
+  return MerchantApi.authPaymentBarCode(initiativeId, {
     trxCode: params.trxCode,
     amountCents: params.amountCents,
     idTrxAcquirer,
@@ -39,14 +41,15 @@ export const authPaymentBarCode = async (params: {
   });
 };
 
-export const capturePayment = async (params: {
+export const capturePayment = async (initiativeId: string,
+  params: {
   trxCode: string;
 }): Promise<TransactionBarCodeResponse> => {
-  return MerchantApi.capturePayment(params);
+  return MerchantApi.capturePayment(initiativeId, params);
 };
 
-export const deleteTransactionInProgress = async (trxId: string): Promise<void> => {
-  return MerchantApi.deleteTransactionInProgress(trxId);
+export const deleteTransactionInProgress = async (initiativeId: string, trxId: string): Promise<void> => {
+  return MerchantApi.deleteTransactionInProgress(initiativeId, trxId);
 };
 
 export const getProcessedTransactions = async (
