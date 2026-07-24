@@ -48,10 +48,13 @@ export const MerchantApi = {
   }): Promise<PreviewPaymentDTO> => {
     applySecurity();
     const response = await initiativesApi.previewPayment(initiativeId, params?.discountCode, {
+      additionalProperties: {
       productGtin: params?.productGtin,
       productName: params?.productName,
+      },
       amountCents: params?.amountCents,
-    });
+    }
+  );
     return response.data;
   },
 
