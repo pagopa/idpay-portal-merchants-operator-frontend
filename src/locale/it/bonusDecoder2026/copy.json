@@ -62,7 +62,7 @@
             },
             "refundTransactionModal": {
                 "title": "Storna transazione",
-                "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Elettrodomestici , mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+                "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Decoder, mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
                 "errorDeleteTransaction": "Non è stato possibile richiedere il rimborso. Riprova."
             },
             "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
@@ -70,6 +70,53 @@
             "transactionDeleteSuccess": "La transazione è stata annullata con successo.",
             "refundSuccessUpload": "Richiesta inviata correttamente",
             "reverseSuccessUpload": "Richiesta inviata correttamente"
+        },
+        "refundManagement": {
+            "title": "Storico rimborsi",
+            "subtitle": "Gestisci e verifica le transazioni e i rimborsi effettuati con il Bonus Decoder",
+            "noTransactions": "Non ci sono transazioni per questa iniziativa",
+            "errorAlert": "Non è stato possibile recuperare le transazioni. Riprova.",
+            "cancelled": "Annullato",
+            "refunded": "Stornato",
+            "rewarded": "Rimborso richiesto",
+            "invoiced": "Preso in carico",
+            "authorized": "Da autorizzare",
+            "captured": "Fattura da caricare",
+            "tableTitle": "Transazioni",
+            "refundSuccessUpload": "Richiesta inviata correttamente",
+            "reverseSuccessUpload": "Richiesta inviata correttamente",
+            "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova.",
+            "drawer": {
+                "title": "Dettaglio transazione",
+                "product": "Prodotto",
+                "totalAmount": "Totale della spesa",
+                "authorizedAmount": "Importo autorizzato",
+                "rewardAmount": "Sconto applicato",
+                "status": "Stato",
+                "fiscalCode": "Codice fiscale",
+                "trxDate": "Data e ora",
+                "brand": "Modello",
+                "category": "Categoria",
+                "confirmPayment": "Conferma pagamento",
+                "cancellPayment": "Annulla transazione",
+                "requestRefund": "Carica fattura",
+                "refund": "Storna",
+                "householdAppliance": "Prodotto",
+                "document": {
+                    "rewarded": "Fattura",
+                    "cancelled": "Nota di credito",
+                    "refunded": "Nota di credito",
+                    "invoiced": "Fattura"
+                },
+                "documentNumber": {
+                    "rewarded": "Numero fattura",
+                    "cancelled": "Numero nota di credito",
+                    "refunded": "Numero nota di credito",
+                    "invoiced": "Numero fattura"
+                },
+                "transactionId": "ID transazione",
+                "trxCode": "Codice sconto"
+            }
         },
         "products": {
             "title": "Prodotti",

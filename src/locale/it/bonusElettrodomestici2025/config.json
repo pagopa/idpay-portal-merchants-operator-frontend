@@ -242,6 +242,147 @@
             }
         },
         "purchaseManagement": {
+            "transactionsTable": {
+                "filters": [
+                    {
+                        "id": "fiscalCode",
+                        "type": "text",
+                        "label": "commons.fiscalCodeFilterPlaceholer"
+                    },
+                    {
+                        "id": "productGtin",
+                        "type": "text",
+                        "label": "commons.gtiInFilterPlaceholer",
+                        "regEx": "^[a-zA-Z0-9]{1,14}$",
+                        "message": "pages.products.filters.errors.gtinCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
+                        "inputProps": {
+                            "maxLength": 14
+                        }
+                    },
+                    {
+                        "id": "trxCode",
+                        "type": "text",
+                        "label": "commons.trxCodeFilterPlaceholer",
+                        "regEx": "^[a-zA-Z0-9]{1,8}$",
+                        "message": "pages.products.filters.errors.trxCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
+                        "inputProps": {
+                            "maxLength": 8
+                        }
+                    },
+                    {
+                        "id": "status",
+                        "type": "select",
+                        "label": "commons.statusFilterPlaceholer",
+                        "template": "commons.templates.transactions.purchaseStatus",
+                        "context": "commons.statusEnum.transaction"
+                    }
+                ],
+                "columns": [
+                    {
+                        "field": "additionalProperties.productName",
+                        "headerName": "pages.purchaseManagement.table.headers.additionalProperties",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "trxChargeDate",
+                        "headerName": "pages.purchaseManagement.table.headers.trxChargeDate",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "date",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "fiscalCode",
+                        "headerName": "pages.purchaseManagement.table.headers.fiscalCode",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "effectiveAmountCents",
+                        "headerName": "pages.purchaseManagement.table.headers.effectiveAmountCents",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "euro",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "rewardAmountCents",
+                        "headerName": "pages.purchaseManagement.table.headers.rewardAmountCents",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "euro",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "residualAmountCents",
+                        "headerName": "pages.purchaseManagement.table.headers.residualAmountCents",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "euro",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "status",
+                        "headerName": "pages.purchaseManagement.table.headers.status",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "chip",
+                            "tooltip": true,
+                            "context": "commons.statusEnum.transaction"
+                        }
+                    },
+                    {
+                        "field": "action",
+                        "sortable": false,
+                        "filterable": false,
+                        "disableColumnMenu": true,
+                        "flex": 0.5,
+                        "cell": {
+                            "type": "action"
+                        }
+                    }
+                ]
+            },
             "drawer": [
                 {
                     "field": "trxChargeDate",
@@ -329,12 +470,264 @@
                         "type": "chip",
                         "tooltip": true,
                         "bold": true,
-                        "context": "commons.statusEnum.transaction.purchase"
+                        "context": "commons.statusEnum.transaction"
                     }
                 },
                 {
                     "field": "trxCode",
                     "headerName": "pages.purchaseManagement.drawer.document",
+                    "cell": {
+                        "type": "download",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                }
+            ]
+        },
+        "refundManagement": {
+            "transactionsTable": {
+                "filters": [
+                    {
+                        "id": "fiscalCode",
+                        "type": "text",
+                        "label": "commons.fiscalCodeFilterPlaceholer"
+                    },
+                    {
+                        "id": "productGtin",
+                        "type": "text",
+                        "label": "commons.gtiInFilterPlaceholer",
+                        "regEx": "^[a-zA-Z0-9]{1,14}$",
+                        "message": "pages.products.filters.errors.gtinCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
+                        "inputProps": {
+                            "maxLength": 14
+                        }
+                    },
+                    {
+                        "id": "trxCode",
+                        "type": "text",
+                        "label": "commons.trxCodeFilterPlaceholer",
+                        "regEx": "^[a-zA-Z0-9]{1,8}$",
+                        "message": "pages.products.filters.errors.trxCode",
+                        "pattern": {
+                            "value": "\\s+",
+                            "flag": "g"
+                        },
+                        "inputProps": {
+                            "maxLength": 8
+                        }
+                    },
+                    {
+                        "id": "status",
+                        "type": "select",
+                        "label": "commons.statusFilterPlaceholer",
+                        "template": "commons.templates.transactions.refundStatus",
+                        "context": "commons.statusEnum.transaction"
+                    }
+                ],
+                "columns": [
+                    {
+                        "field": "additionalProperties.productName",
+                        "headerName": "pages.refundManagement.table.headers.additionalProperties",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "trxChargeDate",
+                        "headerName": "pages.refundManagement.table.headers.trxChargeDate",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "date",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "fiscalCode",
+                        "headerName": "pages.refundManagement.table.headers.fiscalCode",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "text",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "effectiveAmountCents",
+                        "headerName": "pages.refundManagement.table.headers.effectiveAmountCents",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "euro",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "rewardAmountCents",
+                        "headerName": "pages.refundManagement.table.headers.rewardAmountCents",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "euro",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "authorizedAmountCents",
+                        "headerName": "pages.refundManagement.table.headers.residualAmountCents",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "euro",
+                            "tooltip": true
+                        }
+                    },
+                    {
+                        "field": "status",
+                        "headerName": "pages.refundManagement.table.headers.status",
+                        "flex": 1,
+                        "sortable": true,
+                        "disableColumnMenu": true,
+                        "resizable": false,
+                        "cell": {
+                            "type": "chip",
+                            "tooltip": true,
+                            "context": "commons.statusEnum.transaction"
+                        }
+                    },
+                    {
+                        "field": "action",
+                        "sortable": false,
+                        "filterable": false,
+                        "disableColumnMenu": true,
+                        "flex": 0.5,
+                        "cell": {
+                            "type": "action"
+                        }
+                    }
+                ]
+            },
+            "drawer": [
+                {
+                    "field": "trxChargeDate",
+                    "headerName": "pages.refundManagement.drawer.trxDate",
+                    "cell": {
+                        "type": "date",
+                        "tooltip": true,
+                        "bold": true,
+                        "options": {
+                            "day": "2-digit",
+                            "month": "2-digit",
+                            "year": "numeric",
+                            "hour": "2-digit",
+                            "minute": "2-digit"
+                        }
+                    }
+                },
+                {
+                    "field": "additionalProperties.productName",
+                    "headerName": "pages.refundManagement.drawer.householdAppliance",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "fiscalCode",
+                    "headerName": "pages.refundManagement.drawer.fiscalCode",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "id",
+                    "headerName": "pages.refundManagement.drawer.transactionId",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "trxCode",
+                    "headerName": "pages.refundManagement.drawer.trxCode",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "effectiveAmountCents",
+                    "headerName": "pages.refundManagement.drawer.totalAmount",
+                    "cell": {
+                        "type": "euro",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "rewardAmountCents",
+                    "headerName": "pages.refundManagement.drawer.rewardAmount",
+                    "cell": {
+                        "type": "euro",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "authorizedAmountCents",
+                    "headerName": "pages.refundManagement.drawer.authorizedAmount",
+                    "cell": {
+                        "type": "euro",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "status",
+                    "headerName": "pages.refundManagement.drawer.status",
+                    "cell": {
+                        "type": "chip",
+                        "tooltip": true,
+                        "bold": true,
+                        "context": "commons.statusEnum.transaction"
+                    }
+                },
+                {
+                    "field": "invoiceFile.docNumber",
+                    "headerName": "pages.refundManagement.drawer.documentNumber",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "invoiceFile.filename",
+                    "headerName": "pages.refundManagement.drawer.document",
                     "cell": {
                         "type": "download",
                         "tooltip": true,

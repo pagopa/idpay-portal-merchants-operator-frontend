@@ -45,7 +45,6 @@ export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props)
                             textAlign="left"
                             columnGap={6}
                             width="100%"
-                            marginTop={2}
                         >
                             {icon}
                             <Typography

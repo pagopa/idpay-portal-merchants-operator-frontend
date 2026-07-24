@@ -15,7 +15,8 @@ export type DynamicDrawerProps = {
   title: string;
   subtitle?: string;
   fieldsDef: Array<FieldConfigDef>;
-  fieldsValues: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fieldsValues: Record<string, any>;
   buttons?: Array<(ButtonProps & { dataTestId?: string }) | never>;
 };
 
@@ -101,12 +102,12 @@ export default function DynamicDrawer({
                 </Typography>
               </>
             }
-            {mappedFields.map(({ field, headerName, renderCell }) => {
+            {mappedFields.map(({ field, headerName, renderCell }, index) => {
               const params = {
                 row: normalizedFields,
                 value: normalizedFields?.[field]
               }
-              return (<Box key={field}
+              return (<Box key={`${field}-${index}`}
                 display="flex"
                 flexDirection="column"
               >
