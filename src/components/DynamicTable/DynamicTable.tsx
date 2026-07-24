@@ -6,7 +6,7 @@ import { FieldConfigDef } from "../../utils/types"
 import { renderFields } from "../../utils/renderFields"
 import { useMemo, useRef } from "react"
 
-type Props = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
+export type DynamicTableProps = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
     columnsDef: Array<FieldConfigDef>
     emptyText?: string
     isEmpty?: boolean
@@ -23,7 +23,7 @@ export const DynamicTable = ({
     rowsDividerColor,
     onSortModelChange,
     onPaginationModelChange,
-    ...props }: Props) => {
+    ...props }: DynamicTableProps) => {
     const { t } = useScopedTranslation()
 
     const ref = useRef(false)
