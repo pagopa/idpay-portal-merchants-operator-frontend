@@ -87,7 +87,9 @@ describe('SummaryAcceptDiscount', () => {
     const trx = {
       trxCode: 'CODE123',
       originalAmountCents: 1000,
-      productGtin: 'GTIN',
+      additionalProperties: {
+        productGtin: 'GTIN'
+      }
     };
     sessionStorage.setItem('discountCoupon', JSON.stringify(trx));
     mockAuthPayment.mockResolvedValueOnce({});

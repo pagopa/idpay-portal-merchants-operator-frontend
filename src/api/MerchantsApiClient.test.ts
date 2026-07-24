@@ -147,8 +147,10 @@ describe('MerchantApi', () => {
       expect(mockPut).toHaveBeenCalledWith(
         `/initiatives/init-1/transactions/bar-code/${mockData.discountCode}/preview`,
         {
-          productGtin: mockData.productGtin,
-          productName: mockData.productName,
+          additionalProperties: {
+            productGtin: mockData.productGtin,
+            productName: mockData.productName,
+          },
           amountCents: mockData.amountCents,
         }
       );
