@@ -11,7 +11,6 @@ import {
   CircularProgress,
   Button,
 } from '@mui/material';
-import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import DataTable from '../DataTable/DataTable';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -29,6 +28,8 @@ import {
 import { getStatusChip, handleCodeChange } from '../../utils/helpers';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
 import AlertListComponent from '../Alert/AlertListComponent';
+import DynamicDrawer, { DynamicDrawerProps } from '../DynamicDrawer/DynamicDrawer';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 interface TransactionsLayoutProps {
   title: string;
@@ -49,7 +50,7 @@ interface TransactionsLayoutProps {
   };
   noDataMessage: string;
   onRowAction: (row: any) => void;
-  DrawerComponent?: React.ReactNode;
+  drawerProps?: DynamicDrawerProps;
   isDrawerOpen?: boolean;
   externalState?: {
     [key: string]: any;
@@ -69,7 +70,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
   alertMessages,
   noDataMessage,
   onRowAction,
-  DrawerComponent,
+  drawerProps,
   triggerFetchTransactions,
   isDrawerOpen,
   externalState = {},
@@ -87,7 +88,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
   });
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const [errorAlert, setErrorAlert] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useScopedTranslation();
   const token = authStore.getState().token;
   const isLoadingRef = useRef(false);
   const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
@@ -268,7 +269,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
   return (
     <Box>
-      {DrawerComponent}
+      <DynamicDrawer { ...drawerProps}/>
       <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <TitleBox
           title={title}
@@ -291,9 +292,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
           </Button>
         )}
       </Box>
-
       <Typography variant="h6">{tableTitle}</Typography>
-
       <Box>
         {(rows.length > 0 ||
           (rows.length === 0 &&

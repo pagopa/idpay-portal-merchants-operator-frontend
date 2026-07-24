@@ -1,5 +1,5 @@
-import { Box, Button, Drawer, Typography, Grid, CircularProgress } from '@mui/material';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { Box, Button, Typography } from '@mui/material';
+import { useState, useCallback, useEffect } from 'react';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate, useLocation, useParams, generatePath } from 'react-router-dom';
 import ROUTES from '../../routes';
@@ -8,14 +8,9 @@ import {
   deleteTransactionInProgress,
   capturePayment,
 } from '../../services/merchantService';
-import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
-import { transactionInProgreessDTO } from '../../utils/types';
+import { FieldConfigDef, transactionInProgreessDTO } from '../../utils/types';
 import { GridRenderCellParams } from '@mui/x-data-grid';
-import { theme } from '@pagopa/mui-italia';
-import CloseIcon from '@mui/icons-material/Close';
-import style from './purchaseManagement.module.css';
 import {
-  getStatusChip,
   formatEuro,
   checkEuroTooltip,
   checkTooltipValue,
@@ -37,7 +32,9 @@ const PurchaseManagement = () => {
   const [errorDeleteTransaction, setErrorDeleteTransaction] = useState(false);
   const [errorCaptureTransaction, setErrorCaptureTransaction] = useState(false);
   const [transactionCaptured, setTransactionCaptured] = useState(false);
-  const { t } = useScopedTranslation();
+  const { t, config } = useScopedTranslation();
+  const fieldsDef = config<Array<FieldConfigDef>>('pages.purchaseManagement.drawer')
+  const [mappedFieldsDef, setMappedFieldsDef] = useState<Array<FieldConfigDef>>(fieldsDef)
   const navigate = useNavigate();
   const location = useLocation();
   const [cancelTransactionModal, setCancelTransactionModal] = useState(false);
@@ -50,10 +47,6 @@ const PurchaseManagement = () => {
   const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
   const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
   const [transactionDeleteSuccess, setTransactionDeleteSuccess] = useState(false);
-
-  const gridRef = useRef(null);
-
-  const [isScrollable, setIsScrollable] = useState(false);
 
   const replaceValuesObj = {
     initiativeId: initiativeId,
@@ -75,13 +68,6 @@ const PurchaseManagement = () => {
       return () => clearTimeout(timer);
     }
   }, [transactionAuthorized, triggerFetchTransactions]);
-
-  useEffect(() => {
-    if (openDrawer)
-      setTimeout(() => {
-        checkHeight();
-      }, 100);
-  }, [openDrawer]);
 
   useEffect(() => {
     if (location.state) {
@@ -179,18 +165,33 @@ const PurchaseManagement = () => {
     },
   ];
 
-  const checkHeight = () => {
-    if (gridRef.current) {
-      const gridHeight = gridRef.current.scrollHeight;
-      const maxHeight = window.innerHeight - 290;
-      setIsScrollable(gridHeight > maxHeight);
+  const handlePreviewPdf = useCallback(async () => {
+    setIsPreviewPdfLoading(true);
+    try {
+      const response = await getPreviewPdf(selectedTransaction?.id);
+      downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
+    } catch {
+      setErrorPreviewPdf(true);
+    } finally {
+      setIsPreviewPdfLoading(false);
     }
-  };
+  }, [selectedTransaction]);
 
   const handleRowAction = useCallback((row: transactionInProgreessDTO) => {
+    const isDowloadVisible = row?.status === 'AUTHORIZED' || row?.status === 'CAPTURED'
+    const mappedFieldsDef = fieldsDef.reduce((acc, field) => {
+      return [ ...acc, ...(!isDowloadVisible && field.cell.type === "download" ? [] : [field])]
+    }, [])
+    const mappedTransaction = { ...row,
+      onClick: handlePreviewPdf,
+      isLoading: isPreviewPdfLoading,
+      icon: <DescriptionIcon/>,
+      value: `${row?.trxCode}_preautorizzazione.pdf`
+    }
+    setMappedFieldsDef(mappedFieldsDef)
     setOpenDrawer(true);
-    setSelectedTransaction(row);
-  }, []);
+    setSelectedTransaction(mappedTransaction);
+  }, [fieldsDef, handlePreviewPdf, isPreviewPdfLoading]);
 
   const handleCaptureTransaction = () => {
     setOpenDrawer(false);
@@ -238,18 +239,6 @@ const PurchaseManagement = () => {
     navigate(generatePath(ROUTES.REFUND, replaceValuesObj));
   };
 
-  const handlePreviewPdf = async () => {
-    setIsPreviewPdfLoading(true);
-    try {
-      const response = await getPreviewPdf(selectedTransaction?.id);
-      downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
-    } catch {
-      setErrorPreviewPdf(true);
-    } finally {
-      setIsPreviewPdfLoading(false);
-    }
-  };
-
   return (
     <>
       <TransactionsLayout
@@ -292,322 +281,38 @@ const PurchaseManagement = () => {
         noDataMessage={t('pages.purchaseManagement.noTransactions')}
         triggerFetchTransactions={triggerFetchTransactions}
         onRowAction={handleRowAction}
-        DrawerComponent={
-          <Drawer
-            anchor="right"
-            open={openDrawer}
-            onClose={() => setOpenDrawer(false)}
-            sx={{
-              '& .MuiDrawer-paper': {
-                width: 375,
-                boxSizing: 'border-box',
-                p: 3,
+        drawerProps={{
+          title: t('pages.purchaseManagement.drawer.title'),
+          fieldsValues: selectedTransaction,
+          fieldsDef: mappedFieldsDef,
+          isOpen: openDrawer,
+          setIsOpen: () => setOpenDrawer(false),
+          buttons: [
+          {
+            variant: "contained",
+            fullWidth: true,
+            onClick: selectedTransaction?.status === 'AUTHORIZED'
+              ? handleCaptureTransaction
+              : handleRequestRefund,
+            title: selectedTransaction?.status === 'AUTHORIZED'
+              ? t('pages.purchaseManagement.drawer.confirmPayment')
+              : t('pages.purchaseManagement.drawer.requestRefund')
+          },
+          {
+            fullWidth: true,
+            onClick: selectedTransaction?.status === 'AUTHORIZED'
+              ? handleCancelTransaction
+              : () => {
+                setRefundTransactionModal(true);
+                setOpenDrawer(false);
               },
-            }}
-          >
-            <Box sx={{ position: 'relative', height: '100%' }}>
-              <Box
-                sx={{ display: 'flex', justifyContent: 'flex-end' }}
-                mb={4}
-                className={style.cursorPointer}
-              >
-                <CloseIcon sx={{ color: '#5C6F82' }} onClick={() => setOpenDrawer(false)} />
-              </Box>
-              <Typography variant="h6" mb={3}>
-                {t('pages.purchaseManagement.drawer.title')}
-              </Typography>
-              <Grid
-                container
-                ref={gridRef}
-                spacing={2}
-                sx={{
-                  overflowY: isScrollable ? 'auto' : 'visible',
-                  maxHeight: isScrollable ? 'calc(100vh - 300px)' : 'none',
-                }}
-              >
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.trxDate')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {new Date(selectedTransaction?.trxChargeDate)
-                      .toLocaleDateString('it-IT', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
-                      .replace(',', '') ?? MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.householdAppliance')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightMedium,
-                      wordBreak: 'break-word',
-                      overflowWrap: 'anywhere',
-                      whiteSpace: 'normal',
-                    }}
-                  >
-                    {selectedTransaction?.additionalProperties?.productName ??
-                      MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.fiscalCode')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {selectedTransaction?.fiscalCode ?? MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 11, md: 11, lg: 11 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.transactionId')}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightMedium,
-                      wordBreak: 'break-word',
-                      overflowWrap: 'anywhere',
-                      whiteSpace: 'normal',
-                    }}
-                  >
-                    {selectedTransaction?.id ?? MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 11, md: 11, lg: 11 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.trxCode')}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {selectedTransaction?.trxCode ?? MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.totalAmount')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {selectedTransaction?.effectiveAmountCents !== null &&
-                      selectedTransaction?.effectiveAmountCents !== undefined
-                      ? formatEuro(selectedTransaction?.effectiveAmountCents)
-                      : MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.rewardAmount')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {selectedTransaction?.rewardAmountCents !== null &&
-                      selectedTransaction?.rewardAmountCents !== undefined
-                      ? formatEuro(selectedTransaction?.rewardAmountCents)
-                      : MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.authorizedAmount')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {selectedTransaction?.residualAmountCents !== null &&
-                      selectedTransaction?.residualAmountCents !== undefined
-                      ? formatEuro(selectedTransaction?.residualAmountCents)
-                      : MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                  <Typography
-                    variant="body2"
-                    mb={1}
-                    sx={{
-                      fontWeight: theme.typography.fontWeightRegular,
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
-                    {t('pages.purchaseManagement.drawer.status')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: theme.typography.fontWeightMedium }}
-                  >
-                    {selectedTransaction?.status
-                      ? getStatusChip(t, selectedTransaction?.status)
-                      : MISSING_DATA_PLACEHOLDER}
-                  </Typography>
-                </Grid>
-                {(selectedTransaction?.status === 'AUTHORIZED' ||
-                  selectedTransaction?.status === 'CAPTURED') && (
-                    <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-                      <Typography
-                        variant="body2"
-                        mb={1}
-                        sx={{
-                          fontWeight: theme.typography.fontWeightRegular,
-                          color: theme.palette.text.secondary,
-                          margin: 0,
-                        }}
-                      >
-                        {t('pages.purchaseManagement.drawer.document')}
-                      </Typography>
-                      <Button
-                        data-testid="btn-test"
-                        sx={{
-                          padding: '0',
-                          fontWeight: theme.typography.fontWeightMedium,
-                          fontSize: '18px',
-                          minHeight: 'fit-content',
-                          height: 'auto',
-                        }}
-                        onClick={handlePreviewPdf}
-                      >
-                        {isPreviewPdfLoading ? (
-                          <CircularProgress color="inherit" size={20} data-testid="item-loader" />
-                        ) : (
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              gap: 0,
-                              alignItems: 'start',
-                              textAlign: 'left',
-                            }}
-                          >
-                            <DescriptionIcon />
-                            <div
-                              style={{
-                                marginLeft: '8px',
-                                wordBreak: 'break-all',
-                              }}
-                            >
-                              {selectedTransaction?.trxCode}_preautorizzazione.pdf
-                            </div>
-                          </Box>
-                        )}
-                      </Button>
-                    </Grid>
-                  )}
-              </Grid>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '100%',
-                }}
-              >
-                <Box sx={{ width: '100%' }}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={
-                      selectedTransaction?.status === 'AUTHORIZED'
-                        ? handleCaptureTransaction
-                        : handleRequestRefund
-                    }
-                  >
-                    {selectedTransaction?.status === 'AUTHORIZED'
-                      ? t('pages.purchaseManagement.drawer.confirmPayment')
-                      : t('pages.purchaseManagement.drawer.requestRefund')}
-                  </Button>
-                </Box>
-                <Button
-                  fullWidth
-                  onClick={
-                    selectedTransaction?.status === 'AUTHORIZED'
-                      ? handleCancelTransaction
-                      : () => {
-                        setRefundTransactionModal(true);
-                        setOpenDrawer(false);
-                      }
-                  }
-                  sx={{
-                    color: selectedTransaction?.status === 'AUTHORIZED' ? '#D85757' : '#',
-                  }}
-                >
-                  {selectedTransaction?.status === 'AUTHORIZED'
-                    ? t('pages.purchaseManagement.drawer.cancellPayment')
-                    : t('pages.purchaseManagement.drawer.refund')}
-                </Button>
-              </Box>
-            </Box>
-          </Drawer>
-        }
+            color: selectedTransaction?.status === 'AUTHORIZED' ? "error" : "primary",
+            title: selectedTransaction?.status === 'AUTHORIZED'
+              ? t('pages.purchaseManagement.drawer.cancellPayment')
+              : t('pages.purchaseManagement.drawer.refund')
+          }
+        ]
+        }}
         externalState={{
           transactionAuthorized,
           transactionCaptured,
