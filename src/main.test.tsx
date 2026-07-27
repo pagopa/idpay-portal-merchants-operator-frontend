@@ -1,4 +1,4 @@
-import { waitFor } from '@testing-library/dom';
+import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const renderMock = vi.fn();
@@ -10,20 +10,21 @@ vi.mock('react-dom/client', () => ({
 
 vi.mock('./App.tsx', () => ({ default: () => <div>Mocked App</div> }));
 vi.mock('./contexts/AuthContext', () => ({
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 vi.mock('react-router-dom', () => ({
-  BrowserRouter: ({ children }: any) => <>{children}</>,
+  BrowserRouter: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
-vi.mock('@mui/material', async () => {
-  const actual: any = await vi.importActual('@mui/material');
-  return {
-    ...actual,
-    ThemeProvider: ({ children }: any) => <>{children}</>,
-    CssBaseline: () => <></>,
-  };
-});
+vi.mock('@mui/material', () => ({
+  ThemeProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
+  CssBaseline: () => <></>,
+}));
 vi.mock('@pagopa/mui-italia', () => ({ theme: {} }));
+vi.mock('./locale', () => ({}));
+vi.mock('./utils/oneTrustLoader.ts', () => ({
+  initializeCookieOneTrust: vi.fn(() => Promise.resolve()),
+}));
+vi.mock('./redux/store.ts', () => ({ store: {} }));
 
 describe('main.tsx bootstrap', () => {
   beforeEach(() => {
