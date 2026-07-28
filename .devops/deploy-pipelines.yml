@@ -15,13 +15,6 @@ variables:
   react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
   REACT_APP_ONE_TRUST_BASE_URL_GLOBAL: https://cdn.cookielaw.org
   REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL: https://privacyportalde-cdn.onetrust.com/privacy-notice-scripts/otnotice-1.0.min.js
-  REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL: eyJjYWxsYmFja1VybCI6Imh0dHBzOi8vcHJpdmFjeXBvcnRhbC1kZS5vbmV0cnVzdC5jb20vcmVxdWVzdC92MS9wcml2YWN5Tm90aWNlcy9zdGF0cy92aWV3cyJ9
-  VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL: eyJjYWxsYmFja1VybCI6Imh0dHBzOi8vcHJpdmFjeXBvcnRhbC1kZS5vbmV0cnVzdC5jb20vcmVxdWVzdC92MS9wcml2YWN5Tm90aWNlcy9zdGF0cy92aWV3cyIsImNvbnRlbnRBcGlVcmwiOiJodHRwczovL3ByaXZhY3lwb3J0YWwtZGUub25ldHJ1c3QuY29tL3JlcXVlc3QvdjEvZW50ZXJwcmlzZXBvbGljeS9kaWdpdGFscG9saWN5L2NvbnRlbnQiLCJtZXRhZGF0YUFwaVVybCI6Imh0dHBzOi8vcHJpdmFjeXBvcnRhbC1kZS5vbmV0cnVzdC5jb20vcmVxdWVzdC92MS9lbnRlcnByaXNlcG9saWN5L2RpZ2l0YWxwb2xpY3kvbWV0YS1kYXRhIn0=
-  VITE_ONE_TRUST_TOS_JSON_URL_GLOBAL: https://privacyportalde-cdn.onetrust.com/storage-container/77f17844-04c3-4969-a11d-462ee77acbe1/privacy-notices/cadd2394-571d-42e0-90bd-8b0521ba33f7/published/privacynotice.json
-  VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL_GLOBAL: https://privacyportalde-cdn.onetrust.com/storage-container/77f17844-04c3-4969-a11d-462ee77acbe1/privacy-notices/73740495-293b-463c-a5e0-16093604475a/published/privacynotice.json
-  VITE_ONE_TRUST_TOS_NOTICE_ID_GLOBAL: otnotice-cadd2394-571d-42e0-90bd-8b0521ba33f7
-  VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID_GLOBAL: otnotice-73740495-293b-463c-a5e0-16093604475a
-
 
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
 
@@ -50,6 +43,13 @@ variables:
     react_app_one_trust_domain_id: 019a6fb5-adb4-7277-a4d2-227872998fe4
     react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL)
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
+
+    #ONE TRUST ENV
+    vite_one_trust_otnotice_cdn_settings: '$(UAT_VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)'
+    vite_one_trust_tos_json_url: '$(UAT_VITE_ONE_TRUST_TOS_JSON_URL_GLOBAL)'
+    vite_one_trust_privacy_policy_json_url: '$(UAT_VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL_GLOBAL)'
+    vite_one_trust_tos_notice_id: '$(UAT_VITE_ONE_TRUST_TOS_NOTICE_ID_GLOBAL)'
+    vite_one_trust_privacy_policy_notice_id: '$(UAT_VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID_GLOBAL)'
 
     react_app_url_storage: '$(UAT_REACT_APP_URL_STORAGE)'
 
@@ -93,6 +93,13 @@ variables:
     react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL)
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
 
+    #ONE TRUST ENV
+    vite_one_trust_otnotice_cdn_settings: '$(PROD_VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)'
+    vite_one_trust_tos_json_url: '$(PROD_VITE_ONE_TRUST_TOS_JSON_URL_GLOBAL)'
+    vite_one_trust_privacy_policy_json_url: '$(PROD_VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL_GLOBAL)'
+    vite_one_trust_tos_notice_id: '$(PROD_VITE_ONE_TRUST_TOS_NOTICE_ID_GLOBAL)'
+    vite_one_trust_privacy_policy_notice_id: '$(PROD_VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID_GLOBAL)'
+
     react_app_url_storage: '$(PROD_REACT_APP_URL_STORAGE)'
 
     react_app_csv_link: https://bonuselettrodomestici.it/elenco-informatico-elettrodomestici
@@ -134,6 +141,13 @@ variables:
     react_app_one_trust_domain_id: 019a1699-a13c-76c5-8e5b-dd0b116385d3
     react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL)
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
+
+    #ONE TRUST ENV
+    vite_one_trust_otnotice_cdn_settings: '$(DEV_VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)'
+    vite_one_trust_tos_json_url: '$(DEV_VITE_ONE_TRUST_TOS_JSON_URL_GLOBAL)'
+    vite_one_trust_privacy_policy_json_url: '$(DEV_VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL_GLOBAL)'
+    vite_one_trust_tos_notice_id: '$(DEV_VITE_ONE_TRUST_TOS_NOTICE_ID_GLOBAL)'
+    vite_one_trust_privacy_policy_notice_id: '$(DEV_VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID_GLOBAL)'
 
     react_app_url_fe_pre_login: '$(DEV_REACT_APP_URL_FE_PRE_LOGIN)'
     react_app_url_fe_auth: '$(DEV_REACT_APP_URL_FE_LOGIN)'
@@ -263,11 +277,11 @@ stages:
               VITE_ONE_TRUST_BASE_URL: '$(react_app_one_trust_base_url)'
               VITE_ONE_TRUST_DOMAIN_ID: '$(react_app_one_trust_domain_id)'
               VITE_ONE_TRUST_OTNOTICE_CDN_URL: $(react_app_one_trust_otnotice_cdn_url)
-              VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS: $(VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
-              VITE_ONE_TRUST_TOS_JSON_URL: $(VITE_ONE_TRUST_TOS_JSON_URL_GLOBAL)
-              VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL: $(VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL_GLOBAL)
-              VITE_ONE_TRUST_TOS_NOTICE_ID: $(VITE_ONE_TRUST_TOS_NOTICE_ID_GLOBAL)
-              VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID: $(VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID_GLOBAL)
+              VITE_ONE_TRUST_OTNOTICE_CDN_SETTINGS: $(vite_one_trust_otnotice_cdn_settings)
+              VITE_ONE_TRUST_TOS_JSON_URL: $(vite_one_trust_tos_json_url)
+              VITE_ONE_TRUST_PRIVACY_POLICY_JSON_URL: $(vite_one_trust_privacy_policy_json_url)
+              VITE_ONE_TRUST_TOS_NOTICE_ID: $(vite_one_trust_tos_notice_id)
+              VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID: $(vite_one_trust_privacy_policy_notice_id)
 
               VITE_CSV_LINK: $(react_app_csv_link)
 
