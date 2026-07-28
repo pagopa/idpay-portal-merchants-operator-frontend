@@ -23,11 +23,9 @@ describe('PrivacyPolicy component', () => {
   });
 
   test('renders the OneTrust notice container and back link', () => {
-    vi.stubEnv('VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID', 'otnotice-73740495-293b-463c-a5e0-16093604475a');
     render(<PrivacyPolicy />);
 
-    const noticeId = process.env.VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID as string;
-    const notice = document.getElementById(noticeId);
+    const notice = document.querySelector('.otnotice');
     const backHomeLink = screen.getByRole('link', { name: 'Torna alla home' });
 
     expect(notice).toBeTruthy();

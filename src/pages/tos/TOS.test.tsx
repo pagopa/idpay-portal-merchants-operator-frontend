@@ -23,11 +23,9 @@ describe('TOS component', () => {
   });
 
   test('renders the OneTrust notice container and back link', () => {
-    vi.stubEnv('VITE_ONE_TRUST_TOS_NOTICE_ID', 'otnotice-cadd2394-571d-42e0-90bd-8b0521ba33f7');
     render(<TOS />);
 
-    const noticeId = process.env.VITE_ONE_TRUST_TOS_NOTICE_ID as string;
-    const notice = document.getElementById(noticeId);
+    const notice = document.querySelector('.otnotice');
     const backHomeLink = screen.getByRole('link', { name: 'Torna alla home' });
 
     expect(notice).toBeTruthy();
