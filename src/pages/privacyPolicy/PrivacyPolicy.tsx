@@ -3,7 +3,7 @@ import OneTrustContentWrapper from '../../components/OneTrustContentWrapper/OneT
 import { useOneTrustNotice } from '../../hooks/useOneTrustNotice';
 import ROUTES from '../../routes';
 
-const PRIVACY_POLICY_NOTICE_ID = 'otnotice-73740495-293b-463c-a5e0-16093604475a';
+const PRIVACY_POLICY_NOTICE_ID = import.meta.env.VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID;
 
 const PrivacyPolicy = () => {
   const [contentLoaded, setContentLoaded] = useState(false);

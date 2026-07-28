@@ -3,7 +3,7 @@ import OneTrustContentWrapper from '../../components/OneTrustContentWrapper/OneT
 import { useOneTrustNotice } from '../../hooks/useOneTrustNotice';
 import ROUTES from '../../routes';
 
-const TOS_NOTICE_ID = 'otnotice-cadd2394-571d-42e0-90bd-8b0521ba33f7';
+const TOS_NOTICE_ID = import.meta.env.VITE_ONE_TRUST_TOS_NOTICE_ID;
 
 const TOS = () => {
   const [contentLoaded, setContentLoaded] = useState(false);
