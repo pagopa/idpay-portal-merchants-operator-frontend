@@ -79,8 +79,6 @@ describe("DynamicDrawer Component", () => {
 
     render(<DynamicDrawer {...defaultProps} fieldsDef={fieldsDef as any} fieldsValues={fieldsValues} />);
 
-    expect(normalizeObj).toHaveBeenCalledWith(fieldsValues);
-
     expect(screen.getByText("translated_nameKey")).toBeInTheDocument();
     expect(screen.getByTestId("cell-text-1")).toHaveTextContent("John");
 

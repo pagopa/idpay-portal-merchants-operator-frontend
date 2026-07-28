@@ -6,7 +6,6 @@ import { theme } from '@pagopa/mui-italia';
 import { FieldConfigDef } from '../../utils/types';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { renderFields } from '../../utils/renderFields';
-import { normalizeObj } from '../../utils/helpers';
 import { useMemo } from 'react';
 
 export type DynamicDrawerProps = {
@@ -42,12 +41,10 @@ export default function DynamicDrawer({
   const { t } = useScopedTranslation()
 
   const mappedFields = useMemo(() => fieldsDef.map(({ cell, ...field }) => {
-    const { type, tooltip, bold } = cell
-    const fieldsConfig = renderFields({ tooltip, bold })
+    const { type, tooltip, bold, context } = cell
+    const fieldsConfig = renderFields({ tooltip, bold, context })
     return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[type] }
   }), [fieldsDef, t])
-
-  const normalizedFields = useMemo(() => normalizeObj(fieldsValues), [fieldsValues]);
 
   return (
     <Drawer anchor="right" open={isOpen} data-testid="detail-drawer">
@@ -104,8 +101,8 @@ export default function DynamicDrawer({
             }
             {mappedFields.map(({ field, headerName, renderCell }, index) => {
               const params = {
-                row: normalizedFields,
-                value: normalizedFields?.[field]
+                row: fieldsValues,
+                value: fieldsValues?.[field]
               }
               return (<Box key={`${field}-${index}`}
                 display="flex"

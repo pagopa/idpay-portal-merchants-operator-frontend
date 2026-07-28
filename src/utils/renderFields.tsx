@@ -24,7 +24,7 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
         {renderText(params.value, tooltip, bold)}
     </Box>,
     date: (params) => <Box display="flex" alignItems="center" height="100%">
-        {renderText(formatDate(params.value, {options}), tooltip, bold)}
+        {renderText(formatDate(params.value, { options }), tooltip, bold)}
     </Box>,
     euro: (params) => <Box display="flex" alignItems="center" height="100%">
         {renderText(formatEuro(params.value), tooltip, bold)}
@@ -49,10 +49,10 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
         <Box display="flex" alignItems="center" height="100%">
             <DownloadFile
                 tooltip={tooltip}
-                onClick={params?.onClick}
-                isLoading={params?.isLoading}
+                onClick={params?.row?.onClick}
+                isLoading={params?.row?.isLoading}
                 text={params?.value}
-                icon={params?.icon}
+                icon={params?.row?.icon}
             />
         </Box>,
     action: (params) =>

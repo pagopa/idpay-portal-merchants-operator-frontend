@@ -92,7 +92,7 @@ const PurchaseManagement = () => {
         ...normalizedTrx,
         onClick: handlePreviewPdf,
         isLoading: isPreviewPdfLoading,
-        icon: <DescriptionIcon />,
+        icon: DescriptionIcon,
         value: `${normalizedTrx?.trxCode}_preautorizzazione.pdf`,
         action: {
           icon: "arrow",

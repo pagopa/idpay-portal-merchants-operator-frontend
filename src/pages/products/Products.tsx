@@ -14,6 +14,7 @@ import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { theme } from '@pagopa/mui-italia';
 import { useParams } from 'react-router-dom';
+import { normalizeObj } from '../../utils/helpers';
 
 const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
 
@@ -45,18 +46,20 @@ const Products = () => {
   useAutoResetBanner([[errorAlert, setErrorAlert]]);
 
   const mappedProductsList = useMemo(() =>
-    productsList.map((product) =>
-    ({
-      ...product,
-      link: product?.linkEprel,
-      action: {
-        icon: "arrow",
-        onClick: (row) => {
-          setOpenDrawer(true);
-          setSelectedProduct(row)
+    productsList.map((product) => {
+      const normalizedProduct = normalizeObj(product)
+      return {
+        ...normalizedProduct,
+        link: normalizedProduct?.linkEprel,
+        action: {
+          icon: "arrow",
+          onClick: (row) => {
+            setOpenDrawer(true);
+            setSelectedProduct(row)
+          }
         }
       }
-    })),
+    }),
     [productsList])
 
   const fetchProducts = useCallback(async (params: GetProductsParams) => {

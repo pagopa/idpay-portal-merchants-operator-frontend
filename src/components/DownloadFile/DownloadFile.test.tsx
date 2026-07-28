@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { DownloadFile } from "./DownloadFile";
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 describe("DownloadFile component", () => {
   it("should correctly render component with text, icon and handle click events", () => {
@@ -10,7 +11,7 @@ describe("DownloadFile component", () => {
       isLoading: false,
       onClick: vi.fn(),
       text: "test download",
-      icon: <span data-testid="custom-icon">📁</span>
+      icon: AttachFileIcon
     };
 
     render(<DownloadFile {...props} />);
@@ -18,7 +19,7 @@ describe("DownloadFile component", () => {
     const linkText = screen.getByText("test download");
     expect(linkText).toBeInTheDocument();
 
-    expect(screen.getByTestId("custom-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("icon")).toBeInTheDocument();
 
     const btn = screen.getByTestId("btn-test");
     fireEvent.click(btn);
