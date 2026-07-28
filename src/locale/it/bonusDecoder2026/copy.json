@@ -160,18 +160,12 @@
             },
             "feedbackMessages": {
                 "success": {
-                    "transaction": "La transazione è andata a buon fine.",
-                    "payment": "Il pagamento è stato confermato.",
-                    "transactionDelete": "La transazione è stata annullata con successo.",
                     "refundUpload": "Richiesta inviata correttamente",
                     "reverseUpload": "Richiesta inviata correttamente"
                 },
                 "errors": {
                     "generic": "Non è stato possibile recuperare le transazioni. Riprova.",
-                    "previewPdf": "Si è verificato un errore nel download del PDF, riprova.",
-                    "cancel": "Non è stato possibile annullare la transazione. Riprova.",
-                    "capture": "Non è stato possibile confermare la transazione. Riprova.",
-                    "reverse": "Non è stato possibile richiedere il rimborso. Riprova."
+                    "downloadPdf": "Non è stato possibile scaricare il file. Riprova."
                 }
             }
         },
