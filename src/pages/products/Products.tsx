@@ -116,6 +116,7 @@ const Products = () => {
       </Box>
       <Box>
         <DynamicFilters
+          containerStyle={{ paddingY: "2rem" }}
           filters={filters}
           filtersDef={filtersDef}
           setFilters={newFilters => {
@@ -132,7 +133,7 @@ const Products = () => {
           isLoading={productsListIsLoading}
           rows={mappedProductsList}
           getRowId={row => row.gtinCode}
-          paginationModel={{page, pageSize}}
+          paginationModel={{ page, pageSize }}
           onPaginationModelChange={model => {
             setPage(model.page)
             setPageSize(model.pageSize)

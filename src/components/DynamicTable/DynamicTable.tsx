@@ -75,7 +75,7 @@ export const DynamicTable = ({
         }
     }), [rowsDividerColor])
 
-    return (isLoading ?
+    return (<Box> {isLoading ?
         <Box
             mt={3}
             sx={{
@@ -101,7 +101,7 @@ export const DynamicTable = ({
             </Paper> :
             <DataGrid
                 {...props}
-                slotProps={{baseIconButton: { title: "" }}}
+                slotProps={{ baseIconButton: { title: "" } }}
                 onSortModelChange={(model, details) => {
                     ref.current = true
                     onSortModelChange(model, details)
@@ -123,6 +123,6 @@ export const DynamicTable = ({
                         return `${from}-${to} di ${count}`;
                     },
                 }}
-            />
-    )
+            />}
+    </Box>)
 }
