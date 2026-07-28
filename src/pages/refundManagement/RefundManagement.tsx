@@ -29,7 +29,6 @@ const RefundManagement = () => {
   const location = useLocation();
   const { initiativeId } = useParams();
   const { t, config } = useScopedTranslation();
-  const token = authStore.getState().token;
   const filtersDef = config<Array<FilterConfigDef>>('pages.refundManagement.transactionsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.refundManagement.drawer')
   const columnsDef = config<Array<FieldConfigDef>>('pages.refundManagement.transactionsTable.columns')
@@ -66,6 +65,7 @@ const RefundManagement = () => {
   }, [location.state]);
 
   const handleDownloadInvoice = useCallback(async (transaction: PointOfSaleTransactionProcessedDTO) => {
+    const token = authStore.getState().token;
     const decodedToken: DecodedJwtToken = jwtDecode(token);
     setDownloadInProgress(true);
     try {
@@ -83,7 +83,7 @@ const RefundManagement = () => {
     } finally {
       setDownloadInProgress(false);
     }
-  }, [token]);
+  }, []);
 
   const mappedTransactionsList = useMemo(() => {
     return transactionsList.map((trx) => {
@@ -116,6 +116,7 @@ const RefundManagement = () => {
 
   const fetchTransactions = useCallback(async (params) => {
     setTransactionsListIsLoading(true);
+    const token = authStore.getState().token;
     const decodeToken: DecodedJwtToken = jwtDecode(token);
     try {
       const { content, totalElements } = await getProcessedTransactions(initiativeId, decodeToken?.point_of_sale_id, params);
@@ -126,7 +127,7 @@ const RefundManagement = () => {
     } finally {
       setTransactionsListIsLoading(false)
     }
-  }, [initiativeId, token]);
+  }, [initiativeId]);
 
   useEffect(() => {
     const [model] = sortModel
@@ -206,7 +207,7 @@ const RefundManagement = () => {
         <DynamicDrawer
           setIsOpen={() => setOpenDrawer(false)}
           title={t('pages.purchaseManagement.drawer.title')}
-          fieldsValues={{ ...selectedTransaction, isLoading: downloadInProgress}}
+          fieldsValues={{ ...selectedTransaction, isLoading: downloadInProgress }}
           fieldsDef={mappedFieldsDef}
           isOpen={openDrawer}
           buttons={areButtonsVisible && [
@@ -218,7 +219,7 @@ const RefundManagement = () => {
                 const replaceValuesObj = {
                   initiativeId: initiativeId,
                   trxId: selectedTransaction?.id,
-                  fileDocNumber: btoa(selectedTransaction['Numero fattura']) || ''
+                  fileDocNumber: btoa(selectedTransaction?.docNumber) || ''
                 }
                 navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
               },

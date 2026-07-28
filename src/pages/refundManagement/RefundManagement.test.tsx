@@ -107,7 +107,7 @@ vi.mock('../../utils/helpers', async () => {
   const actual = await vi.importActual<typeof import('../../utils/helpers')>('../../utils/helpers');
   return {
     ...actual,
-    normalizeObj: vi.fn((obj) => obj),
+    plainObj: vi.fn((obj) => obj),
   };
 });
 
@@ -191,7 +191,7 @@ describe('RefundManagement', () => {
 
   it('navigates to modify document on drawer button click', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
-      content: [{ id: 'trx-3', status: 'INVOICED', 'Numero fattura': 'FATTURA-123' }],
+      content: [{ id: 'trx-3', status: 'INVOICED', docNumber: 'FATTURA-123' }],
       totalElements: 1
     });
 

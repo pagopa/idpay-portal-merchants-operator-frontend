@@ -38,7 +38,6 @@ const PurchaseManagement = () => {
   const location = useLocation();
   const { initiativeId } = useParams();
   const { t, config } = useScopedTranslation();
-  const token = authStore.getState().token;
   const filtersDef = config<Array<FilterConfigDef>>('pages.purchaseManagement.transactionsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.purchaseManagement.drawer')
   const columnsDef = config<Array<FieldConfigDef>>('pages.purchaseManagement.transactionsTable.columns')
@@ -107,8 +106,9 @@ const PurchaseManagement = () => {
   }, [fieldsDef, handlePreviewPdf, isPreviewPdfLoading, transactionsList])
 
   const fetchTransactions = useCallback(async (params) => {
+    const token = authStore.getState().token;
+    const decodeToken: DecodedJwtToken = jwtDecode(token)
     setTransactionsListIsLoading(true);
-    const decodeToken: DecodedJwtToken = jwtDecode(token);
     try {
       const { content, totalElements } = await getInProgressTransactions(initiativeId, decodeToken?.point_of_sale_id, params);
       setTransactionsList(content);
@@ -118,7 +118,7 @@ const PurchaseManagement = () => {
     } finally {
       setTransactionsListIsLoading(false)
     }
-  }, [initiativeId, token]);
+  }, [initiativeId]);
 
   useEffect(() => {
     const [model] = sortModel

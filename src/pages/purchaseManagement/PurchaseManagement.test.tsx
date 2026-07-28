@@ -35,7 +35,7 @@ vi.mock('../../services/merchantService', () => ({
 
 vi.mock('../../utils/helpers', () => ({
   formatEuro: (cents?: number) => (cents !== undefined ? `${cents / 100} €` : ''),
-  normalizeObj: (obj: any) => obj,
+  plainObj: (obj: any) => obj,
   downloadFileFromBase64: vi.fn(),
 }));
 
