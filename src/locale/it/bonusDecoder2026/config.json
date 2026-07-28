@@ -256,7 +256,14 @@
                         "resizable": false,
                         "cell": {
                             "type": "date",
-                            "tooltip": true
+                            "tooltip": true,
+                            "options": {
+                                "day": "2-digit",
+                                "month": "2-digit",
+                                "year": "numeric",
+                                "hour": "2-digit",
+                                "minute": "2-digit"
+                            }
                         }
                     },
                     {
@@ -498,7 +505,14 @@
                         "resizable": false,
                         "cell": {
                             "type": "date",
-                            "tooltip": true
+                            "tooltip": true,
+                            "options": {
+                                "day": "2-digit",
+                                "month": "2-digit",
+                                "year": "numeric",
+                                "hour": "2-digit",
+                                "minute": "2-digit"
+                            }
                         }
                     },
                     {
