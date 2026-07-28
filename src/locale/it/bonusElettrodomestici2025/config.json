@@ -254,7 +254,7 @@
                         "type": "text",
                         "label": "pages.purchaseManagement.filters.productGtin",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
-                        "message": "pages.purchaseManagement.filters.errors.productGtin",
+                        "message": "pages.purchaseManagement.filters.errors.gtinCode",
                         "pattern": {
                             "value": "\\s+",
                             "flag": "g"
@@ -469,7 +469,6 @@
                     "cell": {
                         "type": "chip",
                         "tooltip": true,
-                        "bold": true,
                         "context": "commons.statusEnum.transaction"
                     }
                 },
@@ -490,14 +489,14 @@
                     {
                         "id": "fiscalCode",
                         "type": "text",
-                        "label": "commons.fiscalCodeFilterPlaceholer"
+                        "label": "pages.refundManagement.filters.fiscalCode"
                     },
                     {
                         "id": "productGtin",
                         "type": "text",
-                        "label": "commons.gtiInFilterPlaceholer",
+                        "label": "pages.refundManagement.filters.productGtin",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
-                        "message": "pages.products.filters.errors.gtinCode",
+                        "message": "pages.refundManagement.filters.errors.gtinCode",
                         "pattern": {
                             "value": "\\s+",
                             "flag": "g"
@@ -509,9 +508,9 @@
                     {
                         "id": "trxCode",
                         "type": "text",
-                        "label": "commons.trxCodeFilterPlaceholer",
+                        "label": "pages.refundManagement.filters.trxCode",
                         "regEx": "^[a-zA-Z0-9]{1,8}$",
-                        "message": "pages.products.filters.errors.trxCode",
+                        "message": "pages.refundManagement.filters.errors.trxCode",
                         "pattern": {
                             "value": "\\s+",
                             "flag": "g"
@@ -523,7 +522,7 @@
                     {
                         "id": "status",
                         "type": "select",
-                        "label": "commons.statusFilterPlaceholer",
+                        "label": "pages.refundManagement.filters.status",
                         "template": "commons.templates.transactions.refundStatus",
                         "context": "commons.statusEnum.transaction"
                     }
@@ -531,8 +530,8 @@
                 "columns": [
                     {
                         "field": "additionalProperties.productName",
-                        "headerName": "pages.refundManagement.table.headers.additionalProperties",
-                        "flex": 1,
+                        "headerName": "pages.refundManagement.tableHeaders.additionalProperties",
+                        "flex": 2.5,
                         "sortable": true,
                         "disableColumnMenu": true,
                         "resizable": false,
@@ -543,8 +542,8 @@
                     },
                     {
                         "field": "trxChargeDate",
-                        "headerName": "pages.refundManagement.table.headers.trxChargeDate",
-                        "flex": 1,
+                        "headerName": "pages.refundManagement.tableHeaders.trxChargeDate",
+                        "flex": 1.5,
                         "sortable": true,
                         "disableColumnMenu": true,
                         "resizable": false,
@@ -555,9 +554,9 @@
                     },
                     {
                         "field": "fiscalCode",
-                        "headerName": "pages.refundManagement.table.headers.fiscalCode",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.refundManagement.tableHeaders.fiscalCode",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -567,9 +566,9 @@
                     },
                     {
                         "field": "effectiveAmountCents",
-                        "headerName": "pages.refundManagement.table.headers.effectiveAmountCents",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.refundManagement.tableHeaders.effectiveAmountCents",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -579,9 +578,9 @@
                     },
                     {
                         "field": "rewardAmountCents",
-                        "headerName": "pages.refundManagement.table.headers.rewardAmountCents",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.refundManagement.tableHeaders.rewardAmountCents",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -591,9 +590,9 @@
                     },
                     {
                         "field": "authorizedAmountCents",
-                        "headerName": "pages.refundManagement.table.headers.residualAmountCents",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.refundManagement.tableHeaders.authorizedAmountCents",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -603,8 +602,8 @@
                     },
                     {
                         "field": "status",
-                        "headerName": "pages.refundManagement.table.headers.status",
-                        "flex": 1,
+                        "headerName": "pages.refundManagement.tableHeaders.status",
+                        "flex": 1.5,
                         "sortable": true,
                         "disableColumnMenu": true,
                         "resizable": false,
@@ -712,7 +711,6 @@
                     "cell": {
                         "type": "chip",
                         "tooltip": true,
-                        "bold": true,
                         "context": "commons.statusEnum.transaction"
                     }
                 },

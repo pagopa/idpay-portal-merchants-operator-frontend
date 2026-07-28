@@ -107,6 +107,25 @@
             "refundSuccessUpload": "Richiesta inviata correttamente",
             "reverseSuccessUpload": "Richiesta inviata correttamente",
             "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova.",
+            "tableHeaders": {
+                "additionalProperties": "Prodotto",
+                "trxChargeDate": "Data e ora",
+                "fiscalCode": "Beneficiario",
+                "effectiveAmountCents": "Totale della spesa",
+                "rewardAmountCents": "Sconto applicato",
+                "authorizedAmountCents": "Importo autorizzato",
+                "status": "Stato"
+            },
+            "filters": {
+                "fiscalCode": "Cerca per codice fiscale",
+                "productGtin": "Cerca per GTIN",
+                "trxCode": "Cerca per codice sconto",
+                "status": "Stato",
+                "errors": {
+                    "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.",
+                    "trxCode": "Il codice sconto deve contenere al massimo 14 caratteri alfanumerici."
+                }
+            },
             "drawer": {
                 "title": "Dettaglio transazione",
                 "product": "Prodotto",
@@ -122,6 +141,7 @@
                 "cancellPayment": "Annulla transazione",
                 "requestRefund": "Carica fattura",
                 "refund": "Storna",
+                "modifyDocument": "Modifica documento",
                 "householdAppliance": "Prodotto",
                 "document": {
                     "rewarded": "Fattura",
@@ -137,6 +157,22 @@
                 },
                 "transactionId": "ID transazione",
                 "trxCode": "Codice sconto"
+            },
+            "feedbackMessages": {
+                "success": {
+                    "transaction": "La transazione è andata a buon fine.",
+                    "payment": "Il pagamento è stato confermato.",
+                    "transactionDelete": "La transazione è stata annullata con successo.",
+                    "refundUpload": "Richiesta inviata correttamente",
+                    "reverseUpload": "Richiesta inviata correttamente"
+                },
+                "errors": {
+                    "generic": "Non è stato possibile recuperare le transazioni. Riprova.",
+                    "previewPdf": "Si è verificato un errore nel download del PDF, riprova.",
+                    "cancel": "Non è stato possibile annullare la transazione. Riprova.",
+                    "capture": "Non è stato possibile confermare la transazione. Riprova.",
+                    "reverse": "Non è stato possibile richiedere il rimborso. Riprova."
+                }
             }
         },
         "products": {
