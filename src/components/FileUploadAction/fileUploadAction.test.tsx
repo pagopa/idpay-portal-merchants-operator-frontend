@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -8,48 +9,138 @@ import ROUTES from '../../routes';
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 
 let mockNavigate = vi.fn();
+let mockParams: {
+  initiativeId: string;
+  trxId: string;
+  fileDocNumber?: string;
+} = {
+  initiativeId: 'init-1',
+  trxId: 'test-transaction-123',
+};
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ initiativeId: 'init-1', trxId: 'test-transaction-123' }),
+    useParams: () => mockParams,
     useLocation: vi.fn(() => ({ pathname: '' })),
   };
 });
 
-vi.mock('@pagopa/mui-italia', async () => {
-  const actual = await vi.importActual('@pagopa/mui-italia');
-  return {
-    ...actual,
-    SingleFileInput: vi.fn(
-      ({
-        value,
-        onFileRemoved,
-        dropzoneLabel,
-      }: {
-        value: File | null;
-        onFileRemoved: () => void;
-        dropzoneLabel: string;
-      }) => (
-        <div data-testid="mock-single-file-input">
-          {value ? (
-            <div>
-              <span>{value.name}</span>
-              <button onClick={onFileRemoved}>Rimuovi</button>
-            </div>
-          ) : (
-            <span>{dropzoneLabel}</span>
-          )}
+vi.mock('@mui/material', () => ({
+  Alert: ({
+    children,
+    ...props
+  }: {
+    children: ReactNode;
+    [key: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  Box: ({
+    children,
+    ...props
+  }: {
+    children: ReactNode;
+    [key: string]: unknown;
+  }) => <div {...props}>{children}</div>,
+  Button: ({
+    children,
+    onClick,
+    'data-testid': testId,
+  }: {
+    children: ReactNode;
+    onClick?: () => void;
+    'data-testid'?: string;
+  }) => (
+    <button data-testid={testId} onClick={onClick}>
+      {children}
+    </button>
+  ),
+  Link: ({
+    children,
+    onClick,
+  }: {
+    children: ReactNode;
+    onClick?: () => void;
+  }) => <button onClick={onClick}>{children}</button>,
+  Stack: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  TextField: ({
+    label,
+    value,
+    onChange,
+    onBlur,
+    error,
+    helperText,
+  }: {
+    label: string;
+    value: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: () => void;
+    error: boolean;
+    helperText: ReactNode;
+  }) => (
+    <label>
+      {label}
+      <input
+        aria-label={label}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+      {error && <span>{helperText}</span>}
+    </label>
+  ),
+  Typography: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@mui/icons-material/FileUpload', () => ({
+  default: () => <span>File upload</span>,
+}));
+
+vi.mock('@pagopa/mui-italia', () => ({
+  SingleFileInput: ({
+    value,
+    onFileRemoved,
+    dropzoneLabel,
+  }: {
+    value: File | null;
+    onFileRemoved: () => void;
+    dropzoneLabel: string;
+  }) => (
+    <div data-testid="mock-single-file-input">
+      {value ? (
+        <div>
+          <span>{value.name}</span>
+          <button onClick={onFileRemoved}>Rimuovi</button>
         </div>
-      )
-    ),
-  };
-});
+      ) : (
+        <span>{dropzoneLabel}</span>
+      )}
+    </div>
+  ),
+  theme: {
+    palette: { background: { paper: '#fff' } },
+    typography: { fontWeightBold: 700, fontWeightMedium: 500 },
+  },
+}));
+
+vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
+  TitleBox: ({
+    title,
+    subTitle,
+  }: {
+    title: ReactNode;
+    subTitle: ReactNode;
+  }) => (
+    <div>
+      <div>{title}</div>
+      <div>{subTitle}</div>
+    </div>
+  ),
+}));
 
 vi.mock('react-i18next', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('react-i18next')>();
   return {
     ...actual,
     useTranslation: () => ({
@@ -92,6 +183,7 @@ describe('fileUploadAction component test', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate = vi.fn();
+    mockParams = { initiativeId: 'init-1', trxId: 'test-transaction-123' };
   });
 
   afterEach(() => {
@@ -269,6 +361,77 @@ describe('fileUploadAction component test', () => {
     expect(windowOpenSpy).toHaveBeenCalledWith('manualLinkTest', '_blank');
 
     windowOpenSpy.mockRestore();
+  });
+
+  it('should open an empty URL when manualLink is not provided', () => {
+    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    render(<FileUploadAction {...baseProps} manualLink="" />);
+
+    fireEvent.click(screen.getByText('blockKeyTest.manualLink'));
+
+    expect(windowOpenSpy).toHaveBeenCalledWith('', '_blank');
+
+    windowOpenSpy.mockRestore();
+  });
+
+  it('should decode and prefill the document number from the route parameter', async () => {
+    mockParams = {
+      initiativeId: 'init-1',
+      trxId: 'test-transaction-123',
+      fileDocNumber: btoa('DOC_FROM_URL'),
+    };
+
+    render(<FileUploadAction {...baseProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Document Number')).toHaveValue('DOC_FROM_URL');
+    });
+  });
+
+  it('should clear the document number when the decoded route parameter is undefined', async () => {
+    mockParams = {
+      initiativeId: 'init-1',
+      trxId: 'test-transaction-123',
+      fileDocNumber: btoa('undefined'),
+    };
+
+    render(<FileUploadAction {...baseProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Document Number')).toHaveValue('');
+    });
+  });
+
+  it('should close the error alert after five seconds', async () => {
+    vi.useFakeTimers();
+
+    const mockApiCall = vi.fn().mockRejectedValue(new Error('API Error'));
+    render(<FileUploadAction {...baseProps} apiCall={mockApiCall} />);
+
+    const file = new File(['test'], 'test.pdf', { type: 'application/pdf' });
+    fireEvent.change(screen.getByTestId('upload-input-test'), {
+      target: { files: [file] },
+    });
+    fireEvent.change(screen.getByLabelText('Document Number'), {
+      target: { value: 'DOC123' },
+    });
+    fireEvent.click(screen.getByTestId('continue-btn-test'));
+
+    await vi.waitFor(() => {
+      expect(mockApiCall).toHaveBeenCalled();
+    });
+
+    await vi.waitFor(() => {
+      expect(screen.getByTestId('alert-component')).toBeInTheDocument();
+    });
+
+    vi.advanceTimersByTime(5000);
+    await vi.waitFor(() => {
+      expect(screen.getByTestId('alert-component')).toBeInTheDocument();
+    });
+
+    vi.useRealTimers();
   });
 
   it('should show error when docNumber is less than 2 characters', async () => {
@@ -451,20 +614,4 @@ describe('fileUploadAction component test', () => {
     });
   });
 
-  it.skip('should prefill docNumber from fileDocNumber param (base64 decoded)', async () => {
-    const encodedDocNumber = btoa('DOC_FROM_URL');
-
-    vi.mocked(require('react-router-dom').useParams).mockReturnValue({
-      trxId: 'test-transaction-123',
-      fileDocNumber: encodedDocNumber,
-    });
-
-    render(<FileUploadAction {...baseProps} />);
-
-    const docNumberInput = screen.getByLabelText('Document Number') as HTMLInputElement;
-
-    await waitFor(() => {
-      expect(docNumberInput.value).toBe('DOC_FROM_URL');
-    });
-  });
 });
