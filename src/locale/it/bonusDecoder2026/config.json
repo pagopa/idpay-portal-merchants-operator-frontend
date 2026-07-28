@@ -196,14 +196,14 @@
                     {
                         "id": "fiscalCode",
                         "type": "text",
-                        "label": "commons.fiscalCodeFilterPlaceholer"
+                        "label": "pages.purchaseManagement.filters.fiscalCode"
                     },
                     {
                         "id": "productGtin",
                         "type": "text",
-                        "label": "commons.gtiInFilterPlaceholer",
+                        "label": "pages.purchaseManagement.filters.productGtin",
                         "regEx": "^[a-zA-Z0-9]{1,14}$",
-                        "message": "pages.products.filters.errors.gtinCode",
+                        "message": "pages.purchaseManagement.filters.errors.productGtin",
                         "pattern": {
                             "value": "\\s+",
                             "flag": "g"
@@ -215,9 +215,9 @@
                     {
                         "id": "trxCode",
                         "type": "text",
-                        "label": "commons.trxCodeFilterPlaceholer",
+                        "label": "pages.purchaseManagement.filters.trxCode",
                         "regEx": "^[a-zA-Z0-9]{1,8}$",
-                        "message": "pages.products.filters.errors.trxCode",
+                        "message": "pages.purchaseManagement.filters.errors.trxCode",
                         "pattern": {
                             "value": "\\s+",
                             "flag": "g"
@@ -229,7 +229,7 @@
                     {
                         "id": "status",
                         "type": "select",
-                        "label": "commons.statusFilterPlaceholer",
+                        "label": "pages.purchaseManagement.filters.status",
                         "template": "commons.templates.transactions.purchaseStatus",
                         "context": "commons.statusEnum.transaction"
                     }
@@ -237,8 +237,8 @@
                 "columns": [
                     {
                         "field": "additionalProperties.productName",
-                        "headerName": "pages.purchaseManagement.table.headers.additionalProperties",
-                        "flex": 1,
+                        "headerName": "pages.purchaseManagement.tableHeaders.additionalProperties",
+                        "flex": 2.5,
                         "sortable": true,
                         "disableColumnMenu": true,
                         "resizable": false,
@@ -249,8 +249,8 @@
                     },
                     {
                         "field": "trxChargeDate",
-                        "headerName": "pages.purchaseManagement.table.headers.trxChargeDate",
-                        "flex": 1,
+                        "headerName": "pages.purchaseManagement.tableHeaders.trxChargeDate",
+                        "flex": 1.5,
                         "sortable": true,
                         "disableColumnMenu": true,
                         "resizable": false,
@@ -261,9 +261,9 @@
                     },
                     {
                         "field": "fiscalCode",
-                        "headerName": "pages.purchaseManagement.table.headers.fiscalCode",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.purchaseManagement.tableHeaders.fiscalCode",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -273,9 +273,9 @@
                     },
                     {
                         "field": "effectiveAmountCents",
-                        "headerName": "pages.purchaseManagement.table.headers.effectiveAmountCents",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.purchaseManagement.tableHeaders.effectiveAmountCents",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -285,9 +285,9 @@
                     },
                     {
                         "field": "rewardAmountCents",
-                        "headerName": "pages.purchaseManagement.table.headers.rewardAmountCents",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.purchaseManagement.tableHeaders.rewardAmountCents",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -297,9 +297,9 @@
                     },
                     {
                         "field": "residualAmountCents",
-                        "headerName": "pages.purchaseManagement.table.headers.residualAmountCents",
-                        "flex": 1,
-                        "sortable": true,
+                        "headerName": "pages.purchaseManagement.tableHeaders.residualAmountCents",
+                        "flex": 1.2,
+                        "sortable": false,
                         "disableColumnMenu": true,
                         "resizable": false,
                         "cell": {
@@ -309,8 +309,8 @@
                     },
                     {
                         "field": "status",
-                        "headerName": "pages.purchaseManagement.table.headers.status",
-                        "flex": 1,
+                        "headerName": "pages.purchaseManagement.tableHeaders.status",
+                        "flex": 1.5,
                         "sortable": true,
                         "disableColumnMenu": true,
                         "resizable": false,
