@@ -10,7 +10,7 @@ import {
 } from '../../services/merchantService';
 import { DecodedJwtToken, FieldConfigDef, FilterConfigDef } from '../../utils/types';
 import { GridSortModel } from '@mui/x-data-grid';
-import { formatEuro, normalizeObj } from '../../utils/helpers';
+import { formatEuro, plainObj } from '../../utils/helpers';
 import { utilsStore } from '../../store/utilsStore';
 import ModalComponent from '../../components/Modal/ModalComponent';
 import TransactionsLayout from '../../components/TransactionsLayout/TransactionsLayout';
@@ -83,17 +83,17 @@ const PurchaseManagement = () => {
 
   const mappedTransactionsList = useMemo(() => {
     return transactionsList.map((trx) => {
-      const normalizedTrx = normalizeObj(trx)
-      const isDowloadVisible = normalizedTrx?.status === 'AUTHORIZED' || normalizedTrx?.status === 'CAPTURED'
+      const plainedTrx = plainObj(trx)
+      const isDowloadVisible = plainedTrx?.status === 'AUTHORIZED' || plainedTrx?.status === 'CAPTURED'
       const mappedFieldsDef = fieldsDef.reduce((acc, field) => {
         return [...acc, ...(!isDowloadVisible && field.cell.type === "download" ? [] : [field])]
       }, [])
       return {
-        ...normalizedTrx,
+        ...plainedTrx,
         onClick: handlePreviewPdf,
         isLoading: isPreviewPdfLoading,
         icon: DescriptionIcon,
-        value: `${normalizedTrx?.trxCode}_preautorizzazione.pdf`,
+        value: `${plainedTrx?.trxCode}_preautorizzazione.pdf`,
         action: {
           icon: "arrow",
           onClick: (row) => {
@@ -322,7 +322,7 @@ const PurchaseManagement = () => {
             {t(`pages.purchaseManagement.modal.${modal}.description`,
               {
                 amount: formatEuro(selectedTransaction?.residualAmountCents),
-                product: selectedTransaction?.['additionalProperties.productName']
+                product: selectedTransaction?.productName
               }
             )}
             {modal === "capture" && <Typography display="inline" variant="body1" fontWeight="bold">"{t(`pages.purchaseManagement.modal.${modal}.detail`)}"</Typography>}.

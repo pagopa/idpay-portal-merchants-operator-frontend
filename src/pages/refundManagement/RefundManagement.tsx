@@ -4,7 +4,7 @@ import { GridSortModel } from '@mui/x-data-grid';
 import { generatePath, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
-import { normalizeObj, } from '../../utils/helpers';
+import { plainObj, } from '../../utils/helpers';
 import TransactionsLayout from '../../components/TransactionsLayout/TransactionsLayout';
 import ROUTES from '../../routes';
 import { authStore } from '../../store/authStore';
@@ -73,7 +73,7 @@ const RefundManagement = () => {
         decodedToken?.point_of_sale_id,
         transaction?.id
       );
-      const filename = transaction?.['invoiceFile.filename'] || 'fattura.pdf';
+      const filename = transaction?.invoiceFile?.filename || 'fattura.pdf';
       const link = document.createElement('a');
       link.href = invoiceUrl;
       link.download = filename;
@@ -87,17 +87,17 @@ const RefundManagement = () => {
 
   const mappedTransactionsList = useMemo(() => {
     return transactionsList.map((trx) => {
-      const normalizedTrx = normalizeObj(trx)
-      const isDowloadVisible = normalizedTrx?.status !== 'CANCELLED'
-      const isButtonDisable = normalizedTrx?.rewardBatchTrxStatus === 'APPROVED'
-      const areButtonsVisible = normalizedTrx?.status === 'INVOICED'
+      const plainedTrx = plainObj(trx)
+      const isDowloadVisible = plainedTrx?.status !== 'CANCELLED'
+      const isButtonDisable = plainedTrx?.rewardBatchTrxStatus === 'APPROVED'
+      const areButtonsVisible = plainedTrx?.status === 'INVOICED'
       const mappedFieldsDef = fieldsDef.reduce((acc, field) => {
-        return [...acc, ...((field.field === "invoiceFile.docNumber" || field.field === "invoiceFile.filename") && isDowloadVisible ? [{ ...field, headerName: `${field.headerName}.${trx?.status.toLowerCase()}` }] :
-          (field.field === "invoiceFile.docNumber" || field.field === "invoiceFile.filename") && !isDowloadVisible ? [] : [field])]
+        return [...acc, ...((field.field === "docNumber" || field.field === "filename") && isDowloadVisible ? [{ ...field, headerName: `${field.headerName}.${plainedTrx?.status.toLowerCase()}` }] :
+          (field.field === "docNumber" || field.field === "filename") && !isDowloadVisible ? [] : [field])]
       }, [])
       return {
-        ...normalizedTrx,
-        onClick: () => handleDownloadInvoice(normalizedTrx),
+        ...plainedTrx,
+        onClick: () => handleDownloadInvoice(trx),
         isLoading: downloadInProgress,
         icon: ReceiptLong,
         action: {

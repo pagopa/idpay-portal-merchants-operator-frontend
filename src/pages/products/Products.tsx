@@ -14,7 +14,7 @@ import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { theme } from '@pagopa/mui-italia';
 import { useParams } from 'react-router-dom';
-import { normalizeObj } from '../../utils/helpers';
+import { plainObj } from '../../utils/helpers';
 
 const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
 
@@ -47,10 +47,10 @@ const Products = () => {
 
   const mappedProductsList = useMemo(() =>
     productsList.map((product) => {
-      const normalizedProduct = normalizeObj(product)
+      const plainedProduct = plainObj(product)
       return {
-        ...normalizedProduct,
-        link: normalizedProduct?.linkEprel,
+        ...plainedProduct,
+        link: plainedProduct?.linkEprel,
         action: {
           icon: "arrow",
           onClick: (row) => {

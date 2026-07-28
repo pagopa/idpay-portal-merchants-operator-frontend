@@ -16,6 +16,7 @@ import {
   replaceValues,
   buildNamespaceKey,
   normalizeObj,
+  plainObj,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -554,6 +555,34 @@ describe("normalizeObj", () => {
     })
 
     const differentValue = normalizeObj(123)
+    expect(differentValue).toBe(123)
+  })
+})
+
+describe("plainObj", () => {
+  it("should plain object", () => {
+    const nestedObject = {
+      key1: "lv1",
+      key2: {
+        key3: {
+          key4: "lv4"
+        }
+      },
+      key5: [1, 2, 3],
+      key6: {
+        key7: null
+      }
+    }
+
+    const plainObject = plainObj(nestedObject)
+    expect(plainObject).toStrictEqual({
+      key1: "lv1",
+      key4: "lv4",
+      key5: [1, 2, 3],
+      key7: null
+    })
+
+    const differentValue = plainObj(123)
     expect(differentValue).toBe(123)
   })
 })

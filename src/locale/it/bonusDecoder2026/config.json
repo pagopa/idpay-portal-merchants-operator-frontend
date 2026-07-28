@@ -236,7 +236,7 @@
                 ],
                 "columns": [
                     {
-                        "field": "additionalProperties.productName",
+                        "field": "productName",
                         "headerName": "pages.purchaseManagement.tableHeaders.additionalProperties",
                         "flex": 2.5,
                         "sortable": true,
@@ -350,7 +350,7 @@
                     }
                 },
                 {
-                    "field": "additionalProperties.productName",
+                    "field": "productName",
                     "headerName": "pages.purchaseManagement.drawer.householdAppliance",
                     "cell": {
                         "type": "text",
@@ -478,7 +478,7 @@
                 ],
                 "columns": [
                     {
-                        "field": "additionalProperties.productName",
+                        "field": "productName",
                         "headerName": "pages.refundManagement.tableHeaders.additionalProperties",
                         "flex": 2.5,
                         "sortable": true,
@@ -592,7 +592,7 @@
                     }
                 },
                 {
-                    "field": "additionalProperties.productName",
+                    "field": "productName",
                     "headerName": "pages.refundManagement.drawer.householdAppliance",
                     "cell": {
                         "type": "text",
@@ -664,7 +664,7 @@
                     }
                 },
                 {
-                    "field": "invoiceFile.docNumber",
+                    "field": "docNumber",
                     "headerName": "pages.refundManagement.drawer.documentNumber",
                     "cell": {
                         "type": "text",
@@ -673,7 +673,7 @@
                     }
                 },
                 {
-                    "field": "invoiceFile.filename",
+                    "field": "filename",
                     "headerName": "pages.refundManagement.drawer.document",
                     "cell": {
                         "type": "download",
