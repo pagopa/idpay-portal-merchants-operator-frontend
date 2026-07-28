@@ -12,6 +12,10 @@ vi.mock('./contexts/AuthContext.tsx', () => ({
 }));
 
 vi.mock('./locale/index.ts', () => ({
+  DEFAULT_LANG: 'it',
+  i18n: {
+    hasResourceBundle: vi.fn().mockReturnValue(false),
+  },
   initI18n: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -46,6 +50,12 @@ vi.mock('./decorators/withInitiativeGuard.tsx', () => ({
 vi.mock('./components/Layout/Layout', () => ({
   default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="layout">{children}</div>
+  ),
+}));
+
+vi.mock('./components/TOSLayout/TOSLayout', () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tos-layout">{children}</div>
   ),
 }));
 

@@ -17,12 +17,13 @@ import ModifyDocument from './pages/modifyDocument/ModifyDocument.tsx';
 import { getInitiativesList } from './services/merchantService.ts';
 import { setInitiativesList } from './redux/slices/initiativesSlice.ts';
 import { useAppDispatch } from './redux/hooks.ts';
-import { initI18n } from './locale/index.ts';
+import { initI18n } from './locale';
 import { useEffect, useState } from 'react';
 import { InitiativesList } from './pages/initiativesList/InitiativesList.tsx';
 import { useAuth } from './contexts/AuthContext.tsx';
 import { buildNamespaceKey } from './utils/helpers.tsx';
 import WithInitiativeGuard from './decorators/withInitiativeGuard.tsx';
+import TOSLayout from './components/TOSLayout/TOSLayout';
 
 function App() {
   const { isAuthenticated, token } = useAuth()
@@ -61,8 +62,22 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <Routes>
         {/* Public routes */}
-        <Route path={ROUTES.PRIVACY_POLICY} element={<PrivacyPolicy />} />
-        <Route path={ROUTES.TOS} element={<TermsOfService />} />
+        <Route
+          path={ROUTES.PRIVACY_POLICY}
+          element={
+            <TOSLayout>
+              <PrivacyPolicy />
+            </TOSLayout>
+          }
+        />
+        <Route
+          path={ROUTES.TOS}
+          element={
+            <TOSLayout>
+              <TermsOfService />
+            </TOSLayout>
+          }
+        />
 
         {/* Protected routes */}
         <Route
