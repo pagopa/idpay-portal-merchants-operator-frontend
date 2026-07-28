@@ -1,32 +1,45 @@
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, useParams } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { MemoryRouter } from 'react-router-dom';
 import RefundManagement from './RefundManagement';
+import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
 
-let mockLocationState: unknown = undefined;
-const navigateMock = vi.fn();
+let mockLocationState: Record<string, unknown> | undefined = undefined;
+const mockNavigate = vi.fn();
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => navigateMock,
+    useNavigate: () => mockNavigate,
     useLocation: () => ({ state: mockLocationState }),
-    useParams: () => ({ initiativeId: 'Init-1' })
+    useParams: () => ({ initiativeId: 'init-123' }),
+    generatePath: vi.fn((path, params) => {
+      let url = path;
+      for (const key in params) {
+        url = url.replace(`:${key}`, params[key]);
+      }
+      return url;
+    }),
   };
 });
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
+vi.mock('../../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: () => ({
     t: (key: string) => key,
+    config: (key: string) => {
+      if (key.includes('filters')) return [{ field: 'testFilter' }];
+      if (key.includes('drawer')) return [{ field: 'invoiceFile.docNumber', headerName: 'Document' }];
+      if (key.includes('columns')) return [{ field: 'status' }];
+      return [];
+    },
   }),
 }));
 
 vi.mock('../../store/authStore', () => ({
   authStore: {
-    getState: () => ({ token: 'fake-token' }),
+    getState: () => ({ token: 'mock-token' }),
   },
 }));
 
@@ -34,232 +47,193 @@ vi.mock('jwt-decode', () => ({
   jwtDecode: () => ({ point_of_sale_id: 'pos-123' }),
 }));
 
-const downloadInvoiceFileApi = vi.fn<(...args: unknown[]) => Promise<unknown>>();
-
 vi.mock('../../services/merchantService', () => ({
   getProcessedTransactions: vi.fn(),
-  downloadInvoiceFileApi: (...args: unknown[]) => downloadInvoiceFileApi(...args),
+  downloadInvoiceFileApi: vi.fn(),
 }));
 
-vi.mock('../../components/DetailsDrawer/DetailsDrawer', () => ({
-  DetailsDrawer: ({
-    isOpen,
-    invoiceStatus,
-    primaryButton,
-    secondaryButton,
-    onFileDownloadCallback,
-  }: {
-    isOpen: boolean;
-    invoiceStatus?: string;
-    primaryButton?: { disabled?: boolean; onClick: () => void };
-    secondaryButton?: { onClick: () => void };
-    onFileDownloadCallback: () => void;
-  }) => (
-    <div data-testid="drawer">
-      <div data-testid="drawer-open">{String(isOpen)}</div>
-      <div data-testid="invoice-status">{invoiceStatus}</div>
-
-      {primaryButton && (
-        <button
-          data-testid="primary-button"
-          disabled={primaryButton.disabled}
-          onClick={primaryButton.onClick}
-        />
-      )}
-
-      {secondaryButton && (
-        <button data-testid="secondary-button" onClick={secondaryButton.onClick} />
-      )}
-
-      <button data-testid="download" onClick={onFileDownloadCallback} />
+vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
+  default: ({ children, alerts, genericErrorState }: any) => (
+    <div data-testid="transactions-layout">
+      <span data-testid="generic-error">{String(genericErrorState[0])}</span>
+      <span data-testid="alert-reverse">{String(alerts[0][0])}</span>
+      <span data-testid="alert-refund">{String(alerts[1][0])}</span>
+      <span data-testid="alert-download">{String(alerts[2][0])}</span>
+      {children}
     </div>
   ),
 }));
 
-const renderMissingDataWithTooltipMock = vi.fn(() => 'MISSING');
-const renderCellWithTooltipMock = vi.fn((v: string) => v);
-
-vi.mock('../../utils/helpers', async () => {
-  const actual = await import('../../utils/helpers')
-  return {
-    ...actual,
-    getStatusChip: vi.fn((_: unknown, status: string) => status),
-    formatEuro: vi.fn((v: number) => `€${v}`),
-    renderCellWithTooltip: (v: string) => renderCellWithTooltipMock(v),
-    renderMissingDataWithTooltip: () => renderMissingDataWithTooltipMock(),
-    checkEuroTooltip: vi.fn(),
-    checkTooltipValue: vi.fn(),
-  }
-});
-
-let capturedColumns: Array<{
-  field: string;
-  renderCell?: (params: { value: unknown }) => unknown;
-}> = [];
-
-vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: ({
-    onRowAction,
-    externalState,
-    DrawerComponent,
-    columns,
-  }: {
-    onRowAction: (row: unknown) => void;
-    externalState: Record<string, boolean>;
-    DrawerComponent: React.ReactNode;
-    columns: Array<{ field: string; renderCell?: (params: { value: unknown }) => unknown }>;
-  }) => {
-    capturedColumns = columns;
-    return (
-      <div>
-        <div data-testid="state-refund">{String(externalState.transactionRefundSuccess)}</div>
-        <div data-testid="state-reverse">{String(externalState.transactionReverseSuccess)}</div>
-        <div data-testid="state-error">{String(externalState.errorDownloadAlert)}</div>
-
-        <button
-          data-testid="open-invoiced"
-          onClick={() =>
-            onRowAction({
-              id: 'trx-invoiced',
-              status: 'INVOICED',
-              rewardBatchTrxStatus: 'PENDING',
-              trxChargeDate: new Date().toISOString(),
-              additionalProperties: { productName: 'prod' },
-              fiscalCode: 'AAA',
-              trxCode: 'trxCode',
-              effectiveAmountCents: 100,
-              rewardAmountCents: 10,
-              authorizedAmountCents: 90,
-              invoiceFile: { filename: 'fattura.pdf', docNumber: '123' },
-            })
-          }
-        />
-
-        <button
-          data-testid="open-rewarded"
-          onClick={() =>
-            onRowAction({
-              id: 'trx-rewarded',
-              status: 'REWARDED',
-              rewardBatchTrxStatus: 'PENDING',
-              trxChargeDate: new Date().toISOString(),
-              additionalProperties: { productName: 'prod' },
-              fiscalCode: 'BBB',
-              trxCode: 'trxCode2',
-              effectiveAmountCents: 200,
-              rewardAmountCents: 20,
-              authorizedAmountCents: 180,
-              invoiceFile: { filename: 'fattura2.pdf', docNumber: 'INV-2' },
-            })
-          }
-        />
-
-        <button
-          data-testid="open-refunded"
-          onClick={() =>
-            onRowAction({
-              id: 'trx-refunded',
-              status: 'REFUNDED',
-              rewardBatchTrxStatus: 'APPROVED',
-              trxChargeDate: new Date().toISOString(),
-              additionalProperties: { productName: 'prod' },
-              fiscalCode: 'AAA',
-              trxCode: 'trxCode',
-              effectiveAmountCents: 100,
-              rewardAmountCents: 10,
-              authorizedAmountCents: 90,
-              invoiceFile: { filename: 'nota.pdf', docNumber: 'CN-1' },
-            })
-          }
-        />
-
-        <button
-          data-testid="open-cancelled"
-          onClick={() =>
-            onRowAction({
-              id: 'trx-cancelled',
-              status: 'CANCELLED',
-              rewardBatchTrxStatus: 'PENDING',
-              trxChargeDate: new Date().toISOString(),
-              additionalProperties: { productName: 'prod' },
-              fiscalCode: 'AAA',
-              trxCode: 'trxCode',
-              effectiveAmountCents: 100,
-              rewardAmountCents: 10,
-              authorizedAmountCents: 90,
-              invoiceFile: { filename: 'canceled.pdf', docNumber: '0' },
-            })
-          }
-        />
-
-        {DrawerComponent}
-      </div>
-    );
-  },
+vi.mock('../../components/DynamicFilters/DynamicFilters', () => ({
+  DynamicFilters: ({ setFilters }: any) => (
+    <button data-testid="set-filters" onClick={() => setFilters({ search: 'test' })} />
+  ),
 }));
 
-const renderComponent = () =>
-  render(
-    <MemoryRouter>
-      <ThemeProvider theme={createTheme()}>
-        <RefundManagement />
-      </ThemeProvider>
-    </MemoryRouter>
-  );
+vi.mock('../../components/DynamicTable/DynamicTable', () => ({
+  DynamicTable: ({ rows, onPaginationModelChange }: any) => (
+    <div data-testid="dynamic-table">
+      <button data-testid="table-page-change" onClick={() => onPaginationModelChange({ page: 1, pageSize: 20 })} />
+      {rows.map((row: any, i: number) => (
+        <div key={i} data-testid={`row-${i}`}>
+          <button data-testid={`row-action-${i}`} onClick={() => row.action.onClick(row)} />
+          <button data-testid={`row-download-${i}`} onClick={() => row.onClick()} />
+        </div>
+      ))}
+    </div>
+  ),
+}));
+
+vi.mock('../../components/DynamicDrawer/DynamicDrawer', () => ({
+  default: ({ isOpen, buttons }: any) => (
+    isOpen ? (
+      <div data-testid="dynamic-drawer">
+        {buttons && buttons.map((btn: any, i: number) => (
+          <button
+            key={i}
+            data-testid={`drawer-btn-${i}`}
+            disabled={btn.disabled}
+            onClick={btn.onClick}
+          >
+            {btn.title}
+          </button>
+        ))}
+      </div>
+    ) : null
+  ),
+}));
+
+vi.mock('../../utils/helpers', async () => {
+  const actual = await vi.importActual<typeof import('../../utils/helpers')>('../../utils/helpers');
+  return {
+    ...actual,
+    normalizeObj: vi.fn((obj) => obj),
+  };
+});
+
+const renderComponent = () => render(
+  <MemoryRouter>
+    <RefundManagement />
+  </MemoryRouter>
+);
 
 describe('RefundManagement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
-    capturedColumns = [];
+    vi.mocked(getProcessedTransactions).mockResolvedValue({
+      content: [],
+      totalElements: 0
+    });
   });
 
-  it('sets refund success alert from location.state', () => {
+  it('sets refund success alert from location state', () => {
     mockLocationState = { refundUploadSuccess: true };
     renderComponent();
-    expect(screen.getByTestId('state-refund')).toHaveTextContent('true');
+    expect(screen.getByTestId('alert-refund')).toHaveTextContent('true');
   });
 
-  it('sets reverse success alert from location.state', () => {
+  it('sets reverse success alert from location state', () => {
     mockLocationState = { reverseUploadSuccess: true };
     renderComponent();
-    expect(screen.getByTestId('state-reverse')).toHaveTextContent('true');
+    expect(screen.getByTestId('alert-reverse')).toHaveTextContent('true');
   });
 
-  it('opens drawer for INVOICED and allows reverse', () => {
+  it('fetches transactions on mount', async () => {
     renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    expect(screen.getByTestId('drawer-open')).toHaveTextContent('true');
-    expect(screen.getByTestId('invoice-status')).toHaveTextContent('INVOICED');
-    expect(screen.getByTestId('secondary-button')).toBeInTheDocument();
-  });
-
-  it('shows secondary button for REWARDED status', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-rewarded'));
-    expect(screen.getByTestId('secondary-button')).toBeInTheDocument();
-    expect(screen.getByTestId('invoice-status')).toHaveTextContent('REWARDED');
-  });
-
-  it('disables modify button when rewardBatchTrxStatus is APPROVED', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-refunded'));
-    const primary = screen.getByTestId('primary-button');
-    expect(primary).toBeDisabled();
-    expect(screen.getByTestId('invoice-status')).toHaveTextContent('REFUNDED');
-  });
-
-  it('does not show secondary button for CANCELLED', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-cancelled'));
-    expect(screen.queryByTestId('secondary-button')).toBeNull();
-    expect(screen.getByTestId('invoice-status')).toHaveTextContent('CANCELLED');
-  });
-
-  it('handles successful invoice download', async () => {
-    downloadInvoiceFileApi.mockResolvedValueOnce({
-      invoiceUrl: 'https://example.com/file.pdf',
+    await waitFor(() => {
+      expect(getProcessedTransactions).toHaveBeenCalledWith('init-123', 'pos-123', expect.any(Object));
     });
+  });
+
+  it('handles API error during fetch transactions', async () => {
+    vi.mocked(getProcessedTransactions).mockRejectedValueOnce(new Error('Network error'));
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByTestId('generic-error')).toHaveTextContent('true');
+    });
+  });
+
+  it('opens drawer and maps correct actions for INVOICED transaction', async () => {
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-1', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING', 'Numero fattura': '123' }],
+      totalElements: 1
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-action-0')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('row-action-0'));
+    
+    expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-btn-0')).not.toBeDisabled();
+  });
+
+  it('disables modify button when rewardBatchTrxStatus is APPROVED', async () => {
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-2', status: 'INVOICED', rewardBatchTrxStatus: 'APPROVED' }],
+      totalElements: 1
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-action-0')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('row-action-0'));
+
+    expect(screen.getByTestId('drawer-btn-0')).toBeDisabled();
+  });
+
+  it('navigates to modify document on drawer button click', async () => {
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-3', status: 'INVOICED', 'Numero fattura': 'FATTURA-123' }],
+      totalElements: 1
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      fireEvent.click(screen.getByTestId('row-action-0'));
+    });
+
+    fireEvent.click(screen.getByTestId('drawer-btn-0'));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      `/init-123/modifica-documento/trx-3/${btoa('FATTURA-123')}`
+    );
+  });
+
+  it('navigates to reverse transaction on drawer button click', async () => {
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-4', status: 'INVOICED' }],
+      totalElements: 1
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      fireEvent.click(screen.getByTestId('row-action-0'));
+    });
+
+    fireEvent.click(screen.getByTestId('drawer-btn-1'));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/init-123/storna-transazione/trx-4',
+      { state: { backTo: '/init-123/gestione-rimborsi' } }
+    );
+  });
+
+  it('downloads invoice successfully', async () => {
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-5', status: 'INVOICED', 'invoiceFile.filename': 'test.pdf' }],
+      totalElements: 1
+    });
+    vi.mocked(downloadInvoiceFileApi).mockResolvedValueOnce({ invoiceUrl: 'http://test.url' });
 
     const clickSpy = vi.fn();
     const originalCreateElement = document.createElement.bind(document);
@@ -268,99 +242,78 @@ describe('RefundManagement', () => {
       if (tag === 'a') {
         return {
           click: clickSpy,
-          set href(_v: string) { },
-          set download(_v: string) { },
+          set href(_v: string) {},
+          set download(_v: string) {},
         } as unknown as HTMLAnchorElement;
       }
       return originalCreateElement(tag);
     }) as typeof document.createElement);
 
     renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    fireEvent.click(screen.getByTestId('download'));
 
     await waitFor(() => {
+      fireEvent.click(screen.getByTestId('row-download-0'));
+    });
+
+    await waitFor(() => {
+      expect(downloadInvoiceFileApi).toHaveBeenCalledWith('pos-123', 'trx-5');
       expect(clickSpy).toHaveBeenCalled();
     });
   });
 
-  it('navigates to reverse transaction when secondary button is clicked', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    fireEvent.click(screen.getByTestId('secondary-button'));
-    expect(navigateMock).toHaveBeenCalledWith(
-      '/Init-1/storna-transazione/trx-invoiced',
-      expect.objectContaining({
-        state: { backTo: '/Init-1/gestione-rimborsi' },
-      })
-    );
-  });
-
-  it('navigates to modify document with btoa-encoded doc number for INVOICED', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    fireEvent.click(screen.getByTestId('primary-button'));
-
-    expect(navigateMock).toHaveBeenCalledWith(`/Init-1/modifica-documento/trx-invoiced/${btoa('123')}`);
-  });
-
-  it('navigates to modify document with btoa-encoded doc number for CANCELLED (covers cancelled label path)', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-cancelled'));
-    fireEvent.click(screen.getByTestId('primary-button'));
-
-    expect(navigateMock).toHaveBeenCalledWith(
-      `/Init-1/modifica-documento/trx-cancelled/${btoa(String(undefined))}`
-    );
-  });
-
-  it('opens drawer for all supported statuses without crashing', () => {
-    renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    fireEvent.click(screen.getByTestId('open-refunded'));
-    fireEvent.click(screen.getByTestId('open-cancelled'));
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
-  });
-
-  it('handles download error and sets error alert', async () => {
-    downloadInvoiceFileApi.mockRejectedValueOnce(new Error('download failed'));
+  it('handles download invoice error', async () => {
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-6', status: 'INVOICED' }],
+      totalElements: 1
+    });
+    vi.mocked(downloadInvoiceFileApi).mockRejectedValueOnce(new Error('Download Failed'));
 
     renderComponent();
-    fireEvent.click(screen.getByTestId('open-invoiced'));
-    fireEvent.click(screen.getByTestId('download'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('state-error')).toHaveTextContent('true');
+      fireEvent.click(screen.getByTestId('row-download-0'));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('alert-download')).toHaveTextContent('true');
     });
   });
 
-  it('does not set alerts when location.state is undefined', () => {
+  it('updates page size and fetches again on pagination change', async () => {
     renderComponent();
-    expect(screen.getByTestId('state-refund')).toHaveTextContent('false');
-    expect(screen.getByTestId('state-reverse')).toHaveTextContent('false');
+
+    await waitFor(() => {
+      expect(getProcessedTransactions).toHaveBeenCalledTimes(1);
+    });
+
+    fireEvent.click(screen.getByTestId('table-page-change'));
+
+    await waitFor(() => {
+      expect(getProcessedTransactions).toHaveBeenCalledTimes(2);
+      expect(getProcessedTransactions).toHaveBeenLastCalledWith(
+        'init-123',
+        'pos-123',
+        expect.objectContaining({ page: 1, size: 20 })
+      );
+    });
   });
 
-  it('formatDateTime: calls renderMissingDataWithTooltip when value is undefined', () => {
+  it('resets page and fetches again on filters change', async () => {
     renderComponent();
-    const col = capturedColumns.find((c) => c.field === 'trxChargeDate');
-    expect(col).toBeDefined();
-    col!.renderCell!({ value: undefined });
-    expect(renderMissingDataWithTooltipMock).toHaveBeenCalled();
-  });
 
-  it('formatDateTime: calls renderCellWithTooltip with formatted date when value is valid', () => {
-    renderComponent();
-    const col = capturedColumns.find((c) => c.field === 'trxChargeDate');
-    expect(col).toBeDefined();
-    col!.renderCell!({ value: '2024-06-15T10:30:00.000Z' });
-    expect(renderCellWithTooltipMock).toHaveBeenCalled();
-  });
+    await waitFor(() => {
+      expect(getProcessedTransactions).toHaveBeenCalledTimes(1);
+    });
 
-  it('formatDateTime: calls renderMissingDataWithTooltip when value is empty string', () => {
-    renderComponent();
-    const col = capturedColumns.find((c) => c.field === 'trxChargeDate');
-    expect(col).toBeDefined();
-    col!.renderCell!({ value: '' });
-    expect(renderMissingDataWithTooltipMock).toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId('set-filters'));
+
+    await waitFor(() => {
+      expect(getProcessedTransactions).toHaveBeenCalledTimes(2);
+      expect(getProcessedTransactions).toHaveBeenLastCalledWith(
+        'init-123',
+        'pos-123',
+        expect.objectContaining({ page: 0, search: 'test' })
+      );
+    });
   });
 });
