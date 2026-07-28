@@ -9,7 +9,7 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
     useScopedTranslation: () => ({
         t: (key: string) => key,
         config: (key: string) => {
-            if (key === 'templates.categories') {
+            if (key === 'categories' || key === 'templates.categories') {
                 return [
                     { value: 'REFRIGERATINGAPPL', label: 'templates.categories.refrigeratingappl' },
                     { value: 'OVENS', label: 'templates.categories.ovens' }
@@ -56,10 +56,10 @@ describe('DynamicFilters Component', () => {
 
     it('should correctly render all filter fields', () => {
         render(
-            <DynamicFilters 
-                filters={{}} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{}}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
@@ -69,10 +69,10 @@ describe('DynamicFilters Component', () => {
 
     it('should validate text input with regex and show/hide error message correctly', async () => {
         render(
-            <DynamicFilters 
-                filters={{}} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{}}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
@@ -88,16 +88,19 @@ describe('DynamicFilters Component', () => {
 
     it('should handle onPaste event with pattern replacement and validation', () => {
         render(
-            <DynamicFilters 
-                filters={{}} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{}}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
         const textInput = screen.getByLabelText('pages.products.filters.eprelCode');
 
-        fireEvent.paste(textInput, { clipboardData: { getData: () => '12 34 56' } });
+        fireEvent.paste(textInput, {
+            clipboardData: { getData: () => '12 34 56' },
+            preventDefault: vi.fn()
+        });
 
         expect(textInput).toHaveValue('123456');
         expect(screen.queryByText('pages.products.filters.errors.eprelCode')).not.toBeInTheDocument();
@@ -105,23 +108,20 @@ describe('DynamicFilters Component', () => {
 
     it('should update select field and format draftFilters', async () => {
         render(
-            <DynamicFilters 
-                filters={{}} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{}}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
-        const selectLabel = screen.getAllByText('pages.products.filters.category')[0];
-        const selectContainer = selectLabel.parentElement?.querySelector('[role="combobox"]');
-        
-        expect(selectContainer).toBeInTheDocument();
-        fireEvent.mouseDown(selectContainer!);
+        const selectContainer = screen.getByRole('combobox');
+        await userEvent.click(selectContainer);
 
-        const option = screen.getByText('templates.categories.refrigeratingappl');
-        fireEvent.click(option);
+        const option = await screen.findByText('templates.categories.refrigeratingappl');
+        await userEvent.click(option);
 
-        fireEvent.click(screen.getByTestId('apply-filters-test'));
+        await userEvent.click(screen.getByTestId('apply-filters-test'));
 
         await waitFor(() => {
             expect(mockSetFilters).toHaveBeenCalledWith({ category: 'REFRIGERATINGAPPL' });
@@ -130,10 +130,10 @@ describe('DynamicFilters Component', () => {
 
     it('should properly apply text filters removing empty values', async () => {
         render(
-            <DynamicFilters 
-                filters={{ category: 'OVENS' }} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{ category: 'OVENS' }}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
@@ -143,19 +143,19 @@ describe('DynamicFilters Component', () => {
         fireEvent.click(screen.getByTestId('apply-filters-test'));
 
         await waitFor(() => {
-            expect(mockSetFilters).toHaveBeenCalledWith({ 
-                category: 'OVENS', 
-                eprelCode: '987' 
+            expect(mockSetFilters).toHaveBeenCalledWith({
+                category: 'OVENS',
+                eprelCode: '987'
             });
         });
     });
 
     it('should trigger setFilters with empty object when reset button is clicked', () => {
         render(
-            <DynamicFilters 
-                filters={{ category: 'OVENS' }} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{ category: 'OVENS' }}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
@@ -165,10 +165,10 @@ describe('DynamicFilters Component', () => {
 
     it('should update draft filters if initial filters prop changes', () => {
         const { rerender } = render(
-            <DynamicFilters 
-                filters={{}} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{}}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
@@ -176,10 +176,10 @@ describe('DynamicFilters Component', () => {
         expect(textInput).toHaveValue('');
 
         rerender(
-            <DynamicFilters 
-                filters={{ eprelCode: '111' }} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{ eprelCode: '111' }}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
 
@@ -188,15 +188,15 @@ describe('DynamicFilters Component', () => {
 
     it('should disable apply button when there are validation errors', async () => {
         render(
-            <DynamicFilters 
-                filters={{ category: 'OVENS' }} 
-                filtersDef={mockFiltersDef} 
-                setFilters={mockSetFilters} 
+            <DynamicFilters
+                filters={{ category: 'OVENS' }}
+                filtersDef={mockFiltersDef}
+                setFilters={mockSetFilters}
             />
         );
-        
+
         const textInput = screen.getByLabelText('pages.products.filters.eprelCode');
-        
+
         await userEvent.type(textInput, 'abc');
         expect(screen.getByTestId('apply-filters-test')).toBeDisabled();
     });
