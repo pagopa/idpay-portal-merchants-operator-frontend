@@ -45,12 +45,10 @@ const SummaryAcceptDiscount = () => {
   const handleAuthorizeDiscount = async () => {
     setAuthorizeIsLoading(true);
     try {
-      await authPaymentBarCode({
+      await authPaymentBarCode(initiativeId, {
         trxCode: summaryDataObj?.trxCode,
         amountCents: summaryDataObj?.originalAmountCents,
-        additionalProperties: {
-          productGtin: summaryDataObj?.productGtin,
-        },
+        additionalProperties: summaryDataObj?.additionalProperties,
       });
       sessionStorage.removeItem('discountCoupon');
       setAuthorizeIsLoading(false);
@@ -209,7 +207,7 @@ const SummaryAcceptDiscount = () => {
                       variant="body2"
                       sx={{ fontWeight: theme.typography.fontWeightMedium }}
                     >
-                      {summaryDataObj?.productName ?? MISSING_DATA_PLACEHOLDER}
+                      {summaryDataObj?.additionalProperties?.productName ?? MISSING_DATA_PLACEHOLDER}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, md: 12, lg: 12 }}>

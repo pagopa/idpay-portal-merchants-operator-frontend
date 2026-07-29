@@ -204,7 +204,7 @@ const PurchaseManagement = () => {
 
   const deleteTransaction = async () => {
     try {
-      await deleteTransactionInProgress(selectedTransaction?.id);
+      await deleteTransactionInProgress(initiativeId, selectedTransaction?.id);
       setOpenDrawer(false);
       setCancelTransactionModal(false);
       setTransactionDeleteSuccess(true);
@@ -218,7 +218,7 @@ const PurchaseManagement = () => {
 
   const captureTransaction = async () => {
     try {
-      await capturePayment({ trxCode: selectedTransaction?.trxCode });
+      await capturePayment(initiativeId, { trxCode: selectedTransaction?.trxCode });
       setOpenDrawer(false);
       setCaptureTransactionModal(false);
       setTransactionCaptured(true);

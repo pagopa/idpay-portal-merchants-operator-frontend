@@ -62,9 +62,9 @@ describe('merchantService', () => {
 
     vi.mocked(MerchantApi.previewPayment).mockResolvedValue(response as never);
 
-    const result = await previewPayment(params);
+    const result = await previewPayment('init-123', params);
 
-    expect(MerchantApi.previewPayment).toHaveBeenCalledWith(params);
+    expect(MerchantApi.previewPayment).toHaveBeenCalledWith('init-123', params);
     expect(result).toEqual(response);
   });
 
@@ -72,12 +72,12 @@ describe('merchantService', () => {
     const response = { trxId: 'TRX', status: 'AUTHORIZED' };
     vi.mocked(MerchantApi.authPaymentBarCode).mockResolvedValue(response as never);
 
-    const result = await authPaymentBarCode({
+    const result = await authPaymentBarCode('init-123', {
       trxCode: 'TRX',
       amountCents: 1000,
     });
 
-    const callArg = vi.mocked(MerchantApi.authPaymentBarCode).mock.calls[0][0];
+    const callArg = vi.mocked(MerchantApi.authPaymentBarCode).mock.calls[0][1];
 
     expect(callArg).toMatchObject({
       trxCode: 'TRX',
@@ -86,6 +86,8 @@ describe('merchantService', () => {
     expect(typeof callArg.idTrxAcquirer).toBe('string');
     expect(callArg.additionalProperties).toEqual({});
 
+    expect(MerchantApi.authPaymentBarCode).toHaveBeenCalledWith('init-123', callArg);
+
     expect(result).toEqual(response);
   });
 
@@ -93,17 +95,17 @@ describe('merchantService', () => {
     const response = { trxCode: 'T1', status: 'CAPTURED' };
     vi.mocked(MerchantApi.capturePayment).mockResolvedValue(response as never);
 
-    const result = await capturePayment({ trxCode: 'T1' });
+    const result = await capturePayment('init-123', { trxCode: 'T1' });
 
-    expect(MerchantApi.capturePayment).toHaveBeenCalledWith({ trxCode: 'T1' });
+    expect(MerchantApi.capturePayment).toHaveBeenCalledWith('init-123', { trxCode: 'T1' });
     expect(result).toEqual(response);
   });
 
   it('deleteTransactionInProgress delegates correctly', async () => {
     vi.mocked(MerchantApi.deleteTransactionInProgress).mockResolvedValue(undefined as never);
 
-    await expect(deleteTransactionInProgress('ID')).resolves.toBeUndefined();
-    expect(MerchantApi.deleteTransactionInProgress).toHaveBeenCalledWith('ID');
+    await expect(deleteTransactionInProgress('init-123', 'ID')).resolves.toBeUndefined();
+    expect(MerchantApi.deleteTransactionInProgress).toHaveBeenCalledWith('init-123', 'ID');
   });
 
   it('getProcessedTransactions delegates correctly', async () => {
