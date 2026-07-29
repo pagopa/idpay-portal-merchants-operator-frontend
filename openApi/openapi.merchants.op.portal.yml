@@ -156,25 +156,13 @@ paths:
         - transaction
       summary: "ENG: Preview Payment - IT: Anteprima pagamento"
       description: |
-        ENG: Preview payment.
-        - Default / V1
-          - do not send `X-API-Version`
-          - request schema: `PreviewPaymentRequestDTO`
-          - response schema: `PreviewPaymentDTO`
-        - V2
-          - send `X-API-Version: 2`
-          - request reference schema: `PreviewPaymentRequestV2DTO`
-          - response reference schema: `PreviewPaymentResponseV2DTO`
+        ENG: Preview payment with V2 payloads.
+        - request schema: `PreviewPaymentRequestV2DTO`
+        - response schema: `PreviewPaymentResponseV2DTO`
 
-        IT: Anteprima pagamento.
-        - Default / V1
-          - non inviare `X-API-Version`
-          - schema request: `PreviewPaymentRequestDTO`
-          - schema response: `PreviewPaymentDTO`
-        - V2
-          - inviare `X-API-Version: 2`
-          - schema request di riferimento: `PreviewPaymentRequestV2DTO`
-          - schema response di riferimento: `PreviewPaymentResponseV2DTO`
+        IT: Anteprima pagamento con payload V2.
+        - schema request: `PreviewPaymentRequestV2DTO`
+        - schema response: `PreviewPaymentResponseV2DTO`
       operationId: previewPayment
       parameters:
         - name: initiativeId
@@ -193,54 +181,23 @@ paths:
             type: string
             maxLength: 24
             pattern: "^[a-zA-Z0-9]+$"
-        - name: X-API-Version
-          in: header
-          description: "ENG: API version. When set to `2`, preview payment uses V2 payloads - IT: Versione dell'API. Se valorizzato a `2`, la preview pagamento usa i payload V2"
-          required: false
-          schema:
-            type: string
-            enum:
-              - "2"
       requestBody:
-        description: |
-          ENG: Supported request schemas:
-          - default / V1: `PreviewPaymentRequestDTO`
-          - V2 with `X-API-Version: 2`: `PreviewPaymentRequestV2DTO`
-
-          IT: Schemi request supportati:
-          - default / V1: `PreviewPaymentRequestDTO`
-          - V2 con `X-API-Version: 2`: `PreviewPaymentRequestV2DTO`
+        description: "ENG: Preview payment request (V2) - IT: Request anteprima pagamento (V2)"
         required: true
         content:
           application/json:
             schema:
-              anyOf:
-                - $ref: "#/components/schemas/PreviewPaymentRequestDTO"
-                - $ref: "#/components/schemas/PreviewPaymentRequestV2DTO"
+              $ref: "#/components/schemas/PreviewPaymentRequestV2DTO"
             examples:
-              v1:
-                summary: "ENG: Preview payment V1 - IT: Anteprima pagamento V1"
-                value:
-                  productName: "Forno XYZ"
-                  productGtin: "OVENS09"
-                  amountCents: 123400
               v2:
                 summary: "ENG: Preview payment V2 - IT: Anteprima pagamento V2"
-                description: "ENG: Requires `X-API-Version: 2` - IT: Richiede `X-API-Version: 2`"
                 value:
                   amountCents: 123400
                   additionalProperties:
                     customField: "customValue"
       responses:
         "200":
-          description: |
-            ENG: Supported response schemas:
-            - default / V1: `PreviewPaymentDTO`
-            - V2 with `X-API-Version: 2`: `PreviewPaymentResponseV2DTO`
-
-            IT: Schemi response supportati:
-            - default / V1: `PreviewPaymentDTO`
-            - V2 con `X-API-Version: 2`: `PreviewPaymentResponseV2DTO`
+          description: "ENG: Preview payment response (V2) - IT: Risposta anteprima pagamento (V2)"
           headers:
             Access-Control-Allow-Origin:
               $ref: "#/components/headers/Access-Control-Allow-Origin"
@@ -253,26 +210,10 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - $ref: "#/components/schemas/PreviewPaymentDTO"
-                  - $ref: "#/components/schemas/PreviewPaymentResponseV2DTO"
+                $ref: "#/components/schemas/PreviewPaymentResponseV2DTO"
               examples:
-                v1:
-                  summary: "ENG: Preview payment V1 response - IT: Risposta anteprima pagamento V1"
-                  value:
-                    trxCode: "cmhszi7u"
-                    trxDate: "2025-10-24T12:36:00.725+00:00"
-                    status: "AUTHORIZED"
-                    originalAmountCents: 133400
-                    rewardCents: 10000
-                    residualAmountCents: 123400
-                    userId: "RSSMRA85M01H501U"
-                    productName: "Forno XYZ"
-                    productGtin: "OVENS09"
-                    extendedAuthorization: true
                 v2:
                   summary: "ENG: Preview payment V2 response - IT: Risposta anteprima pagamento V2"
-                  description: "ENG: Returned with `X-API-Version: 2` - IT: Restituita con `X-API-Version: 2`"
                   value:
                     trxCode: "cmhszi7u"
                     trxDate: "2025-10-24T12:36:00.725+00:00"
