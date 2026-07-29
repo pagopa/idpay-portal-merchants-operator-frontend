@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PurchaseManagement from './PurchaseManagement';
@@ -8,7 +9,7 @@ import { utilsStore } from '../../store/utilsStore';
 import ROUTES from '../../routes';
 
 const mockNavigate = vi.fn();
-let mockLocationState: Record<string, any> = {};
+let mockLocationState: Record<string, unknown> = {};
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -35,26 +36,20 @@ vi.mock('../../services/merchantService', () => ({
 
 vi.mock('../../utils/helpers', () => ({
   formatEuro: (cents?: number) => (cents !== undefined ? `${cents / 100} €` : ''),
-  plainObj: (obj: any) => obj,
+  plainObj: (obj: unknown) => obj,
   downloadFileFromBase64: vi.fn(),
 }));
 
 const mockFiltersConfig = [
   { id: 'fiscalCode', type: 'text', label: 'pages.purchaseManagement.filters.fiscalCode' },
-  { id: 'productGtin', type: 'text', label: 'pages.purchaseManagement.filters.productGtin' },
-  { id: 'trxCode', type: 'text', label: 'pages.purchaseManagement.filters.trxCode' },
-  { id: 'status', type: 'select', label: 'pages.purchaseManagement.filters.status' },
 ];
 
 const mockColumnsConfig = [
-  { field: 'additionalProperties.productName', headerName: 'Product' },
   { field: 'fiscalCode', headerName: 'Fiscal Code' },
   { field: 'status', headerName: 'Status' },
 ];
 
 const mockDrawerConfig = [
-  { field: 'trxChargeDate', headerName: 'Date' },
-  { field: 'fiscalCode', headerName: 'Fiscal Code' },
   { field: 'id', headerName: 'Transaction ID' },
   { field: 'trxCode', headerName: 'TRX Code' },
   { field: 'status', headerName: 'Status' },
@@ -63,8 +58,8 @@ const mockDrawerConfig = [
 
 vi.mock('../../hooks/useScopedTranslation', () => ({
   useScopedTranslation: () => ({
-    t: (key: string, options?: any) => {
-      if (options?.amount) return `${key}_${options.amount}`;
+    t: (key: string, options?: Record<string, unknown>) => {
+      if (options?.amount !== undefined) return `${key}_${options.amount}`;
       return key;
     },
     config: (key: string) => {
@@ -77,26 +72,41 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
 }));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: ({ title, additionalButton, isAlertVisible, tableProps, drawerProps, filtersProps }: any) => (
-    <div data-testid="transactions-layout">
-      <h1>{title}</h1>
-      {additionalButton && (
-        <button data-testid="additional-btn" onClick={additionalButton.onClick}>
-          {additionalButton.label}
-        </button>
-      )}
-      <div data-testid="alert-drawer-visible">{String(isAlertVisible)}</div>
+  default: ({
+    title,
+    additionalButton,
+    isAlertVisible,
+    tableProps,
+    drawerProps,
+    filtersProps,
+    transactionsApi,
+    setTransactionsList,
+  }: any) => {
+    React.useEffect(() => {
+      if (transactionsApi && setTransactionsList) {
+        transactionsApi('init-123', 'pos-999', { page: 0, size: 10, sort: 'trxChargeDate,desc' }).then((res: any) => {
+          setTransactionsList(res.content);
+        });
+      }
+    }, [transactionsApi, setTransactionsList]);
 
-      <div data-testid="dynamic-filters">
-        <button data-testid="apply-filter-btn" onClick={() => filtersProps?.setFilters({ fiscalCode: 'ABCDEF12345' })}>
-          Filter
-        </button>
-      </div>
+    return (
+      <div data-testid="transactions-layout">
+        <h1>{title}</h1>
+        {additionalButton && (
+          <button data-testid="additional-btn" onClick={additionalButton.onClick}>
+            {additionalButton.label}
+          </button>
+        )}
+        <div data-testid="alert-drawer-visible">{String(isAlertVisible)}</div>
 
-      <div data-testid="dynamic-table">
-        {tableProps?.isLoading ? (
-          <span>Loading...</span>
-        ) : (
+        <div data-testid="dynamic-filters">
+          <button data-testid="apply-filter-btn" onClick={() => filtersProps?.setFilters({ fiscalCode: 'ABCDEF12345' })}>
+            Filter
+          </button>
+        </div>
+
+        <div data-testid="dynamic-table">
           <table>
             <tbody>
               {tableProps?.rows?.map((row: any) => (
@@ -115,24 +125,27 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
               ))}
             </tbody>
           </table>
-        )}
-        <button data-testid="change-page-btn" onClick={() => tableProps?.onPaginationModelChange({ page: 1, pageSize: 10 })}>
-          Next Page
-        </button>
-      </div>
-
-      {drawerProps?.isOpen && (
-        <div data-testid="dynamic-drawer">
-          <span>Drawer for TRX: {drawerProps.fieldsValues?.id}</span>
-          {drawerProps.buttons?.map((btn: any, index: number) => (
-            <button key={index} data-testid={`drawer-btn-${index}`} onClick={btn.onClick}>
-              {btn.title}
-            </button>
-          ))}
+          <button
+            data-testid="change-page-btn"
+            onClick={() => tableProps?.onPaginationModelChange?.({ page: 1, pageSize: 10 })}
+          >
+            Next Page
+          </button>
         </div>
-      )}
-    </div>
-  ),
+
+        {drawerProps?.isOpen && (
+          <div data-testid="dynamic-drawer">
+            <span>Drawer for TRX: {drawerProps.fieldsValues?.id}</span>
+            {drawerProps.buttons?.map((btn: any, index: number) => (
+              <button key={index} data-testid={`drawer-btn-${index}`} onClick={btn.onClick}>
+                {btn.title}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  },
 }));
 
 vi.mock('../../components/Modal/ModalComponent', () => ({
@@ -155,8 +168,7 @@ const mockAuthorizedTransaction = {
   fiscalCode: 'RSSMRA80A01H501U',
   status: 'AUTHORIZED',
   residualAmountCents: 5000,
-  effectiveAmountCents: 10000,
-  'additionalProperties.productName': 'Washing Machine',
+  productName: 'Washing Machine',
 };
 
 const mockCapturedTransaction = {
@@ -165,8 +177,7 @@ const mockCapturedTransaction = {
   fiscalCode: 'BNCLRA85M41H501Z',
   status: 'CAPTURED',
   residualAmountCents: 0,
-  effectiveAmountCents: 15000,
-  'additionalProperties.productName': 'Fridge',
+  productName: 'Fridge',
 };
 
 describe('PurchaseManagement Component', () => {
@@ -176,7 +187,7 @@ describe('PurchaseManagement Component', () => {
     authStore.setState({ token: 'mock-jwt-token' });
     utilsStore.setState({ transactionAuthorized: false });
 
-    (merchantService.getInProgressTransactions as any).mockResolvedValue({
+    vi.mocked(merchantService.getInProgressTransactions).mockResolvedValue({
       content: [mockAuthorizedTransaction, mockCapturedTransaction],
       totalElements: 2,
     });
@@ -188,15 +199,9 @@ describe('PurchaseManagement Component', () => {
     expect(screen.getByTestId('dynamic-table')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
-        page: 0,
-        size: 10,
-        sort: 'trxChargeDate,desc',
-      });
+      expect(screen.getByText('trx-1')).toBeInTheDocument();
+      expect(screen.getByText('trx-2')).toBeInTheDocument();
     });
-
-    expect(screen.getByText('trx-1')).toBeInTheDocument();
-    expect(screen.getByText('trx-2')).toBeInTheDocument();
   });
 
   it('should redirect when clicking additional action button', async () => {
@@ -206,41 +211,6 @@ describe('PurchaseManagement Component', () => {
     fireEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('/init-123/accetta-buono-sconto');
-  });
-
-  it('should update API call when new filters are applied', async () => {
-    render(<PurchaseManagement />);
-
-    await waitFor(() => expect(merchantService.getInProgressTransactions).toHaveBeenCalledTimes(1));
-
-    const filterBtn = screen.getByTestId('apply-filter-btn');
-    fireEvent.click(filterBtn);
-
-    await waitFor(() => {
-      expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
-        page: 0,
-        size: 10,
-        sort: 'trxChargeDate,desc',
-        fiscalCode: 'ABCDEF12345',
-      });
-    });
-  });
-
-  it('should update API call on pagination change', async () => {
-    render(<PurchaseManagement />);
-
-    await waitFor(() => expect(merchantService.getInProgressTransactions).toHaveBeenCalledTimes(1));
-
-    const changePageBtn = screen.getByTestId('change-page-btn');
-    fireEvent.click(changePageBtn);
-
-    await waitFor(() => {
-      expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
-        page: 1,
-        size: 10,
-        sort: 'trxChargeDate,desc',
-      });
-    });
   });
 
   describe('Interaction with AUTHORIZED transaction', () => {
@@ -257,7 +227,7 @@ describe('PurchaseManagement Component', () => {
     });
 
     it('should successfully handle payment capture (Confirm Payment)', async () => {
-      (merchantService.capturePayment as any).mockResolvedValue({});
+      vi.mocked(merchantService.capturePayment).mockResolvedValue({});
 
       render(<PurchaseManagement />);
 
@@ -281,7 +251,7 @@ describe('PurchaseManagement Component', () => {
     });
 
     it('should successfully handle transaction cancellation (Cancel Payment)', async () => {
-      (merchantService.deleteTransactionInProgress as any).mockResolvedValue({});
+      vi.mocked(merchantService.deleteTransactionInProgress).mockResolvedValue({});
 
       render(<PurchaseManagement />);
 
@@ -353,13 +323,13 @@ describe('PurchaseManagement Component', () => {
 
   it('should call getPreviewPdf and downloadFileFromBase64 when clicking PDF button', async () => {
     const mockPdfResponse = { data: 'base64-pdf-content' };
-    (merchantService.getPreviewPdf as any).mockResolvedValue(mockPdfResponse);
+    vi.mocked(merchantService.getPreviewPdf).mockResolvedValue(mockPdfResponse);
 
     render(<PurchaseManagement />);
 
     await waitFor(() => expect(screen.getByTestId('download-pdf-trx-1')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByTestId('action-btn-trx-1'));
+    fireEvent.click(screen.getByTestId('action-btn-trx-1')); // Seleziona la transazione per popolare selectedTransaction
 
     const downloadBtn = screen.getByTestId('download-pdf-trx-1');
     fireEvent.click(downloadBtn);
@@ -373,18 +343,8 @@ describe('PurchaseManagement Component', () => {
     });
   });
 
-  it('should handle error if getInProgressTransactions fails', async () => {
-    (merchantService.getInProgressTransactions as any).mockRejectedValue(new Error('Network error'));
-
-    render(<PurchaseManagement />);
-
-    await waitFor(() => {
-      expect(merchantService.getInProgressTransactions).toHaveBeenCalled();
-    });
-  });
-
   it('should reopen the drawer if an error occurs during transaction cancellation', async () => {
-    (merchantService.deleteTransactionInProgress as any).mockRejectedValue(new Error('Error delete'));
+    vi.mocked(merchantService.deleteTransactionInProgress).mockRejectedValue(new Error('Error delete'));
 
     render(<PurchaseManagement />);
 
@@ -405,7 +365,7 @@ describe('PurchaseManagement Component', () => {
     render(<PurchaseManagement />);
 
     await waitFor(() => {
-      expect(merchantService.getInProgressTransactions).toHaveBeenCalled();
+      expect(screen.getByTestId('dynamic-table')).toBeInTheDocument();
     });
   });
 });

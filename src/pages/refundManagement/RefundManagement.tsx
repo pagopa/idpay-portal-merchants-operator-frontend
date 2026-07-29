@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { GridSortModel } from '@mui/x-data-grid';
 import { generatePath, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
@@ -12,13 +11,6 @@ import { PointOfSaleTransactionProcessedDTO } from '../../api/generated/data-con
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { ReceiptLong } from '@mui/icons-material';
 
-const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
-
-const initialPagination = {
-  page: 0,
-  pageSize: isNaN(initialPageSize) ? 10 : initialPageSize
-}
-
 const RefundManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,21 +22,14 @@ const RefundManagement = () => {
   const [mappedFieldsDef, setMappedFieldsDef] = useState<Array<FieldConfigDef>>(fieldsDef)
 
   const [transactionsList, setTransactionsList] = useState<Array<PointOfSaleTransactionProcessedDTO | never>>([]);
-  const [transactionsListIsLoading, setTransactionsListIsLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [page, setPage] = useState(initialPagination.page)
-  const [pageSize, setPageSize] = useState(initialPagination.pageSize)
-  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "trxChargeDate", sort: "desc" }]);
-  const [totalElements, setTotalElements] = useState(0)
 
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const [downloadInProgress, setDownloadInProgress] = useState(false);
   const [isDisabledModDocButton, setIsDisabledModDocButton] = useState(false);
   const [areButtonsVisible, setAreButtonsVisible] = useState(false);
-  const [genericError, setGenericError] = useState(false);
   const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
   const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
   const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
@@ -109,32 +94,6 @@ const RefundManagement = () => {
     })
   }, [downloadInProgress, fieldsDef, handleDownloadInvoice, transactionsList])
 
-  const fetchTransactions = useCallback(async (params) => {
-    setTransactionsListIsLoading(true);
-    const token = authStore.getState().token;
-    const decodeToken: DecodedJwtToken = jwtDecode(token);
-    try {
-      const { content, totalElements } = await getProcessedTransactions(initiativeId, decodeToken?.point_of_sale_id, params);
-      setTransactionsList(content);
-      setTotalElements(totalElements)
-    } catch {
-      setGenericError(true)
-    } finally {
-      setTransactionsListIsLoading(false)
-    }
-  }, [initiativeId]);
-
-  useEffect(() => {
-    const [model] = sortModel
-    const params = {
-      size: pageSize,
-      page,
-      ...filters,
-      ...(sortModel.length ? { sort: `${model?.field},${model?.sort}` } : {}),
-    }
-    fetchTransactions(params);
-  }, [fetchTransactions, filters, page, pageSize, sortModel]);
-
   const handleReverseTransaction = useCallback(() => {
     const replaceValuesObj = {
       initiativeId: initiativeId,
@@ -147,11 +106,13 @@ const RefundManagement = () => {
 
   return (
     <TransactionsLayout
+      initiativeId={initiativeId}
       title={t('pages.refundManagement.title')}
       subtitle={t('pages.refundManagement.subtitle')}
       tableTitle={t('pages.refundManagement.tableTitle')}
-      genericErrorState={[genericError, setGenericError]}
       isAlertVisible={openDrawer}
+      transactionsApi={getProcessedTransactions}
+      setTransactionsList={setTransactionsList}
       alerts={[
         [transactionReverseSuccess, setTransactionReverseSuccess],
         [transactionRefundSuccess, setTransactionRefundSuccess],
@@ -169,26 +130,14 @@ const RefundManagement = () => {
         errorDownloadAlert,
       }}
       tableProps={{
-        emptyText: t('pages.purchaseManagement.noTransactions'),
+        emptyText: t('pages.refundManagement.noTransactions'),
         columnsDef: columnsDef,
         rows: mappedTransactionsList,
-        isEmpty: !mappedTransactionsList?.length,
-        isLoading: transactionsListIsLoading,
-        sortModel,
-        getRowId: row => row.id,
-        paginationModel: { page, pageSize },
-        onPaginationModelChange: model => {
-          setPage(model.page)
-          setPageSize(model.pageSize)
-        },
-        rowCount: totalElements || 0,
-        sortingMode: 'server',
-        paginationMode: "server",
-        onSortModelChange: setSortModel
+        isEmpty: !mappedTransactionsList?.length
       }}
       drawerProps={{
         setIsOpen: () => setOpenDrawer(false),
-        title: t('pages.purchaseManagement.drawer.title'),
+        title: t('pages.refundManagement.drawer.title'),
         fieldsValues: { ...selectedTransaction, isLoading: downloadInProgress },
         fieldsDef: mappedFieldsDef,
         isOpen: openDrawer,
@@ -217,10 +166,7 @@ const RefundManagement = () => {
       filtersProps={{
         filtersDef,
         filters,
-        setFilters: newFilters => {
-          setPage(0)
-          setFilters(newFilters)
-        }
+        setFilters: setFilters
       }
       }
     />

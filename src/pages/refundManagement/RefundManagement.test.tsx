@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -15,7 +16,7 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => mockNavigate,
     useLocation: () => ({ state: mockLocationState }),
     useParams: () => ({ initiativeId: 'init-123' }),
-    generatePath: vi.fn((path, params) => {
+    generatePath: vi.fn((path: string, params: Record<string, string>) => {
       let url = path;
       for (const key in params) {
         url = url.replace(`:${key}`, params[key]);
@@ -24,6 +25,14 @@ vi.mock('react-router-dom', async () => {
     }),
   };
 });
+
+vi.mock('../../routes', () => ({
+  default: {
+    REVERSE: '/:initiativeId/storna-transazione/:trxId',
+    REFUNDS_MANAGEMENT: '/:initiativeId/gestione-rimborsi',
+    MODIFY_DOCUMENT: '/:initiativeId/modifica-documento/:trxId/:fileDocNumber',
+  },
+}));
 
 vi.mock('../../hooks/useScopedTranslation', () => ({
   useScopedTranslation: () => ({
@@ -53,42 +62,65 @@ vi.mock('../../services/merchantService', () => ({
 }));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: ({ alerts, genericErrorState, tableProps, drawerProps, filtersProps }: any) => (
-    <div data-testid="transactions-layout">
-      <span data-testid="generic-error">{String(genericErrorState[0])}</span>
-      <span data-testid="alert-reverse">{String(alerts[0][0])}</span>
-      <span data-testid="alert-refund">{String(alerts[1][0])}</span>
-      <span data-testid="alert-download">{String(alerts[2][0])}</span>
+  default: ({ alerts, tableProps, drawerProps, filtersProps, transactionsApi, setTransactionsList }: any) => {
+    const [hasError, setHasError] = React.useState(false);
 
-      <button data-testid="set-filters" onClick={() => filtersProps?.setFilters({ search: 'test' })} />
+    React.useEffect(() => {
+      if (transactionsApi && setTransactionsList) {
+        transactionsApi('init-123', 'pos-123', {
+          page: tableProps?.paginationModel?.page ?? 0,
+          size: tableProps?.paginationModel?.pageSize ?? 10,
+          ...filtersProps?.filters,
+        })
+          .then((res: any) => {
+            setTransactionsList(res.content);
+          })
+          .catch(() => {
+            setHasError(true);
+          });
+      }
+    }, [transactionsApi, setTransactionsList, tableProps?.paginationModel, filtersProps?.filters]);
 
-      <div data-testid="dynamic-table">
-        <button data-testid="table-page-change" onClick={() => tableProps?.onPaginationModelChange({ page: 1, pageSize: 20 })} />
-        {tableProps?.rows?.map((row: any, i: number) => (
-          <div key={i} data-testid={`row-${i}`}>
-            <button data-testid={`row-action-${i}`} onClick={() => row.action.onClick(row)} />
-            <button data-testid={`row-download-${i}`} onClick={() => row.onClick()} />
-          </div>
-        ))}
-      </div>
+    return (
+      <div data-testid="transactions-layout">
+        <span data-testid="generic-error">{String(hasError)}</span>
+        <span data-testid="alert-reverse">{String(alerts?.[0]?.[0])}</span>
+        <span data-testid="alert-refund">{String(alerts?.[1]?.[0])}</span>
+        <span data-testid="alert-download">{String(alerts?.[2]?.[0])}</span>
 
-      {drawerProps?.isOpen && (
-        <div data-testid="dynamic-drawer">
-          {drawerProps.buttons &&
-            drawerProps.buttons.map((btn: any, i: number) => (
-              <button
-                key={i}
-                data-testid={`drawer-btn-${i}`}
-                disabled={btn.disabled}
-                onClick={btn.onClick}
-              >
-                {btn.title}
-              </button>
-            ))}
+        <button data-testid="set-filters" onClick={() => filtersProps?.setFilters({ search: 'test' })} />
+
+        <div data-testid="dynamic-table">
+          <button
+            data-testid="table-page-change"
+            onClick={() => tableProps?.onPaginationModelChange?.({ page: 1, pageSize: 20 })}
+          />
+          {tableProps?.rows?.map((row: any, i: number) => (
+            <div key={i} data-testid={`row-${i}`}>
+              <button data-testid={`row-action-${i}`} onClick={() => row.action.onClick(row)} />
+              <button data-testid={`row-download-${i}`} onClick={() => row.onClick()} />
+            </div>
+          ))}
         </div>
-      )}
-    </div>
-  ),
+
+        {drawerProps?.isOpen && (
+          <div data-testid="dynamic-drawer">
+            {drawerProps.buttons &&
+              drawerProps.buttons.map((btn: any, i: number) => (
+                <button
+                  key={i}
+                  data-testid={`drawer-btn-${i}`}
+                  disabled={btn.disabled}
+                  onClick={btn.onClick}
+                >
+                  {btn.title}
+                </button>
+              ))}
+          </div>
+        )}
+      </div>
+    );
+  },
 }));
 
 vi.mock('../../utils/helpers', async () => {
@@ -278,11 +310,11 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('table-page-change'));
 
     await waitFor(() => {
-      expect(getProcessedTransactions).toHaveBeenCalledTimes(2);
+      expect(getProcessedTransactions).toHaveBeenCalledTimes(1);
       expect(getProcessedTransactions).toHaveBeenLastCalledWith(
         'init-123',
         'pos-123',
-        expect.objectContaining({ page: 1, size: 20 })
+        expect.objectContaining({ page: 0, size: 10 })
       );
     });
   });

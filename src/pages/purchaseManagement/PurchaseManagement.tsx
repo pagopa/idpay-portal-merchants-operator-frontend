@@ -8,8 +8,7 @@ import {
   deleteTransactionInProgress,
   capturePayment,
 } from '../../services/merchantService';
-import { DecodedJwtToken, FieldConfigDef, FilterConfigDef } from '../../utils/types';
-import { GridSortModel } from '@mui/x-data-grid';
+import { FieldConfigDef, FilterConfigDef } from '../../utils/types';
 import { formatEuro, plainObj } from '../../utils/helpers';
 import { utilsStore } from '../../store/utilsStore';
 import ModalComponent from '../../components/Modal/ModalComponent';
@@ -18,16 +17,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import { getPreviewPdf } from '../../services/merchantService';
 import { downloadFileFromBase64 } from '../../utils/helpers';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation'
-import { authStore } from '../../store/authStore';
-import { jwtDecode } from 'jwt-decode';
 import { PointOfSaleTransactionDTO } from '../../api/generated/data-contracts';
-
-const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
-
-const initialPagination = {
-  page: 0,
-  pageSize: isNaN(initialPageSize) ? 10 : initialPageSize
-}
 
 const PurchaseManagement = () => {
   const navigate = useNavigate();
@@ -40,20 +30,14 @@ const PurchaseManagement = () => {
   const [mappedFieldsDef, setMappedFieldsDef] = useState<Array<FieldConfigDef>>(fieldsDef)
 
   const [transactionsList, setTransactionsList] = useState<Array<PointOfSaleTransactionDTO | never>>([]);
-  const [transactionsListIsLoading, setTransactionsListIsLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [page, setPage] = useState(initialPagination.page)
-  const [pageSize, setPageSize] = useState(initialPagination.pageSize)
-  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "trxChargeDate", sort: "desc" }]);
-  const [totalElements, setTotalElements] = useState(0)
 
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isPreviewPdfLoading, setIsPreviewPdfLoading] = useState(false);
   const [modal, setModal] = useState<string>("");
 
-  const [genericError, setGenericError] = useState(false);
   const [errorDeleteTransaction, setErrorDeleteTransaction] = useState(false);
   const [errorCaptureTransaction, setErrorCaptureTransaction] = useState(false);
   const [transactionCaptured, setTransactionCaptured] = useState(false);
@@ -101,31 +85,6 @@ const PurchaseManagement = () => {
     })
   }, [fieldsDef, handlePreviewPdf, isPreviewPdfLoading, transactionsList])
 
-  const fetchTransactions = useCallback(async (params) => {
-    const token = authStore.getState().token;
-    const decodeToken: DecodedJwtToken = jwtDecode(token)
-    setTransactionsListIsLoading(true);
-    try {
-      const { content, totalElements } = await getInProgressTransactions(initiativeId, decodeToken?.point_of_sale_id, params);
-      setTransactionsList(content);
-      setTotalElements(totalElements)
-    } catch {
-      setGenericError(true)
-    } finally {
-      setTransactionsListIsLoading(false)
-    }
-  }, [initiativeId]);
-
-  useEffect(() => {
-    const [model] = sortModel
-    const params = {
-      size: pageSize,
-      page,
-      ...filters,
-      ...(sortModel.length ? { sort: `${model?.field},${model?.sort}` } : {}),
-    }
-    fetchTransactions(params);
-  }, [fetchTransactions, filters, page, pageSize, sortModel]);
 
   useEffect(() => {
     if (transactionAuthorized) {
@@ -199,6 +158,7 @@ const PurchaseManagement = () => {
   return (
     <>
       <TransactionsLayout
+        initiativeId={initiativeId}
         title={t('pages.purchaseManagement.title')}
         subtitle={t('pages.purchaseManagement.subtitle')}
         tableTitle={t('pages.purchaseManagement.tableTitle')}
@@ -208,7 +168,8 @@ const PurchaseManagement = () => {
           onClick: () => navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId })),
         }}
         isAlertVisible={openDrawer}
-        genericErrorState={[genericError, setGenericError]}
+        transactionsApi={getInProgressTransactions}
+        setTransactionsList={setTransactionsList}
         alerts={[
           [errorDeleteTransaction, setErrorDeleteTransaction],
           [errorCaptureTransaction, setErrorCaptureTransaction],
@@ -248,19 +209,7 @@ const PurchaseManagement = () => {
           emptyText: t('pages.purchaseManagement.noTransactions'),
           columnsDef: columnsDef,
           rows: mappedTransactionsList,
-          isEmpty: !mappedTransactionsList?.length,
-          isLoading: transactionsListIsLoading,
-          sortModel,
-          getRowId: row => row.id,
-          paginationModel: { page, pageSize },
-          onPaginationModelChange: model => {
-            setPage(model.page)
-            setPageSize(model.pageSize)
-          },
-          rowCount: totalElements || 0,
-          sortingMode: 'server',
-          paginationMode: "server",
-          onSortModelChange: setSortModel
+          isEmpty: !mappedTransactionsList?.length
         }}
         drawerProps={{
           setIsOpen: () => setOpenDrawer(false),
@@ -292,10 +241,7 @@ const PurchaseManagement = () => {
         filtersProps={{
           filtersDef,
           filters,
-          setFilters: newFilters => {
-            setPage(0)
-            setFilters(newFilters)
-          }
+          setFilters: setFilters
         }
         }
       />

@@ -25,7 +25,7 @@
                 "status": "Stato",
                 "errors": {
                     "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.",
-                    "trxCode": "Il codice sconto deve contenere al massimo 14 caratteri alfanumerici."
+                    "trxCode": "Il codice sconto deve contenere al massimo 8 caratteri alfanumerici."
                 }
             },
             "drawer": {
@@ -117,7 +117,7 @@
                 "status": "Stato",
                 "errors": {
                     "gtinCode": "Il codice GTIN/EAN deve contenere al massimo 14 caratteri alfanumerici.",
-                    "trxCode": "Il codice sconto deve contenere al massimo 14 caratteri alfanumerici."
+                    "trxCode": "Il codice sconto deve contenere al massimo 8 caratteri alfanumerici."
                 }
             },
             "drawer": {
