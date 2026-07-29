@@ -50,7 +50,7 @@ const PurchaseManagement = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(initialPagination.page)
   const [pageSize, setPageSize] = useState(initialPagination.pageSize)
-  const [sortModel, setSortModel] = useState<GridSortModel>([]);
+  const [sortModel, setSortModel] = useState<GridSortModel>([{field: "trxChargeDate", sort: "desc"}]);
   const [totalElements, setTotalElements] = useState(0)
 
   const [openDrawer, setOpenDrawer] = useState(false);

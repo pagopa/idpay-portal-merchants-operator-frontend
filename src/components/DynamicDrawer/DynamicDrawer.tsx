@@ -7,6 +7,7 @@ import { FieldConfigDef } from '../../utils/types';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { renderFields } from '../../utils/renderFields';
 import { useMemo } from 'react';
+import { FieldTitle } from './FieldTitle';
 
 export type DynamicDrawerProps = {
   isOpen: boolean;
@@ -108,13 +109,7 @@ export default function DynamicDrawer({
                 display="flex"
                 flexDirection="column"
               >
-                <Typography
-                  variant="body2"
-                  fontWeight={theme.typography.fontWeightRegular}
-                  color={theme.palette.text.secondary}
-                >
-                  {headerName}
-                </Typography>
+                <FieldTitle title={headerName} />
                 {renderCell(params)}
               </Box>)
             })}

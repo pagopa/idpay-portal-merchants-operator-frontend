@@ -141,13 +141,15 @@
                     "rewarded": "Fattura",
                     "cancelled": "Nota di credito",
                     "refunded": "Nota di credito",
-                    "invoiced": "Fattura"
+                    "invoiced": "Fattura",
+                    "authorized": "Fattura"
                 },
                 "documentNumber": {
                     "rewarded": "Numero fattura",
                     "cancelled": "Numero nota di credito",
                     "refunded": "Numero nota di credito",
-                    "invoiced": "Numero fattura"
+                    "invoiced": "Numero fattura",
+                    "authorized": "Numero fattura"
                 },
                 "transactionId": "ID transazione",
                 "trxCode": "Codice sconto"
