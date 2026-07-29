@@ -122,8 +122,9 @@ export default function DynamicDrawer({
             width="100%"
             display="flex"
             flexDirection="column"
-            rowGap="1rem"
+            rowGap="0.5rem"
             bgcolor={theme.palette.background.paper}
+            padding="0.5rem"
             data-testid="buttons-box"
           >
             {buttons.map(({ title, dataTestId, ...rest }, index) => (

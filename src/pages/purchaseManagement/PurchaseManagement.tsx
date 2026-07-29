@@ -20,7 +20,6 @@ import { downloadFileFromBase64 } from '../../utils/helpers';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
-import { ELEMENT_PER_PAGE } from '../../utils/constants';
 import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
 import { authStore } from '../../store/authStore';
 import { jwtDecode } from 'jwt-decode';
@@ -176,7 +175,7 @@ const PurchaseManagement = () => {
     } finally {
       setModal("");
     }
-  }, [selectedTransaction?.id]);
+  }, [initiativeId, selectedTransaction?.id]);
 
   const captureTransaction = useCallback(async () => {
     try {
@@ -190,7 +189,7 @@ const PurchaseManagement = () => {
     } finally {
       setModal("");
     }
-  }, [selectedTransaction?.trxCode]);
+  }, [initiativeId, selectedTransaction?.trxCode]);
 
   const handleRedirect = useCallback((path: string) => {
     const replaceValuesObj = {
@@ -276,7 +275,6 @@ const PurchaseManagement = () => {
               sortingMode='server'
               paginationMode="server"
               onSortModelChange={setSortModel}
-              pageSizeOptions={ELEMENT_PER_PAGE}
             />
           </Box>
           <DynamicDrawer

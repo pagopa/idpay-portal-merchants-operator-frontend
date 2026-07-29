@@ -14,7 +14,6 @@ import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { ReceiptLong } from '@mui/icons-material';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
-import { ELEMENT_PER_PAGE } from '../../utils/constants';
 import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
 
 const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
@@ -201,7 +200,6 @@ const RefundManagement = () => {
             sortingMode='server'
             paginationMode="server"
             onSortModelChange={setSortModel}
-            pageSizeOptions={ELEMENT_PER_PAGE}
           />
         </Box>
         <DynamicDrawer
