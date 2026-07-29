@@ -29,6 +29,7 @@ import {
 import { getStatusChip, handleCodeChange } from '../../utils/helpers';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
 import AlertListComponent from '../Alert/AlertListComponent';
+import { useParams } from 'react-router-dom';
 
 interface TransactionsLayoutProps {
   title: string;
@@ -74,6 +75,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
   isDrawerOpen,
   externalState = {},
 }) => {
+  const {initiativeId} = useParams()
   const [codeError, setCodeError] = useState<Record<string, string>>({
     gtinCodeError: '',
     trxCodeError: '',
@@ -127,17 +129,17 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         sort: 'desc',
       },
     ]);
-    fetchTransactions({});
-  }, []);
+    fetchTransactions(initiativeId, {});
+  }, [initiativeId]);
 
   useEffect(() => {
     if (triggerFetchTransactions) {
-      fetchTransactions({});
+      fetchTransactions(initiativeId, {});
     }
-  }, [triggerFetchTransactions]);
+  }, [triggerFetchTransactions, initiativeId]);
 
   const fetchTransactions = useCallback(
-    async (params: {
+    async (initiativeId: string, params: {
       fiscalCode?: string;
       productGtin?: string;
       trxCode?: string;
@@ -156,7 +158,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
       try {
         const response = await fetchTransactionsApi(
-          import.meta.env.VITE_INITIATIVE_ID,
+          initiativeId,
           decodeToken?.point_of_sale_id,
           Object.keys(params).length > 0
             ? params
@@ -189,14 +191,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     setFiltersAppliedOnce(true);
     setAppliedFilters(filtersObj);
     if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
-      fetchTransactions({
+      fetchTransactions(initiativeId, {
         sort: 'productName,' + sortModel[0].sort,
         page: 0,
         size: paginationModel.pageSize,
         ...filtersObj,
       });
     } else {
-      fetchTransactions({
+      fetchTransactions(initiativeId, {
         sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
         page: 0,
         size: paginationModel.pageSize,
@@ -207,14 +209,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
 
   const handlePaginationChange = (model: GridPaginationModel) => {
     if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
-      fetchTransactions({
+      fetchTransactions(initiativeId, {
         sort: 'productName,' + sortModel[0].sort,
         page: model.page,
         size: model.pageSize,
         ...appliedFilters,
       });
     } else {
-      fetchTransactions({
+      fetchTransactions(initiativeId, {
         sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
         page: model.page,
         size: model.pageSize,
@@ -227,14 +229,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     if (model.length > 0) {
       setSortModel(model);
       if (model[0].field === 'additionalProperties') {
-        fetchTransactions({
+        fetchTransactions(initiativeId, {
           sort: 'productName,' + model[0].sort,
           page: paginationModel.page,
           size: paginationModel.pageSize,
           ...appliedFilters,
         });
       } else {
-        fetchTransactions({
+        fetchTransactions(initiativeId, {
           sort: model[0].field + ',' + model[0].sort,
           page: paginationModel.page,
           size: paginationModel.pageSize,
