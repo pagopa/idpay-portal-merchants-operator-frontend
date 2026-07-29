@@ -39,22 +39,27 @@ export const MerchantApi = {
     return response.data;
   },
 
-  previewPayment: async (params: {
+  previewPayment: async (initiativeId: string,
+    params: {
     productGtin: string;
     productName: string;
     amountCents: number;
     discountCode: string;
   }): Promise<PreviewPaymentDTO> => {
     applySecurity();
-    const response = await transactionsApi.previewPayment(params.discountCode, {
-      productGtin: params.productGtin,
-      productName: params.productName,
-      amountCents: params.amountCents,
-    });
+    const response = await initiativesApi.previewPayment(initiativeId, params?.discountCode, {
+      additionalProperties: {
+      productGtin: params?.productGtin,
+      productName: params?.productName,
+      },
+      amountCents: params?.amountCents,
+    }
+  );
     return response.data;
   },
 
-  authPaymentBarCode: async (params: {
+  authPaymentBarCode: async (initiativeId: string,
+    params: {
     trxCode: string;
     amountCents: number;
     idTrxAcquirer: string;
@@ -63,24 +68,24 @@ export const MerchantApi = {
     applySecurity();
 
     const payload: AuthBarCodePaymentDTO = {
-      amountCents: params.amountCents,
-      idTrxAcquirer: params.idTrxAcquirer,
-      additionalProperties: params.additionalProperties,
+      amountCents: params?.amountCents,
+      idTrxAcquirer: params?.idTrxAcquirer,
+      additionalProperties: params?.additionalProperties,
     };
 
-    const response = await transactionsApi.authPaymentBarCode(params.trxCode, payload);
+    const response = await initiativesApi.authPaymentBarCode(initiativeId, params?.trxCode, payload);
     return response.data;
   },
 
-  capturePayment: async (params: { trxCode: string }): Promise<TransactionBarCodeResponse> => {
+  capturePayment: async (initiativeId: string, params: { trxCode: string }): Promise<TransactionBarCodeResponse> => {
     applySecurity();
-    const response = await transactionsApi.capturePayment(params.trxCode);
+    const response = await initiativesApi.capturePayment(initiativeId, params?.trxCode);
     return response.data;
   },
 
-  deleteTransactionInProgress: async (trxId: string): Promise<void> => {
+  deleteTransactionInProgress: async (initiativeId: string, trxId: string): Promise<void> => {
     applySecurity();
-    await transactionsApi.deleteTransaction(trxId);
+    await initiativesApi.deleteTransaction(initiativeId, trxId);
   },
 
   reverseTransactionApi: async (trxId: string, file: File, docNumber: string): Promise<void> => {

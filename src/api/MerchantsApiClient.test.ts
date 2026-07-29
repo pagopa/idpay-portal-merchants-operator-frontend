@@ -33,6 +33,13 @@ vi.mock('./generated/Transactions', () => ({
 vi.mock('./generated/Initiatives', () => ({
   Initiatives: class {
     setSecurityData = vi.fn();
+    previewPayment = (initiativeId: string, code: string, body: Record<string, unknown>) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/bar-code/${code}/preview`, body);
+    authPaymentBarCode = (initiativeId: string, trxCode: string, body: Record<string, unknown>) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/bar-code/${trxCode}/authorize`, body);
+    capturePayment = (initiativeId: string, trxCode: string) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/bar-code/${trxCode}/capture`, { trxCode });
+    deleteTransaction = (initiativeId: string, trxCode: string) => mockDelete(`/initiatives/${initiativeId}/transactions/${trxCode}`);
     getProducts = (initiativeId: string, params: Record<string, unknown>) =>
       mockGet(initiativeId, {
         params: Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined)),
@@ -135,13 +142,15 @@ describe('MerchantApi', () => {
       const mockResponse = { data: { previewed: true } };
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.previewPayment(mockData);
+      const result = await MerchantApi.previewPayment('init-1', mockData);
 
       expect(mockPut).toHaveBeenCalledWith(
-        `/transactions/bar-code/${mockData.discountCode}/preview`,
+        `/initiatives/init-1/transactions/bar-code/${mockData.discountCode}/preview`,
         {
-          productGtin: mockData.productGtin,
-          productName: mockData.productName,
+          additionalProperties: {
+            productGtin: mockData.productGtin,
+            productName: mockData.productName,
+          },
           amountCents: mockData.amountCents,
         }
       );
@@ -159,9 +168,9 @@ describe('MerchantApi', () => {
       const mockResponse = { data: { authorized: true } };
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.authPaymentBarCode(params);
+      const result = await MerchantApi.authPaymentBarCode('init-1', params);
 
-      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/authorize`, {
+      expect(mockPut).toHaveBeenCalledWith(`/initiatives/init-1/transactions/bar-code/${params.trxCode}/authorize`, {
         amountCents: params.amountCents,
         idTrxAcquirer: undefined,
         additionalProperties: params.additionalProperties,
@@ -186,9 +195,9 @@ describe('MerchantApi', () => {
 
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.capturePayment(params);
+      const result = await MerchantApi.capturePayment('init-1', params);
 
-      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/capture`, {
+      expect(mockPut).toHaveBeenCalledWith(`/initiatives/init-1/transactions/bar-code/${params.trxCode}/capture`, {
         trxCode: params.trxCode,
       });
 
@@ -205,11 +214,11 @@ describe('MerchantApi', () => {
 
       mockPut.mockRejectedValue(apiError);
 
-      const promise = MerchantApi.capturePayment(params);
+      const promise = MerchantApi.capturePayment('init-1', params);
 
       await expect(promise).rejects.toThrow('400 Bad Request: Capture Failed');
 
-      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/capture`, {
+      expect(mockPut).toHaveBeenCalledWith(`/initiatives/init-1/transactions/bar-code/${params.trxCode}/capture`, {
         trxCode: params.trxCode,
       });
     });
@@ -534,9 +543,9 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockDelete.mockResolvedValue(mockResponse);
 
-      await expect(MerchantApi.deleteTransactionInProgress(trxId)).resolves.toBeUndefined();
+      await expect(MerchantApi.deleteTransactionInProgress('init-1', trxId)).resolves.toBeUndefined();
 
-      expect(mockDelete).toHaveBeenCalledWith(`/transactions/${trxId}`);
+      expect(mockDelete).toHaveBeenCalledWith(`/initiatives/init-1/transactions/${trxId}`);
       expect(mockDelete).toHaveBeenCalledTimes(1);
     });
 
@@ -545,10 +554,10 @@ describe('MerchantApi', () => {
       const apiError = new Error('DELETE API Error');
       mockDelete.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.deleteTransactionInProgress(trxId)).rejects.toThrow(
+      await expect(MerchantApi.deleteTransactionInProgress('init-1', trxId)).rejects.toThrow(
         'DELETE API Error'
       );
-      expect(mockDelete).toHaveBeenCalledWith(`/transactions/${trxId}`);
+      expect(mockDelete).toHaveBeenCalledWith(`/initiatives/init-1/transactions/${trxId}`);
     });
   });
 

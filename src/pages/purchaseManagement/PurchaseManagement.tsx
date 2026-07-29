@@ -166,7 +166,7 @@ const PurchaseManagement = () => {
 
   const deleteTransaction = useCallback(async () => {
     try {
-      await deleteTransactionInProgress(selectedTransaction?.id);
+      await deleteTransactionInProgress(initiativeId, selectedTransaction?.id);
       setOpenDrawer(false);
       setTransactionDeleteSuccess(true);
       setTriggerFetchTransactions(true);
@@ -180,7 +180,7 @@ const PurchaseManagement = () => {
 
   const captureTransaction = useCallback(async () => {
     try {
-      await capturePayment({ trxCode: selectedTransaction?.trxCode });
+      await capturePayment(initiativeId, { trxCode: selectedTransaction?.trxCode });
       setOpenDrawer(false);
       setTransactionCaptured(true);
       setTriggerFetchTransactions(true);
