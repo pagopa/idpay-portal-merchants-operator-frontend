@@ -136,7 +136,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
     if (triggerFetchTransactions) {
       fetchTransactions(initiativeId, {});
     }
-  }, [triggerFetchTransactions]);
+  }, [triggerFetchTransactions, initiativeId]);
 
   const fetchTransactions = useCallback(
     async (initiativeId: string, params: {
