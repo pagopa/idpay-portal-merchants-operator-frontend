@@ -5,11 +5,11 @@
                 "purchaseStatus": [
                     {
                         "value": "AUTHORIZED",
-                        "label": ""
+                        "label": "commons.statusEnum.transaction.authorized"
                     },
                     {
                         "value": "CAPTURED",
-                        "label": ""
+                        "label": "commons.statusEnum.transaction.captured"
                     }
                 ],
                 "refundStatus": [

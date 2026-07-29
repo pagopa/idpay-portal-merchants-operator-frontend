@@ -80,7 +80,7 @@ export function getStatusChip(t: any, status: string) {
 
 export function formatEuro(value: number) {
   return (
-    (value / 100).toLocaleString('it-IT', {
+    !isNaN(value) && (value / 100).toLocaleString('it-IT', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }) + '€'

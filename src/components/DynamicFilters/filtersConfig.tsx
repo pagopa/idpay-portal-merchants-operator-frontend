@@ -38,7 +38,10 @@ export const filtersConfig: Record<
                             whiteSpace: 'nowrap',
                         }}
                     >
-                        {t(templateLabels[value])}
+                        {id === "status" ?
+                            <StatusChip context={context} value={value?.toLowerCase()} /> :
+                            t(templateLabels[value])
+                        }
                     </Box>
                 )}
             >
