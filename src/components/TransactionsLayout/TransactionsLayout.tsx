@@ -77,7 +77,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
           </Button>
         )}
       </Box>
-      <Typography variant="h6">{tableTitle}</Typography>
+      <Typography variant="h6" paddingBottom="0.5rem">{tableTitle}</Typography>
       {children}
       {/* Alerts */}
       {Object.entries(externalState)
