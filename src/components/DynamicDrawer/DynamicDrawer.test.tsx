@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
 import DynamicDrawer from "./DynamicDrawer";
-import { normalizeObj } from "../../utils/helpers";
+import { FieldTitle } from "./FieldTitle";
+import { title } from "process";
 
 vi.mock("../../hooks/useScopedTranslation", () => ({
   useScopedTranslation: () => ({
@@ -53,6 +54,12 @@ describe("DynamicDrawer Component", () => {
     render(<DynamicDrawer {...defaultProps} />);
     
     expect(screen.getByText("Drawer Title")).toBeInTheDocument();
+  });
+
+  it("should render the drawer without title", async () => {
+    render(<DynamicDrawer {...defaultProps} title={undefined} />);
+    
+    expect(await screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
   it("should render the subtitle in uppercase if provided", () => {
@@ -111,5 +118,41 @@ describe("DynamicDrawer Component", () => {
     render(<DynamicDrawer {...defaultProps} buttons={[]} />);
     
     expect(screen.queryByTestId("buttons-box")).not.toBeInTheDocument();
+  });
+});
+
+describe("FieldTitle Component", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("should render title text correctly", () => {
+    render(<FieldTitle title="Field Label" />);
+
+    expect(screen.getByText("Field Label")).toBeInTheDocument();
+  });
+
+  it("should enable tooltip when text overflows", async () => {
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(200);
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+
+    render(<FieldTitle title="Very Long Overflowing Title" />);
+
+    const titleElement = screen.getByText("Very Long Overflowing Title");
+    fireEvent.mouseOver(titleElement);
+
+    expect(await screen.findByRole("tooltip")).toBeInTheDocument();
+  });
+
+  it("should not enable tooltip when text does not overflow", () => {
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(100);
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(200);
+
+    render(<FieldTitle title="Short Title" />);
+
+    const titleElement = screen.getByText("Short Title");
+    fireEvent.mouseOver(titleElement);
+
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 });

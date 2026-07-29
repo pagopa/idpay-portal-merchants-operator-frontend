@@ -203,6 +203,7 @@ describe('PurchaseManagement Component', () => {
       expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
         page: 0,
         size: 10,
+        sort: 'trxChargeDate,desc'
       });
     });
 
@@ -231,6 +232,7 @@ describe('PurchaseManagement Component', () => {
       expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
         page: 0,
         size: 10,
+        sort: 'trxChargeDate,desc',
         fiscalCode: 'ABCDEF12345',
       });
     });
@@ -248,6 +250,7 @@ describe('PurchaseManagement Component', () => {
       expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
         page: 1,
         size: 10,
+        sort: 'trxChargeDate,desc'
       });
     });
   });
@@ -283,7 +286,7 @@ describe('PurchaseManagement Component', () => {
       fireEvent.click(confirmModalBtn);
 
       await waitFor(() => {
-        expect(merchantService.capturePayment).toHaveBeenCalledWith({ trxCode: 'TRX123' });
+        expect(merchantService.capturePayment).toHaveBeenCalledWith('init-123', { trxCode: 'TRX123' });
         expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
         expect(screen.queryByTestId('dynamic-drawer')).not.toBeInTheDocument();
       });
@@ -307,7 +310,7 @@ describe('PurchaseManagement Component', () => {
       fireEvent.click(confirmModalBtn);
 
       await waitFor(() => {
-        expect(merchantService.deleteTransactionInProgress).toHaveBeenCalledWith('trx-1');
+        expect(merchantService.deleteTransactionInProgress).toHaveBeenCalledWith('init-123', 'trx-1');
         expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
       });
     });
