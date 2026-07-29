@@ -1,4 +1,3 @@
-import { Box } from '@mui/material';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { GridSortModel } from '@mui/x-data-grid';
 import { generatePath, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -12,9 +11,6 @@ import { DecodedJwtToken, FieldConfigDef, FilterConfigDef } from '../../utils/ty
 import { PointOfSaleTransactionProcessedDTO } from '../../api/generated/data-contracts';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { ReceiptLong } from '@mui/icons-material';
-import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
-import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
-import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
 
 const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
 
@@ -40,7 +36,7 @@ const RefundManagement = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(initialPagination.page)
   const [pageSize, setPageSize] = useState(initialPagination.pageSize)
-  const [sortModel, setSortModel] = useState<GridSortModel>([{field: "trxChargeDate", sort: "desc"}]);
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "trxChargeDate", sort: "desc" }]);
   const [totalElements, setTotalElements] = useState(0)
 
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -172,67 +168,62 @@ const RefundManagement = () => {
         transactionReverseSuccess,
         errorDownloadAlert,
       }}
-    >
-      <Box>
-        <DynamicFilters
-          filtersDef={filtersDef}
-          filters={filters}
-          setFilters={newFilters => {
-            setPage(0)
-            setFilters(newFilters);
-          }}
-        />
-        <Box marginTop="1rem">
-          <DynamicTable
-            emptyText={t('pages.purchaseManagement.noTransactions')}
-            columnsDef={columnsDef}
-            isEmpty={!mappedTransactionsList?.length}
-            isLoading={transactionsListIsLoading}
-            rows={mappedTransactionsList}
-            sortModel={sortModel}
-            getRowId={row => row.id}
-            paginationModel={{ page, pageSize }}
-            onPaginationModelChange={model => {
-              setPage(model.page)
-              setPageSize(model.pageSize)
-            }}
-            rowCount={totalElements || 0}
-            sortingMode='server'
-            paginationMode="server"
-            onSortModelChange={setSortModel}
-          />
-        </Box>
-        <DynamicDrawer
-          setIsOpen={() => setOpenDrawer(false)}
-          title={t('pages.purchaseManagement.drawer.title')}
-          fieldsValues={{ ...selectedTransaction, isLoading: downloadInProgress }}
-          fieldsDef={mappedFieldsDef}
-          isOpen={openDrawer}
-          buttons={areButtonsVisible && [
-            {
-              disabled: isDisabledModDocButton,
-              variant: "contained",
-              fullWidth: true,
-              onClick: () => {
-                const replaceValuesObj = {
-                  initiativeId: initiativeId,
-                  trxId: selectedTransaction?.id,
-                  fileDocNumber: btoa(selectedTransaction?.docNumber) || ''
-                }
-                navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
-              },
-              title: t('pages.refundManagement.drawer.modifyDocument')
+      tableProps={{
+        emptyText: t('pages.purchaseManagement.noTransactions'),
+        columnsDef: columnsDef,
+        rows: mappedTransactionsList,
+        isEmpty: !mappedTransactionsList?.length,
+        isLoading: transactionsListIsLoading,
+        sortModel,
+        getRowId: row => row.id,
+        paginationModel: { page, pageSize },
+        onPaginationModelChange: model => {
+          setPage(model.page)
+          setPageSize(model.pageSize)
+        },
+        rowCount: totalElements || 0,
+        sortingMode: 'server',
+        paginationMode: "server",
+        onSortModelChange: setSortModel
+      }}
+      drawerProps={{
+        setIsOpen: () => setOpenDrawer(false),
+        title: t('pages.purchaseManagement.drawer.title'),
+        fieldsValues: { ...selectedTransaction, isLoading: downloadInProgress },
+        fieldsDef: mappedFieldsDef,
+        isOpen: openDrawer,
+        buttons: areButtonsVisible && [
+          {
+            disabled: isDisabledModDocButton,
+            variant: "contained",
+            fullWidth: true,
+            onClick: () => {
+              const replaceValuesObj = {
+                initiativeId: initiativeId,
+                trxId: selectedTransaction?.id,
+                fileDocNumber: btoa(selectedTransaction?.docNumber) || ''
+              }
+              navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
             },
-            {
-              fullWidth: true,
-              onClick: handleReverseTransaction,
-              title: t('pages.refundManagement.drawer.refund')
-            }
-          ]
+            title: t('pages.refundManagement.drawer.modifyDocument')
+          },
+          {
+            fullWidth: true,
+            onClick: handleReverseTransaction,
+            title: t('pages.refundManagement.drawer.refund')
           }
-        />
-      </Box>
-    </TransactionsLayout>
+        ]
+      }}
+      filtersProps={{
+        filtersDef,
+        filters,
+        setFilters: newFilters => {
+          setPage(0)
+          setFilters(newFilters)
+        }
+      }
+      }
+    />
   );
 };
 

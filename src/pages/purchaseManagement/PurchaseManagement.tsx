@@ -17,10 +17,7 @@ import TransactionsLayout from '../../components/TransactionsLayout/Transactions
 import DescriptionIcon from '@mui/icons-material/Description';
 import { getPreviewPdf } from '../../services/merchantService';
 import { downloadFileFromBase64 } from '../../utils/helpers';
-import { useScopedTranslation } from '../../hooks/useScopedTranslation';
-import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
-import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
-import DynamicDrawer from '../../components/DynamicDrawer/DynamicDrawer';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation'
 import { authStore } from '../../store/authStore';
 import { jwtDecode } from 'jwt-decode';
 import { PointOfSaleTransactionDTO } from '../../api/generated/data-contracts';
@@ -49,7 +46,7 @@ const PurchaseManagement = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(initialPagination.page)
   const [pageSize, setPageSize] = useState(initialPagination.pageSize)
-  const [sortModel, setSortModel] = useState<GridSortModel>([{field: "trxChargeDate", sort: "desc"}]);
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "trxChargeDate", sort: "desc" }]);
   const [totalElements, setTotalElements] = useState(0)
 
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -247,65 +244,61 @@ const PurchaseManagement = () => {
           transactionReverseSuccess,
           transactionDeleteSuccess,
         }}
-      >
-        <Box>
-          <DynamicFilters
-            filtersDef={filtersDef}
-            filters={filters}
-            setFilters={newFilters => {
-              setPage(0)
-              setFilters(newFilters);
-            }}
-          />
-          <Box marginTop="1rem">
-            <DynamicTable
-              emptyText={t('pages.purchaseManagement.noTransactions')}
-              columnsDef={columnsDef}
-              isEmpty={!mappedTransactionsList?.length}
-              isLoading={transactionsListIsLoading}
-              rows={mappedTransactionsList}
-              sortModel={sortModel}
-              getRowId={row => row.id}
-              paginationModel={{ page, pageSize }}
-              onPaginationModelChange={model => {
-                setPage(model.page)
-                setPageSize(model.pageSize)
-              }}
-              rowCount={totalElements || 0}
-              sortingMode='server'
-              paginationMode="server"
-              onSortModelChange={setSortModel}
-            />
-          </Box>
-          <DynamicDrawer
-            setIsOpen={() => setOpenDrawer(false)}
-            title={t('pages.purchaseManagement.drawer.title')}
-            fieldsValues={selectedTransaction}
-            fieldsDef={mappedFieldsDef}
-            isOpen={openDrawer}
-            buttons={[
-              {
-                variant: "contained",
-                fullWidth: true,
-                onClick: () => selectedTransaction?.status === 'AUTHORIZED'
-                  ? handleModal("capture")
-                  : handleRedirect(ROUTES.REFUND),
-                title: selectedTransaction?.status === 'AUTHORIZED'
-                  ? t('pages.purchaseManagement.drawer.confirmPayment')
-                  : t('pages.purchaseManagement.drawer.requestRefund')
-              },
-              {
-                fullWidth: true,
-                onClick: () => handleModal(selectedTransaction?.status === 'AUTHORIZED' ? "cancel" : "reverse"),
-                color: selectedTransaction?.status === 'AUTHORIZED' ? "error" : "primary",
-                title: selectedTransaction?.status === 'AUTHORIZED'
-                  ? t('pages.purchaseManagement.drawer.cancellPayment')
-                  : t('pages.purchaseManagement.drawer.refund')
-              }
-            ]}
-          />
-        </Box>
-      </TransactionsLayout>
+        tableProps={{
+          emptyText: t('pages.purchaseManagement.noTransactions'),
+          columnsDef: columnsDef,
+          rows: mappedTransactionsList,
+          isEmpty: !mappedTransactionsList?.length,
+          isLoading: transactionsListIsLoading,
+          sortModel,
+          getRowId: row => row.id,
+          paginationModel: { page, pageSize },
+          onPaginationModelChange: model => {
+            setPage(model.page)
+            setPageSize(model.pageSize)
+          },
+          rowCount: totalElements || 0,
+          sortingMode: 'server',
+          paginationMode: "server",
+          onSortModelChange: setSortModel
+        }}
+        drawerProps={{
+          setIsOpen: () => setOpenDrawer(false),
+          title: t('pages.purchaseManagement.drawer.title'),
+          fieldsValues: selectedTransaction,
+          fieldsDef: mappedFieldsDef,
+          isOpen: openDrawer,
+          buttons: [
+            {
+              variant: "contained",
+              fullWidth: true,
+              onClick: () => selectedTransaction?.status === 'AUTHORIZED'
+                ? handleModal("capture")
+                : handleRedirect(ROUTES.REFUND),
+              title: selectedTransaction?.status === 'AUTHORIZED'
+                ? t('pages.purchaseManagement.drawer.confirmPayment')
+                : t('pages.purchaseManagement.drawer.requestRefund')
+            },
+            {
+              fullWidth: true,
+              onClick: () => handleModal(selectedTransaction?.status === 'AUTHORIZED' ? "cancel" : "reverse"),
+              color: selectedTransaction?.status === 'AUTHORIZED' ? "error" : "primary",
+              title: selectedTransaction?.status === 'AUTHORIZED'
+                ? t('pages.purchaseManagement.drawer.cancellPayment')
+                : t('pages.purchaseManagement.drawer.refund')
+            }
+          ]
+        }}
+        filtersProps={{
+          filtersDef,
+          filters,
+          setFilters: newFilters => {
+            setPage(0)
+            setFilters(newFilters)
+          }
+        }
+        }
+      />
       <ModalComponent
         open={!!modal}
         onClose={() => {

@@ -77,7 +77,7 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
 }));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: ({ children, title, additionalButton, isAlertVisible }: any) => (
+  default: ({ title, additionalButton, isAlertVisible, tableProps, drawerProps, filtersProps }: any) => (
     <div data-testid="transactions-layout">
       <h1>{title}</h1>
       {additionalButton && (
@@ -86,65 +86,53 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
         </button>
       )}
       <div data-testid="alert-drawer-visible">{String(isAlertVisible)}</div>
-      {children}
-    </div>
-  ),
-}));
 
-vi.mock('../../components/DynamicFilters/DynamicFilters', () => ({
-  DynamicFilters: ({ setFilters }: any) => (
-    <div data-testid="dynamic-filters">
-      <button data-testid="apply-filter-btn" onClick={() => setFilters({ fiscalCode: 'ABCDEF12345' })}>
-        Filter
-      </button>
-    </div>
-  ),
-}));
-
-vi.mock('../../components/DynamicTable/DynamicTable', () => ({
-  DynamicTable: ({ rows, isLoading, onPaginationModelChange }: any) => (
-    <div data-testid="dynamic-table">
-      {isLoading ? (
-        <span>Loading...</span>
-      ) : (
-        <table>
-          <tbody>
-            {rows.map((row: any) => (
-              <tr key={row.id}>
-                <td>{row.id}</td>
-                <td>{row.status}</td>
-                <td>
-                  <button data-testid={`action-btn-${row.id}`} onClick={() => row.action.onClick(row)}>
-                    Detail
-                  </button>
-                  <button data-testid={`download-pdf-${row.id}`} onClick={() => row.onClick()}>
-                    Download PDF
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      <button data-testid="change-page-btn" onClick={() => onPaginationModelChange({ page: 1, pageSize: 10 })}>
-        Next Page
-      </button>
-    </div>
-  ),
-}));
-
-vi.mock('../../components/DynamicDrawer/DynamicDrawer', () => ({
-  default: ({ isOpen, buttons, fieldsValues }: any) =>
-    isOpen ? (
-      <div data-testid="dynamic-drawer">
-        <span>Drawer for TRX: {fieldsValues?.id}</span>
-        {buttons?.map((btn: any, index: number) => (
-          <button key={index} data-testid={`drawer-btn-${index}`} onClick={btn.onClick}>
-            {btn.title}
-          </button>
-        ))}
+      <div data-testid="dynamic-filters">
+        <button data-testid="apply-filter-btn" onClick={() => filtersProps?.setFilters({ fiscalCode: 'ABCDEF12345' })}>
+          Filter
+        </button>
       </div>
-    ) : null,
+
+      <div data-testid="dynamic-table">
+        {tableProps?.isLoading ? (
+          <span>Loading...</span>
+        ) : (
+          <table>
+            <tbody>
+              {tableProps?.rows?.map((row: any) => (
+                <tr key={row.id}>
+                  <td>{row.id}</td>
+                  <td>{row.status}</td>
+                  <td>
+                    <button data-testid={`action-btn-${row.id}`} onClick={() => row.action.onClick(row)}>
+                      Detail
+                    </button>
+                    <button data-testid={`download-pdf-${row.id}`} onClick={() => row.onClick()}>
+                      Download PDF
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <button data-testid="change-page-btn" onClick={() => tableProps?.onPaginationModelChange({ page: 1, pageSize: 10 })}>
+          Next Page
+        </button>
+      </div>
+
+      {drawerProps?.isOpen && (
+        <div data-testid="dynamic-drawer">
+          <span>Drawer for TRX: {drawerProps.fieldsValues?.id}</span>
+          {drawerProps.buttons?.map((btn: any, index: number) => (
+            <button key={index} data-testid={`drawer-btn-${index}`} onClick={btn.onClick}>
+              {btn.title}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  ),
 }));
 
 vi.mock('../../components/Modal/ModalComponent', () => ({
@@ -203,7 +191,7 @@ describe('PurchaseManagement Component', () => {
       expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
         page: 0,
         size: 10,
-        sort: 'trxChargeDate,desc'
+        sort: 'trxChargeDate,desc',
       });
     });
 
@@ -250,7 +238,7 @@ describe('PurchaseManagement Component', () => {
       expect(merchantService.getInProgressTransactions).toHaveBeenCalledWith('init-123', 'pos-999', {
         page: 1,
         size: 10,
-        sort: 'trxChargeDate,desc'
+        sort: 'trxChargeDate,desc',
       });
     });
   });

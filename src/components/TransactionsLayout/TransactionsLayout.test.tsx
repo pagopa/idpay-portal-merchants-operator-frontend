@@ -12,7 +12,7 @@ vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
 }));
 
 vi.mock('../Alert/AlertComponent', () => ({
-  default: vi.fn(({ message, isOpen }) => 
+  default: vi.fn(({ message, isOpen }) =>
     isOpen ? <div data-testid="alert-component">{message}</div> : null
   ),
 }));
@@ -27,6 +27,18 @@ vi.mock('../Alert/AlertListComponent', () => ({
       ))}
     </div>
   )),
+}));
+
+vi.mock('../DynamicTable/DynamicTable', () => ({
+  DynamicTable: vi.fn(() => <div data-testid="dynamic-table">DynamicTable</div>),
+}));
+
+vi.mock('../DynamicFilters/DynamicFilters', () => ({
+  DynamicFilters: vi.fn(() => <div data-testid="dynamic-filters">DynamicFilters</div>),
+}));
+
+vi.mock('../DynamicDrawer/DynamicDrawer', () => ({
+  default: vi.fn(() => <div data-testid="dynamic-drawer">DynamicDrawer</div>),
 }));
 
 vi.mock('../../hooks/useScopedTranslation', () => ({
@@ -54,6 +66,9 @@ describe('TransactionsLayout component', () => {
       error: 'Generic Error',
     },
     isAlertVisible: true,
+    tableProps: { rows: [{ id: '1' }] } as any,
+    drawerProps: { isOpen: true, buttons: [] } as any,
+    filtersProps: { filters: { test: '1' } } as any,
   };
 
   beforeEach(() => {
@@ -61,16 +76,14 @@ describe('TransactionsLayout component', () => {
   });
 
   it('renders correctly with base props', () => {
-    render(
-      <TransactionsLayout {...defaultProps}>
-        <div data-testid="child-element">Child Content</div>
-      </TransactionsLayout>
-    );
+    render(<TransactionsLayout {...defaultProps} />);
 
     expect(screen.getByTestId('title-box')).toHaveTextContent('Test Title - Test Subtitle');
-    
     expect(screen.getByText('Test Table Title')).toBeInTheDocument();
-    expect(screen.getByTestId('child-element')).toBeInTheDocument();
+
+    expect(screen.getByTestId('dynamic-filters')).toBeInTheDocument();
+    expect(screen.getByTestId('dynamic-table')).toBeInTheDocument();
+    expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
 
     expect(mockUseAutoResetBanner).toHaveBeenCalledWith([
       mockGenericErrorState,
@@ -106,10 +119,10 @@ describe('TransactionsLayout component', () => {
     };
 
     render(
-      <TransactionsLayout 
-        {...defaultProps} 
-        externalState={externalState} 
-        alertMessages={alertMessages} 
+      <TransactionsLayout
+        {...defaultProps}
+        externalState={externalState}
+        alertMessages={alertMessages}
       />
     );
 
@@ -126,11 +139,11 @@ describe('TransactionsLayout component', () => {
     };
 
     render(
-      <TransactionsLayout 
-        {...defaultProps} 
-        externalState={externalState} 
-        alertMessages={alertMessages} 
-        isAlertVisible={false} 
+      <TransactionsLayout
+        {...defaultProps}
+        externalState={externalState}
+        alertMessages={alertMessages}
+        isAlertVisible={false}
       />
     );
 
@@ -149,24 +162,23 @@ describe('TransactionsLayout component', () => {
     };
 
     render(
-      <TransactionsLayout 
-        {...defaultProps} 
-        externalState={externalState} 
-        alertMessages={alertMessages} 
+      <TransactionsLayout
+        {...defaultProps}
+        externalState={externalState}
+        alertMessages={alertMessages}
       />
     );
 
     const alertListContainer = screen.getByTestId('alert-list-component');
 
     expect(alertListContainer).toHaveTextContent('Operation successful');
-
     expect(alertListContainer).toHaveTextContent('Default error fallback');
   });
 
   it('uses translation for fallback generic error if alertMessages.error is undefined', () => {
     render(
-      <TransactionsLayout 
-        {...defaultProps} 
+      <TransactionsLayout
+        {...defaultProps}
         alertMessages={{}}
       />
     );

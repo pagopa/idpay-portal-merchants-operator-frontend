@@ -53,53 +53,41 @@ vi.mock('../../services/merchantService', () => ({
 }));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: ({ children, alerts, genericErrorState }: any) => (
+  default: ({ alerts, genericErrorState, tableProps, drawerProps, filtersProps }: any) => (
     <div data-testid="transactions-layout">
       <span data-testid="generic-error">{String(genericErrorState[0])}</span>
       <span data-testid="alert-reverse">{String(alerts[0][0])}</span>
       <span data-testid="alert-refund">{String(alerts[1][0])}</span>
       <span data-testid="alert-download">{String(alerts[2][0])}</span>
-      {children}
-    </div>
-  ),
-}));
 
-vi.mock('../../components/DynamicFilters/DynamicFilters', () => ({
-  DynamicFilters: ({ setFilters }: any) => (
-    <button data-testid="set-filters" onClick={() => setFilters({ search: 'test' })} />
-  ),
-}));
+      <button data-testid="set-filters" onClick={() => filtersProps?.setFilters({ search: 'test' })} />
 
-vi.mock('../../components/DynamicTable/DynamicTable', () => ({
-  DynamicTable: ({ rows, onPaginationModelChange }: any) => (
-    <div data-testid="dynamic-table">
-      <button data-testid="table-page-change" onClick={() => onPaginationModelChange({ page: 1, pageSize: 20 })} />
-      {rows.map((row: any, i: number) => (
-        <div key={i} data-testid={`row-${i}`}>
-          <button data-testid={`row-action-${i}`} onClick={() => row.action.onClick(row)} />
-          <button data-testid={`row-download-${i}`} onClick={() => row.onClick()} />
-        </div>
-      ))}
-    </div>
-  ),
-}));
-
-vi.mock('../../components/DynamicDrawer/DynamicDrawer', () => ({
-  default: ({ isOpen, buttons }: any) => (
-    isOpen ? (
-      <div data-testid="dynamic-drawer">
-        {buttons && buttons.map((btn: any, i: number) => (
-          <button
-            key={i}
-            data-testid={`drawer-btn-${i}`}
-            disabled={btn.disabled}
-            onClick={btn.onClick}
-          >
-            {btn.title}
-          </button>
+      <div data-testid="dynamic-table">
+        <button data-testid="table-page-change" onClick={() => tableProps?.onPaginationModelChange({ page: 1, pageSize: 20 })} />
+        {tableProps?.rows?.map((row: any, i: number) => (
+          <div key={i} data-testid={`row-${i}`}>
+            <button data-testid={`row-action-${i}`} onClick={() => row.action.onClick(row)} />
+            <button data-testid={`row-download-${i}`} onClick={() => row.onClick()} />
+          </div>
         ))}
       </div>
-    ) : null
+
+      {drawerProps?.isOpen && (
+        <div data-testid="dynamic-drawer">
+          {drawerProps.buttons &&
+            drawerProps.buttons.map((btn: any, i: number) => (
+              <button
+                key={i}
+                data-testid={`drawer-btn-${i}`}
+                disabled={btn.disabled}
+                onClick={btn.onClick}
+              >
+                {btn.title}
+              </button>
+            ))}
+        </div>
+      )}
+    </div>
   ),
 }));
 
@@ -111,11 +99,12 @@ vi.mock('../../utils/helpers', async () => {
   };
 });
 
-const renderComponent = () => render(
-  <MemoryRouter>
-    <RefundManagement />
-  </MemoryRouter>
-);
+const renderComponent = () =>
+  render(
+    <MemoryRouter>
+      <RefundManagement />
+    </MemoryRouter>
+  );
 
 describe('RefundManagement', () => {
   beforeEach(() => {
@@ -123,7 +112,7 @@ describe('RefundManagement', () => {
     mockLocationState = undefined;
     vi.mocked(getProcessedTransactions).mockResolvedValue({
       content: [],
-      totalElements: 0
+      totalElements: 0,
     });
   });
 
@@ -157,7 +146,7 @@ describe('RefundManagement', () => {
   it('opens drawer and maps correct actions for INVOICED transaction', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-1', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING', 'Numero fattura': '123' }],
-      totalElements: 1
+      totalElements: 1,
     });
 
     renderComponent();
@@ -167,7 +156,7 @@ describe('RefundManagement', () => {
     });
 
     fireEvent.click(screen.getByTestId('row-action-0'));
-    
+
     expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
     expect(screen.getByTestId('drawer-btn-0')).not.toBeDisabled();
   });
@@ -175,7 +164,7 @@ describe('RefundManagement', () => {
   it('disables modify button when rewardBatchTrxStatus is APPROVED', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-2', status: 'INVOICED', rewardBatchTrxStatus: 'APPROVED' }],
-      totalElements: 1
+      totalElements: 1,
     });
 
     renderComponent();
@@ -192,7 +181,7 @@ describe('RefundManagement', () => {
   it('navigates to modify document on drawer button click', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-3', status: 'INVOICED', docNumber: 'FATTURA-123' }],
-      totalElements: 1
+      totalElements: 1,
     });
 
     renderComponent();
@@ -211,7 +200,7 @@ describe('RefundManagement', () => {
   it('navigates to reverse transaction on drawer button click', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-4', status: 'INVOICED' }],
-      totalElements: 1
+      totalElements: 1,
     });
 
     renderComponent();
@@ -231,7 +220,7 @@ describe('RefundManagement', () => {
   it('downloads invoice successfully', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-5', status: 'INVOICED', 'invoiceFile.filename': 'test.pdf' }],
-      totalElements: 1
+      totalElements: 1,
     });
     vi.mocked(downloadInvoiceFileApi).mockResolvedValueOnce({ invoiceUrl: 'http://test.url' });
 
@@ -264,7 +253,7 @@ describe('RefundManagement', () => {
   it('handles download invoice error', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-6', status: 'INVOICED' }],
-      totalElements: 1
+      totalElements: 1,
     });
     vi.mocked(downloadInvoiceFileApi).mockRejectedValueOnce(new Error('Download Failed'));
 

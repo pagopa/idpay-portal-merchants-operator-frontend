@@ -4,7 +4,7 @@ import { filtersConfig } from './filtersConfig';
 import { FilterConfigDef } from '../../utils/types';
 import { Box, Button, FormControl, InputLabel, SxProps, Theme } from '@mui/material';
 
-type Props = {
+export type DynamicFiltersProps = {
   filters: Record<string, string>;
   setFilters: (filters: Record<string, string>) => void
   filtersDef: Array<FilterConfigDef>;
@@ -16,7 +16,7 @@ export const DynamicFilters = ({
   setFilters,
   filtersDef,
   containerStyle
-}: Props) => {
+}: DynamicFiltersProps) => {
   const { t, config } = useScopedTranslation();
   const [draftFilters, setDraftFilters] = useState<Record<string, string>>(filters);
   const [errors, setErrors] = useState<Array<string>>([]);

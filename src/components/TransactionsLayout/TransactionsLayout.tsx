@@ -4,15 +4,20 @@ import {
   Button,
 } from '@mui/material';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import { PropsWithChildren } from 'react';
 import AlertComponent from '../Alert/AlertComponent';
 import AlertListComponent from '../Alert/AlertListComponent';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
+import { DynamicTable, DynamicTableProps } from '../DynamicTable/DynamicTable';
+import { DynamicFilters, DynamicFiltersProps } from '../DynamicFilters/DynamicFilters';
+import DynamicDrawer, { DynamicDrawerProps } from '../DynamicDrawer/DynamicDrawer';
 
-type TransactionsLayoutProps = PropsWithChildren<{
+type TransactionsLayoutProps = {
   title: string;
   subtitle: string;
+  tableProps: DynamicTableProps,
+  drawerProps: DynamicDrawerProps,
+  filtersProps: DynamicFiltersProps,
   tableTitle?: string;
   additionalButton?: {
     label: string;
@@ -30,12 +35,14 @@ type TransactionsLayoutProps = PropsWithChildren<{
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
-}>
+}
 
 const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
-  children,
   title,
   subtitle,
+  tableProps,
+  drawerProps,
+  filtersProps,
   tableTitle,
   additionalButton,
   alerts,
@@ -78,7 +85,14 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         )}
       </Box>
       <Typography variant="h6" paddingBottom="0.5rem">{tableTitle}</Typography>
-      {children}
+
+      <Box>
+        {(!!tableProps?.rows?.length || !!Object.keys(filtersProps?.filters)?.length) && <DynamicFilters {...filtersProps} />}
+        <Box marginTop="1rem">
+          <DynamicTable {...tableProps} />
+        </Box>
+        <DynamicDrawer {...drawerProps} />
+      </Box>
       {/* Alerts */}
       {Object.entries(externalState)
         .filter(([key]) => key.includes('error'))
