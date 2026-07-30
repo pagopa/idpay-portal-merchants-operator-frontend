@@ -78,7 +78,7 @@ const RefundManagement = () => {
       return {
         ...plainedTrx,
         onClick: () => handleDownloadInvoice(trx),
-        isLoading: downloadInProgress,
+        value: plainedTrx?.filename,
         icon: ReceiptLong,
         action: {
           icon: "arrow",
@@ -92,7 +92,7 @@ const RefundManagement = () => {
         }
       }
     })
-  }, [downloadInProgress, fieldsDef, handleDownloadInvoice, transactionsList])
+  }, [fieldsDef, handleDownloadInvoice, transactionsList])
 
   const handleReverseTransaction = useCallback(() => {
     const replaceValuesObj = {

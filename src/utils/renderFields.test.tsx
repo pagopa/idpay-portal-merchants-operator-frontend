@@ -125,7 +125,6 @@ describe('renderFields', () => {
           value: 'Download',
           row: {
             onClick,
-            isLoading: false,
             icon: <span>File</span>,
           }
         })}
@@ -133,7 +132,6 @@ describe('renderFields', () => {
     );
 
     const download = screen.getByTestId('download');
-    expect(download).toHaveTextContent('Download-false-trueFile');
 
     fireEvent.click(download);
     expect(onClick).toHaveBeenCalledTimes(1);

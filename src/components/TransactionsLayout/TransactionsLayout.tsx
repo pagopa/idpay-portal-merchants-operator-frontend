@@ -28,6 +28,7 @@ type TransactionsLayoutProps = {
   filtersProps: DynamicFiltersProps
   transactionsApi: (initiativeId: string, trxId: string, params: unknown) => Promise<PointOfSaleTransactionsListDTO | PointOfSaleTransactionsProcessedListDTO>
   setTransactionsList: (content) => void
+  triggerFetchTransactions?: number,
   tableTitle?: string
   additionalButton?: {
     label: string
@@ -59,6 +60,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
   subtitle,
   transactionsApi,
   setTransactionsList,
+  triggerFetchTransactions,
   tableProps,
   drawerProps,
   filtersProps,
@@ -112,7 +114,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
       ...(sortModel.length ? { sort: `${model?.field},${model?.sort}` } : {}),
     }
     fetchTransactions(params);
-  }, [fetchTransactions, filtersProps?.filters, page, pageSize, sortModel]);
+  }, [fetchTransactions, triggerFetchTransactions, filtersProps?.filters, page, pageSize, sortModel]);
 
   return (
     <Box>

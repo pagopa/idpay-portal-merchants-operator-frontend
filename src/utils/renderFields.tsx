@@ -51,7 +51,7 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
                 tooltip={tooltip}
                 onClick={params?.row?.onClick}
                 isLoading={params?.row?.isLoading}
-                text={params?.value}
+                text={params?.row?.value}
                 icon={params?.row?.icon}
             />
         </Box>,
