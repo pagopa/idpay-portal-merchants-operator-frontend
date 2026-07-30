@@ -18,7 +18,6 @@ export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
   }
   return <Tooltip title={tooltip && (text || MISSING_DATA_PLACEHOLDER)}>
     <Typography
-      variant="body2"
       sx={sx}
     >
       {text || MISSING_DATA_PLACEHOLDER}

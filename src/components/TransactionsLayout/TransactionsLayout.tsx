@@ -17,6 +17,7 @@ import { DecodedJwtToken } from '../../utils/types';
 import { authStore } from '../../store/authStore';
 import { jwtDecode } from 'jwt-decode';
 import { PointOfSaleTransactionsListDTO, PointOfSaleTransactionsProcessedListDTO } from '../../api/generated/data-contracts';
+import { theme } from '@pagopa/mui-italia';
 
 type TransactionsLayoutProps = {
   initiativeId: string,
@@ -137,8 +138,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
           </Button>
         )}
       </Box>
-      <Typography variant="h6" paddingBottom="0.5rem">{tableTitle}</Typography>
-
+      <Typography variant="h6" paddingBottom="1rem">{tableTitle}</Typography>
       <Box>
         {(!!tableProps?.rows?.length || !!Object.keys(filtersProps?.filters)?.length) && <DynamicFilters {...filtersProps} setFilters={setFilters} />}
         <Box marginTop="1rem">
@@ -155,6 +155,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
             onSortModelChange={setSortModel}
             rowCount={totalElements || 0}
             isLoading={transactionsListIsLoading}
+            rowsDividerColor={theme.palette.divider}
           />
         </Box>
         <DynamicDrawer {...drawerProps} />
