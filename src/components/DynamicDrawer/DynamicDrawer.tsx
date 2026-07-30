@@ -26,7 +26,6 @@ const drawerStyle = {
   overflow: "hidden",
   maxHeight: "100vh",
   maxWidth: 375,
-  padding: "1rem",
   height: "100%"
 }
 
@@ -54,6 +53,7 @@ export default function DynamicDrawer({
           display="flex"
           justifyContent="end"
           alignItems="center"
+          padding="0.5rem"
         >
           <IconButton
             data-testid="close-button"
@@ -67,7 +67,6 @@ export default function DynamicDrawer({
           display="flex"
           flexDirection="column"
           height="100%"
-          padding="0.5rem"
           sx={{ overflowY: 'auto' }}
         >
           <Box
@@ -75,6 +74,7 @@ export default function DynamicDrawer({
             flexDirection="column"
             width="100%"
             rowGap="1rem"
+            paddingX="1rem"
           >
             <Tooltip title={title || ''}>
               <Box sx={{
@@ -124,7 +124,7 @@ export default function DynamicDrawer({
             flexDirection="column"
             rowGap="0.5rem"
             bgcolor={theme.palette.background.paper}
-            padding="0.5rem"
+            padding="1rem"
             data-testid="buttons-box"
           >
             {buttons.map(({ title, dataTestId, ...rest }, index) => (
