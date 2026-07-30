@@ -46,19 +46,19 @@ const PurchaseManagement = () => {
   const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
   const [transactionDeleteSuccess, setTransactionDeleteSuccess] = useState(false);
   const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
-  const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(0);
+  const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
 
-  const handlePreviewPdf = useCallback(async () => {
+  const handlePreviewPdf = useCallback(async (transaction: PointOfSaleTransactionDTO) => {
     setIsPreviewPdfLoading(true);
     try {
-      const response = await getPreviewPdf(selectedTransaction?.id);
-      downloadFileFromBase64(response.data, `${selectedTransaction.trxCode}_preautorizzazione.pdf`);
+      const response = await getPreviewPdf(transaction?.id);
+      downloadFileFromBase64(response.data, `${transaction.trxCode}_preautorizzazione.pdf`);
     } catch {
       setErrorPreviewPdf(true);
     } finally {
       setIsPreviewPdfLoading(false);
     }
-  }, [selectedTransaction]);
+  }, []);
 
   const mappedTransactionsList = useMemo(() => {
     return transactionsList.map((trx) => {
@@ -69,7 +69,7 @@ const PurchaseManagement = () => {
       }, [])
       return {
         ...plainedTrx,
-        onClick: handlePreviewPdf,
+        onClick: () => handlePreviewPdf(trx),
         icon: DescriptionIcon,
         value: `${plainedTrx?.trxCode}_preautorizzazione.pdf`,
         action: {
@@ -116,7 +116,7 @@ const PurchaseManagement = () => {
       await deleteTransactionInProgress(initiativeId, selectedTransaction?.id);
       setOpenDrawer(false);
       setTransactionDeleteSuccess(true);
-      setTriggerFetchTransactions(prev => prev + 1);
+      setTriggerFetchTransactions(prev => !prev);
     } catch {
       setErrorDeleteTransaction(true);
       setOpenDrawer(true);
@@ -130,7 +130,7 @@ const PurchaseManagement = () => {
       await capturePayment(initiativeId, { trxCode: selectedTransaction?.trxCode });
       setOpenDrawer(false);
       setTransactionCaptured(true);
-      setTriggerFetchTransactions(prev => prev + 1);
+      setTriggerFetchTransactions(prev => !prev);
     } catch {
       setErrorCaptureTransaction(true);
       setOpenDrawer(true);
@@ -174,19 +174,15 @@ const PurchaseManagement = () => {
           [transactionDeleteSuccess, setTransactionDeleteSuccess],
         ]}
         alertMessages={{
-          error: t('pages.purchaseManagement.errorAlert'),
-          transactionAuthorized: t('pages.purchaseManagement.alertSuccess'),
-          transactionCaptured: t('pages.purchaseManagement.paymentSuccess'),
-          errorDeleteTransaction: t(
-            'pages.purchaseManagement.cancelTransactionModal.errorDeleteTransaction'
-          ),
-          errorCaptureTransaction: t(
-            'pages.purchaseManagement.captureTransactionModal.errorCaptureTransaction'
-          ),
-          errorPreviewPdf: t('pages.purchaseManagement.errorPreviewPdf'),
-          transactionRefundSuccess: t('pages.purchaseManagement.refundSuccessUpload'),
-          transactionReverseSuccess: t('pages.purchaseManagement.reverseSuccessUpload'),
-          transactionDeleteSuccess: t('pages.purchaseManagement.transactionDeleteSuccess'),
+          error: t('pages.purchaseManagement.feedbackMessages.errors.generic'),
+          transactionAuthorized: t('pages.purchaseManagement.feedbackMessages.success.transaction'),
+          transactionCaptured: t('pages.purchaseManagement.feedbackMessages.success.payment'),
+          errorDeleteTransaction: t('pages.purchaseManagement.feedbackMessages.errors.cancel'),
+          errorCaptureTransaction: t('pages.purchaseManagement.feedbackMessages.errors.capture'),
+          errorPreviewPdf: t('pages.purchaseManagement.feedbackMessages.errors.previewPdf'),
+          transactionRefundSuccess: t('pages.purchaseManagement.feedbackMessages.success.refundUpload'),
+          transactionReverseSuccess: t('pages.purchaseManagement.feedbackMessages.success.reverseUpload'),
+          transactionDeleteSuccess: t('pages.purchaseManagement.feedbackMessages.success.transactionDelete'),
         }}
         externalState={{
           transactionAuthorized,

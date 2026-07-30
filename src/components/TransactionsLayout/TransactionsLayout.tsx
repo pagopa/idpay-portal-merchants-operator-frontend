@@ -28,7 +28,7 @@ type TransactionsLayoutProps = {
   filtersProps: DynamicFiltersProps
   transactionsApi: (initiativeId: string, trxId: string, params: unknown) => Promise<PointOfSaleTransactionsListDTO | PointOfSaleTransactionsProcessedListDTO>
   setTransactionsList: (content) => void
-  triggerFetchTransactions?: number,
+  triggerFetchTransactions?: boolean,
   tableTitle?: string
   additionalButton?: {
     label: string
