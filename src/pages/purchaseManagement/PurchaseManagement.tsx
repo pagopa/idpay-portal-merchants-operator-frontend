@@ -70,7 +70,6 @@ const PurchaseManagement = () => {
       return {
         ...plainedTrx,
         onClick: handlePreviewPdf,
-        isLoading: isPreviewPdfLoading,
         icon: DescriptionIcon,
         value: `${plainedTrx?.trxCode}_preautorizzazione.pdf`,
         action: {
@@ -83,7 +82,7 @@ const PurchaseManagement = () => {
         }
       }
     })
-  }, [fieldsDef, handlePreviewPdf, isPreviewPdfLoading, transactionsList])
+  }, [fieldsDef, handlePreviewPdf, transactionsList])
 
 
   useEffect(() => {
@@ -214,7 +213,7 @@ const PurchaseManagement = () => {
         drawerProps={{
           setIsOpen: () => setOpenDrawer(false),
           title: t('pages.purchaseManagement.drawer.title'),
-          fieldsValues: selectedTransaction,
+          fieldsValues: { ...selectedTransaction, isLoading: isPreviewPdfLoading},
           fieldsDef: mappedFieldsDef,
           isOpen: openDrawer,
           buttons: [
