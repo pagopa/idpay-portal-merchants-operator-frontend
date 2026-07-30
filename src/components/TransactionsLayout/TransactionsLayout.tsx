@@ -1,276 +1,121 @@
 import {
   Box,
-  Grid,
   Typography,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Paper,
-  CircularProgress,
   Button,
 } from '@mui/material';
-import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import DataTable from '../DataTable/DataTable';
-import { useEffect, useState, useCallback, useRef } from 'react';
-import FiltersForm from '../FiltersForm/FiltersForm';
-import { useFormik } from 'formik';
+import AlertComponent from '../Alert/AlertComponent';
+import AlertListComponent from '../Alert/AlertListComponent';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
+import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
+import { DynamicTable, DynamicTableProps } from '../DynamicTable/DynamicTable';
+import { DynamicFilters, DynamicFiltersProps } from '../DynamicFilters/DynamicFilters';
+import DynamicDrawer, { DynamicDrawerProps } from '../DynamicDrawer/DynamicDrawer';
+import { useCallback, useEffect, useState } from 'react';
+import { GridSortModel } from '@mui/x-data-grid';
+import { DecodedJwtToken } from '../../utils/types';
 import { authStore } from '../../store/authStore';
 import { jwtDecode } from 'jwt-decode';
-import AlertComponent from '../Alert/AlertComponent';
-import { GridSortModel, GridPaginationModel } from '@mui/x-data-grid';
-import {
-  GetProcessedTransactionsFilters,
-  PaginationExtendedModel,
-  DecodedJwtToken,
-} from '../../utils/types';
-import { getStatusChip, handleCodeChange } from '../../utils/helpers';
-import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
-import AlertListComponent from '../Alert/AlertListComponent';
-import { useParams } from 'react-router-dom';
+import { PointOfSaleTransactionsListDTO, PointOfSaleTransactionsProcessedListDTO } from '../../api/generated/data-contracts';
+import { theme } from '@pagopa/mui-italia';
 
-interface TransactionsLayoutProps {
-  title: string;
-  subtitle: string;
-  tableTitle: string;
-  fetchTransactionsApi: (initiativeId: string, posId: string, params: any) => Promise<any>;
-  columns: any[];
-  statusOptions: string[];
+type TransactionsLayoutProps = {
+  initiativeId: string,
+  title: string
+  subtitle: string
+  tableProps: DynamicTableProps
+  drawerProps: DynamicDrawerProps
+  filtersProps: DynamicFiltersProps
+  transactionsApi: (initiativeId: string, trxId: string, params: unknown) => Promise<PointOfSaleTransactionsListDTO | PointOfSaleTransactionsProcessedListDTO>
+  setTransactionsList: (content) => void
+  tableTitle?: string
   additionalButton?: {
-    label: string;
-    icon: React.ReactNode;
-    onClick: () => void;
+    label: string
+    icon: React.ReactNode
+    onClick: () => void
   };
-  alerts: Array<[boolean, (value: boolean) => void]>;
-  alertMessages: {
-    error?: string;
-    [key: string]: string | undefined;
-  };
-  noDataMessage: string;
-  onRowAction: (row: any) => void;
-  DrawerComponent?: React.ReactNode;
-  isDrawerOpen?: boolean;
+  alerts: Array<[boolean, (value: boolean) => void]>
+  alertMessages?: {
+    error?: string
+    [key: string]: string | undefined
+  }
+  isAlertVisible?: boolean
   externalState?: {
-    [key: string]: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any
   };
-  triggerFetchTransactions?: boolean;
+}
+
+const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
+
+const initialPagination = {
+  page: 0,
+  pageSize: isNaN(initialPageSize) ? 10 : initialPageSize
 }
 
 const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
+  initiativeId,
   title,
   subtitle,
+  transactionsApi,
+  setTransactionsList,
+  tableProps,
+  drawerProps,
+  filtersProps,
   tableTitle,
-  fetchTransactionsApi,
-  columns,
-  statusOptions,
   additionalButton,
   alerts,
   alertMessages,
-  noDataMessage,
-  onRowAction,
-  DrawerComponent,
-  triggerFetchTransactions,
-  isDrawerOpen,
+  isAlertVisible,
   externalState = {},
 }) => {
-  const {initiativeId} = useParams()
-  const [codeError, setCodeError] = useState<Record<string, string>>({
-    gtinCodeError: '',
-    trxCodeError: '',
-  });
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [paginationModel, setPaginationModel] = useState<PaginationExtendedModel>({
-    page: 0,
-    pageSize: import.meta.env.VITE_PAGINATION_SIZE,
-    totalElements: 0,
-  });
-  const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  const [errorAlert, setErrorAlert] = useState(false);
-  const { t } = useTranslation();
-  const token = authStore.getState().token;
-  const isLoadingRef = useRef(false);
-  const [filtersAppliedOnce, setFiltersAppliedOnce] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<GetProcessedTransactionsFilters>({
-    fiscalCode: '',
-    productGtin: '',
-    trxCode: '',
-    status: '',
-  });
-
-  const allAlerts = [[errorAlert, setErrorAlert], ...alerts];
-
+  const { t } = useScopedTranslation()
+  const [page, setPage] = useState(initialPagination.page)
+  const [pageSize, setPageSize] = useState(initialPagination.pageSize)
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: "trxChargeDate", sort: "desc" }]);
+  const [totalElements, setTotalElements] = useState(0)
+  const [transactionsListIsLoading, setTransactionsListIsLoading] = useState(true);
+  const [genericError, setGenericError] = useState(false);
+  const allAlerts = [[genericError, setGenericError], ...alerts];
   const alertsList = Object.entries(externalState)
     .filter(([key]) => !key.includes('error'))
     .map(([key, value]) => ({ isOpen: value, message: alertMessages[key] }));
 
   useAutoResetBanner(allAlerts);
 
-  const initialValues: GetProcessedTransactionsFilters = {
-    fiscalCode: '',
-    productGtin: '',
-    trxCode: '',
-    status: '',
-  };
+  const setFilters = useCallback((filters) => {
+    setPage(0)
+    filtersProps?.setFilters(filters)
+  }, [filtersProps])
 
-  const formik = useFormik<GetProcessedTransactionsFilters>({
-    initialValues,
-    onSubmit: async (values) => {
-      handleApplyFilters(values);
-    },
-  });
+  const fetchTransactions = useCallback(async (params) => {
+    const token = authStore.getState().token;
+    const decodeToken: DecodedJwtToken = jwtDecode(token)
+    setTransactionsListIsLoading(true);
+    try {
+      const { content, totalElements } = await transactionsApi(initiativeId, decodeToken?.point_of_sale_id, params);
+      setTransactionsList(content);
+      setTotalElements(totalElements)
+    } catch {
+      setGenericError(true)
+    } finally {
+      setTransactionsListIsLoading(false)
+    }
+  }, [initiativeId, setTransactionsList, transactionsApi]);
 
   useEffect(() => {
-    setSortModel([
-      {
-        field: 'trxChargeDate',
-        sort: 'desc',
-      },
-    ]);
-    fetchTransactions(initiativeId, {});
-  }, [initiativeId]);
-
-  useEffect(() => {
-    if (triggerFetchTransactions) {
-      fetchTransactions(initiativeId, {});
+    const [model] = sortModel
+    const params = {
+      size: pageSize,
+      page,
+      ...filtersProps?.filters,
+      ...(sortModel.length ? { sort: `${model?.field},${model?.sort}` } : {}),
     }
-  }, [triggerFetchTransactions, initiativeId]);
-
-  const fetchTransactions = useCallback(
-    async (initiativeId: string, params: {
-      fiscalCode?: string;
-      productGtin?: string;
-      trxCode?: string;
-      status?: string;
-      page?: number;
-      size?: number;
-      sort?: string;
-    }) => {
-      if (isLoadingRef.current) {
-        return;
-      }
-
-      const decodeToken: DecodedJwtToken = jwtDecode(token);
-      isLoadingRef.current = true;
-      setLoading(true);
-
-      try {
-        const response = await fetchTransactionsApi(
-          initiativeId,
-          decodeToken?.point_of_sale_id,
-          Object.keys(params).length > 0
-            ? params
-            : {
-                sort: 'trxChargeDate,desc',
-                page: paginationModel.page,
-                size: paginationModel.pageSize,
-              }
-        );
-
-        setPaginationModel({
-          page: response.pageNo || 0,
-          pageSize: response.pageSize || import.meta.env.VITE_PAGINATION_SIZE,
-          totalElements: response.totalElements || 0,
-        });
-
-        setRows([...response.content]);
-        setErrorAlert(false);
-      } catch {
-        setErrorAlert(true);
-      } finally {
-        setLoading(false);
-        isLoadingRef.current = false;
-      }
-    },
-    [token, paginationModel.page, paginationModel.pageSize, fetchTransactionsApi]
-  );
-
-  const handleApplyFilters = (filtersObj: GetProcessedTransactionsFilters) => {
-    setFiltersAppliedOnce(true);
-    setAppliedFilters(filtersObj);
-    if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
-      fetchTransactions(initiativeId, {
-        sort: 'productName,' + sortModel[0].sort,
-        page: 0,
-        size: paginationModel.pageSize,
-        ...filtersObj,
-      });
-    } else {
-      fetchTransactions(initiativeId, {
-        sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-        page: 0,
-        size: paginationModel.pageSize,
-        ...filtersObj,
-      });
-    }
-  };
-
-  const handlePaginationChange = (model: GridPaginationModel) => {
-    if (sortModel?.length > 0 && sortModel[0].field === 'additionalProperties') {
-      fetchTransactions(initiativeId, {
-        sort: 'productName,' + sortModel[0].sort,
-        page: model.page,
-        size: model.pageSize,
-        ...appliedFilters,
-      });
-    } else {
-      fetchTransactions(initiativeId, {
-        sort: sortModel?.length > 0 ? sortModel[0].field + ',' + sortModel[0].sort : '',
-        page: model.page,
-        size: model.pageSize,
-        ...appliedFilters,
-      });
-    }
-  };
-
-  const handleSortModelChange = (model: GridSortModel) => {
-    if (model.length > 0) {
-      setSortModel(model);
-      if (model[0].field === 'additionalProperties') {
-        fetchTransactions(initiativeId, {
-          sort: 'productName,' + model[0].sort,
-          page: paginationModel.page,
-          size: paginationModel.pageSize,
-          ...appliedFilters,
-        });
-      } else {
-        fetchTransactions(initiativeId, {
-          sort: model[0].field + ',' + model[0].sort,
-          page: paginationModel.page,
-          size: paginationModel.pageSize,
-          ...appliedFilters,
-        });
-      }
-    }
-  };
-
-  const handleResetFilters = () => {
-    if (
-      formik.values.fiscalCode.length > 0 ||
-      formik.values.productGtin.length > 0 ||
-      formik.values.trxCode.length > 0 ||
-      formik.values.status !== null
-    ) {
-      handleApplyFilters({
-        fiscalCode: '',
-        productGtin: '',
-        trxCode: '',
-        status: '',
-      });
-    }
-    setFiltersAppliedOnce(false);
-    formik.resetForm();
-  };
-
-  const handleCodeErrors = useCallback((code, error) => {
-    setCodeError((prev) => ({ ...prev, [code]: error }));
-  }, []);
+    fetchTransactions(params);
+  }, [fetchTransactions, filtersProps?.filters, page, pageSize, sortModel]);
 
   return (
     <Box>
-      {DrawerComponent}
       <Box mt={2} mb={4} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <TitleBox
           title={title}
@@ -293,139 +138,28 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
           </Button>
         )}
       </Box>
-
-      <Typography variant="h6">{tableTitle}</Typography>
-
+      <Typography variant="h6" paddingBottom="1rem">{tableTitle}</Typography>
       <Box>
-        {(rows.length > 0 ||
-          (rows.length === 0 &&
-            (formik.values.fiscalCode.length > 0 ||
-              formik.values.productGtin.length > 0 ||
-              formik.values.trxCode.length > 0 ||
-              (formik.values.status !== null && formik.values.status !== ''))) ||
-          filtersAppliedOnce) && (
-          <FiltersForm
-            formik={formik}
-            onFiltersApplied={formik.handleSubmit}
-            onFiltersReset={handleResetFilters}
-            filtersApplied={
-              formik.values.fiscalCode.length > 0 ||
-              formik.values.productGtin.length > 0 ||
-              formik.values.trxCode.length > 0 ||
-              (formik.values.status !== null && formik.values.status !== '')
-            }
-            filtersAppliedOnce={filtersAppliedOnce}
-          >
-            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
-              <TextField
-                name="fiscalCode"
-                label={t('commons.fiscalCodeFilterPlaceholer')}
-                size="small"
-                fullWidth
-                value={formik.values.fiscalCode}
-                onChange={formik.handleChange}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
-              <TextField
-                name="productGtin"
-                label={t('commons.gtiInFilterPlaceholer')}
-                size="small"
-                fullWidth
-                value={formik.values.productGtin}
-                onChange={(e) =>
-                  handleCodeErrors('gtinCodeError', handleCodeChange(e, formik, 14, 'GTIN/EAN'))
-                }
-                onBlur={() => handleCodeErrors('gtinCodeError', '')}
-                error={!!codeError.gtinCodeError}
-                helperText={codeError.gtinCodeError}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
-              <TextField
-                name="trxCode"
-                label={t('commons.trxCodeFilterPlaceholer')}
-                size="small"
-                fullWidth
-                value={formik.values.trxCode}
-                onChange={(e) =>
-                  handleCodeErrors('trxCodeError', handleCodeChange(e, formik, 8, 'sconto'))
-                }
-                onBlur={() => handleCodeErrors('trxCodeError', '')}
-                error={!!codeError.trxCodeError}
-                helperText={codeError.trxCodeError}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2.5 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="status-label">{t('commons.statusFilterPlaceholer')}</InputLabel>
-                <Select
-                  labelId="status-label"
-                  id="status-select"
-                  label={t('commons.statusFilterPlaceholer')}
-                  name="status"
-                  value={formik.values.status}
-                  onChange={formik.handleChange}
-                >
-                  {statusOptions.map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {getStatusChip(t, status)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </FiltersForm>
-        )}
-      </Box>
-
-      {loading && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: 'auto',
-          }}
-          data-testid="loading"
-        >
-          <CircularProgress />
+        {(!!tableProps?.rows?.length || !!Object.keys(filtersProps?.filters)?.length) && <DynamicFilters {...filtersProps} setFilters={setFilters} />}
+        <Box marginTop="1rem">
+          <DynamicTable {...tableProps}
+            getRowId={row => row.id}
+            sortingMode='server'
+            paginationMode="server"
+            sortModel={sortModel}
+            paginationModel={{ page, pageSize }}
+            onPaginationModelChange={model => {
+              setPage(model.page)
+              setPageSize(model.pageSize)
+            }}
+            onSortModelChange={setSortModel}
+            rowCount={totalElements || 0}
+            isLoading={transactionsListIsLoading}
+            rowsDividerColor={theme.palette.divider}
+          />
         </Box>
-      )}
-
-      {rows && rows?.length > 0 && !loading && (
-        <Grid container mt={2}>
-          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-            <Box sx={{ height: 'auto', width: '100%' }}>
-              <DataTable
-                rows={rows}
-                columns={columns}
-                onPaginationPageChange={handlePaginationChange}
-                paginationModel={paginationModel}
-                onSortModelChange={handleSortModelChange}
-                sortModel={sortModel}
-                handleRowAction={onRowAction}
-              />
-            </Box>
-          </Grid>
-        </Grid>
-      )}
-
-      {rows.length === 0 && !loading && (
-        <Paper
-          sx={{
-            my: 4,
-            p: 3,
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="body2">{noDataMessage}</Typography>
-        </Paper>
-      )}
-
+        <DynamicDrawer {...drawerProps} />
+      </Box>
       {/* Alerts */}
       {Object.entries(externalState)
         .filter(([key]) => key.includes('error'))
@@ -441,7 +175,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                   zIndex: '1300',
                 }}
                 contentStyle={{ position: 'unset', bottom: '0', right: '0' }}
-                isOpen={value && isDrawerOpen}
+                isOpen={value && isAlertVisible}
                 key={key}
                 error
                 message={alertMessages[key]}
@@ -452,7 +186,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         alertList={[
           ...alertsList,
           {
-            isOpen: errorAlert,
+            isOpen: genericError,
             error: true,
             message: alertMessages.error || t('pages.refundManagement.errorAlert'),
           },

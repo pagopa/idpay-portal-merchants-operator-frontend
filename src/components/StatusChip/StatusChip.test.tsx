@@ -37,10 +37,10 @@ describe('StatusChip', () => {
     mockT.mockReturnValue('In corso');
     mockConfig.mockReturnValue({ label: 'commons.statusEnum.initiative.published', color: 'success' });
 
-    render(<StatusChip field="initiative" value="published" />);
+    render(<StatusChip context="initiative" value="published" />);
 
     expect(mockT).toHaveBeenCalledWith('commons.statusEnum.initiative.published');
-    expect(mockConfig).toHaveBeenCalledWith('commons.statusEnum.initiative.published');
+    expect(mockConfig).toHaveBeenCalledWith('initiative.published');
 
     const chipLabel = screen.getByText('In corso');
     expect(chipLabel).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('StatusChip', () => {
   it('should render missing data placeholder when value is empty', () => {
     mockConfig.mockReturnValue({ label: 'commons.statusEnum.initiative.', color: 'default' });
 
-    const { container } = render(<StatusChip field="initiative" value="" />);
+    const { container } = render(<StatusChip context="initiative" value="" />);
 
     expect(screen.getByText(MISSING_DATA_PLACEHOLDER)).toBeInTheDocument();
     expect(container.querySelector('.MuiChip-root')).not.toBeInTheDocument();
@@ -64,7 +64,7 @@ describe('StatusChip', () => {
     mockT.mockReturnValue('In corso');
     mockConfig.mockReturnValue({ label: 'commons.statusEnum.initiative.published', color: 'success' });
 
-    render(<StatusChip field="initiative" value="published" tooltip />);
+    render(<StatusChip context="initiative" value="published" tooltip />);
 
     expect(screen.getByTestId('mock-tooltip')).toHaveAttribute('data-title', 'In corso');
   });
@@ -72,7 +72,7 @@ describe('StatusChip', () => {
   it('should display placeholder as tooltip title when tooltip prop is true and value is empty', () => {
     mockConfig.mockReturnValue({ label: 'commons.statusEnum.initiative.', color: 'default' });
 
-    render(<StatusChip field="initiative" value="" tooltip />);
+    render(<StatusChip context="initiative" value="" tooltip />);
 
     expect(screen.getByTestId('mock-tooltip')).toHaveAttribute('data-title', MISSING_DATA_PLACEHOLDER);
   });

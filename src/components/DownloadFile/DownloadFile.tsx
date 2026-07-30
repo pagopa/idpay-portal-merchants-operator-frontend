@@ -1,16 +1,17 @@
 import { Box, Button, CircularProgress, Tooltip, Typography } from "@mui/material"
-import { ReactNode } from "react"
 import { MISSING_DATA_PLACEHOLDER } from "../../utils/constants";
+import { SvgIconComponent } from "@mui/icons-material";
 
 type Props = {
     isLoading: boolean;
     onClick: () => void;
-    icon?: ReactNode;
+    icon?: SvgIconComponent;
     text?: string;
     tooltip?: boolean;
 }
 
 export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props) => {
+    const IconCmp = icon
     const sx = {
         ...(tooltip ? {
             overflow: 'hidden',
@@ -27,8 +28,7 @@ export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props)
                 <Button
                     data-testid="btn-test"
                     sx={{
-                        padding: "0",
-                        alignItems: "flex-start",
+                        padding: "0"
                     }}
                     onClick={onClick}
                 >
@@ -39,15 +39,8 @@ export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props)
                             data-testid="item-loader"
                         />
                     ) : (
-                        <Box
-                            display="flex"
-                            alignItems="start"
-                            textAlign="left"
-                            columnGap={6}
-                            width="100%"
-                            marginTop={2}
-                        >
-                            {icon}
+                        <Box display="flex" alignItems="center" columnGap={1} width="100%">
+                            <IconCmp data-testid="icon" />
                             <Typography
                                 component="span"
                                 variant="inherit"

@@ -7,9 +7,9 @@ export type StatusChipConfigProps = {
     color: ChipOwnProps['color']
 }
 
-export const StatusChip = ({ field, value, tooltip }: { field: string, value: string, tooltip?: boolean }) => {
+export const StatusChip = ({ context, value, tooltip }: { context: string, value: string, tooltip?: boolean }) => {
     const { t, config } = useScopedTranslation();
-    const chipProps = config<StatusChipConfigProps>(`commons.statusEnum.${field}.${value}`)
+    const chipProps = config<StatusChipConfigProps>(`${context}.${value}`)
     return <Tooltip title={tooltip && (value ? t(chipProps.label) : MISSING_DATA_PLACEHOLDER)}>
         {value ? <Chip
             label={t(chipProps.label)}

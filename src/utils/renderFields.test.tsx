@@ -45,14 +45,14 @@ vi.mock('../components/Link/Link', () => ({
 
 vi.mock('../components/StatusChip/StatusChip', () => ({
   StatusChip: ({
-    field,
+    context,
     value,
     tooltip,
   }: {
-    field: string;
+    context?: string;
     value: string;
     tooltip?: boolean;
-  }) => <span data-testid="chip">{`${field}-${value}-${tooltip}`}</span>,
+  }) => <span data-testid="chip">{`${context}-${value}-${tooltip}`}</span>,
 }));
 
 vi.mock('../components/DownloadFile/DownloadFile', () => ({
@@ -78,36 +78,41 @@ vi.mock('../components/DownloadFile/DownloadFile', () => ({
 
 vi.mock('./helpers', () => ({
   formatDate: vi.fn(() => 'formatted date'),
+  formatEuro: vi.fn(() => 'formatted euro'),
   renderText: vi.fn((value: string) => value),
 }));
 
 describe('renderFields', () => {
-  const fields = renderFields({ tooltip: true, bold: true, options: { locale: 'it' } });
+  const fields = renderFields({ 
+    tooltip: true, 
+    bold: true, 
+    options: { locale: 'en' }, 
+    context: 'status' 
+  });
 
-  it('renders text and date fields', () => {
+  it('renders text, date, and euro fields', () => {
     const { rerender } = render(<>{fields.text({ value: 'Text value' })}</>);
-
     expect(screen.getByText('Text value')).toBeInTheDocument();
 
     rerender(<>{fields.date({ value: '2026-01-01' })}</>);
     expect(screen.getByText('formatted date')).toBeInTheDocument();
+
+    rerender(<>{fields.euro({ value: 100 })}</>);
+    expect(screen.getByText('formatted euro')).toBeInTheDocument();
   });
 
   it('renders a navigation field', () => {
     render(<>{fields.navigation({ value: 'Details', row: { route: '/details' } })}</>);
-
     expect(screen.getByTestId('navigation-link')).toHaveTextContent('Details-/details-true');
   });
 
   it('renders a link field', () => {
     render(<>{fields.link({ value: 'Website', row: { link: 'https://example.com' } })}</>);
-
     expect(screen.getByTestId('link')).toHaveTextContent('Website-https://example.com-true');
   });
 
   it('renders a chip field with a normalized value', () => {
-    render(<>{fields.chip({ value: 'ACTIVE', row: { key: 'status' } })}</>);
-
+    render(<>{fields.chip({ value: 'ACTIVE' })}</>);
     expect(screen.getByTestId('chip')).toHaveTextContent('status-active-true');
   });
 
@@ -118,9 +123,11 @@ describe('renderFields', () => {
       <>
         {fields.download({
           value: 'Download',
-          onClick,
-          isLoading: false,
-          icon: <span>File</span>,
+          row: {
+            onClick,
+            isLoading: false,
+            icon: <span>File</span>,
+          }
         })}
       </>
     );

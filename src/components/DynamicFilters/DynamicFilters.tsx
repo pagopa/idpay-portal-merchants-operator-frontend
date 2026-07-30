@@ -2,19 +2,21 @@ import { useCallback, useEffect, useState } from 'react';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { filtersConfig } from './filtersConfig';
 import { FilterConfigDef } from '../../utils/types';
-import { Box, Button, FormControl, InputLabel } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, SxProps, Theme } from '@mui/material';
 
-type Props = {
+export type DynamicFiltersProps = {
   filters: Record<string, string>;
   setFilters: (filters: Record<string, string>) => void
   filtersDef: Array<FilterConfigDef>;
+  containerStyle?: SxProps<Theme>
 };
 
 export const DynamicFilters = ({
   filters,
   setFilters,
-  filtersDef
-}: Props) => {
+  filtersDef,
+  containerStyle
+}: DynamicFiltersProps) => {
   const { t, config } = useScopedTranslation();
   const [draftFilters, setDraftFilters] = useState<Record<string, string>>(filters);
   const [errors, setErrors] = useState<Array<string>>([]);
@@ -36,7 +38,7 @@ export const DynamicFilters = ({
   );
 
   return (
-    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%" paddingY="2rem">
+    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%" sx={containerStyle}>
       {filtersDef.map(({ type, ...filter }) => {
         const props = {
           item: filter,

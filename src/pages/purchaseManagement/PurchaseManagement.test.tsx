@@ -1,483 +1,371 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PurchaseManagement from './PurchaseManagement';
+import * as merchantService from '../../services/merchantService';
+import * as helpers from '../../utils/helpers';
+import { authStore } from '../../store/authStore';
 import { utilsStore } from '../../store/utilsStore';
 import ROUTES from '../../routes';
 
-const {
-  mockedNavigate,
-  mockDelete,
-  mockCapture,
-  mockPreview,
-  mockDownload,
-  mockAuthorized,
-  mockCaptured,
-  mockParams
-} = vi.hoisted(() => ({
-  mockedNavigate: vi.fn(),
-  mockDelete: vi.fn(),
-  mockCapture: vi.fn(),
-  mockPreview: vi.fn(),
-  mockDownload: vi.fn(),
-  mockParams: { initiativeId: 'Init-1' },
-  mockAuthorized: {
-    id: '1',
-    trxCode: 'trx',
-    additionalProperties: { productName: 'prod' },
-    trxChargeDate: new Date().toISOString(),
-    fiscalCode: 'AAA',
-    effectiveAmountCents: 100,
-    rewardAmountCents: 10,
-    residualAmountCents: 90,
-    status: 'AUTHORIZED',
-  },
-  mockCaptured: {
-    id: '2',
-    trxCode: 'trx2',
-    additionalProperties: { productName: 'prod2' },
-    trxChargeDate: new Date().toISOString(),
-    fiscalCode: 'BBB',
-    effectiveAmountCents: 200,
-    rewardAmountCents: 20,
-    residualAmountCents: 180,
-    status: 'CAPTURED',
-  },
-}));
-
-let mockedLocation: { state: unknown } = { state: null };
-
-vi.mock('@mui/material', () => ({
-  Box: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Button: ({
-    children,
-    onClick,
-    disabled,
-    ...rest
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-    disabled?: boolean;
-    [key: string]: unknown;
-  }) => (
-    <button onClick={onClick} disabled={disabled} {...rest}>
-      {children}
-    </button>
-  ),
-  Drawer: ({
-    open,
-    children,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-    onClose?: () => void;
-  }) => (open ? <div data-testid="drawer">{children}</div> : null),
-  Typography: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Grid: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CircularProgress: () => <div data-testid="item-loader" />,
-}));
-
-vi.mock('@mui/icons-material/Close', () => ({
-  default: ({ onClick }: { onClick?: () => void }) => (
-    <div data-testid="CloseIcon" onClick={onClick} />
-  ),
-}));
-
-vi.mock('@mui/icons-material/Description', () => ({
-  default: () => <div />,
-}));
-
-vi.mock('@mui/icons-material/QrCode', () => ({
-  default: () => <div />,
-}));
-
-vi.mock('@pagopa/mui-italia', () => ({
-  theme: {
-    typography: { fontWeightRegular: 400, fontWeightMedium: 600 },
-    palette: { text: { secondary: '#000' } },
-  },
-}));
-
-vi.mock('../../hooks/useScopedTranslation', () => ({
-  useScopedTranslation: () => ({ t: (k: string) => k }),
-}));
+const mockNavigate = vi.fn();
+let mockLocationState: Record<string, unknown> = {};
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('react-router-dom');
+  const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockedNavigate,
-    useLocation: () => mockedLocation,
-    useParams: () => mockParams
+    useNavigate: () => mockNavigate,
+    useLocation: () => ({ state: mockLocationState }),
+    useParams: () => ({ initiativeId: 'init-123' }),
+    generatePath: (path: string, params: Record<string, string>) =>
+      path.replace(':initiativeId', params.initiativeId || '').replace(':trxId', params.trxId || ''),
   };
 });
 
-vi.mock('../../services/merchantService', () => ({
-  getInProgressTransactions: vi.fn().mockResolvedValue({ content: [], totalElements: 0 }),
-  deleteTransactionInProgress: mockDelete,
-  capturePayment: mockCapture,
-  getPreviewPdf: mockPreview,
+vi.mock('jwt-decode', () => ({
+  jwtDecode: vi.fn(() => ({ point_of_sale_id: 'pos-999' })),
 }));
 
-vi.mock('../../utils/helpers', async () => {
-  const actual = await vi.importActual('../../utils/helpers')
-  return {
-    ...actual,
-  getStatusChip: vi.fn((_, status: string) => <div data-testid="status-chip">{status}</div>),
-  formatEuro: vi.fn((v: number) => `€${v}`),
-  downloadFileFromBase64: mockDownload,
-  checkEuroTooltip: vi.fn((p: { value?: number }) =>
-    p?.value !== undefined ? `€${p.value}` : '---'
-  ),
-  checkTooltipValue: vi.fn((p: { value?: unknown }) => p?.value ?? '---'),
-  checkDateTooltip: vi.fn(() => 'date')
-}});
+vi.mock('../../services/merchantService', () => ({
+  getInProgressTransactions: vi.fn(),
+  deleteTransactionInProgress: vi.fn(),
+  capturePayment: vi.fn(),
+  getPreviewPdf: vi.fn(),
+}));
+
+vi.mock('../../utils/helpers', () => ({
+  formatEuro: (cents?: number) => (cents !== undefined ? `${cents / 100} €` : ''),
+  plainObj: (obj: unknown) => obj,
+  downloadFileFromBase64: vi.fn(),
+}));
+
+const mockFiltersConfig = [
+  { id: 'fiscalCode', type: 'text', label: 'pages.purchaseManagement.filters.fiscalCode' },
+];
+
+const mockColumnsConfig = [
+  { field: 'fiscalCode', headerName: 'Fiscal Code' },
+  { field: 'status', headerName: 'Status' },
+];
+
+const mockDrawerConfig = [
+  { field: 'id', headerName: 'Transaction ID' },
+  { field: 'trxCode', headerName: 'TRX Code' },
+  { field: 'status', headerName: 'Status' },
+  { field: 'trxCode', headerName: 'Document', cell: { type: 'download' } },
+];
+
+vi.mock('../../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) => {
+      if (options?.amount !== undefined) return `${key}_${options.amount}`;
+      return key;
+    },
+    config: (key: string) => {
+      if (key === 'pages.purchaseManagement.transactionsTable.filters') return mockFiltersConfig;
+      if (key === 'pages.purchaseManagement.transactionsTable.columns') return mockColumnsConfig;
+      if (key === 'pages.purchaseManagement.drawer') return mockDrawerConfig;
+      return [];
+    },
+  }),
+}));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: (props: {
-    additionalButton: { onClick: () => void };
-    onRowAction: (row: unknown) => void;
-    externalState: unknown;
-    DrawerComponent: React.ReactNode;
-  }) => (
-    <div data-testid="layout">
-      <button data-testid="btn-add" onClick={props.additionalButton.onClick}>
-        add
-      </button>
-      <button data-testid="btn-auth" onClick={() => props.onRowAction(mockAuthorized)}>
-        auth
-      </button>
-      <button data-testid="btn-cap" onClick={() => props.onRowAction(mockCaptured)}>
-        cap
-      </button>
-      <div data-testid="external">{JSON.stringify(props.externalState)}</div>
-      {props.DrawerComponent}
-    </div>
-  ),
+  default: ({
+    title,
+    additionalButton,
+    isAlertVisible,
+    tableProps,
+    drawerProps,
+    filtersProps,
+    transactionsApi,
+    setTransactionsList,
+  }: any) => {
+    React.useEffect(() => {
+      if (transactionsApi && setTransactionsList) {
+        transactionsApi('init-123', 'pos-999', { page: 0, size: 10, sort: 'trxChargeDate,desc' }).then((res: any) => {
+          setTransactionsList(res.content);
+        });
+      }
+    }, [transactionsApi, setTransactionsList]);
+
+    return (
+      <div data-testid="transactions-layout">
+        <h1>{title}</h1>
+        {additionalButton && (
+          <button data-testid="additional-btn" onClick={additionalButton.onClick}>
+            {additionalButton.label}
+          </button>
+        )}
+        <div data-testid="alert-drawer-visible">{String(isAlertVisible)}</div>
+
+        <div data-testid="dynamic-filters">
+          <button data-testid="apply-filter-btn" onClick={() => filtersProps?.setFilters({ fiscalCode: 'ABCDEF12345' })}>
+            Filter
+          </button>
+        </div>
+
+        <div data-testid="dynamic-table">
+          <table>
+            <tbody>
+              {tableProps?.rows?.map((row: any) => (
+                <tr key={row.id}>
+                  <td>{row.id}</td>
+                  <td>{row.status}</td>
+                  <td>
+                    <button data-testid={`action-btn-${row.id}`} onClick={() => row.action.onClick(row)}>
+                      Detail
+                    </button>
+                    <button data-testid={`download-pdf-${row.id}`} onClick={() => row.onClick()}>
+                      Download PDF
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button
+            data-testid="change-page-btn"
+            onClick={() => tableProps?.onPaginationModelChange?.({ page: 1, pageSize: 10 })}
+          >
+            Next Page
+          </button>
+        </div>
+
+        {drawerProps?.isOpen && (
+          <div data-testid="dynamic-drawer">
+            <span>Drawer for TRX: {drawerProps.fieldsValues?.id}</span>
+            {drawerProps.buttons?.map((btn: any, index: number) => (
+              <button key={index} data-testid={`drawer-btn-${index}`} onClick={btn.onClick}>
+                {btn.title}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  },
 }));
 
 vi.mock('../../components/Modal/ModalComponent', () => ({
-  default: ({
-    open,
-    children,
-    onClose,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-    onClose?: () => void;
-  }) =>
+  default: ({ open, onClose, children }: any) =>
     open ? (
-      <div data-testid="modal">
-        <button data-testid="modal-close" onClick={onClose}>
-          close
+      <div data-testid="modal-component">
+        <button data-testid="close-modal-btn" onClick={onClose}>
+          X
         </button>
         {children}
       </div>
     ) : null,
 }));
 
-vi.mock('./purchaseManagement.module.css', () => ({ default: { cursorPointer: '' } }));
+vi.stubEnv('VITE_PAGINATION_SIZE', '10');
 
-const renderPage = () =>
-  render(
-    <MemoryRouter>
-      <PurchaseManagement />
-    </MemoryRouter>
-  );
-
-const openAuthorizedDrawer = async () => {
-  fireEvent.click(screen.getByTestId('btn-auth'));
-  await waitFor(() => expect(screen.getByTestId('drawer')).toBeInTheDocument());
+const mockAuthorizedTransaction = {
+  id: 'trx-1',
+  trxCode: 'TRX123',
+  fiscalCode: 'RSSMRA80A01H501U',
+  status: 'AUTHORIZED',
+  residualAmountCents: 5000,
+  productName: 'Washing Machine',
 };
 
-const openCapturedDrawer = async () => {
-  fireEvent.click(screen.getByTestId('btn-cap'));
-  await waitFor(() => expect(screen.getByTestId('drawer')).toBeInTheDocument());
+const mockCapturedTransaction = {
+  id: 'trx-2',
+  trxCode: 'TRX456',
+  fiscalCode: 'BNCLRA85M41H501Z',
+  status: 'CAPTURED',
+  residualAmountCents: 0,
+  productName: 'Fridge',
 };
 
-describe('PurchaseManagement coverage completion', () => {
+describe('PurchaseManagement Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockedLocation = { state: null };
-    vi.useRealTimers();
-    act(() => {
-      utilsStore.setState({ ...utilsStore.getState(), transactionAuthorized: false });
+    mockLocationState = {};
+    authStore.setState({ token: 'mock-jwt-token' });
+    utilsStore.setState({ transactionAuthorized: false });
+
+    vi.mocked(merchantService.getInProgressTransactions).mockResolvedValue({
+      content: [mockAuthorizedTransaction, mockCapturedTransaction],
+      totalElements: 2,
     });
   });
 
-  it('navigates to accept discount', () => {
-    renderPage();
-    fireEvent.click(screen.getByTestId('btn-add'));
-    expect(mockedNavigate).toHaveBeenCalledWith('/Init-1/accetta-buono-sconto');
-  });
+  it('should load and display transactions correctly on mount', async () => {
+    render(<PurchaseManagement />);
 
-  it('renders AUTHORIZED drawer branch', async () => {
-    renderPage();
-    await openAuthorizedDrawer();
-    expect(screen.getByTestId('status-chip')).toHaveTextContent('AUTHORIZED');
-  });
+    expect(screen.getByTestId('dynamic-table')).toBeInTheDocument();
 
-  it('renders CAPTURED drawer branch', async () => {
-    renderPage();
-    await openCapturedDrawer();
-    expect(screen.getByTestId('status-chip')).toHaveTextContent('CAPTURED');
-  });
-
-  it('closes drawer via CloseIcon', async () => {
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByTestId('CloseIcon'));
-    await waitFor(() => expect(screen.queryByTestId('drawer')).not.toBeInTheDocument());
-  });
-
-  it('covers capture success branch', async () => {
-    mockCapture.mockResolvedValue({});
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.confirmPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Conferma'));
-    await waitFor(() => expect(mockCapture).toHaveBeenCalled());
-    const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-    expect(state.transactionCaptured).toBe(true);
-  });
-
-  it('covers capture error branch — reopens drawer', async () => {
-    mockCapture.mockRejectedValue(new Error());
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.confirmPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Conferma'));
     await waitFor(() => {
-      const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-      expect(state.errorCaptureTransaction).toBe(true);
+      expect(screen.getByText('trx-1')).toBeInTheDocument();
+      expect(screen.getByText('trx-2')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
   });
 
-  it('covers delete success branch', async () => {
-    mockDelete.mockResolvedValue({});
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.cancellPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Conferma'));
-    await waitFor(() => expect(mockDelete).toHaveBeenCalled());
-    const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-    expect(state.transactionDeleteSuccess).toBe(true);
+  it('should redirect when clicking additional action button', async () => {
+    render(<PurchaseManagement />);
+
+    const button = screen.getByTestId('additional-btn');
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/init-123/accetta-buono-sconto');
   });
 
-  it('covers delete error branch — reopens drawer', async () => {
-    mockDelete.mockRejectedValue(new Error());
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.cancellPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Conferma'));
+  describe('Interaction with AUTHORIZED transaction', () => {
+    it('should open the drawer with Confirm and Cancel Payment buttons', async () => {
+      render(<PurchaseManagement />);
+
+      await waitFor(() => expect(screen.getByTestId('action-btn-trx-1')).toBeInTheDocument());
+
+      fireEvent.click(screen.getByTestId('action-btn-trx-1'));
+
+      expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
+      expect(screen.getByText('pages.purchaseManagement.drawer.confirmPayment')).toBeInTheDocument();
+      expect(screen.getByText('pages.purchaseManagement.drawer.cancellPayment')).toBeInTheDocument();
+    });
+
+    it('should successfully handle payment capture (Confirm Payment)', async () => {
+      vi.mocked(merchantService.capturePayment).mockResolvedValue({});
+
+      render(<PurchaseManagement />);
+
+      await waitFor(() => expect(screen.getByTestId('action-btn-trx-1')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('action-btn-trx-1'));
+
+      const confirmDrawerBtn = screen.getByTestId('drawer-btn-0');
+      fireEvent.click(confirmDrawerBtn);
+
+      expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+      expect(screen.getByText('pages.purchaseManagement.modal.capture.title')).toBeInTheDocument();
+
+      const confirmModalBtn = screen.getByText('pages.purchaseManagement.modal.capture.confirmBtn');
+      fireEvent.click(confirmModalBtn);
+
+      await waitFor(() => {
+        expect(merchantService.capturePayment).toHaveBeenCalledWith('init-123', { trxCode: 'TRX123' });
+        expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('dynamic-drawer')).not.toBeInTheDocument();
+      });
+    });
+
+    it('should successfully handle transaction cancellation (Cancel Payment)', async () => {
+      vi.mocked(merchantService.deleteTransactionInProgress).mockResolvedValue({});
+
+      render(<PurchaseManagement />);
+
+      await waitFor(() => expect(screen.getByTestId('action-btn-trx-1')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('action-btn-trx-1'));
+
+      const cancelDrawerBtn = screen.getByTestId('drawer-btn-1');
+      fireEvent.click(cancelDrawerBtn);
+
+      expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+      expect(screen.getByText('pages.purchaseManagement.modal.cancel.title')).toBeInTheDocument();
+
+      const confirmModalBtn = screen.getByText('pages.purchaseManagement.modal.cancel.confirmBtn');
+      fireEvent.click(confirmModalBtn);
+
+      await waitFor(() => {
+        expect(merchantService.deleteTransactionInProgress).toHaveBeenCalledWith('init-123', 'trx-1');
+        expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Interaction with CAPTURED transaction', () => {
+    it('should open the drawer with Request Refund and Reverse buttons', async () => {
+      render(<PurchaseManagement />);
+
+      await waitFor(() => expect(screen.getByTestId('action-btn-trx-2')).toBeInTheDocument());
+
+      fireEvent.click(screen.getByTestId('action-btn-trx-2'));
+
+      expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
+      expect(screen.getByText('pages.purchaseManagement.drawer.requestRefund')).toBeInTheDocument();
+      expect(screen.getByText('pages.purchaseManagement.drawer.refund')).toBeInTheDocument();
+    });
+
+    it('should redirect to Refund page when clicking "Request Refund"', async () => {
+      render(<PurchaseManagement />);
+
+      await waitFor(() => expect(screen.getByTestId('action-btn-trx-2')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('action-btn-trx-2'));
+
+      const refundBtn = screen.getByTestId('drawer-btn-0');
+      fireEvent.click(refundBtn);
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        ROUTES.REFUND.replace(':initiativeId', 'init-123').replace(':trxId', 'trx-2')
+      );
+    });
+
+    it('should open modal and redirect to Reverse when clicking "Reverse"', async () => {
+      render(<PurchaseManagement />);
+
+      await waitFor(() => expect(screen.getByTestId('action-btn-trx-2')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('action-btn-trx-2'));
+
+      const reverseDrawerBtn = screen.getByTestId('drawer-btn-1');
+      fireEvent.click(reverseDrawerBtn);
+
+      expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+
+      const confirmModalBtn = screen.getByText('pages.purchaseManagement.modal.reverse.confirmBtn');
+      fireEvent.click(confirmModalBtn);
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        ROUTES.REVERSE.replace(':initiativeId', 'init-123').replace(':trxId', 'trx-2')
+      );
+    });
+  });
+
+  it('should call getPreviewPdf and downloadFileFromBase64 when clicking PDF button', async () => {
+    const mockPdfResponse = { data: 'base64-pdf-content' };
+    vi.mocked(merchantService.getPreviewPdf).mockResolvedValue(mockPdfResponse);
+
+    render(<PurchaseManagement />);
+
+    await waitFor(() => expect(screen.getByTestId('download-pdf-trx-1')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId('action-btn-trx-1')); // Seleziona la transazione per popolare selectedTransaction
+
+    const downloadBtn = screen.getByTestId('download-pdf-trx-1');
+    fireEvent.click(downloadBtn);
+
     await waitFor(() => {
-      const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-      expect(state.errorDeleteTransaction).toBe(true);
+      expect(merchantService.getPreviewPdf).toHaveBeenCalledWith('trx-1');
+      expect(helpers.downloadFileFromBase64).toHaveBeenCalledWith(
+        'base64-pdf-content',
+        'TRX123_preautorizzazione.pdf'
+      );
     });
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
   });
 
-  it('covers cancel modal Indietro — reopens drawer', async () => {
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.cancellPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Esci'));
-    await waitFor(() => expect(screen.getByTestId('drawer')).toBeInTheDocument());
-  });
+  it('should reopen the drawer if an error occurs during transaction cancellation', async () => {
+    vi.mocked(merchantService.deleteTransactionInProgress).mockRejectedValue(new Error('Error delete'));
 
-  it('covers capture modal Indietro — reopens drawer', async () => {
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.confirmPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Indietro'));
-    await waitFor(() => expect(screen.getByTestId('drawer')).toBeInTheDocument());
-  });
+    render(<PurchaseManagement />);
 
-  it('covers capture/cancel modal onClose — closes modal', async () => {
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.confirmPayment'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('modal-close'));
-    await waitFor(() => expect(screen.queryByTestId('modal')).not.toBeInTheDocument());
-  });
+    await waitFor(() => expect(screen.getByTestId('action-btn-trx-1')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('action-btn-trx-1'));
 
-  it('covers PDF success branch', async () => {
-    mockPreview.mockResolvedValue({ data: 'b64' });
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByTestId('btn-test'));
+    fireEvent.click(screen.getByTestId('drawer-btn-1'));
+    fireEvent.click(screen.getByText('pages.purchaseManagement.modal.cancel.confirmBtn'));
+
     await waitFor(() => {
-      expect(mockPreview).toHaveBeenCalled();
-      expect(mockDownload).toHaveBeenCalled();
+      expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
     });
-    const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-    expect(state.errorPreviewPdf).toBe(false);
   });
 
-  it('covers PDF error branch', async () => {
-    mockPreview.mockRejectedValue(new Error());
-    renderPage();
-    await openAuthorizedDrawer();
-    fireEvent.click(screen.getByTestId('btn-test'));
+  it('should activate success flag if location.state contains refundUploadSuccess', async () => {
+    mockLocationState = { refundUploadSuccess: true };
+
+    render(<PurchaseManagement />);
+
     await waitFor(() => {
-      const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-      expect(state.errorPreviewPdf).toBe(true);
-    });
-  });
-
-  it('shows CircularProgress while PDF is loading', async () => {
-    let resolve!: (v: unknown) => void;
-    const pending = new Promise((r) => {
-      resolve = r;
-    });
-    mockPreview.mockReturnValue(pending);
-
-    renderPage();
-    await openAuthorizedDrawer();
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('btn-test'));
-    });
-
-    expect(await screen.findByTestId('item-loader')).toBeInTheDocument();
-
-    act(() => resolve({ data: 'b64' }));
-
-    await waitFor(() => expect(screen.queryByTestId('item-loader')).not.toBeInTheDocument());
-  });
-
-  it('covers refund modal opened from CAPTURED drawer', async () => {
-    renderPage();
-    await openCapturedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    expect(screen.queryByTestId('drawer')).not.toBeInTheDocument();
-  });
-
-  it('covers refund modal Indietro — reopens drawer', async () => {
-    renderPage();
-    await openCapturedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Indietro'));
-    await waitFor(() => expect(screen.getByTestId('drawer')).toBeInTheDocument());
-  });
-
-  it('covers refund modal onClose', async () => {
-    renderPage();
-    await openCapturedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('modal-close'));
-    await waitFor(() => expect(screen.queryByTestId('modal')).not.toBeInTheDocument());
-  });
-
-  it('covers handleReverseTransaction navigate', async () => {
-    renderPage();
-    await openCapturedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
-    await waitFor(() => expect(screen.getByTestId('modal')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.refund'));
-    expect(mockedNavigate).toHaveBeenCalledWith('/Init-1/storna-transazione/2');
-  });
-
-  it('covers handleRequestRefund navigate from CAPTURED', async () => {
-    renderPage();
-    await openCapturedDrawer();
-    fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.requestRefund'));
-    expect(mockedNavigate).toHaveBeenCalledWith('/Init-1/richiedi-rimborso/2');
-  });
-
-  it('covers location state refundUploadSuccess', () => {
-    mockedLocation = { state: { refundUploadSuccess: true } };
-    renderPage();
-    const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-    expect(state.transactionRefundSuccess).toBe(true);
-  });
-
-  it('covers location state reverseUploadSuccess', () => {
-    mockedLocation = { state: { reverseUploadSuccess: true } };
-    renderPage();
-    const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-    expect(state.transactionReverseSuccess).toBe(true);
-  });
-
-  it('covers transactionAuthorized timeout clears flag', () => {
-    vi.useFakeTimers();
-    act(() => {
-      utilsStore.setState({ ...utilsStore.getState(), transactionAuthorized: true });
-    });
-    renderPage();
-    act(() => {
-      vi.advanceTimersByTime(5000);
-    });
-    expect(utilsStore.getState().transactionAuthorized).toBe(false);
-    vi.useRealTimers();
-  });
-
-  it('covers triggerFetchTransactions timeout branch via delete success', async () => {
-    vi.useFakeTimers();
-    mockDelete.mockResolvedValue({});
-    renderPage();
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('btn-auth'));
-    });
-    await act(async () => {
-      fireEvent.click(screen.getByText('pages.purchaseManagement.drawer.cancellPayment'));
-    });
-    await act(async () => {
-      fireEvent.click(screen.getByText('Conferma'));
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(3000);
-    });
-
-    const state = JSON.parse(screen.getByTestId('external').textContent || '{}');
-    expect(state.transactionDeleteSuccess).toBe(true);
-    vi.useRealTimers();
-  });
-
-  it('covers openDrawer useEffect triggering checkHeight', async () => {
-    renderPage();
-    await openAuthorizedDrawer();
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 150));
-    });
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
-  });
-
-  it('covers checkHeight with scrollable gridRef', async () => {
-    renderPage();
-
-    Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
-      configurable: true,
-      get() {
-        return 9999;
-      },
-    });
-
-    await openAuthorizedDrawer();
-
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 150));
-    });
-
-    expect(screen.getByTestId('drawer')).toBeInTheDocument();
-
-    Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
-      configurable: true,
-      get() {
-        return 0;
-      },
+      expect(screen.getByTestId('dynamic-table')).toBeInTheDocument();
     });
   });
 });

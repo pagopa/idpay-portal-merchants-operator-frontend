@@ -14,6 +14,7 @@ import { DynamicTable } from '../../components/DynamicTable/DynamicTable';
 import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { theme } from '@pagopa/mui-italia';
 import { useParams } from 'react-router-dom';
+import { plainObj } from '../../utils/helpers';
 
 const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
 
@@ -45,18 +46,20 @@ const Products = () => {
   useAutoResetBanner([[errorAlert, setErrorAlert]]);
 
   const mappedProductsList = useMemo(() =>
-    productsList.map((product) =>
-    ({
-      ...product,
-      link: product?.linkEprel,
-      action: {
-        icon: "arrow",
-        onClick: (row) => {
-          setOpenDrawer(true);
-          setSelectedProduct(row)
+    productsList.map((product) => {
+      const plainedProduct = plainObj(product)
+      return {
+        ...plainedProduct,
+        link: plainedProduct?.linkEprel,
+        action: {
+          icon: "arrow",
+          onClick: (row) => {
+            setOpenDrawer(true);
+            setSelectedProduct(row)
+          }
         }
       }
-    })),
+    }),
     [productsList])
 
   const fetchProducts = useCallback(async (params: GetProductsParams) => {
@@ -116,6 +119,7 @@ const Products = () => {
       </Box>
       <Box>
         <DynamicFilters
+          containerStyle={{ paddingY: "2rem" }}
           filters={filters}
           filtersDef={filtersDef}
           setFilters={newFilters => {
@@ -132,7 +136,7 @@ const Products = () => {
           isLoading={productsListIsLoading}
           rows={mappedProductsList}
           getRowId={row => row.gtinCode}
-          paginationModel={{page, pageSize}}
+          paginationModel={{ page, pageSize }}
           onPaginationModelChange={model => {
             setPage(model.page)
             setPageSize(model.pageSize)

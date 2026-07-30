@@ -18,7 +18,6 @@ export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
   }
   return <Tooltip title={tooltip && (text || MISSING_DATA_PLACEHOLDER)}>
     <Typography
-      variant="body2"
       sx={sx}
     >
       {text || MISSING_DATA_PLACEHOLDER}
@@ -80,7 +79,7 @@ export function getStatusChip(t: any, status: string) {
 
 export function formatEuro(value: number) {
   return (
-    (value / 100).toLocaleString('it-IT', {
+    !isNaN(value) && (value / 100).toLocaleString('it-IT', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }) + '€'
@@ -290,6 +289,7 @@ export function buildNamespaceKey(name: string, startDate: string): string {
   return `${camelCaseName}${year}`;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const normalizeObj = (obj: Record<string, any>, parentKey?: string) => {
   const isObj = Object.prototype.toString.call(obj) === "[object Object]" &&
     Object.getPrototypeOf(obj) === Object.prototype;
@@ -298,4 +298,14 @@ export const normalizeObj = (obj: Record<string, any>, parentKey?: string) => {
     const objKey = parentKey ? `${parentKey}.${key}` : key
     return { ...acc, ...normalizeObj(value, objKey) }
   }, {}) : parentKey ? { [parentKey]: obj } : obj
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const plainObj = (obj: Record<string, any>) => {
+  const isObj = (item) => Object.prototype.toString.call(item) === "[object Object]" &&
+    Object.getPrototypeOf(item) === Object.prototype;
+
+  return isObj(obj) ? Object.entries(obj).reduce((acc, [key, value]) => {
+    return { ...acc, ...(isObj(value) ? plainObj(value) : {[key]: value})}
+  }, {}) : obj
 }

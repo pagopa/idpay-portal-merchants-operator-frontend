@@ -1,307 +1,295 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TransactionsLayout from './TransactionsLayout';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
-  TitleBox: ({ title, subTitle }: { title: string; subTitle: string }) => (
-    <div data-testid="title-box">
-      <h1>{title}</h1>
-      <p>{subTitle}</p>
-    </div>
-  ),
-}));
-
-vi.mock('../DataTable/DataTable', () => ({
-  default: ({ rows, columns, onPaginationPageChange, onSortModelChange }: any) => (
-    <div data-testid="data-table">
-      <button
-        data-testid="sort-by-name"
-        onClick={() => onSortModelChange([{ field: 'additionalProperties', sort: 'desc' }])}
-      />
-      <button
-        data-testid="sort-by-date"
-        onClick={() => onSortModelChange([{ field: 'updateDate', sort: 'asc' }])}
-      />
-      <button
-        data-testid="paginate"
-        onClick={() => onPaginationPageChange({ page: 1, pageSize: 10 })}
-      />
-      {rows.length > 0 && <div data-testid="data-row">{rows[0].id}</div>}
-    </div>
-  ),
-}));
-
-vi.mock('../FiltersForm/FiltersForm', () => ({
-  default: ({ children, onFiltersApplied, onFiltersReset, formik }: any) => (
-    <div data-testid="filters-form">
-      {children}
-      <button data-testid="apply-filters" onClick={() => onFiltersApplied(formik.values)}>
-        Applica
-      </button>
-      <button data-testid="reset-filters" onClick={onFiltersReset}>
-        Resetta
-      </button>
-    </div>
-  ),
-}));
-
-vi.mock('../Alert/AlertComponent', () => ({
-  default: ({ message }: { message: string }) => <div data-testid="alert">{message}</div>,
-}));
-
-const mockFetchTransactionsApi = vi.fn();
-
 vi.mock('jwt-decode', () => ({
-  jwtDecode: () => ({ point_of_sale_id: 'pos-123' }),
+  jwtDecode: vi.fn(() => ({ point_of_sale_id: 'mocked-pos-id' })),
 }));
+
 vi.mock('../../store/authStore', () => ({
   authStore: {
-    getState: () => ({ token: 'fake-jwt-token' }),
+    getState: vi.fn(() => ({ token: 'mocked-jwt-token' })),
   },
 }));
 
-vi.mock('../../hooks/useAutoResetBanner', () => ({
-  useAutoResetBanner: vi.fn(),
+vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
+  TitleBox: vi.fn(({ title, subTitle }) => (
+    <div data-testid="title-box">
+      {title} - {subTitle}
+    </div>
+  )),
 }));
 
-const mockTransactions = [
-  { id: 'trx1', fiscalCode: 'AAAAAA11B22C333D', status: 'COMPLETED' },
-  { id: 'trx2', fiscalCode: 'BBBBBB22C33D444E', status: 'REJECTED' },
-];
+vi.mock('../Alert/AlertComponent', () => ({
+  default: vi.fn(({ message, isOpen }) =>
+    isOpen ? <div data-testid="alert-component">{message}</div> : null
+  ),
+}));
 
-const mockApiResponse = {
-  content: mockTransactions,
-  pageNo: 0,
-  pageSize: 10,
-  totalElements: 2,
-};
+vi.mock('../Alert/AlertListComponent', () => ({
+  default: vi.fn(({ alertList }) => (
+    <div data-testid="alert-list-component">
+      {alertList
+        .filter((alert: { isOpen: boolean }) => alert.isOpen)
+        .map((alert: { message: string }, index: number) => (
+          <span key={index} data-testid={`alert-list-item-${index}`}>
+            {alert.message}
+          </span>
+        ))}
+    </div>
+  )),
+}));
 
-const mockColumns = [{ field: 'id', headerName: 'ID' }];
+vi.mock('../DynamicTable/DynamicTable', () => ({
+  DynamicTable: vi.fn(({ onPaginationModelChange, onSortModelChange }) => (
+    <div data-testid="dynamic-table">
+      <button
+        data-testid="pagination-btn"
+        onClick={() => onPaginationModelChange({ page: 1, pageSize: 20 })}
+      >
+        Change Page
+      </button>
+      <button
+        data-testid="sort-btn"
+        onClick={() => onSortModelChange([{ field: 'amount', sort: 'asc' }])}
+      >
+        Change Sort
+      </button>
+    </div>
+  )),
+}));
 
-const renderComponent = (props = {}) => {
+vi.mock('../DynamicFilters/DynamicFilters', () => ({
+  DynamicFilters: vi.fn(({ setFilters }) => (
+    <div data-testid="dynamic-filters">
+      <button
+        data-testid="filters-btn"
+        onClick={() => setFilters({ customFilter: 'test' })}
+      >
+        Set Filters
+      </button>
+    </div>
+  )),
+}));
+
+vi.mock('../DynamicDrawer/DynamicDrawer', () => ({
+  default: vi.fn(() => <div data-testid="dynamic-drawer">DynamicDrawer</div>),
+}));
+
+vi.mock('../../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: vi.fn(() => ({
+    t: (key: string) => key,
+  })),
+}));
+
+const mockUseAutoResetBanner = vi.fn();
+vi.mock('../../hooks/useAutoResetBanner', () => ({
+  useAutoResetBanner: (...args: unknown[]) => mockUseAutoResetBanner(...args),
+}));
+
+describe('TransactionsLayout component', () => {
+  const mockAlerts = [[false, vi.fn()]] as Array<[boolean, (value: boolean) => void]>;
+  const mockTransactionsApi = vi.fn();
+  const mockSetTransactionsList = vi.fn();
+  const mockSetFilters = vi.fn();
+
   const defaultProps = {
+    initiativeId: 'test-init-id',
     title: 'Test Title',
     subtitle: 'Test Subtitle',
     tableTitle: 'Test Table Title',
-    fetchTransactionsApi: mockFetchTransactionsApi,
-    columns: mockColumns,
-    statusOptions: ['COMPLETED', 'REJECTED'],
-    alerts: [],
-    alertMessages: { error: 'Si è verificato un errore.' },
-    noDataMessage: 'Nessun dato trovato.',
-    onRowAction: vi.fn(),
-    ...props,
+    alerts: mockAlerts,
+    alertMessages: {
+      error: 'Generic Error',
+    },
+    isAlertVisible: true,
+    tableProps: { rows: [{ id: '1' }] } as any,
+    drawerProps: { isOpen: true, buttons: [] } as any,
+    filtersProps: { filters: { defaultFilter: '1' }, setFilters: mockSetFilters } as any,
+    transactionsApi: mockTransactionsApi,
+    setTransactionsList: mockSetTransactionsList,
   };
-  const theme = createTheme();
-  return render(
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <TransactionsLayout {...defaultProps} />
-      </ThemeProvider>
-    </BrowserRouter>
-  );
-};
 
-describe('TransactionsLayout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetchTransactionsApi.mockResolvedValue(mockApiResponse);
+    mockTransactionsApi.mockResolvedValue({ content: [{ id: '1' }], totalElements: 1 });
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+  it('renders correctly and fetches transactions on mount', async () => {
+    render(<TransactionsLayout {...defaultProps} />);
 
-  it('should show initial loading and then render the data table', async () => {
-    renderComponent();
-    expect(screen.getByTestId('loading')).toBeInTheDocument();
+    expect(screen.getByTestId('title-box')).toHaveTextContent('Test Title - Test Subtitle');
+    expect(screen.getByText('Test Table Title')).toBeInTheDocument();
+    expect(screen.getByTestId('dynamic-filters')).toBeInTheDocument();
+    expect(screen.getByTestId('dynamic-table')).toBeInTheDocument();
+    expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
+
+    expect(mockUseAutoResetBanner).toHaveBeenCalledWith(expect.any(Array));
 
     await waitFor(() => {
-      expect(screen.getByTestId('data-table')).toBeInTheDocument();
+      expect(mockTransactionsApi).toHaveBeenCalledWith(
+        'test-init-id',
+        'mocked-pos-id',
+        { size: 10, page: 0, defaultFilter: '1', sort: 'trxChargeDate,desc' }
+      );
+      expect(mockSetTransactionsList).toHaveBeenCalledWith([{ id: '1' }]);
     });
-
-    expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
-    expect(screen.getByText('Test Title')).toBeInTheDocument();
-    expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(1);
   });
 
-  it('should show "no data" message when API returns an empty array', async () => {
-    mockFetchTransactionsApi.mockResolvedValue({
-      ...mockApiResponse,
-      content: [],
-      totalElements: 0,
-    });
-    renderComponent();
+  it('sets generic error state when transactionsApi fails', async () => {
+    mockTransactionsApi.mockRejectedValueOnce(new Error('API Error'));
+
+    render(<TransactionsLayout {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Nessun dato trovato.')).toBeInTheDocument();
+      const errorAlert = screen.getByTestId('alert-list-component');
+      expect(errorAlert).toHaveTextContent('Generic Error');
     });
-
-    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
   });
 
-  it('should show an error alert when the API call fails', async () => {
-    mockFetchTransactionsApi.mockRejectedValue(new Error('API Error'));
-    renderComponent();
+  it('handles pagination changes and triggers fetch', async () => {
+    render(<TransactionsLayout {...defaultProps} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('alert')).toBeInTheDocument();
+      expect(mockTransactionsApi).toHaveBeenCalledTimes(1);
     });
 
-    expect(screen.getByText('Si è verificato un errore.')).toBeInTheDocument();
-    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
-  });
-
-  it('should call the fetch API with filter values when filters are applied', async () => {
-    const user = userEvent.setup();
-    renderComponent();
-    await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
-
-    const fiscalCodeInput = screen.getByLabelText('commons.fiscalCodeFilterPlaceholer');
-    const gtinCodeInput = screen.getByLabelText('commons.gtiInFilterPlaceholer');
-    const trxCodeInput = screen.getByLabelText('commons.trxCodeFilterPlaceholer');
-    await user.type(fiscalCodeInput, 'TESTCF123');
-    await user.type(gtinCodeInput, 'TEST123');
-    await user.type(trxCodeInput, 'TEST123');
-
-    fireEvent.click(screen.getByTestId('apply-filters'));
+    fireEvent.click(screen.getByTestId('pagination-btn'));
 
     await waitFor(() => {
-      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2);
+      expect(mockTransactionsApi).toHaveBeenCalledWith(
+        'test-init-id',
+        'mocked-pos-id',
+        expect.objectContaining({ size: 20, page: 1 })
+      );
     });
-
-    expect(mockFetchTransactionsApi).toHaveBeenLastCalledWith(
-      undefined,
-      'pos-123',
-      expect.objectContaining({ fiscalCode: 'TESTCF123' })
-    );
   });
 
-  it('should reset the form and refetch data when reset is clicked', async () => {
-    const user = userEvent.setup();
-    renderComponent();
-    await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
-
-    const fiscalCodeInput = screen.getByLabelText('commons.fiscalCodeFilterPlaceholer');
-    await user.type(fiscalCodeInput, 'TESTCF123');
-
-    fireEvent.click(screen.getByTestId('reset-filters'));
+  it('handles sort changes and triggers fetch', async () => {
+    render(<TransactionsLayout {...defaultProps} />);
 
     await waitFor(() => {
-      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2);
+      expect(mockTransactionsApi).toHaveBeenCalledTimes(1);
     });
 
-    expect(mockFetchTransactionsApi).toHaveBeenLastCalledWith(
-      undefined,
-      'pos-123',
-      expect.objectContaining({ fiscalCode: '' })
-    );
-    expect(fiscalCodeInput).toHaveValue('');
-  });
-
-  it('should handle special "additionalProperties" sorting correctly', async () => {
-    renderComponent();
-    await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
-
-    fireEvent.click(screen.getByTestId('sort-by-name'));
+    fireEvent.click(screen.getByTestId('sort-btn'));
 
     await waitFor(() => {
-      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2);
+      expect(mockTransactionsApi).toHaveBeenCalledWith(
+        'test-init-id',
+        'mocked-pos-id',
+        expect.objectContaining({ sort: 'amount,asc' })
+      );
     });
-
-    expect(mockFetchTransactionsApi).toHaveBeenLastCalledWith(
-      undefined,
-      'pos-123',
-      expect.objectContaining({ sort: 'productName,desc' })
-    );
   });
 
-  it('should handle standard sorting correctly', async () => {
-    renderComponent();
-    await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
+  it('handles filter changes and resets page', async () => {
+    render(<TransactionsLayout {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId('sort-by-date'));
+    fireEvent.click(screen.getByTestId('filters-btn'));
 
     await waitFor(() => {
-      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2);
+      expect(mockSetFilters).toHaveBeenCalledWith({ customFilter: 'test' });
     });
-
-    expect(mockFetchTransactionsApi).toHaveBeenLastCalledWith(
-      undefined,
-      'pos-123',
-      expect.objectContaining({ sort: 'updateDate,asc' })
-    );
   });
 
-  it('should refetch data with new page number on pagination change', async () => {
-    renderComponent();
-    await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
-
-    fireEvent.click(screen.getByTestId('paginate'));
-
-    await waitFor(() => {
-      expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2);
-    });
-
-    expect(mockFetchTransactionsApi).toHaveBeenLastCalledWith(
-      undefined,
-      'pos-123',
-      expect.objectContaining({ page: 1, size: 10 })
-    );
-  });
-
-  it('should render the additional button and call its onClick handler', async () => {
+  it('renders the additional button and handles click', () => {
     const mockOnClick = vi.fn();
-    renderComponent({
-      additionalButton: {
-        label: 'Azione Extra',
-        icon: <span>+</span>,
-        onClick: mockOnClick,
-      },
-    });
+    const additionalButton = {
+      label: 'Custom Action',
+      icon: <span data-testid="btn-icon" />,
+      onClick: mockOnClick,
+    };
 
-    await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
+    render(<TransactionsLayout {...defaultProps} additionalButton={additionalButton} />);
 
-    const button = screen.getByRole('button', { name: /Azione Extra/i });
+    const button = screen.getByRole('button', { name: /Custom Action/i });
     expect(button).toBeInTheDocument();
+    expect(screen.getByTestId('btn-icon')).toBeInTheDocument();
 
     fireEvent.click(button);
     expect(mockOnClick).toHaveBeenCalledTimes(1);
   });
 
-  it('should refetch data when triggerFetchTransactions becomes true', async () => {
-    const { rerender } = renderComponent({ triggerFetchTransactions: false });
-    await waitFor(() => expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(1));
+  it('renders AlertComponent for keys containing "error" in externalState', () => {
+    const externalState = {
+      downloadError: true,
+    };
+    const alertMessages = {
+      downloadError: 'Download failed',
+      error: 'Generic Error',
+    };
 
-    rerender(
-      <BrowserRouter>
-        <ThemeProvider theme={createTheme()}>
-          <TransactionsLayout
-            title="Test"
-            subtitle="Test"
-            tableTitle="Test"
-            fetchTransactionsApi={mockFetchTransactionsApi}
-            columns={mockColumns}
-            statusOptions={[]}
-            alerts={[]}
-            alertMessages={{}}
-            noDataMessage=""
-            onRowAction={vi.fn()}
-            triggerFetchTransactions={true}
-          />
-        </ThemeProvider>
-      </BrowserRouter>
+    render(
+      <TransactionsLayout
+        {...defaultProps}
+        externalState={externalState}
+        alertMessages={alertMessages}
+      />
     );
 
-    await waitFor(() => expect(mockFetchTransactionsApi).toHaveBeenCalledTimes(2));
+    const errorAlert = screen.getByTestId('alert-list-component');
+    expect(errorAlert).toHaveTextContent('Download failed');
+  });
+
+  it('does not render AlertComponent if isAlertVisible is false', () => {
+    const externalState = {
+      downloadError: true,
+    };
+    const alertMessages = {
+      downloadError: 'Download failed',
+    };
+
+    render(
+      <TransactionsLayout
+        {...defaultProps}
+        externalState={externalState}
+        alertMessages={alertMessages}
+        isAlertVisible={false}
+      />
+    );
+
+    expect(screen.queryByTestId('alert-component')).not.toBeInTheDocument();
+  });
+
+  it('passes non-error states to AlertListComponent', () => {
+    const externalState = {
+      successEvent: true,
+      downloadError: true,
+    };
+    const alertMessages = {
+      successEvent: 'Operation successful',
+      downloadError: 'Download failed',
+      error: 'Default error fallback',
+    };
+
+    render(
+      <TransactionsLayout
+        {...defaultProps}
+        externalState={externalState}
+        alertMessages={alertMessages}
+      />
+    );
+
+    const alertListContainer = screen.getByTestId('alert-list-component');
+
+    expect(alertListContainer).toHaveTextContent('Operation successful');
+  });
+
+  it('uses translation for fallback generic error if alertMessages.error is undefined', async () => {
+    mockTransactionsApi.mockRejectedValueOnce(new Error('API Error'));
+
+    render(
+      <TransactionsLayout
+        {...defaultProps}
+        alertMessages={{}}
+      />
+    );
+
+    await waitFor(() => {
+      const alertListContainer = screen.getByTestId('alert-list-component');
+      expect(alertListContainer).toHaveTextContent('pages.refundManagement.errorAlert');
+    });
   });
 });
