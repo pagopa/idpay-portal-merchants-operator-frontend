@@ -46,7 +46,7 @@ const PurchaseManagement = () => {
   const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
   const [transactionDeleteSuccess, setTransactionDeleteSuccess] = useState(false);
   const transactionAuthorized = utilsStore((state) => state.transactionAuthorized);
-  const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(false);
+  const [triggerFetchTransactions, setTriggerFetchTransactions] = useState(0);
 
   const handlePreviewPdf = useCallback(async () => {
     setIsPreviewPdfLoading(true);
@@ -92,14 +92,7 @@ const PurchaseManagement = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
-    if (triggerFetchTransactions) {
-      const timer = setTimeout(() => {
-        setTriggerFetchTransactions(false);
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [transactionAuthorized, triggerFetchTransactions]);
+  }, [transactionAuthorized]);
 
   useEffect(() => {
     if (location.state) {
@@ -123,7 +116,7 @@ const PurchaseManagement = () => {
       await deleteTransactionInProgress(initiativeId, selectedTransaction?.id);
       setOpenDrawer(false);
       setTransactionDeleteSuccess(true);
-      setTriggerFetchTransactions(true);
+      setTriggerFetchTransactions(prev => prev + 1);
     } catch {
       setErrorDeleteTransaction(true);
       setOpenDrawer(true);
@@ -137,7 +130,7 @@ const PurchaseManagement = () => {
       await capturePayment(initiativeId, { trxCode: selectedTransaction?.trxCode });
       setOpenDrawer(false);
       setTransactionCaptured(true);
-      setTriggerFetchTransactions(true);
+      setTriggerFetchTransactions(prev => prev + 1);
     } catch {
       setErrorCaptureTransaction(true);
       setOpenDrawer(true);
@@ -169,6 +162,7 @@ const PurchaseManagement = () => {
         isAlertVisible={openDrawer}
         transactionsApi={getInProgressTransactions}
         setTransactionsList={setTransactionsList}
+        triggerFetchTransactions={triggerFetchTransactions}
         alerts={[
           [errorDeleteTransaction, setErrorDeleteTransaction],
           [errorCaptureTransaction, setErrorCaptureTransaction],
@@ -213,7 +207,7 @@ const PurchaseManagement = () => {
         drawerProps={{
           setIsOpen: () => setOpenDrawer(false),
           title: t('pages.purchaseManagement.drawer.title'),
-          fieldsValues: { ...selectedTransaction, isLoading: isPreviewPdfLoading},
+          fieldsValues: { ...selectedTransaction, isLoading: isPreviewPdfLoading },
           fieldsDef: mappedFieldsDef,
           isOpen: openDrawer,
           buttons: [
