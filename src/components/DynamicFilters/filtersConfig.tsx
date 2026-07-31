@@ -17,8 +17,8 @@ export const filtersConfig: Record<
     ({ item, t, config, filters, setFilters }: Props) => JSX.Element
 > = {
     select: ({ item, t, config, filters, setFilters }) => {
-        const { id, label, template } = item;
-        const templateDef = config(`templates.${template}`)
+        const { id, label, template, context } = item;
+        const templateDef = config(template)
         const templateLabels = templateDef.reduce((acc, { value, label }) => ({ ...acc, [value]: label }), {})
         return (
             <Select
@@ -38,14 +38,17 @@ export const filtersConfig: Record<
                             whiteSpace: 'nowrap',
                         }}
                     >
-                        {t(templateLabels[value])}
+                        {id === "status" ?
+                            <StatusChip context={context} value={value?.toLowerCase()} /> :
+                            t(templateLabels[value])
+                        }
                     </Box>
                 )}
             >
                 {templateDef.map(({ label, value }) => (
                     <MenuItem key={value} value={value}>
                         {id === "status" ?
-                            <StatusChip field="transactions" value={value?.toLowerCase()} /> :
+                            <StatusChip context={context} value={value?.toLowerCase()} /> :
                             t(label)}
                     </MenuItem>
                 ))}

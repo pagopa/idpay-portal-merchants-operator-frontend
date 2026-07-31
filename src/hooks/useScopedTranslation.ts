@@ -17,10 +17,10 @@ export const useScopedTranslation = () => {
         config: i18n.hasResourceBundle(DEFAULT_LANG, `${namespace}/config`) ? `${namespace}/config` : 'default/config'
     }
 
-    const t = (key: string) => {
-        const res = key ? translation(key, { ns: key.startsWith('commons') ? 'common' : existentNamespaces.copy }) : ''
+    const t = (key: string, options?: Record<string, string | Element>) => {
+        const res = key ? translation(key, { ns: key.startsWith('commons') ? 'common' : existentNamespaces.copy, ...options }) : ''
         if (res === key) {
-            return translation(key, { ns: 'common' })
+            return translation(key, { ns: 'common', ...options })
         }
         return res
     }

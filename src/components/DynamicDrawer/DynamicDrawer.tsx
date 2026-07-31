@@ -6,8 +6,8 @@ import { theme } from '@pagopa/mui-italia';
 import { FieldConfigDef } from '../../utils/types';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { renderFields } from '../../utils/renderFields';
-import { normalizeObj } from '../../utils/helpers';
 import { useMemo } from 'react';
+import { FieldTitle } from './FieldTitle';
 
 export type DynamicDrawerProps = {
   isOpen: boolean;
@@ -15,7 +15,8 @@ export type DynamicDrawerProps = {
   title: string;
   subtitle?: string;
   fieldsDef: Array<FieldConfigDef>;
-  fieldsValues: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fieldsValues: Record<string, any>;
   buttons?: Array<(ButtonProps & { dataTestId?: string }) | never>;
 };
 
@@ -25,7 +26,6 @@ const drawerStyle = {
   overflow: "hidden",
   maxHeight: "100vh",
   maxWidth: 375,
-  padding: "1rem",
   height: "100%"
 }
 
@@ -41,12 +41,10 @@ export default function DynamicDrawer({
   const { t } = useScopedTranslation()
 
   const mappedFields = useMemo(() => fieldsDef.map(({ cell, ...field }) => {
-    const { type, tooltip, bold } = cell
-    const fieldsConfig = renderFields({ tooltip, bold })
+    const { type, tooltip, bold, context, options } = cell
+    const fieldsConfig = renderFields({ tooltip, bold, context, options })
     return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[type] }
   }), [fieldsDef, t])
-
-  const normalizedFields = useMemo(() => normalizeObj(fieldsValues), [fieldsValues]);
 
   return (
     <Drawer anchor="right" open={isOpen} data-testid="detail-drawer">
@@ -55,6 +53,7 @@ export default function DynamicDrawer({
           display="flex"
           justifyContent="end"
           alignItems="center"
+          padding="0.5rem"
         >
           <IconButton
             data-testid="close-button"
@@ -68,7 +67,6 @@ export default function DynamicDrawer({
           display="flex"
           flexDirection="column"
           height="100%"
-          padding="0.5rem"
           sx={{ overflowY: 'auto' }}
         >
           <Box
@@ -76,6 +74,7 @@ export default function DynamicDrawer({
             flexDirection="column"
             width="100%"
             rowGap="1rem"
+            paddingX="1rem"
           >
             <Tooltip title={title || ''}>
               <Box sx={{
@@ -101,22 +100,16 @@ export default function DynamicDrawer({
                 </Typography>
               </>
             }
-            {mappedFields.map(({ field, headerName, renderCell }) => {
+            {mappedFields.map(({ field, headerName, renderCell }, index) => {
               const params = {
-                row: normalizedFields,
-                value: normalizedFields?.[field]
+                row: fieldsValues,
+                value: fieldsValues?.[field]
               }
-              return (<Box key={field}
+              return (<Box key={`${field}-${index}`}
                 display="flex"
                 flexDirection="column"
               >
-                <Typography
-                  variant="body2"
-                  fontWeight={theme.typography.fontWeightRegular}
-                  color={theme.palette.text.secondary}
-                >
-                  {headerName}
-                </Typography>
+                <FieldTitle title={headerName} />
                 {renderCell(params)}
               </Box>)
             })}
@@ -129,8 +122,9 @@ export default function DynamicDrawer({
             width="100%"
             display="flex"
             flexDirection="column"
-            rowGap="1rem"
+            rowGap="0.5rem"
             bgcolor={theme.palette.background.paper}
+            padding="1rem"
             data-testid="buttons-box"
           >
             {buttons.map(({ title, dataTestId, ...rest }, index) => (

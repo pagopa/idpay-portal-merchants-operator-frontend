@@ -1,115 +1,42 @@
-import { Box } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useState, useCallback, useEffect } from 'react';
-import { GridRenderCellParams } from '@mui/x-data-grid';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { generatePath, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
-import {
-  getStatusChip,
-  formatEuro,
-  renderCellWithTooltip,
-  renderMissingDataWithTooltip,
-  checkEuroTooltip,
-  checkTooltipValue,
-} from '../../utils/helpers';
-import { DetailsDrawer } from '../../components/DetailsDrawer/DetailsDrawer';
+import { plainObj, } from '../../utils/helpers';
 import TransactionsLayout from '../../components/TransactionsLayout/TransactionsLayout';
 import ROUTES from '../../routes';
 import { authStore } from '../../store/authStore';
-import { DecodedJwtToken } from '../../utils/types';
+import { DecodedJwtToken, FieldConfigDef, FilterConfigDef } from '../../utils/types';
 import { PointOfSaleTransactionProcessedDTO } from '../../api/generated/data-contracts';
-
-const formatDateTime = (value?: string) => {
-  if (!value) {
-    return renderMissingDataWithTooltip();
-  }
-
-  const formatted = new Date(value)
-    .toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    .replace(',', '');
-
-  return renderCellWithTooltip(formatted);
-};
-
-const mapTransactionToDrawerItem = (
-  transaction: PointOfSaleTransactionProcessedDTO,
-  t: (key: string) => string
-) => {
-  const invoiceLabel =
-    transaction?.status === 'REFUNDED'
-      ? 'Nota di credito'
-      : transaction?.status === 'CANCELLED'
-        ? 'cancelled'
-        : 'Fattura';
-
-  const docNumberLabel =
-    transaction?.status === 'REFUNDED'
-      ? 'Numero nota di credito'
-      : transaction?.status === 'CANCELLED'
-        ? 'cancelled'
-        : 'Numero fattura';
-
-  return {
-    [t('pages.refundManagement.drawer.trxDate')]: new Date(transaction?.trxChargeDate)
-      .toLocaleDateString('it-IT', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-      .replace(',', ''),
-    [t('pages.refundManagement.drawer.householdAppliance')]:
-      transaction?.additionalProperties?.productName,
-    [t('pages.refundManagement.drawer.fiscalCode')]: transaction?.fiscalCode,
-    [t('pages.refundManagement.drawer.transactionId')]: transaction?.id,
-    [t('pages.refundManagement.drawer.trxCode')]: transaction?.trxCode,
-    [t('pages.refundManagement.drawer.totalAmount')]:
-      transaction?.effectiveAmountCents && formatEuro(transaction?.effectiveAmountCents),
-    [t('pages.refundManagement.drawer.rewardAmount')]:
-      transaction?.rewardAmountCents && formatEuro(transaction?.rewardAmountCents),
-    [t('pages.refundManagement.drawer.authorizedAmount')]:
-      transaction?.authorizedAmountCents && formatEuro(transaction?.authorizedAmountCents),
-    Stato: getStatusChip(t, transaction?.status),
-    [docNumberLabel]: transaction?.invoiceFile?.docNumber,
-    [invoiceLabel]: transaction?.invoiceFile?.filename,
-    id: transaction?.id,
-  };
-};
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
+import { ReceiptLong } from '@mui/icons-material';
 
 const RefundManagement = () => {
-  const { initiativeId } = useParams();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const token = authStore.getState().token;
+  const { initiativeId } = useParams();
+  const { t, config } = useScopedTranslation();
+  const filtersDef = config<Array<FilterConfigDef>>('pages.refundManagement.transactionsTable.filters')
+  const fieldsDef = config<Array<FieldConfigDef>>('pages.refundManagement.drawer')
+  const columnsDef = config<Array<FieldConfigDef>>('pages.refundManagement.transactionsTable.columns')
+  const [mappedFieldsDef, setMappedFieldsDef] = useState<Array<FieldConfigDef>>(fieldsDef)
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<PointOfSaleTransactionProcessedDTO>({});
-  const [invoiceStatus, setInvoiceStatus] = useState<
-    'INVOICED' | 'REWARDED' | 'REFUNDED' | 'CANCELLED'
-  >();
+  const [transactionsList, setTransactionsList] = useState<Array<PointOfSaleTransactionProcessedDTO | never>>([]);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [filters, setFilters] = useState<Record<string, string>>({});
+
+  const [openDrawer, setOpenDrawer] = useState(false);
+
   const [downloadInProgress, setDownloadInProgress] = useState(false);
   const [isDisabledModDocButton, setIsDisabledModDocButton] = useState(false);
-
+  const [areButtonsVisible, setAreButtonsVisible] = useState(false);
   const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
   const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
   const [transactionRefundSuccess, setTransactionRefundSuccess] = useState(false);
 
   useEffect(() => {
     if (!location.state) return;
-
     const { refundUploadSuccess, reverseUploadSuccess } = location.state;
-
     if (refundUploadSuccess) {
       setTransactionRefundSuccess(true);
     } else if (reverseUploadSuccess) {
@@ -117,16 +44,55 @@ const RefundManagement = () => {
     }
   }, [location.state]);
 
-  const handleRowAction = useCallback(
-    (transaction: PointOfSaleTransactionProcessedDTO) => {
-      setInvoiceStatus(transaction?.status);
-      setIsDrawerOpen(true);
-      setIsDisabledModDocButton(transaction?.rewardBatchTrxStatus === 'APPROVED');
+  const handleDownloadInvoice = useCallback(async (transaction: PointOfSaleTransactionProcessedDTO) => {
+    const token = authStore.getState().token;
+    const decodedToken: DecodedJwtToken = jwtDecode(token);
+    setDownloadInProgress(true);
+    try {
+      const { invoiceUrl } = await downloadInvoiceFileApi(
+        decodedToken?.point_of_sale_id,
+        transaction?.id
+      );
+      const filename = transaction?.invoiceFile?.filename || 'fattura.pdf';
+      const link = document.createElement('a');
+      link.href = invoiceUrl;
+      link.download = filename;
+      link.click();
+    } catch {
+      setErrorDownloadAlert(true);
+    } finally {
+      setDownloadInProgress(false);
+    }
+  }, []);
 
-      setSelectedTransaction(mapTransactionToDrawerItem(transaction, t));
-    },
-    [t]
-  );
+  const mappedTransactionsList = useMemo(() => {
+    return transactionsList.map((trx) => {
+      const plainedTrx = plainObj(trx)
+      const isDowloadVisible = plainedTrx?.status !== 'CANCELLED'
+      const isButtonDisable = plainedTrx?.rewardBatchTrxStatus === 'APPROVED'
+      const areButtonsVisible = plainedTrx?.status === 'INVOICED'
+      const mappedFieldsDef = fieldsDef.reduce((acc, field) => {
+        return [...acc, ...((field.field === "docNumber" || field.field === "filename") && isDowloadVisible ? [{ ...field, headerName: `${field.headerName}.${plainedTrx?.status.toLowerCase()}` }] :
+          (field.field === "docNumber" || field.field === "filename") && !isDowloadVisible ? [] : [field])]
+      }, [])
+      return {
+        ...plainedTrx,
+        onClick: () => handleDownloadInvoice(trx),
+        value: plainedTrx?.filename,
+        icon: ReceiptLong,
+        action: {
+          icon: "arrow",
+          onClick: (row) => {
+            setIsDisabledModDocButton(isButtonDisable)
+            setAreButtonsVisible(areButtonsVisible)
+            setMappedFieldsDef(mappedFieldsDef)
+            setOpenDrawer(true);
+            setSelectedTransaction(row)
+          }
+        }
+      }
+    })
+  }, [fieldsDef, handleDownloadInvoice, transactionsList])
 
   const handleReverseTransaction = useCallback(() => {
     const replaceValuesObj = {
@@ -138,159 +104,71 @@ const RefundManagement = () => {
     });
   }, [initiativeId, navigate, selectedTransaction?.id]);
 
-  const handleDownloadInvoice = useCallback(async () => {
-    const decodedToken: DecodedJwtToken = jwtDecode(token);
-
-    setDownloadInProgress(true);
-    try {
-      const { invoiceUrl } = await downloadInvoiceFileApi(
-        decodedToken?.point_of_sale_id,
-        selectedTransaction?.id
-      );
-
-      const filename = selectedTransaction?.invoiceFile?.filename || 'fattura.pdf';
-
-      const link = document.createElement('a');
-      link.href = invoiceUrl;
-      link.download = filename;
-      link.click();
-    } catch {
-      setErrorDownloadAlert(true);
-    } finally {
-      setDownloadInProgress(false);
-    }
-  }, [token, selectedTransaction]);
-
-  const columns = [
-    {
-      field: 'additionalProperties',
-      headerName: 'Elettrodomestico',
-      flex: 2.5,
-      disableColumnMenu: true,
-      align: 'center',
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => checkTooltipValue(params, 'productName'),
-    },
-    {
-      field: 'trxChargeDate',
-      headerName: 'Data e ora',
-      flex: 1.5,
-      disableColumnMenu: true,
-      renderCell: (params: GridRenderCellParams) => formatDateTime(params.value),
-    },
-    {
-      field: 'fiscalCode',
-      headerName: 'Beneficiario',
-      flex: 1.2,
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => checkTooltipValue(params),
-    },
-    {
-      field: 'effectiveAmountCents',
-      headerName: 'Totale della spesa',
-      flex: 1,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'left',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: checkEuroTooltip,
-    },
-    {
-      field: 'rewardAmountCents',
-      headerName: 'Sconto applicato',
-      flex: 1,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'left',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: checkEuroTooltip,
-    },
-    {
-      field: 'authorizedAmountCents',
-      headerName: 'Importo autorizzato',
-      flex: 1.4,
-      type: 'number',
-      align: 'center',
-      headerAlign: 'left',
-      disableColumnMenu: true,
-      sortable: false,
-      renderCell: checkEuroTooltip,
-    },
-    {
-      field: 'status',
-      headerName: 'Stato',
-      flex: 1.5,
-      disableColumnMenu: true,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          {getStatusChip(t, params.value)}
-        </Box>
-      ),
-    },
-  ];
-
   return (
     <TransactionsLayout
+      initiativeId={initiativeId}
       title={t('pages.refundManagement.title')}
       subtitle={t('pages.refundManagement.subtitle')}
       tableTitle={t('pages.refundManagement.tableTitle')}
-      fetchTransactionsApi={getProcessedTransactions}
-      columns={columns}
-      statusOptions={['REWARDED', 'CANCELLED', 'REFUNDED', 'INVOICED']}
-      noDataMessage={t('pages.refundManagement.noTransactions')}
-      onRowAction={handleRowAction}
+      isAlertVisible={openDrawer}
+      transactionsApi={getProcessedTransactions}
+      setTransactionsList={setTransactionsList}
       alerts={[
         [transactionReverseSuccess, setTransactionReverseSuccess],
         [transactionRefundSuccess, setTransactionRefundSuccess],
         [errorDownloadAlert, setErrorDownloadAlert],
       ]}
       alertMessages={{
-        error: t('pages.refundManagement.errorAlert'),
-        transactionRefundSuccess: t('pages.refundManagement.refundSuccessUpload'),
-        transactionReverseSuccess: t('pages.refundManagement.reverseSuccessUpload'),
-        errorDownloadAlert: t('pages.refundManagement.errorDownloadAlert'),
+        error: t('pages.refundManagement.feedbackMessages.errors.generic'),
+        transactionRefundSuccess: t('pages.refundManagement.feedbackMessages.success.refundUpload'),
+        transactionReverseSuccess: t('pages.refundManagement.feedbackMessages.success.reverseUpload'),
+        errorDownloadAlert: t('pages.refundManagement.feedbackMessages.errors.downloadPdf'),
       }}
-      DrawerComponent={
-        <DetailsDrawer
-          isOpen={isDrawerOpen}
-          setIsOpen={() => setIsDrawerOpen(false)}
-          isLoading={downloadInProgress}
-          title={t('pages.refundManagement.drawer.title')}
-          item={selectedTransaction}
-          invoiceStatus={invoiceStatus}
-          primaryButton={{
-            label: 'Modifica documento',
-            disabled: isDisabledModDocButton,
-            onClick: () => {
-              const replaceValuesObj = {
-                initiativeId: initiativeId,
-                trxId: selectedTransaction?.id,
-                fileDocNumber: btoa(selectedTransaction['Numero fattura']) || ''
-              }
-              navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
-            },
-          }}
-          secondaryButton={
-            invoiceStatus === 'INVOICED' || invoiceStatus === 'REWARDED'
-              ? {
-                label: t('pages.refundManagement.drawer.refund'),
-                onClick: handleReverseTransaction,
-              }
-              : undefined
-          }
-          onFileDownloadCallback={handleDownloadInvoice}
-        />
-      }
       externalState={{
         transactionRefundSuccess,
         transactionReverseSuccess,
         errorDownloadAlert,
       }}
-      isDrawerOpen={isDrawerOpen}
+      tableProps={{
+        emptyText: t('pages.refundManagement.noTransactions'),
+        columnsDef: columnsDef,
+        rows: mappedTransactionsList,
+        isEmpty: !mappedTransactionsList?.length
+      }}
+      drawerProps={{
+        setIsOpen: () => setOpenDrawer(false),
+        title: t('pages.refundManagement.drawer.title'),
+        fieldsValues: { ...selectedTransaction, isLoading: downloadInProgress },
+        fieldsDef: mappedFieldsDef,
+        isOpen: openDrawer,
+        buttons: areButtonsVisible && [
+          {
+            disabled: isDisabledModDocButton,
+            variant: "contained",
+            fullWidth: true,
+            onClick: () => {
+              const replaceValuesObj = {
+                initiativeId: initiativeId,
+                trxId: selectedTransaction?.id,
+                fileDocNumber: btoa(selectedTransaction?.docNumber) || ''
+              }
+              navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
+            },
+            title: t('pages.refundManagement.drawer.modifyDocument')
+          },
+          {
+            fullWidth: true,
+            onClick: handleReverseTransaction,
+            title: t('pages.refundManagement.drawer.refund')
+          }
+        ]
+      }}
+      filtersProps={{
+        filtersDef,
+        filters,
+        setFilters: setFilters
+      }
+      }
     />
   );
 };
