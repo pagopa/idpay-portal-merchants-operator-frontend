@@ -19,7 +19,7 @@ interface FileUploadActionProps {
   titleKey: string;
   subtitleKey: string;
   i18nBlockKey: string;
-  apiCall: (trxId: string, file: File, docNumber: string) => Promise<unknown>;
+  apiCall: (initiativeId: string, trxId: string, file: File, docNumber: string) => Promise<unknown>;
   successStateKey: string;
   breadcrumbsLabelKey: string;
   breadcrumbsProp: BreadcrumbsProps;
@@ -122,7 +122,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     if (file && trxId && docNumber.trim() && docNumber.trim().length >= 2) {
       setLoadingFile(true);
       try {
-        await apiCall(trxId, file, docNumber);
+        await apiCall(initiativeId, trxId, file, docNumber);
         setLoadingFile(false);
         navigate(breadcrumbsProp?.path, {
           state: {

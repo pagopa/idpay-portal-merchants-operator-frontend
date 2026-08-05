@@ -50,6 +50,7 @@ const RefundManagement = () => {
     setDownloadInProgress(true);
     try {
       const { invoiceUrl } = await downloadInvoiceFileApi(
+        initiativeId,
         decodedToken?.point_of_sale_id,
         transaction?.id
       );
@@ -63,7 +64,7 @@ const RefundManagement = () => {
     } finally {
       setDownloadInProgress(false);
     }
-  }, []);
+  }, [initiativeId]);
 
   const mappedTransactionsList = useMemo(() => {
     return transactionsList.map((trx) => {

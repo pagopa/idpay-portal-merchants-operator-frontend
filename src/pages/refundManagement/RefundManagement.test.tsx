@@ -277,7 +277,7 @@ describe('RefundManagement', () => {
     });
 
     await waitFor(() => {
-      expect(downloadInvoiceFileApi).toHaveBeenCalledWith('pos-123', 'trx-5');
+      expect(downloadInvoiceFileApi).toHaveBeenCalledWith('init-123', 'pos-123', 'trx-5');
       expect(clickSpy).toHaveBeenCalled();
     });
   });

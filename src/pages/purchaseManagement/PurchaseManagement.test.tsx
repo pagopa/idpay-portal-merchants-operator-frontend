@@ -335,7 +335,7 @@ describe('PurchaseManagement Component', () => {
     fireEvent.click(downloadBtn);
 
     await waitFor(() => {
-      expect(merchantService.getPreviewPdf).toHaveBeenCalledWith('trx-1');
+      expect(merchantService.getPreviewPdf).toHaveBeenCalledWith('init-123', 'trx-1');
       expect(helpers.downloadFileFromBase64).toHaveBeenCalledWith(
         'base64-pdf-content',
         'TRX123_preautorizzazione.pdf'
