@@ -5,9 +5,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RefundManagement from './RefundManagement';
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
+import { useActionPermission } from '../../hooks/useActionPermission';
 
 let mockLocationState: Record<string, unknown> | undefined = undefined;
 const mockNavigate = vi.fn();
+const mockGetPermission = vi.fn();
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -25,6 +27,19 @@ vi.mock('react-router-dom', async () => {
     }),
   };
 });
+
+vi.mock('../../redux/hooks', () => ({
+    useAppSelector: vi.fn((selectorFn) => selectorFn({})),
+}));
+
+vi.mock('../../redux/slices/initiativesSlice', () => ({
+    initiativesListSelector: vi.fn(),
+    currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
+}));
+
+vi.mock('../../hooks/useActionPermission', () => ({
+  useActionPermission: vi.fn(() => ({ getPermission: mockGetPermission })),
+}));
 
 vi.mock('../../routes', () => ({
   default: {
@@ -142,6 +157,7 @@ describe('RefundManagement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
+    mockGetPermission.mockReturnValue(true);
     vi.mocked(getProcessedTransactions).mockResolvedValue({
       content: [],
       totalElements: 0,
@@ -208,6 +224,27 @@ describe('RefundManagement', () => {
     fireEvent.click(screen.getByTestId('row-action-0'));
 
     expect(screen.getByTestId('drawer-btn-0')).toBeDisabled();
+  });
+
+  it('disables buttons in drawer if user does not have permission', async () => {
+    mockGetPermission.mockReturnValue(false);
+    
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-perm', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING' }],
+      totalElements: 1,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-action-0')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('row-action-0'));
+
+    expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-btn-0')).toBeDisabled();
+    expect(screen.getByTestId('drawer-btn-1')).toBeDisabled();
   });
 
   it('navigates to modify document on drawer button click', async () => {

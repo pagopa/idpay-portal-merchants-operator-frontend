@@ -1,14 +1,22 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, matchPath } from 'react-router-dom';
 import { currentInitiativeSelector, initiativesListSelector } from '../redux/slices/initiativesSlice';
 import ROUTES from '../routes';
 import WithInitiativeGuard from './withInitiativeGuard';
 
+vi.mock('../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: vi.fn(() => ({
+    config: () => ['REFUND'],
+  })),
+}));
+
 vi.mock('react-router-dom', () => ({
     useParams: vi.fn(),
     Navigate: vi.fn(() => null),
+    useLocation: () => ({location: {pathname: 'test'}}),
+    matchPath: vi.fn()
 }));
 
 vi.mock('../redux/hooks', () => ({

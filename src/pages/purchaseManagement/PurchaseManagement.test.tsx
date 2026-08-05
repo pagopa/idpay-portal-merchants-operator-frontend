@@ -11,6 +11,21 @@ import ROUTES from '../../routes';
 const mockNavigate = vi.fn();
 let mockLocationState: Record<string, unknown> = {};
 
+vi.mock('../../redux/hooks', () => ({
+  useAppSelector: vi.fn((selectorFn) => selectorFn({})),
+}));
+
+vi.mock('../../redux/slices/initiativesSlice', () => ({
+  initiativesListSelector: vi.fn(),
+  currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
+}));
+
+vi.mock('../../hooks/useActionPermission', () => ({
+  useActionPermission: vi.fn(() => ({
+    getPermission: vi.fn(() => true),
+  })),
+}));
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -66,6 +81,7 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
       if (key === 'pages.purchaseManagement.transactionsTable.filters') return mockFiltersConfig;
       if (key === 'pages.purchaseManagement.transactionsTable.columns') return mockColumnsConfig;
       if (key === 'pages.purchaseManagement.drawer') return mockDrawerConfig;
+      if (key === 'commons.permissions.initiativeStatus') return ['PUBLISHED'];
       return [];
     },
   }),
@@ -329,7 +345,7 @@ describe('PurchaseManagement Component', () => {
 
     await waitFor(() => expect(screen.getByTestId('download-pdf-trx-1')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByTestId('action-btn-trx-1')); // Seleziona la transazione per popolare selectedTransaction
+    fireEvent.click(screen.getByTestId('action-btn-trx-1'));
 
     const downloadBtn = screen.getByTestId('download-pdf-trx-1');
     fireEvent.click(downloadBtn);
