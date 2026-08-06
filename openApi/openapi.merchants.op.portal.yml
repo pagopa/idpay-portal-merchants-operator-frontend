@@ -577,7 +577,7 @@ paths:
           $ref: "#/components/responses/GET_transactions_in_progress_429_Response"
         "500":
           $ref: "#/components/responses/GET_transactions_in_progress_500_Response"
-  /initiatives/{initiativeId}/{pointOfSaleId}/transactions/{transactionId}/download:
+  /initiatives/{initiativeId}/point-of-sales/{pointOfSaleId}/transactions/{transactionId}/download:
     get:
       tags:
         - transaction
