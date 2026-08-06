@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
-
-// Mock
-const getPortalConsent = async () => ({versionId: 'mocked-version', firstAcceptance: false})
-const savePortalConsent = async (version: string) => version
+import { getPortalConsent, savePortalConsent } from '../services/rolePermissionService';
 
 const useTCAgreement = () => {
   const [acceptedTOS, setAcceptedTOS] = useState<boolean | undefined>(undefined);
