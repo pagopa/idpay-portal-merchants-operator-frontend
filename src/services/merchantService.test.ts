@@ -142,9 +142,9 @@ describe('merchantService', () => {
     const response = { invoiceUrl: 'url' };
     vi.mocked(MerchantApi.downloadInvoiceFileApi).mockResolvedValue(response as never);
 
-    const result = await downloadInvoiceFileApi('P', 'T');
+    const result = await downloadInvoiceFileApi('init-123', 'P', 'T');
 
-    expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledWith('P', 'T');
+    expect(MerchantApi.downloadInvoiceFileApi).toHaveBeenCalledWith('init-123', 'P', 'T');
     expect(result).toEqual(response);
   });
 
@@ -152,49 +152,49 @@ describe('merchantService', () => {
     const file = new File([new Blob()], 'f');
     vi.mocked(MerchantApi.reverseTransactionApi).mockResolvedValue(undefined as never);
 
-    await expect(reverseTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
-    expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
+    await expect(reverseTransactionApi('init-123', 'T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.reverseTransactionApi).toHaveBeenCalledWith('init-123', 'T', file, 'DOC');
   });
 
   it('reverseInvoicedTransactionApi delegates correctly', async () => {
     const file = new File([new Blob()], 'f');
     vi.mocked(MerchantApi.reverseInvoicedTransactionApi).mockResolvedValue(undefined as never);
 
-    await expect(reverseInvoicedTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
-    expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
+    await expect(reverseInvoicedTransactionApi('init-123', 'T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.reverseInvoicedTransactionApi).toHaveBeenCalledWith('init-123', 'T', file, 'DOC');
   });
 
   it('invoiceTransactionApi delegates correctly', async () => {
     const file = new File([new Blob()], 'f');
     vi.mocked(MerchantApi.invoiceTransactionApi).mockResolvedValue(undefined as never);
 
-    await expect(invoiceTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
-    expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
+    await expect(invoiceTransactionApi('init-123', 'T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.invoiceTransactionApi).toHaveBeenCalledWith('init-123', 'T', file, 'DOC');
   });
 
   it('updateInvoiceTransactionApi delegates correctly', async () => {
     const file = new File([new Blob()], 'f');
     vi.mocked(MerchantApi.updateInvoiceTransactionApi).mockResolvedValue(undefined as never);
 
-    await expect(updateInvoiceTransactionApi('T', file, 'DOC')).resolves.toBeUndefined();
-    expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith('T', file, 'DOC');
+    await expect(updateInvoiceTransactionApi('init-123', 'T', file, 'DOC')).resolves.toBeUndefined();
+    expect(MerchantApi.updateInvoiceTransactionApi).toHaveBeenCalledWith('init-123', 'T', file, 'DOC');
   });
 
   it('getPreviewPdf returns empty string when API returns no data', async () => {
     vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({} as never);
 
-    const result = await getPreviewPdf('T');
+    const result = await getPreviewPdf('init-123', 'T');
 
-    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('init-123', 'T');
     expect(result).toEqual({ data: '' });
   });
 
   it('getPreviewPdf returns base64 when API already returns a base64 string', async () => {
     vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: 'BASE64PDF' } as never);
 
-    const result = await getPreviewPdf('T');
+    const result = await getPreviewPdf('init-123', 'T');
 
-    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('init-123', 'T');
     expect(result).toEqual({ data: 'BASE64PDF' });
   });
 
@@ -205,9 +205,9 @@ describe('merchantService', () => {
 
     vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: mockBlobLike } as never);
 
-    const result = await getPreviewPdf('T');
+    const result = await getPreviewPdf('init-123', 'T');
 
-    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('init-123', 'T');
     expect(typeof result.data).toBe('string');
     expect(result.data.length).toBeGreaterThan(0);
   });
@@ -219,9 +219,9 @@ describe('merchantService', () => {
 
     vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: mockFileLike } as never);
 
-    const result = await getPreviewPdf('T');
+    const result = await getPreviewPdf('init-123', 'T');
 
-    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('init-123', 'T');
     expect(typeof result.data).toBe('string');
     expect(result.data.length).toBeGreaterThan(0);
   });
@@ -229,9 +229,9 @@ describe('merchantService', () => {
   it('getPreviewPdf returns empty string for unknown data shape', async () => {
     vi.mocked(MerchantApi.getPreviewPdf).mockResolvedValue({ data: { foo: 'bar' } } as never);
 
-    const result = await getPreviewPdf('T');
+    const result = await getPreviewPdf('init-123', 'T');
 
-    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('T');
+    expect(MerchantApi.getPreviewPdf).toHaveBeenCalledWith('init-123', 'T');
     expect(result).toEqual({ data: '' });
   });
 });

@@ -51,14 +51,14 @@ const PurchaseManagement = () => {
   const handlePreviewPdf = useCallback(async (transaction: PointOfSaleTransactionDTO) => {
     setIsPreviewPdfLoading(true);
     try {
-      const response = await getPreviewPdf(transaction?.id);
+      const response = await getPreviewPdf(initiativeId, transaction?.id);
       downloadFileFromBase64(response.data, `${transaction.trxCode}_preautorizzazione.pdf`);
     } catch {
       setErrorPreviewPdf(true);
     } finally {
       setIsPreviewPdfLoading(false);
     }
-  }, []);
+  }, [initiativeId]);
 
   const mappedTransactionsList = useMemo(() => {
     return transactionsList.map((trx) => {

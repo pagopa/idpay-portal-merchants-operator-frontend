@@ -17,20 +17,20 @@ export const getInitiativeProductsList = async (initiativeId: string, params: Ge
 
 export const previewPayment = async (initiativeId: string,
   params: {
-  productGtin: string;
-  productName: string;
-  amountCents: number;
-  discountCode: string;
-}): Promise<PreviewPaymentDTO> => {
+    productGtin: string;
+    productName: string;
+    amountCents: number;
+    discountCode: string;
+  }): Promise<PreviewPaymentDTO> => {
   return MerchantApi.previewPayment(initiativeId, params);
 };
 
 export const authPaymentBarCode = async (initiativeId: string,
   params: {
-  trxCode: string;
-  amountCents: number;
-  additionalProperties?: Record<string, string>;
-}): Promise<AuthPaymentResponseDTO> => {
+    trxCode: string;
+    amountCents: number;
+    additionalProperties?: Record<string, string>;
+  }): Promise<AuthPaymentResponseDTO> => {
   const idTrxAcquirer = crypto.randomUUID();
 
   return MerchantApi.authPaymentBarCode(initiativeId, {
@@ -43,8 +43,8 @@ export const authPaymentBarCode = async (initiativeId: string,
 
 export const capturePayment = async (initiativeId: string,
   params: {
-  trxCode: string;
-}): Promise<TransactionBarCodeResponse> => {
+    trxCode: string;
+  }): Promise<TransactionBarCodeResponse> => {
   return MerchantApi.capturePayment(initiativeId, params);
 };
 
@@ -72,44 +72,48 @@ export const getPointOfSaleDetails = async (merchantId: string, pointOfSaleId: s
   return MerchantApi.getPointOfSaleDetails(merchantId, pointOfSaleId);
 };
 
-export const downloadInvoiceFileApi = async (pointOfSaleId: string, trxId: string) => {
-  return MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId);
+export const downloadInvoiceFileApi = async (initiativeId: string, pointOfSaleId: string, trxId: string) => {
+  return MerchantApi.downloadInvoiceFileApi(initiativeId, pointOfSaleId, trxId);
 };
 
 export const reverseTransactionApi = async (
+  initiativeId: string,
   trxId: string,
   file: File,
   docNumber: string
 ): Promise<void> => {
-  return MerchantApi.reverseTransactionApi(trxId, file, docNumber);
+  return MerchantApi.reverseTransactionApi(initiativeId, trxId, file, docNumber);
 };
 
 export const reverseInvoicedTransactionApi = async (
+  initiativeId: string,
   trxId: string,
   file: File,
   docNumber: string
 ): Promise<void> => {
-  return MerchantApi.reverseInvoicedTransactionApi(trxId, file, docNumber);
+  return MerchantApi.reverseInvoicedTransactionApi(initiativeId, trxId, file, docNumber);
 };
 
 export const invoiceTransactionApi = async (
+  initiativeId: string,
   trxId: string,
   file: File,
   docNumber: string
 ): Promise<void> => {
-  return MerchantApi.invoiceTransactionApi(trxId, file, docNumber);
+  return MerchantApi.invoiceTransactionApi(initiativeId, trxId, file, docNumber);
 };
 
 export const updateInvoiceTransactionApi = async (
+  initiativeId: string,
   trxId: string,
   file: File,
   docNumber: string
 ): Promise<void> => {
-  return MerchantApi.updateInvoiceTransactionApi(trxId, file, docNumber);
+  return MerchantApi.updateInvoiceTransactionApi(initiativeId, trxId, file, docNumber);
 };
 
-export const getPreviewPdf = async (trxId: string): Promise<{ data: string }> => {
-  const report = await MerchantApi.getPreviewPdf(trxId);
+export const getPreviewPdf = async (initiativeId: string, trxId: string): Promise<{ data: string }> => {
+  const report = await MerchantApi.getPreviewPdf(initiativeId, trxId);
   const rawData = (report as unknown as { data?: unknown })?.data;
 
   if (!rawData) {
