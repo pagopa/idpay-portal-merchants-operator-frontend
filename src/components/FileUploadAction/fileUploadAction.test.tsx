@@ -241,7 +241,7 @@ describe('fileUploadAction component test', () => {
     const continueButton = screen.getByTestId('continue-btn-test');
     await user.click(continueButton);
 
-    expect(mockApiCall).toHaveBeenCalledWith('test-transaction-123', file, 'DOC123');
+    expect(mockApiCall).toHaveBeenCalledWith('init-1', 'test-transaction-123', file, 'DOC123');
 
     await waitFor(
       () => {
@@ -272,7 +272,7 @@ describe('fileUploadAction component test', () => {
     const continueButton = screen.getByTestId('continue-btn-test');
     await user.click(continueButton);
 
-    expect(mockApiCall).toHaveBeenCalledWith('test-transaction-123', expect.any(File), 'DOC123');
+    expect(mockApiCall).toHaveBeenCalledWith('init-1', 'test-transaction-123', expect.any(File), 'DOC123');
 
     await waitFor(() => {
       expect(screen.getByTestId('alert-component')).toBeInTheDocument();
