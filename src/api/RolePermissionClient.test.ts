@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createApiConfig, getAuthToken } from './BaseApiClient';
+import { getAuthToken } from './BaseApiClient';
 import { RolePermissionApiClient } from './RolePermissionClient';
 
 const { mockPermissionsInstance, mockConsentInstance } = vi.hoisted(() => ({
