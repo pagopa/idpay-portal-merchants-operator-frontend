@@ -1,9 +1,12 @@
-import { getAuthToken } from "./BaseApiClient";
+import { createApiConfig, getAuthToken } from "./BaseApiClient";
 import { Consent } from "./generated/Consent";
 import { Permissions } from "./generated/Permissions";
 
-const permissionsClient = new Permissions();
-const consentClient = new Consent();
+const apiConfig = createApiConfig()
+const config = { ...apiConfig, baseURL: `${apiConfig.baseURL}/authorization`}
+
+const permissionsClient = new Permissions(config);
+const consentClient = new Consent(config);
 
 const applySecurity = () => {
     const token = getAuthToken();
