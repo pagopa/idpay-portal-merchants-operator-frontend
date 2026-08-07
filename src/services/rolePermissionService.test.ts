@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getUserPermission, getPortalConsent, savePortalConsent } from './RolePermissionService';
+import { getUserPermission, getPortalConsent, savePortalConsent } from './rolePermissionService';
 import { RolePermissionApiClient } from '../api/RolePermissionClient';
 
 vi.mock('../api/RolePermissionClient', () => ({
