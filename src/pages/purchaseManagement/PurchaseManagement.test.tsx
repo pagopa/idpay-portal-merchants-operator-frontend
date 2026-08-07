@@ -7,9 +7,23 @@ import * as helpers from '../../utils/helpers';
 import { authStore } from '../../store/authStore';
 import { utilsStore } from '../../store/utilsStore';
 import ROUTES from '../../routes';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 const mockNavigate = vi.fn();
 let mockLocationState: Record<string, unknown> = {};
+
+vi.mock('../../redux/hooks', () => ({
+  useAppSelector: vi.fn((selectorFn) => selectorFn({})),
+}));
+
+vi.mock('../../redux/slices/initiativesSlice', () => ({
+  initiativesListSelector: vi.fn(),
+  currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
+}));
+
+vi.mock('../../hooks/useInitiativeStatusAction', () => ({
+  useInitiativeStatusAction: vi.fn(),
+}));
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -183,6 +197,9 @@ const mockCapturedTransaction = {
 describe('PurchaseManagement Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useInitiativeStatusAction).mockReturnValue({
+      isActionPermitted: true,
+    });
     mockLocationState = {};
     authStore.setState({ token: 'mock-jwt-token' });
     utilsStore.setState({ transactionAuthorized: false });
@@ -329,7 +346,7 @@ describe('PurchaseManagement Component', () => {
 
     await waitFor(() => expect(screen.getByTestId('download-pdf-trx-1')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByTestId('action-btn-trx-1')); // Seleziona la transazione per popolare selectedTransaction
+    fireEvent.click(screen.getByTestId('action-btn-trx-1'));
 
     const downloadBtn = screen.getByTestId('download-pdf-trx-1');
     fireEvent.click(downloadBtn);
