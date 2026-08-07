@@ -18,17 +18,13 @@ import { getPreviewPdf } from '../../services/merchantService';
 import { downloadFileFromBase64 } from '../../utils/helpers';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation'
 import { PointOfSaleTransactionDTO } from '../../api/generated/data-contracts';
-import { useActionPermission } from '../../hooks/useActionPermission';
-import { currentInitiativeSelector } from '../../redux/slices/initiativesSlice';
-import { useAppSelector } from '../../redux/hooks';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 const PurchaseManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { initiativeId } = useParams();
-  const currentInitiative = useAppSelector(state => currentInitiativeSelector(state, initiativeId))
-  const { getPermission } = useActionPermission()
-  const isActionPermitted = getPermission('commons.permissions.initiativeStatus', currentInitiative?.status)
+  const { isActionPermitted } = useInitiativeStatusAction(initiativeId);
   const { t, config } = useScopedTranslation();
   const filtersDef = config<Array<FilterConfigDef>>('pages.purchaseManagement.transactionsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.purchaseManagement.drawer')

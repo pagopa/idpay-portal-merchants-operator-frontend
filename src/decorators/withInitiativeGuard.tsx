@@ -4,7 +4,7 @@ import { useAppSelector } from '../redux/hooks';
 import { currentInitiativeSelector, initiativesListSelector } from '../redux/slices/initiativesSlice';
 import { matchPath, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useScopedTranslation } from '../hooks/useScopedTranslation';
-import { useActionPermission } from '../hooks/useActionPermission';
+import { useInitiativeStatusAction } from '../hooks/useInitiativeStatusAction';
 
 type Props = {
     children: React.ReactNode;
@@ -17,8 +17,7 @@ const WithInitiativeGuard: React.FC<Props> = ({ children }) => {
     const forbiddenRoutes = config<Array<string>>('commons.permissions.closedRoutes')
     const initiatives = useAppSelector(initiativesListSelector);
     const selectedInitiative = useAppSelector((state) => currentInitiativeSelector(state, initiativeId));
-    const { getPermission } = useActionPermission()
-    const isActionPermitted = getPermission('commons.permissions.initiativeStatus', selectedInitiative?.status)
+    const { isActionPermitted } = useInitiativeStatusAction(initiativeId);
     
 
     const match = (paths) => paths.find((path) => matchPath({ path }, location.pathname))

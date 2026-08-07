@@ -7,6 +7,7 @@ import * as helpers from '../../utils/helpers';
 import { authStore } from '../../store/authStore';
 import { utilsStore } from '../../store/utilsStore';
 import ROUTES from '../../routes';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 const mockNavigate = vi.fn();
 let mockLocationState: Record<string, unknown> = {};
@@ -20,10 +21,8 @@ vi.mock('../../redux/slices/initiativesSlice', () => ({
   currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
 }));
 
-vi.mock('../../hooks/useActionPermission', () => ({
-  useActionPermission: vi.fn(() => ({
-    getPermission: vi.fn(() => true),
-  })),
+vi.mock('../../hooks/useInitiativeStatusAction', () => ({
+  useInitiativeStatusAction: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -81,7 +80,6 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
       if (key === 'pages.purchaseManagement.transactionsTable.filters') return mockFiltersConfig;
       if (key === 'pages.purchaseManagement.transactionsTable.columns') return mockColumnsConfig;
       if (key === 'pages.purchaseManagement.drawer') return mockDrawerConfig;
-      if (key === 'commons.permissions.initiativeStatus') return ['PUBLISHED'];
       return [];
     },
   }),
@@ -199,6 +197,9 @@ const mockCapturedTransaction = {
 describe('PurchaseManagement Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useInitiativeStatusAction).mockReturnValue({
+      isActionPermitted: true,
+    });
     mockLocationState = {};
     authStore.setState({ token: 'mock-jwt-token' });
     utilsStore.setState({ transactionAuthorized: false });

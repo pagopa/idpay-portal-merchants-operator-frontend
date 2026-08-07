@@ -10,17 +10,13 @@ import { DecodedJwtToken, FieldConfigDef, FilterConfigDef } from '../../utils/ty
 import { PointOfSaleTransactionProcessedDTO } from '../../api/generated/data-contracts';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { ReceiptLong } from '@mui/icons-material';
-import { useActionPermission } from '../../hooks/useActionPermission';
-import { useAppSelector } from '../../redux/hooks';
-import { currentInitiativeSelector } from '../../redux/slices/initiativesSlice';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 const RefundManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { initiativeId } = useParams();
-  const currentInitiative = useAppSelector(state => currentInitiativeSelector(state, initiativeId))
-  const { getPermission } = useActionPermission()
-  const isActionPermitted = getPermission('commons.permissions.initiativeStatus', currentInitiative?.status)
+  const { isActionPermitted } = useInitiativeStatusAction(initiativeId);
   const { t, config } = useScopedTranslation();
   const filtersDef = config<Array<FilterConfigDef>>('pages.refundManagement.transactionsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.refundManagement.drawer')

@@ -5,11 +5,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RefundManagement from './RefundManagement';
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
-import { useActionPermission } from '../../hooks/useActionPermission';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 let mockLocationState: Record<string, unknown> | undefined = undefined;
 const mockNavigate = vi.fn();
-const mockGetPermission = vi.fn();
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -29,16 +28,15 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('../../redux/hooks', () => ({
-    useAppSelector: vi.fn((selectorFn) => selectorFn({})),
+  useAppSelector: vi.fn((selectorFn) => selectorFn({})),
 }));
 
 vi.mock('../../redux/slices/initiativesSlice', () => ({
-    initiativesListSelector: vi.fn(),
-    currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
+  initiativesListSelector: vi.fn(),
+  currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
 }));
-
-vi.mock('../../hooks/useActionPermission', () => ({
-  useActionPermission: vi.fn(() => ({ getPermission: mockGetPermission })),
+vi.mock('../../hooks/useInitiativeStatusAction', () => ({
+  useInitiativeStatusAction: vi.fn(),
 }));
 
 vi.mock('../../routes', () => ({
@@ -157,7 +155,9 @@ describe('RefundManagement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
-    mockGetPermission.mockReturnValue(true);
+    vi.mocked(useInitiativeStatusAction).mockReturnValue({
+      isActionPermitted: true,
+    });
     vi.mocked(getProcessedTransactions).mockResolvedValue({
       content: [],
       totalElements: 0,
@@ -227,8 +227,10 @@ describe('RefundManagement', () => {
   });
 
   it('disables buttons in drawer if user does not have permission', async () => {
-    mockGetPermission.mockReturnValue(false);
-    
+    vi.mocked(useInitiativeStatusAction).mockReturnValue({
+      isActionPermitted: false,
+    });
+
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-perm', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING' }],
       totalElements: 1,
@@ -300,8 +302,8 @@ describe('RefundManagement', () => {
       if (tag === 'a') {
         return {
           click: clickSpy,
-          set href(_v: string) {},
-          set download(_v: string) {},
+          set href(_v: string) { },
+          set download(_v: string) { },
         } as unknown as HTMLAnchorElement;
       }
       return originalCreateElement(tag);
