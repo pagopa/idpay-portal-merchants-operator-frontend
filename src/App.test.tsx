@@ -1,18 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import ROUTES from './routes';
 import { useAppSelector } from './redux/hooks';
 import { getInitiativesList } from './services/merchantService';
 import { useAuth } from './contexts/AuthContext';
+import useTCAgreement from './hooks/useTCAgreement';
 
 vi.mock('./contexts/AuthContext.tsx', () => ({
   useAuth: vi.fn(),
 }));
 
 vi.mock('./locale/index.ts', () => ({
-  DEFAULT_LANG: 'it',
+  DEFAULT_LANG: 'en',
   i18n: {
     hasResourceBundle: vi.fn().mockReturnValue(false),
   },
@@ -24,7 +25,7 @@ vi.mock('./utils/helpers.tsx', () => ({
 }));
 
 const mockInitiatives = [
-  { initiativeId: 'Init-1', initiativeName: 'Bonus Elettrodomestici', startDate: '2025' }
+  { initiativeId: 'Init-1', initiativeName: 'Home Appliances Bonus', startDate: '2025' }
 ];
 
 const mockDispatch = vi.fn();
@@ -41,6 +42,10 @@ vi.mock('./redux/slices/initiativesSlice.ts', () => ({
   setInitiativesList: vi.fn((data) => ({ type: 'SET_INITIATIVES', payload: data })),
   initiativesListSelector: vi.fn(),
   currentInitiativeSelector: vi.fn(),
+}));
+
+vi.mock('./hooks/useTCAgreement.ts', () => ({
+  default: vi.fn(),
 }));
 
 vi.mock('./decorators/withInitiativeGuard.tsx', () => ({
@@ -79,6 +84,7 @@ vi.mock('./pages/refund/Refund.tsx', () => ({ default: () => <div>RefundPage</di
 vi.mock('./pages/privacyPolicy/PrivacyPolicy.tsx', () => ({ default: () => <div>PrivacyPolicyPage</div> }));
 vi.mock('./pages/tos/TOS.tsx', () => ({ default: () => <div>TermsOfServicePage</div> }));
 vi.mock('./pages/modifyDocument/ModifyDocument.tsx', () => ({ default: () => <div>ModifyDocumentPage</div> }));
+vi.mock('./pages/TOSAcceptance/TOSAcceptance.tsx', () => ({ default: () => <div>TOSAcceptancePage</div> }));
 
 describe('App routing', () => {
   beforeEach(() => {
@@ -87,26 +93,64 @@ describe('App routing', () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       token: 'fake-jwt-token',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     vi.mocked(getInitiativesList).mockResolvedValue({ initiatives: mockInitiatives });
     vi.mocked(useAppSelector).mockReturnValue(mockInitiatives);
+
+    vi.mocked(useTCAgreement).mockReturnValue({
+      isTOSAccepted: true,
+      acceptTOS: vi.fn(),
+      firstAcceptance: true,
+    });
   });
 
-  const renderWithRoute = (route: string) =>
-    render(
+  const renderWithRoute = (route: string) => {
+    window.history.pushState({}, '', route);
+    
+    return render(
       <MemoryRouter initialEntries={[route]}>
         <App />
       </MemoryRouter>
     );
+  };
 
-  it('should render loading state initially', () => {
+  it('renders TOSAcceptance when isTOSAccepted is false', async () => {
+    vi.mocked(useTCAgreement).mockReturnValue({
+      isTOSAccepted: false,
+      acceptTOS: vi.fn(),
+      firstAcceptance: true,
+    });
+    renderWithRoute(ROUTES.INITIATIVES_LIST);
+    await waitFor(() => expect(screen.getByText('TOSAcceptancePage')).toBeInTheDocument());
+  });
+
+  it('renders privacy policy even if isTOSAccepted is false', async () => {
+    vi.mocked(useTCAgreement).mockReturnValue({
+      isTOSAccepted: false,
+      acceptTOS: vi.fn(),
+      firstAcceptance: true,
+    });
+    renderWithRoute(ROUTES.PRIVACY_POLICY);
+    expect(await screen.findByText('PrivacyPolicyPage')).toBeInTheDocument();
+  });
+
+  it('renders terms of service even if isTOSAccepted is false', async () => {
+    vi.mocked(useTCAgreement).mockReturnValue({
+      isTOSAccepted: false,
+      acceptTOS: vi.fn(),
+      firstAcceptance: true,
+    });
+    renderWithRoute(ROUTES.TOS);
+    expect(await screen.findByText('TermsOfServicePage')).toBeInTheDocument();
+  });
+
+  it('renders loading state initially when TOS is accepted', () => {
     renderWithRoute(ROUTES.INITIATIVES_LIST);
     expect(screen.getByText('Caricamento...')).toBeInTheDocument();
   });
 
-  it('should render initiativesList', async () => {
+  it('renders initiativesList', async () => {
     renderWithRoute(ROUTES.INITIATIVES_LIST);
     expect(await screen.findByText('InitiativesListPage')).toBeInTheDocument();
   });

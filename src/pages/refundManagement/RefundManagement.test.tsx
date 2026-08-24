@@ -5,6 +5,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RefundManagement from './RefundManagement';
 import { getProcessedTransactions, downloadInvoiceFileApi } from '../../services/merchantService';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 let mockLocationState: Record<string, unknown> | undefined = undefined;
 const mockNavigate = vi.fn();
@@ -25,6 +26,18 @@ vi.mock('react-router-dom', async () => {
     }),
   };
 });
+
+vi.mock('../../redux/hooks', () => ({
+  useAppSelector: vi.fn((selectorFn) => selectorFn({})),
+}));
+
+vi.mock('../../redux/slices/initiativesSlice', () => ({
+  initiativesListSelector: vi.fn(),
+  currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
+}));
+vi.mock('../../hooks/useInitiativeStatusAction', () => ({
+  useInitiativeStatusAction: vi.fn(),
+}));
 
 vi.mock('../../routes', () => ({
   default: {
@@ -142,6 +155,9 @@ describe('RefundManagement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
+    vi.mocked(useInitiativeStatusAction).mockReturnValue({
+      isActionPermitted: true,
+    });
     vi.mocked(getProcessedTransactions).mockResolvedValue({
       content: [],
       totalElements: 0,
@@ -210,6 +226,29 @@ describe('RefundManagement', () => {
     expect(screen.getByTestId('drawer-btn-0')).toBeDisabled();
   });
 
+  it('disables buttons in drawer if user does not have permission', async () => {
+    vi.mocked(useInitiativeStatusAction).mockReturnValue({
+      isActionPermitted: false,
+    });
+
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-perm', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING' }],
+      totalElements: 1,
+    });
+
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('row-action-0')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('row-action-0'));
+
+    expect(screen.getByTestId('dynamic-drawer')).toBeInTheDocument();
+    expect(screen.getByTestId('drawer-btn-0')).toBeDisabled();
+    expect(screen.getByTestId('drawer-btn-1')).toBeDisabled();
+  });
+
   it('navigates to modify document on drawer button click', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-3', status: 'INVOICED', docNumber: 'FATTURA-123' }],
@@ -263,8 +302,8 @@ describe('RefundManagement', () => {
       if (tag === 'a') {
         return {
           click: clickSpy,
-          set href(_v: string) {},
-          set download(_v: string) {},
+          set href(_v: string) { },
+          set download(_v: string) { },
         } as unknown as HTMLAnchorElement;
       }
       return originalCreateElement(tag);

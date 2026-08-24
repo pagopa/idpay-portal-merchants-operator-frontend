@@ -1,5 +1,17 @@
 {
     "commons": {
+        "permissions": {
+            "initiativeStatus": [
+                "PUBLISHED"
+            ],
+            "closedRoutes": [
+                "ACCEPT_DISCOUNT",
+                "ACCEPT_DISCOUNT_SUMMARY",
+                "REVERSE",
+                "REFUND",
+                "MODIFY_DOCUMENT"
+            ]
+        },
         "templates": {
             "transactions": {
                 "purchaseStatus": [

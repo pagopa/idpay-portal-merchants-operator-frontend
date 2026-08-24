@@ -1,7 +1,7 @@
 import './App.css';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import AcceptDiscount from './pages/acceptDiscount/AcceptDiscount.tsx';
 import SummaryAcceptDiscount from './pages/summaryAcceptDiscount/SummaryAcceptDiscount.tsx';
 import ROUTES from './routes.ts';
@@ -24,14 +24,18 @@ import { useAuth } from './contexts/AuthContext.tsx';
 import { buildNamespaceKey } from './utils/helpers.tsx';
 import WithInitiativeGuard from './decorators/withInitiativeGuard.tsx';
 import TOSLayout from './components/TOSLayout/TOSLayout';
+import useTCAgreement from './hooks/useTCAgreement.ts';
+import TOSAcceptance from './pages/TOSAcceptance/TOSAcceptance.tsx';
 
 function App() {
   const { isAuthenticated, token } = useAuth()
   const [isLoaded, setIsLoaded] = useState(false)
   const dispatch = useAppDispatch()
+  const location = useLocation();
+  const { isTOSAccepted, acceptTOS, firstAcceptance } = useTCAgreement();
 
   useEffect(() => {
-    if(isLoaded) {
+    if (isLoaded) {
       return
     }
     if (!isAuthenticated || !token) {
@@ -58,6 +62,22 @@ function App() {
   if (!isLoaded) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Caricamento...</div>;
   }
+
+  if (
+    isTOSAccepted === false &&
+    location.pathname !== ROUTES.PRIVACY_POLICY &&
+    location.pathname !== ROUTES.TOS
+  ) {
+    return (
+        <TOSAcceptance
+          acceptTOS={acceptTOS}
+          privacyRoute={ROUTES.PRIVACY_POLICY}
+          tosRoute={ROUTES.TOS}
+          firstAcceptance={firstAcceptance}
+        />
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-gray-100">
       <Routes>
