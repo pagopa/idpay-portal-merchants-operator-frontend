@@ -19,11 +19,11 @@ vi.mock('./BaseApiClient', () => ({
   getAuthToken: vi.fn()
 }));
 
-vi.mock('./generated/Permissions', () => ({
+vi.mock('./generated/permission/Permissions', () => ({
   Permissions: vi.fn(() => mockPermissionsInstance),
 }));
 
-vi.mock('./generated/Consent', () => ({
+vi.mock('./generated/permission/Consent', () => ({
   Consent: vi.fn(() => mockConsentInstance),
 }));
 
