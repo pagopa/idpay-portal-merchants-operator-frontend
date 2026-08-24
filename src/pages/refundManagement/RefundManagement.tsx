@@ -10,11 +10,13 @@ import { DecodedJwtToken, FieldConfigDef, FilterConfigDef } from '../../utils/ty
 import { PointOfSaleTransactionProcessedDTO } from '../../api/generated/data-contracts';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import { ReceiptLong } from '@mui/icons-material';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 const RefundManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { initiativeId } = useParams();
+  const { isActionPermitted } = useInitiativeStatusAction(initiativeId);
   const { t, config } = useScopedTranslation();
   const filtersDef = config<Array<FilterConfigDef>>('pages.refundManagement.transactionsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.refundManagement.drawer')
@@ -144,22 +146,25 @@ const RefundManagement = () => {
         isOpen: openDrawer,
         buttons: areButtonsVisible && [
           {
-            disabled: isDisabledModDocButton,
+            disabled: isDisabledModDocButton || !isActionPermitted,
             variant: "contained",
             fullWidth: true,
             onClick: () => {
-              const replaceValuesObj = {
-                initiativeId: initiativeId,
-                trxId: selectedTransaction?.id,
-                fileDocNumber: btoa(selectedTransaction?.docNumber) || ''
+              if (isActionPermitted) {
+                const replaceValuesObj = {
+                  initiativeId: initiativeId,
+                  trxId: selectedTransaction?.id,
+                  fileDocNumber: btoa(selectedTransaction?.docNumber) || ''
+                }
+                navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
               }
-              navigate(generatePath(ROUTES.MODIFY_DOCUMENT, replaceValuesObj))
             },
             title: t('pages.refundManagement.drawer.modifyDocument')
           },
           {
             fullWidth: true,
-            onClick: handleReverseTransaction,
+            disabled: !isActionPermitted,
+            onClick: isActionPermitted && handleReverseTransaction,
             title: t('pages.refundManagement.drawer.refund')
           }
         ]

@@ -87,6 +87,9 @@ const mockUseAutoResetBanner = vi.fn();
 vi.mock('../../hooks/useAutoResetBanner', () => ({
   useAutoResetBanner: (...args: unknown[]) => mockUseAutoResetBanner(...args),
 }));
+vi.mock('../../hooks/useActionPermission', () => ({
+  useActionPermission: vi.fn(() => ({isActionPermitted: true})),
+}));
 
 describe('TransactionsLayout component', () => {
   const mockAlerts = [[false, vi.fn()]] as Array<[boolean, (value: boolean) => void]>;
@@ -197,8 +200,8 @@ describe('TransactionsLayout component', () => {
   it('renders the additional button and handles click', () => {
     const mockOnClick = vi.fn();
     const additionalButton = {
-      label: 'Custom Action',
-      icon: <span data-testid="btn-icon" />,
+      title: 'Custom Action',
+      startIcon: <span data-testid="btn-icon" />,
       onClick: mockOnClick,
     };
 

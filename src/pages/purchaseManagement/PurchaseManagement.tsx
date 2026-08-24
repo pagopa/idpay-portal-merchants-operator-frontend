@@ -18,11 +18,13 @@ import { getPreviewPdf } from '../../services/merchantService';
 import { downloadFileFromBase64 } from '../../utils/helpers';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation'
 import { PointOfSaleTransactionDTO } from '../../api/generated/data-contracts';
+import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
 
 const PurchaseManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { initiativeId } = useParams();
+  const { isActionPermitted } = useInitiativeStatusAction(initiativeId);
   const { t, config } = useScopedTranslation();
   const filtersDef = config<Array<FilterConfigDef>>('pages.purchaseManagement.transactionsTable.filters')
   const fieldsDef = config<Array<FieldConfigDef>>('pages.purchaseManagement.drawer')
@@ -155,9 +157,13 @@ const PurchaseManagement = () => {
         subtitle={t('pages.purchaseManagement.subtitle')}
         tableTitle={t('pages.purchaseManagement.tableTitle')}
         additionalButton={{
-          label: 'Accetta buono sconto',
-          icon: <QrCodeIcon />,
-          onClick: () => navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId })),
+          variant: 'contained',
+          size: 'small',
+          disabled: !isActionPermitted,
+          title: 'Accetta buono sconto',
+          sx: { textWrap: 'nowrap' },
+          startIcon: <QrCodeIcon />,
+          onClick: () => isActionPermitted && navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId })),
         }}
         isAlertVisible={openDrawer}
         transactionsApi={getInProgressTransactions}
@@ -210,16 +216,18 @@ const PurchaseManagement = () => {
             {
               variant: "contained",
               fullWidth: true,
-              onClick: () => selectedTransaction?.status === 'AUTHORIZED'
+              disabled: !isActionPermitted,
+              onClick: () => isActionPermitted && (selectedTransaction?.status === 'AUTHORIZED'
                 ? handleModal("capture")
-                : handleRedirect(ROUTES.REFUND),
+                : handleRedirect(ROUTES.REFUND)),
               title: selectedTransaction?.status === 'AUTHORIZED'
                 ? t('pages.purchaseManagement.drawer.confirmPayment')
                 : t('pages.purchaseManagement.drawer.requestRefund')
             },
             {
               fullWidth: true,
-              onClick: () => handleModal(selectedTransaction?.status === 'AUTHORIZED' ? "cancel" : "reverse"),
+              disabled: !isActionPermitted,
+              onClick: () => isActionPermitted && handleModal(selectedTransaction?.status === 'AUTHORIZED' ? "cancel" : "reverse"),
               color: selectedTransaction?.status === 'AUTHORIZED' ? "error" : "primary",
               title: selectedTransaction?.status === 'AUTHORIZED'
                 ? t('pages.purchaseManagement.drawer.cancellPayment')

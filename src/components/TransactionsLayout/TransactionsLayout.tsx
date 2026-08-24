@@ -2,6 +2,7 @@ import {
   Box,
   Typography,
   Button,
+  ButtonProps,
 } from '@mui/material';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import AlertComponent from '../Alert/AlertComponent';
@@ -30,11 +31,7 @@ type TransactionsLayoutProps = {
   setTransactionsList: (content) => void
   triggerFetchTransactions?: boolean,
   tableTitle?: string
-  additionalButton?: {
-    label: string
-    icon: React.ReactNode
-    onClick: () => void
-  };
+  additionalButton?: ButtonProps;
   alerts: Array<[boolean, (value: boolean) => void]>
   alertMessages?: {
     error?: string
@@ -129,14 +126,8 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
           mbSubTitle={2}
         />
         {additionalButton && (
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={additionalButton.icon}
-            sx={{ textWrap: 'nowrap' }}
-            onClick={additionalButton.onClick}
-          >
-            {additionalButton.label}
+          <Button { ...additionalButton}>
+            {additionalButton.title}
           </Button>
         )}
       </Box>
