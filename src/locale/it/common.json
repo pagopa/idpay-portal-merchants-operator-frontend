@@ -46,6 +46,16 @@
     "sendBtn": "Invia",
     "title": "Portale Esercenti",
     "pages": {
+      "tos": {
+        "and": "e l’",
+        "backHome": "Torna alla home",
+        "linkPrivacy": "Informativa Privacy",
+        "linkTos": "Termini e condizioni d’uso",
+        "termsDescription": "Accedendo, accetti i",
+        "termsDescription2": "del servizio e confermi di aver letto l’",
+        "termsDescriptionChanged": "Recentemente abbiamo cambiato i",
+        "title": "Portale Punto Vendita"
+      },
       "initiativesList": {
         "title": "Iniziative",
         "subtitle": "Visualizza e gestisci le iniziative di supporto alla spesa a cui hai aderito.",
