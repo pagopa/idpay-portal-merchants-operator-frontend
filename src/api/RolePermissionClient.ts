@@ -1,6 +1,6 @@
 import { createApiConfig, getAuthToken } from "./BaseApiClient";
-import { Consent } from "./generated/Consent";
-import { Permissions } from "./generated/Permissions";
+import { Consent } from "./generated/permission/Consent";
+import { Permissions } from "./generated/permission/Permissions";
 
 const apiConfig = createApiConfig()
 const config = { ...apiConfig, baseURL: `${apiConfig.baseURL}/authorization`}
