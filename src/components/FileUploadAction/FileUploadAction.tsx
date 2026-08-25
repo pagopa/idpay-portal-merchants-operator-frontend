@@ -203,6 +203,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 : setDocNumberError(false);
             }}
             label={docNumberLabel}
+            required
             size="small"
             sx={{
               mt: 2,

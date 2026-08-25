@@ -381,7 +381,7 @@
     },
     "reverse": {
       "title": "Storna transazione",
-      "creditNote": "Carica nota di credito",
+      "creditNote": "Carica la nota di credito",
       "subtitle": "Inserisci il numero della nota di credito e carica la documentazione necessaria per avviare lo storno.  ",
       "creditNoteSubtitle": "Carica il file della nota di credito relativa a questo acquisto. ",
       "manualLink": "Dubbi? Vai sul manuale",
