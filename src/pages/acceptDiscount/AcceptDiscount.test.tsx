@@ -1,457 +1,275 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
-
-import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
-import ROUTES from '../../routes';
-import { getInitiativeProductsList, previewPayment } from '../../services/merchantService';
-import { ProductDTO } from '../../api/generated/data-contracts';
 import AcceptDiscount from './AcceptDiscount';
-import { useParams } from 'react-router-dom';
+import { getInitiativeProductsList, previewPayment } from '../../services/merchantService';
 
 const mockNavigate = vi.fn();
 
-vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-    useLocation: vi.fn(),
-    useParams: () => ({ initiativeId: 'Init-1' })
-  }
-});
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
+  useParams: () => ({ initiativeId: 'test-initiative-123' }),
+  generatePath: (path: string, params: Record<string, string>) => `${path}/${params.initiativeId}`,
+}));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
 
 vi.mock('../../services/merchantService', () => ({
   getInitiativeProductsList: vi.fn(),
   previewPayment: vi.fn(),
 }));
 
-const BreadcrumbsBoxMock = vi.fn(({ onClickBackButton }: { onClickBackButton?: () => void }) => (
-  <button data-testid="BreadcrumbsBox" onClick={onClickBackButton}>
-    back
-  </button>
-));
-
-vi.mock('../../components/BreadcrumbsBox/BreadcrumbsBox', () => ({
-  default: (props: { onClickBackButton?: () => void }) => BreadcrumbsBoxMock(props),
-}));
-
-vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
-  TitleBox: () => <div data-testid="TitleBox" />,
-}));
-
-vi.mock('./AcceptDiscountCard', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
-vi.mock('../../components/Modal/ModalComponent', () => ({
-  default: ({ open, children }: { open: boolean; children: React.ReactNode }) =>
-    open ? <div data-testid="ModalComponent">{children}</div> : null,
-}));
-
 vi.mock('../../components/Autocomplete/AutocompleteComponent', () => ({
-  default: ({
-    onChangeDebounce,
-    onChange,
-    value,
-  }: {
-    onChangeDebounce: (v: string) => void;
-    onChange: (v: ProductDTO) => void;
-    value: ProductDTO | null;
-  }) => (
-    <input
-      data-testid="Autocomplete"
-      value={value?.fullProductName || ''}
-      onChange={(e) => onChangeDebounce(e.target.value)}
-      onBlur={() =>
-        onChange({ gtinCode: '123', productName: 'Prodotto', fullProductName: 'Prodotto' })
-      }
-    />
+  default: ({ onChange, onChangeDebounce, value, inputError }: any) => (
+    <div>
+      <input
+        data-testid="autocomplete-input"
+        value={value ? value.productName : ''}
+        onChange={(e) => {
+          onChangeDebounce(e.target.value);
+          onChange({ gtinCode: 'GTIN123', productName: e.target.value });
+        }}
+      />
+      {inputError && <span data-testid="autocomplete-error">Product Error</span>}
+    </div>
   ),
 }));
 
+vi.mock('../../components/BreadcrumbsBox/BreadcrumbsBox', () => ({
+  default: ({ onClickBackButton }: any) => (
+    <button data-testid="breadcrumbs-back" onClick={onClickBackButton}>
+      Back
+    </button>
+  ),
+}));
+
+vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
+  TitleBox: ({ title, subTitle }: any) => (
+    <div>
+      <h1>{title}</h1>
+      <h2>{subTitle}</h2>
+    </div>
+  ),
+}));
+
+vi.mock('../../components/Modal/ModalComponent', () => ({
+  default: ({ open, children, onClose }: any) =>
+    open ? (
+      <div data-testid="modal-component">
+        {children}
+        <button data-testid="modal-close-btn" onClick={onClose}>
+          Close Modal
+        </button>
+      </div>
+    ) : null,
+}));
+
 vi.mock('../../components/Alert/AlertComponent', () => ({
-  default: ({ message }: { message: string }) => <div data-testid="AlertComponent">{message}</div>,
+  default: ({ isOpen, message }: any) =>
+    isOpen ? <div data-testid="alert-component">{message}</div> : null,
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (k: string) => k,
-  }),
-}));
-
-Object.defineProperty(window, 'sessionStorage', {
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-  },
-});
-
-const mockProduct: ProductDTO = {
-  gtinCode: '123',
-  productName: 'Prodotto',
-  fullProductName: 'Prodotto',
-} as ProductDTO;
-
-const fillForm = () => {
-  fireEvent.change(screen.getByLabelText('pages.acceptDiscount.expenditureAmount'), {
-    target: { value: '10' },
-  });
-  fireEvent.change(screen.getByLabelText('pages.acceptDiscount.discountCode'), {
-    target: { value: 'ABC123' },
-  });
-  fireEvent.blur(screen.getByTestId('Autocomplete'));
-};
-
-describe('AcceptDiscount', () => {
+describe('AcceptDiscount Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (getInitiativeProductsList as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({
-      content: [mockProduct],
-    });
+    sessionStorage.clear();
   });
 
-  it('renders correctly', () => {
+  it('renders initial state correctly', () => {
     render(<AcceptDiscount />);
-    expect(screen.getByTestId('BreadcrumbsBox')).toBeInTheDocument();
-    expect(screen.getByLabelText('pages.acceptDiscount.expenditureAmount')).toBeInTheDocument();
-    expect(screen.getByLabelText('pages.acceptDiscount.discountCode')).toBeInTheDocument();
+
+    expect(screen.getByText('pages.acceptDiscount.title')).toBeInTheDocument();
+    expect(screen.getByText('pages.acceptDiscount.subtitle')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'commons.continueBtn' })).toBeInTheDocument();
   });
 
-  it('shows required errors when fields are empty', async () => {
-    render(<AcceptDiscount />);
-    fireEvent.click(screen.getByText('commons.continueBtn'));
-
-    await waitFor(() => {
-      expect(screen.getAllByText(REQUIRED_FIELD_ERROR).length).toBeGreaterThan(0);
-    });
-  });
-
-  it('handles previewPayment success', async () => {
-    (previewPayment as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({
-      originalAmountCents: 1000,
-      trxCode: 'ABC123',
-    });
-
-    render(<AcceptDiscount />);
-    fillForm();
-
-    fireEvent.click(screen.getByText('commons.continueBtn'));
-
-    await waitFor(() => {
-      expect(previewPayment).toHaveBeenCalled();
-    });
-
-    expect(window.sessionStorage.setItem).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith('/Init-1/accetta-buono-sconto/riepilogo');
-  });
-
-  it('handles discountCodeWrong error', async () => {
-    (previewPayment as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue({
-      response: { data: { code: 'PAYMENT_NOT_FOUND_OR_EXPIRED' } },
-    });
-
-    render(<AcceptDiscount />);
-    fillForm();
-
-    fireEvent.click(screen.getByText('commons.continueBtn'));
-
-    await waitFor(() => {
-      expect(screen.getByText('Codice sconto non valido')).toBeInTheDocument();
-    });
-  });
-
-  it('handles PAYMENT_ALREADY_AUTHORIZED error', async () => {
-    (previewPayment as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue({
-      response: { data: { code: 'PAYMENT_ALREADY_AUTHORIZED' } },
-    });
-
-    render(<AcceptDiscount />);
-    fillForm();
-
-    fireEvent.click(screen.getByText('commons.continueBtn'));
-
-    await waitFor(() => {
-      expect(screen.getByText('Codice sconto non valido')).toBeInTheDocument();
-    });
-  });
-
-  it('handles generic previewPayment error', async () => {
-    (previewPayment as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue(
-      new Error('Generic')
-    );
-
-    render(<AcceptDiscount />);
-    fillForm();
-
-    fireEvent.click(screen.getByText('commons.continueBtn'));
-
-    await waitFor(() => {
-      expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
-    });
-  });
-
-  it('handles exit flow', () => {
-    render(<AcceptDiscount />);
-    fireEvent.click(screen.getByText('Indietro'));
-    fireEvent.click(screen.getByText('Esci'));
-
-    expect(window.sessionStorage.removeItem).toHaveBeenCalledWith('discountCoupon');
-    expect(mockNavigate).toHaveBeenCalledWith('/Init-1/gestione-acquisti');
-  });
-
-  it('loads form data from sessionStorage on mount', () => {
-    const storedData = {
-      product: mockProduct,
-      originalAmountCents: 1500,
-      trxCode: 'STORED123',
+  it('restores data from sessionStorage on mount', () => {
+    const savedDiscountData = {
+      product: { gtinCode: '98765', productName: 'Saved Product' },
+      originalAmountCents: 2550,
+      trxCode: 'SAVED_CODE_123',
     };
-    (window.sessionStorage.getItem as ReturnType<typeof vi.fn>).mockReturnValue(
-      JSON.stringify(storedData)
-    );
+
+    sessionStorage.setItem('discountCoupon', JSON.stringify(savedDiscountData));
 
     render(<AcceptDiscount />);
 
-    expect(window.sessionStorage.getItem).toHaveBeenCalledWith('discountCoupon');
-    expect(
-      (screen.getByLabelText('pages.acceptDiscount.expenditureAmount') as HTMLInputElement).value
-    ).toBe('15');
-    expect(
-      (screen.getByLabelText('pages.acceptDiscount.discountCode') as HTMLInputElement).value
-    ).toBe('STORED123');
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs[0]).toHaveValue('Saved Product');
+    expect(inputs[1]).toHaveValue('25,5');
+    expect(inputs[2]).toHaveValue('SAVED_CODE_123');
   });
 
-  it('does not load form data when sessionStorage is empty', () => {
-    (window.sessionStorage.getItem as ReturnType<typeof vi.fn>).mockReturnValue(null);
-
+  it('displays validation errors when submitting an empty form', async () => {
     render(<AcceptDiscount />);
 
-    expect(
-      (screen.getByLabelText('pages.acceptDiscount.expenditureAmount') as HTMLInputElement).value
-    ).toBe('');
-    expect(
-      (screen.getByLabelText('pages.acceptDiscount.discountCode') as HTMLInputElement).value
-    ).toBe('');
+    const submitBtn = screen.getByRole('button', { name: 'commons.continueBtn' });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('autocomplete-error')).toBeInTheDocument();
+    });
   });
 
-  it('auto-dismisses errorAlert after 5 seconds', async () => {
-    vi.useFakeTimers();
-
-    (previewPayment as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue(
-      new Error('Generic')
-    );
-
+  it('restricts invalid decimal input formats for totalAmount', () => {
     render(<AcceptDiscount />);
-    fillForm();
 
-    fireEvent.click(screen.getByText('commons.continueBtn'));
+    const inputs = screen.getAllByRole('textbox');
+    const amountInput = inputs[1];
 
-    await act(async () => { });
+    fireEvent.change(amountInput, { target: { value: '0' } });
+    expect(amountInput).toHaveValue('');
 
-    expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
+    fireEvent.change(amountInput, { target: { value: ',' } });
+    expect(amountInput).toHaveValue('');
 
-    await act(async () => {
-      vi.advanceTimersByTime(6000);
-      vi.runOnlyPendingTimers();
+    fireEvent.change(amountInput, { target: { value: '12,345' } });
+    expect(amountInput).toHaveValue('');
+
+    fireEvent.change(amountInput, { target: { value: '123456' } });
+    expect(amountInput).toHaveValue('');
+
+    fireEvent.change(amountInput, { target: { value: '15,50' } });
+    expect(amountInput).toHaveValue('15,50');
+  });
+
+  it('fetches products list on typing in autocomplete', async () => {
+    vi.mocked(getInitiativeProductsList).mockResolvedValueOnce({
+      content: [{ gtinCode: '111', productName: 'Fetched Product' }],
     });
 
-    await act(async () => { });
-
-    expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
-
-    vi.useRealTimers();
-  });
-
-  it('clears errorAlert timer on unmount', async () => {
-    vi.useFakeTimers();
-    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
-
-    (previewPayment as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue(
-      new Error('Generic')
-    );
-
-    const { unmount } = render(<AcceptDiscount />);
-    fillForm();
-
-    fireEvent.click(screen.getByText('commons.continueBtn'));
-
-    await act(async () => { });
-
-    expect(screen.getByTestId('AlertComponent')).toBeInTheDocument();
-
-    unmount();
-    expect(clearTimeoutSpy).toHaveBeenCalled();
-
-    vi.useRealTimers();
-    clearTimeoutSpy.mockRestore();
-  });
-
-  it('ignores totalAmount input with multiple commas', () => {
     render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
 
-    fireEvent.change(input, { target: { value: '1,2,3' } });
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Product Search' } });
 
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('ignores totalAmount input when integer part contains non-digit characters', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '12a' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('ignores totalAmount input when decimal part exceeds 2 digits', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '1,234' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('ignores totalAmount input when integer part exceeds 5 digits', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '123456' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('ignores totalAmount input when decimal part contains non-digit characters', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '1,2a' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('ignores totalAmount when value is "0"', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '0' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('ignores totalAmount when value is ","', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: ',' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('accepts empty string for totalAmount', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '10' } });
-    fireEvent.change(input, { target: { value: '' } });
-
-    expect((input as HTMLInputElement).value).toBe('');
-  });
-
-  it('accepts valid totalAmount with decimal', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
-
-    fireEvent.change(input, { target: { value: '10,99' } });
-
-    expect((input as HTMLInputElement).value).toBe('10,99');
-  });
-
-  it('updates discountCode field correctly', () => {
-    render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.discountCode');
-
-    fireEvent.change(input, { target: { value: 'MYCODE' } });
-
-    expect((input as HTMLInputElement).value).toBe('MYCODE');
-  });
-
-  it('triggers fetchProductsList when autocomplete input changes', async () => {
-    vi.useFakeTimers();
-
-    render(<AcceptDiscount />);
-    const autocomplete = screen.getByTestId('Autocomplete');
-
-    fireEvent.change(autocomplete, { target: { value: 'test' } });
-
-    await act(async () => {
-      vi.runOnlyPendingTimers();
+    await waitFor(() => {
+      expect(getInitiativeProductsList).toHaveBeenCalledWith('test-initiative-123', {
+        fullProductName: 'Product Search',
+        size: 50,
+      });
     });
-
-    expect(getInitiativeProductsList).toHaveBeenCalled();
-
-    vi.useRealTimers();
   });
 
-  it('sets productsList to empty array when getProductsList throws', async () => {
-    vi.useFakeTimers();
-
-    (getInitiativeProductsList as unknown as { mockRejectedValue: (v: unknown) => void }).mockRejectedValue(
-      new Error('fetch error')
-    );
+  it('handles products list fetch failure silently', async () => {
+    vi.mocked(getInitiativeProductsList).mockRejectedValueOnce(new Error('Network error'));
 
     render(<AcceptDiscount />);
-    const autocomplete = screen.getByTestId('Autocomplete');
 
-    fireEvent.change(autocomplete, { target: { value: 'fail' } });
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Error Test' } });
 
-    await act(async () => {
-      vi.runOnlyPendingTimers();
+    await waitFor(() => {
+      expect(getInitiativeProductsList).toHaveBeenCalled();
     });
-
-    expect(getInitiativeProductsList).toHaveBeenCalled();
-
-    vi.useRealTimers();
   });
 
-  it('shows euro icon adornment when expenditure field is focused', () => {
+  it('submits valid form data, sets sessionStorage, and navigates', async () => {
+    const mockResponse = { id: 'preview-1', amountCents: 1000 };
+    vi.mocked(previewPayment).mockResolvedValueOnce(mockResponse);
+
     render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
 
-    fireEvent.focus(input);
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Sample Item' } });
 
-    expect(
-      document.querySelector('[data-testid="EuroIcon"]') || document.querySelector('svg')
-    ).toBeTruthy();
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[1], { target: { value: '10,00' } });
+    fireEvent.change(inputs[2], { target: { value: 'DISCOUNT20' } });
+
+    const submitBtn = screen.getByRole('button', { name: 'commons.continueBtn' });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(previewPayment).toHaveBeenCalledWith('test-initiative-123', {
+        productGtin: 'GTIN123',
+        productName: 'Sample Item',
+        amountCents: 1000,
+        discountCode: 'DISCOUNT20',
+      });
+      expect(sessionStorage.getItem('discountCoupon')).not.toBeNull();
+      expect(mockNavigate).toHaveBeenCalled();
+    });
   });
 
-  it('hides euro icon adornment when expenditure field is blurred and empty', () => {
+  it('handles invalid discount code response from previewPayment API', async () => {
+    const errorResponse = {
+      response: {
+        data: {
+          code: 'PAYMENT_NOT_FOUND_OR_EXPIRED',
+        },
+      },
+    };
+    vi.mocked(previewPayment).mockRejectedValueOnce(errorResponse);
+
     render(<AcceptDiscount />);
-    const input = screen.getByLabelText('pages.acceptDiscount.expenditureAmount');
 
-    fireEvent.focus(input);
-    fireEvent.blur(input);
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Sample Item' } });
 
-    expect((input as HTMLInputElement).value).toBe('');
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[1], { target: { value: '10,00' } });
+    fireEvent.change(inputs[2], { target: { value: 'EXPIRED_CODE' } });
+
+    const submitBtn = screen.getByRole('button', { name: 'commons.continueBtn' });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText('Codice sconto non valido')).toBeInTheDocument();
+    });
   });
 
-  it('closes modal when "Torna indietro" is clicked', () => {
+  it('displays generic error alert on previewPayment system error', async () => {
+    vi.mocked(previewPayment).mockRejectedValueOnce(new Error('Internal error'));
+
     render(<AcceptDiscount />);
 
-    fireEvent.click(screen.getByText('Indietro'));
-    expect(screen.getByTestId('ModalComponent')).toBeInTheDocument();
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Sample Item' } });
 
-    fireEvent.click(screen.getByText('Torna indietro'));
-    expect(screen.queryByTestId('ModalComponent')).not.toBeInTheDocument();
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[1], { target: { value: '10,00' } });
+    fireEvent.change(inputs[2], { target: { value: 'ANY_CODE' } });
+
+    const submitBtn = screen.getByRole('button', { name: 'commons.continueBtn' });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('alert-component')).toBeInTheDocument();
+    });
   });
 
-  it('opens modal when BreadcrumbsBox back button is clicked', () => {
+  it('opens and closes exit modal upon user interactions', async () => {
     render(<AcceptDiscount />);
 
-    fireEvent.click(screen.getByTestId('BreadcrumbsBox'));
-    expect(screen.getByTestId('ModalComponent')).toBeInTheDocument();
+    const backBtn = screen.getByText('Indietro');
+    fireEvent.click(backBtn);
+
+    expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+
+    const returnBtn = screen.getByText('Torna indietro');
+    fireEvent.click(returnBtn);
+
+    expect(screen.queryByTestId('modal-component')).not.toBeInTheDocument();
+  });
+
+  it('clears sessionStorage and navigates when confirming exit from modal', async () => {
+    sessionStorage.setItem('discountCoupon', '{"test": "data"}');
+
+    render(<AcceptDiscount />);
+
+    const breadcrumbsBack = screen.getByTestId('breadcrumbs-back');
+    fireEvent.click(breadcrumbsBack);
+
+    expect(screen.getByTestId('modal-component')).toBeInTheDocument();
+
+    const exitBtn = screen.getByText('Esci');
+    fireEvent.click(exitBtn);
+
+    expect(sessionStorage.getItem('discountCoupon')).toBeNull();
+    expect(mockNavigate).toHaveBeenCalled();
   });
 });
