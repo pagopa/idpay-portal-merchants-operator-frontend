@@ -19,7 +19,7 @@
                 "additionalProperties": "Prodotto",
                 "trxChargeDate": "Data e ora",
                 "fiscalCode": "Beneficiario",
-                "effectiveAmountCents": "Totale della spesa",
+                "effectiveAmountCents": "Totale spesa",
                 "rewardAmountCents": "Sconto applicato",
                 "residualAmountCents": "Importo autorizzato",
                 "status": "Stato"
@@ -41,13 +41,13 @@
                 "authorizedAmount": "Importo autorizzato",
                 "rewardAmount": "Sconto applicato",
                 "status": "Stato",
-                "fiscalCode": "Codice fiscale",
+                "fiscalCode": "Codice Fiscale",
                 "trxDate": "Data e ora",
                 "brand": "Modello",
                 "category": "Categoria",
                 "confirmPayment": "Conferma pagamento",
                 "cancellPayment": "Annulla transazione",
-                "requestRefund": "Carica fattura",
+                "requestRefund": "Carica la fattura",
                 "refund": "Storna",
                 "householdAppliance": "Prodotto",
                 "document": "Documento di pre-autorizzazione",
@@ -70,18 +70,18 @@
                 },
                 "reverse": {
                     "title": "Storna transazione",
-                    "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Decoder, mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+                    "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Decoder, mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito",
                     "exitBtn": "Indietro",
                     "confirmBtn": "Storna"
                 }
             },
             "feedbackMessages": {
                 "success": {
-                    "transaction": "La transazione è andata a buon fine.",
-                    "payment": "Il pagamento è stato confermato.",
-                    "transactionDelete": "La transazione è stata annullata con successo.",
-                    "refundUpload": "Richiesta inviata correttamente",
-                    "reverseUpload": "Richiesta inviata correttamente"
+                    "transaction": "L'operazione è andata a buon fine.",
+                    "payment": "Il pagamento è stato autorizzato.",
+                    "transactionDelete": "Transazione annullata correttamente.",
+                    "refundUpload": "Richiesta inviata correttamente.",
+                    "reverseUpload": "Richiesta inviata correttamente."
                 },
                 "errors": {
                     "generic": "Non è stato possibile recuperare le transazioni. Riprova.",
@@ -104,14 +104,11 @@
             "authorized": "Da autorizzare",
             "captured": "Fattura da caricare",
             "tableTitle": "Transazioni",
-            "refundSuccessUpload": "Richiesta inviata correttamente",
-            "reverseSuccessUpload": "Richiesta inviata correttamente",
-            "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova.",
             "tableHeaders": {
                 "additionalProperties": "Prodotto",
                 "trxChargeDate": "Data e ora",
                 "fiscalCode": "Beneficiario",
-                "effectiveAmountCents": "Totale della spesa",
+                "effectiveAmountCents": "Totale spesa",
                 "rewardAmountCents": "Sconto applicato",
                 "authorizedAmountCents": "Importo autorizzato",
                 "status": "Stato"
@@ -133,7 +130,7 @@
                 "authorizedAmount": "Importo autorizzato",
                 "rewardAmount": "Sconto applicato",
                 "status": "Stato",
-                "fiscalCode": "Codice fiscale",
+                "fiscalCode": "Codice Fiscale",
                 "trxDate": "Data e ora",
                 "brand": "Modello",
                 "category": "Categoria",
@@ -162,8 +159,8 @@
             },
             "feedbackMessages": {
                 "success": {
-                    "refundUpload": "Richiesta inviata correttamente",
-                    "reverseUpload": "Richiesta inviata correttamente"
+                    "refundUpload": "Richiesta inviata correttamente.",
+                    "reverseUpload": "Richiesta inviata correttamente."
                 },
                 "errors": {
                     "generic": "Non è stato possibile recuperare le transazioni. Riprova.",
