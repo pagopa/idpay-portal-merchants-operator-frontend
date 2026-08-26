@@ -307,7 +307,7 @@ const AcceptDiscount = () => {
                     fieldErrors.discountCode
                       ? REQUIRED_FIELD_ERROR
                       : fieldErrors.discountCodeWrong
-                        ? 'Codice sconto non valido'
+                        ? t("pages.acceptDiscount.invalidDiscountCode")
                         : ''
                   }
                   onChange={(e) => handleFieldChange('discountCode', e.target.value)}
