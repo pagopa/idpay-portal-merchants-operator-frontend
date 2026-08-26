@@ -44,13 +44,13 @@
                 "authorizedAmount": "Importo autorizzato",
                 "rewardAmount": "Sconto applicato",
                 "status": "Stato",
-                "fiscalCode": "Codice fiscale",
+                "fiscalCode": "Codice Fiscale",
                 "trxDate": "Data e ora",
                 "brand": "Modello",
                 "category": "Categoria",
                 "confirmPayment": "Conferma pagamento",
                 "cancellPayment": "Annulla transazione",
-                "requestRefund": "Carica fattura",
+                "requestRefund": "Carica la fattura",
                 "refund": "Storna",
                 "householdAppliance": "Elettrodomestico",
                 "document": "Documento di pre-autorizzazione",
@@ -80,11 +80,11 @@
             },
             "feedbackMessages": {
                 "success": {
-                    "transaction": "La transazione è andata a buon fine.",
-                    "payment": "Il pagamento è stato confermato.",
-                    "transactionDelete": "La transazione è stata annullata con successo.",
-                    "refundUpload": "Richiesta inviata correttamente",
-                    "reverseUpload": "Richiesta inviata correttamente"
+                    "transaction": "L'operazione è andata a buon fine.",
+                    "payment": "Il pagamento è stato autorizzato.",
+                    "transactionDelete": "Transazione annullata correttamente.",
+                    "refundUpload": "Richiesta inviata correttamente.",
+                    "reverseUpload": "Richiesta inviata correttamente."
                 },
                 "errors": {
                     "generic": "Non è stato possibile recuperare le transazioni. Riprova.",
@@ -133,7 +133,7 @@
                 "authorizedAmount": "Importo autorizzato",
                 "rewardAmount": "Sconto applicato",
                 "status": "Stato",
-                "fiscalCode": "Codice fiscale",
+                "fiscalCode": "Codice Fiscale",
                 "trxDate": "Data e ora",
                 "brand": "Modello",
                 "category": "Categoria",
@@ -162,8 +162,8 @@
             },
             "feedbackMessages": {
                 "success": {
-                    "refundUpload": "Richiesta inviata correttamente",
-                    "reverseUpload": "Richiesta inviata correttamente"
+                    "refundUpload": "Richiesta inviata correttamente.",
+                    "reverseUpload": "Richiesta inviata correttamente."
                 },
                 "errors": {
                     "generic": "Non è stato possibile recuperare le transazioni. Riprova.",

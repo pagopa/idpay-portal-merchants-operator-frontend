@@ -218,7 +218,7 @@ describe('AcceptDiscount Component', () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.getByText('Codice sconto non valido')).toBeInTheDocument();
+      expect(screen.getByText('pages.acceptDiscount.invalidDiscountCode')).toBeInTheDocument();
     });
   });
 
