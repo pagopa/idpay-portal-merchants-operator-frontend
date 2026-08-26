@@ -38,7 +38,7 @@ interface FormErrors {
 
 const AcceptDiscount = () => {
   const { t } = useTranslation();
-  const {initiativeId} = useParams();
+  const { initiativeId } = useParams();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState<FormData>({
@@ -114,7 +114,7 @@ const AcceptDiscount = () => {
           JSON.stringify({ ...response, product: formData.product })
         );
         setPreviewIsLoading(false);
-        navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, {initiativeId: initiativeId}));
+        navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
       } catch (error) {
         if (
           error?.response?.data?.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
@@ -197,7 +197,7 @@ const AcceptDiscount = () => {
 
   const handleExitPage = () => {
     sessionStorage.removeItem('discountCoupon');
-    navigate(generatePath(ROUTES.BUY_MANAGEMENT, {initiativeId: initiativeId}));
+    navigate(generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiativeId }));
   };
 
   return (
@@ -233,6 +233,7 @@ const AcceptDiscount = () => {
                 inputTitle={t('pages.acceptDiscount.selectProductTitle')}
               >
                 <Autocomplete
+                  required
                   options={productsList as ProductDTO[]}
                   onChangeDebounce={(value) => handleChangeAutocomplete(value)}
                   onChange={(productObj) => handleFieldChange('product', productObj)}
@@ -248,6 +249,7 @@ const AcceptDiscount = () => {
                 subTitleBox={t('pages.acceptDiscount.insertAmount')}
               >
                 <TextField
+                  required
                   variant="outlined"
                   label={t('pages.acceptDiscount.expenditureAmount')}
                   size="small"
@@ -289,6 +291,7 @@ const AcceptDiscount = () => {
                 inputTitle={'Inserisci codice sconto'}
               >
                 <TextField
+                  required
                   variant="outlined"
                   label={t('pages.acceptDiscount.discountCode')}
                   size="small"
