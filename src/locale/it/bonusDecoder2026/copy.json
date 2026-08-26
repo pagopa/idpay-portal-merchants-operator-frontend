@@ -70,7 +70,7 @@
                 },
                 "reverse": {
                     "title": "Storna transazione",
-                    "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Decoder, mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito.",
+                    "description": "Sei sicuro di voler stornare questa transazione? L’utente non beneficerà più del Bonus Decoder, mentre tu non riceverai nessun rimborso e dovrai caricare la nota di credito",
                     "exitBtn": "Indietro",
                     "confirmBtn": "Storna"
                 }
