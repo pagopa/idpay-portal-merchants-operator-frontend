@@ -172,7 +172,8 @@ variables:
 trigger:
   branches:
     include:
-      - main
+      - develop
+      - uat
 
 pr: none
 
