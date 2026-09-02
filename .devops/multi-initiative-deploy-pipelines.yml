@@ -40,7 +40,7 @@ variables:
     vite_privacy: ''
 
     react_app_one_trust_base_url: '$(REACT_APP_ONE_TRUST_BASE_URL_GLOBAL)'
-    react_app_one_trust_domain_id: 019a6fb5-adb4-7277-a4d2-227872998fe4
+    react_app_one_trust_domain_id: '$(UAT_VITE_ONE_TRUST_DOMAIN_ID)'
     react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL)
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
 
@@ -89,7 +89,7 @@ variables:
     vite_privacy: ''
 
     react_app_one_trust_base_url: '$(REACT_APP_ONE_TRUST_BASE_URL_GLOBAL)'
-    react_app_one_trust_domain_id: 019a6fb5-adb4-7277-a4d2-227872998fe4
+    react_app_one_trust_domain_id: '$(PROD_VITE_ONE_TRUST_DOMAIN_ID)'
     react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL)
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
 
@@ -138,7 +138,7 @@ variables:
     vite_privacy: ''
 
     react_app_one_trust_base_url: '$(REACT_APP_ONE_TRUST_BASE_URL_GLOBAL)'
-    react_app_one_trust_domain_id: 019a1699-a13c-76c5-8e5b-dd0b116385d3
+    react_app_one_trust_domain_id: '$(DEV_VITE_ONE_TRUST_DOMAIN_ID)'
     react_app_one_trust_otnotice_cdn_url: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL)
     react_app_one_trust_otnotice_cdn_settings: $(REACT_APP_ONE_TRUST_OTNOTICE_CDN_SETTINGS_GLOBAL)
 
