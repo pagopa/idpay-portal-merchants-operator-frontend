@@ -38,22 +38,22 @@ function App() {
     if (isLoaded) {
       return
     }
-    if (!isAuthenticated || !token) {
-      setIsLoaded(true)
-      return;
-    }
     const initializeApp = async () => {
-      try {
-        const data = await getInitiativesList();
-        dispatch(setInitiativesList(data.initiatives));
-        const namespaces = data.initiatives.map(
-          ({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate)
-        )
-        await initI18n(namespaces);
-      } catch {
-        await initI18n([])
-      } finally {
-        setIsLoaded(true)
+      if (!isAuthenticated || !token) {
+        await initI18n([]).finally(() => setIsLoaded(true))
+      } else {
+        try {
+          const data = await getInitiativesList();
+          dispatch(setInitiativesList(data.initiatives));
+          const namespaces = data.initiatives.map(
+            ({ initiativeName, startDate }) => buildNamespaceKey(initiativeName, startDate)
+          )
+          await initI18n(namespaces);
+        } catch {
+          await initI18n([])
+        } finally {
+          setIsLoaded(true)
+        }
       }
     }
     initializeApp();
@@ -69,15 +69,15 @@ function App() {
     location.pathname !== ROUTES.TOS
   ) {
     return (
-        <TOSAcceptance
-          acceptTOS={acceptTOS}
-          privacyRoute={ROUTES.PRIVACY_POLICY}
-          tosRoute={ROUTES.TOS}
-          firstAcceptance={firstAcceptance}
-        />
+      <TOSAcceptance
+        acceptTOS={acceptTOS}
+        privacyRoute={ROUTES.PRIVACY_POLICY}
+        tosRoute={ROUTES.TOS}
+        firstAcceptance={firstAcceptance}
+      />
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Routes>

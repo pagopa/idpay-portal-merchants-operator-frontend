@@ -1,6 +1,6 @@
 import { Box, Grid, Link } from '@mui/material';
-import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 import ROUTES from '../../routes';
+import { useTranslation } from 'react-i18next';
 
 interface OneTrustContentWrapperProps {
   idSelector: string;
@@ -9,7 +9,7 @@ interface OneTrustContentWrapperProps {
 const OneTrustContentWrapper = ({
   idSelector,
 }: OneTrustContentWrapperProps) => {
-  const { t } = useScopedTranslation();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -23,7 +23,7 @@ const OneTrustContentWrapper = ({
         ></Grid>
         <Grid sx={{ display: 'grid', gridColumn: 'span 10', mt: 5, justifyContent: 'center' }}>
           <Link underline="hover" href={ROUTES.HOME}>
-            {t('pages.tos.backHome')}
+            {t('commons.pages.tos.backHome')}
           </Link>
         </Grid>
       </Box>

@@ -1,13 +1,12 @@
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { FooterPostLogin, FooterLegal } from '@pagopa/mui-italia';
 import { CONFIG } from '@pagopa/selfcare-common-frontend/lib/config/env';
 import ROUTES from '../../routes';
-import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 const openExternalLink = (url: string) => window.open(url, '_blank')?.focus();
 
 export const CustomFooter = () => {
-  const { t } = useScopedTranslation();
+  const { t } = useTranslation();
 
   const companyLegalInfo = (
     <Trans i18nKey="commons.footer.legalInfoText">
