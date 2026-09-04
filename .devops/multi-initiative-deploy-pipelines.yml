@@ -65,6 +65,11 @@ variables:
     vite_api_url: '$(UAT_VITE_API_URL)'
     vite_initiative_id: '$(UAT_VITE_INITIATIVE_ID)'
 
+    # MIXPANEL TEST
+    vite_mixpanel_enable: 'true'
+    vite_mixpanel_debug: 'true'
+    vite_mixpanel_token: '$(UAT_MIXPANEL_TOKEN)'
+
 
   ${{ elseif eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
     environment: 'PROD'
@@ -113,6 +118,11 @@ variables:
     #API ENV
     vite_api_url: '$(PROD_VITE_API_URL)'
     vite_initiative_id: '$(PROD_VITE_INITIATIVE_ID)'
+
+    # MIXPANEL TEST
+    vite_mixpanel_enable: 'false'
+    vite_mixpanel_debug: 'false'
+    vite_mixpanel_token: '$(PROD_MIXPANEL_TOKEN)'
 
 
   # every branch different from past will be considered as DEV
@@ -165,6 +175,11 @@ variables:
     #API ENV
     vite_api_url: '$(DEV_VITE_API_URL)'
     vite_initiative_id: '$(DEV_VITE_INITIATIVE_ID)'
+
+    # MIXPANEL TEST
+    vite_mixpanel_enable: 'true'
+    vite_mixpanel_debug: 'true'
+    vite_mixpanel_token: '$(DEV_MIXPANEL_TOKEN)'
     
     
 # Automatically triggered on PR
@@ -283,6 +298,12 @@ stages:
               VITE_ONE_TRUST_PRIVACY_POLICY_NOTICE_ID: $(vite_one_trust_privacy_policy_notice_id)
 
               VITE_CSV_LINK: $(react_app_csv_link)
+
+              # MIXPANEL TEST
+              VITE_MIXPANEL_ENABLE: '$(vite_mixpanel_enable)'
+              VITE_MIXPANEL_DEBUG: '$(vite_mixpanel_debug)'
+              VITE_MIXPANEL_TOKEN: '$(vite_mixpanel_token)'
+              VITE_MIXPANEL_API_HOST: 'https://api-eu.mixpanel.com'
 
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
