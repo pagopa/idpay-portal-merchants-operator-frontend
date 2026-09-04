@@ -6,6 +6,12 @@ import useTCAgreement from './useTCAgreement';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { useAppSelector } from '../redux/hooks';
 import { getPortalConsent, savePortalConsent } from '../services/rolePermissionService';
+import { useAuth } from '../contexts/AuthContext';
+
+vi.mock('../contexts/AuthContext.tsx', () => ({
+  useAuth: vi.fn(),
+}));
+
 const mockCommonHooks = () => {
   const mockAddError = vi.fn();
 
@@ -67,6 +73,10 @@ describe('useTCAgreement', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      token: 'fake-jwt-token',
+    } as any);
     const mocks = mockCommonHooks();
     mockAddError = mocks.mockAddError;
   });
