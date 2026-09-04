@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import keycloak from '../config/keycloak';
 import type { ReactNode } from 'react';
-import type { JwtUser } from '../utils/types';
+import type { LoggedUser } from '../utils/types';
 import { authStore } from '../store/authStore';
 import axios from 'axios';
+import { JwtUser } from '@pagopa/mui-italia/components/HeaderAccount';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: JwtUser | null;
+  user?: JwtUser;
   token: string | null;
   login: () => void;
   logout: () => void;
@@ -22,7 +23,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<JwtUser | null>(null);
+  const [user, setUser] = useState<AuthContextType["user"]>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -61,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(true);
           setToken(keycloak.token || null);
           try {
-            const response = await axios.get(
+            const { data }: { data: LoggedUser } = await axios.get(
               `${keycloak.authServerUrl}/realms/${import.meta.env.VITE_KEYCLOAK_REALM
               }/protocol/openid-connect/userinfo`,
               {
@@ -70,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 },
               }
             );
-            setUser(response.data);
+            setUser({id: data?.sub, name: data?.name, email: data?.email});
           } catch {
             keycloak.logout();
           }

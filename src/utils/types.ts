@@ -12,10 +12,15 @@ export interface JwtUser {
 }
 
 export interface LoggedUser {
-  id: string;
-  name?: string;
-  email?: string;
-  surname?: string;
+    sub: string,
+    email_verified: boolean,
+    name: string,
+    merchant_id: string,
+    preferred_username: string,
+    given_name: string,
+    family_name: string,
+    email: string,
+    point_of_sale_id: string
 }
 
 export interface GetProductsParams {

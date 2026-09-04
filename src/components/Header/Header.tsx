@@ -1,54 +1,33 @@
-import type { ProductEntity } from '@pagopa/mui-italia';
 import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
-import type { DecodedJwtToken, LoggedUser } from '../../utils/types';
-import { useAuth } from '../../contexts/AuthContext';
+import type { DecodedJwtToken } from '../../utils/types';
 import keycloak from '../../config/keycloak';
 import { jwtDecode } from 'jwt-decode';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
 import { useEffect, useState } from 'react';
 import { authStore } from '../../store/authStore.ts';
-import { useScopedTranslation } from '../../hooks/useScopedTranslation.ts';
-interface HeaderProps {
-  userProps?: LoggedUser & { merchant_id?: string };
-}
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext.tsx';
 
-const Header = ({ userProps }: HeaderProps) => {
-  const { user } = userProps ? { user: userProps } : useAuth();
-  const token = authStore.getState().token;
+const Header = () => {
+  const { user } = useAuth()
+  const token = authStore((state) => state.token);
   const [franchiseName, setFranchiseName] = useState<string>('');
-  const {t} = useScopedTranslation()
-
-  const loggedUser: LoggedUser = {
-    id: userProps ? userProps.id : user.id,
-    email: userProps ? userProps.email : user.email,
-  };
-  const fetchDetails = async (user: any) => {
-    const decodeToken: DecodedJwtToken = jwtDecode(token);
-    getPointOfSaleDetails(user.merchant_id, decodeToken?.point_of_sale_id).then((response) =>
-      setFranchiseName(response?.franchiseName || '')
-    );
-  };
-
+  const { t } = useTranslation()
+  
   useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const decodeToken: DecodedJwtToken = jwtDecode(token);
+        const response = await getPointOfSaleDetails(decodeToken?.merchant_id, decodeToken?.point_of_sale_id)
+        setFranchiseName(response?.franchiseName || '')
+      } catch {
+        setFranchiseName('')
+      }
+    };
     if (user && token) {
-      fetchDetails(user);
+      fetchDetails();
     }
   }, [user, token]);
-
-  const welfareProduct: ProductEntity = {
-    id: 'prod-idpay-merchants',
-    title: t('commons.headerTitle'),
-    productUrl: 'test',
-    linkType: 'internal',
-  };
-
-  const activeProducts = [
-    {
-      id: welfareProduct.id,
-      title: welfareProduct.title,
-      publicUrl: welfareProduct.productUrl,
-    },
-  ];
 
   return (
     <>
@@ -59,22 +38,20 @@ const Header = ({ userProps }: HeaderProps) => {
           ariaLabel: 'PagoPA S.p.A.',
           title: 'PagoPA S.p.A.',
         }}
-        loggedUser={loggedUser}
+        loggedUser={user}
         onDocumentationClick={() => window.open(import.meta.env.VITE_MANUAL_LINK || '', '_blank')}
         onAssistanceClick={() => window.open(import.meta.env.VITE_ASSISTANCE || '', '_blank')}
-        onLogin={() => {}}
-        onLogout={() => {
-          keycloak.logout();
-        }}
+        onLogout={() => keycloak.logout()}
+        onLogin={() => keycloak.login()}
       />
 
       <HeaderProduct
-        productsList={activeProducts.map((p) => ({
-          id: p.id,
-          title: p.title,
-          productUrl: p.publicUrl,
+        productsList={[{
+          id: 'prod-idpay-merchants',
+          title: t('commons.headerTitle'),
+          productUrl: 'test',
           linkType: 'internal',
-        }))}
+        }]}
         partyList={[
           {
             id: 'party-idpay-merchants',

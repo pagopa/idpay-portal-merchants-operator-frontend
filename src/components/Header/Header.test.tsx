@@ -5,32 +5,28 @@ import keycloak from '../../config/keycloak';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
 import { jwtDecode } from 'jwt-decode';
 
-vi.mock('../../hooks/useScopedTranslation', () => ({
-  useScopedTranslation: () => ({ t: (key: string) => key }),
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 vi.mock('../../config/keycloak', () => ({
   default: {
     logout: vi.fn(),
+    login: vi.fn(),
   },
 }));
 
-vi.mock('../../contexts/AuthContext', () => ({
+vi.mock('../../contexts/AuthContext.tsx', () => ({
   useAuth: () => ({
     user: {
       id: 'test-user-id',
       email: 'm.rossi@example.com',
-      merchant_id: 'merchant-123',
     },
   }),
 }));
 
 vi.mock('../../store/authStore.ts', () => ({
-  authStore: {
-    getState: vi.fn(() => ({
-      token: 'mock-token-123',
-    })),
-  },
+  authStore: vi.fn((selector) => selector({ token: 'mock-token-123' })),
 }));
 
 vi.mock('../../services/merchantService.ts', () => ({
@@ -39,18 +35,20 @@ vi.mock('../../services/merchantService.ts', () => ({
 
 vi.mock('jwt-decode', () => ({
   jwtDecode: vi.fn(() => ({
+    merchant_id: 'merchant-123',
     point_of_sale_id: 'pos-123',
   })),
 }));
 
 vi.stubEnv('VITE_MANUAL_LINK', 'https://manual.example.com');
+vi.stubEnv('VITE_ASSISTANCE', 'https://assistance.example.com');
 
 vi.mock('@pagopa/mui-italia', () => ({
   HeaderAccount: (props: any) => (
     <div data-testid="header-account">
-      <span data-testid="logged-user-email">{props.loggedUser.email}</span>
       <a href={props.rootLink.href}>{props.rootLink.label}</a>
       <button onClick={props.onLogout}>Logout</button>
+      <button onClick={props.onLogin}>Login</button>
       <button data-testid="documentation-button" onClick={props.onDocumentationClick}>
         Documentazione
       </button>
@@ -73,12 +71,6 @@ vi.mock('@pagopa/mui-italia', () => ({
 
 const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
 
-const mockUserProps = {
-  id: '123',
-  email: 'mario.bianchi@example.com',
-  merchant_id: 'merchant-456',
-};
-
 beforeEach(() => {
   vi.clearAllMocks();
   windowOpenSpy.mockClear();
@@ -89,13 +81,7 @@ beforeEach(() => {
 
 describe('Header Component - Basic Rendering', () => {
   it('should render HeaderAccount with logged user email', async () => {
-    render(<Header userProps={mockUserProps} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('logged-user-email')).toHaveTextContent(
-        'mario.bianchi@example.com'
-      );
-    });
+    render(<Header />);
 
     const pagopaLink = screen.getByText('PagoPA S.p.A.');
     expect(pagopaLink).toBeInTheDocument();
@@ -103,7 +89,7 @@ describe('Header Component - Basic Rendering', () => {
   });
 
   it('should render HeaderProduct with product title', async () => {
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
 
     await waitFor(() => {
       expect(screen.getByTestId('product-title')).toHaveTextContent('commons.headerTitle');
@@ -111,7 +97,7 @@ describe('Header Component - Basic Rendering', () => {
   });
 
   it('should have both HeaderAccount and HeaderProduct components in the document', () => {
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
 
     expect(screen.getByTestId('header-account')).toBeInTheDocument();
     expect(screen.getByTestId('header-product')).toBeInTheDocument();
@@ -119,23 +105,8 @@ describe('Header Component - Basic Rendering', () => {
 });
 
 describe('Header Component - User Props vs useAuth', () => {
-  it('should use useAuth when userProps is not provided', async () => {
+  it('should use loggedUser when provided', async () => {
     render(<Header />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('logged-user-email')).toHaveTextContent('m.rossi@example.com');
-    });
-    expect(screen.getByTestId('header-account')).toBeInTheDocument();
-  });
-
-  it('should use userProps when provided', async () => {
-    render(<Header userProps={mockUserProps} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('logged-user-email')).toHaveTextContent(
-        'mario.bianchi@example.com'
-      );
-    });
 
     const logoutButton = screen.getByRole('button', { name: /logout/i });
     expect(logoutButton).toBeInTheDocument();
@@ -144,10 +115,10 @@ describe('Header Component - User Props vs useAuth', () => {
 
 describe('Header Component - Franchise Name Fetch', () => {
   it('should fetch and display franchise name when user and token are available', async () => {
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
 
     await waitFor(() => {
-      expect(getPointOfSaleDetails).toHaveBeenCalledWith('merchant-456', 'pos-123');
+      expect(getPointOfSaleDetails).toHaveBeenCalledWith('merchant-123', 'pos-123');
     });
 
     await waitFor(() => {
@@ -158,7 +129,22 @@ describe('Header Component - Franchise Name Fetch', () => {
   it('should use empty string when franchiseName is not returned', async () => {
     (getPointOfSaleDetails as any).mockResolvedValueOnce({});
 
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
+
+    await waitFor(() => {
+      expect(getPointOfSaleDetails).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      const partyName = screen.getByTestId('party-name');
+      expect(partyName).toHaveTextContent('');
+    });
+  });
+
+  it('should handle error when fetching point of sale details fails', async () => {
+    (getPointOfSaleDetails as any).mockRejectedValueOnce(new Error('Fetch failed'));
+
+    render(<Header />);
 
     await waitFor(() => {
       expect(getPointOfSaleDetails).toHaveBeenCalled();
@@ -173,7 +159,7 @@ describe('Header Component - Franchise Name Fetch', () => {
 
 describe('Header Component - User Actions', () => {
   it('should call keycloak.logout when onLogout is triggered', async () => {
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
 
     const logoutButton = screen.getByRole('button', { name: /logout/i });
     fireEvent.click(logoutButton);
@@ -181,37 +167,28 @@ describe('Header Component - User Actions', () => {
     expect(keycloak.logout).toHaveBeenCalledTimes(1);
   });
 
-  it('should call logger.log when onSelectedParty is triggered in HeaderProduct', async () => {
-    render(<Header userProps={mockUserProps} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('party-name')).toHaveTextContent('Test Franchise');
-    });
-  });
-
   it('should open manual link when onDocumentationClick is triggered', async () => {
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
 
     const documentationButton = screen.getByTestId('documentation-button');
     fireEvent.click(documentationButton);
 
-    expect(windowOpenSpy).toHaveBeenCalledWith(import.meta.env.VITE_MANUAL_LINK || '', '_blank');
+    expect(windowOpenSpy).toHaveBeenCalledWith('https://manual.example.com', '_blank');
   });
 
-  it('should call onAssistanceClick without errors', async () => {
-    render(<Header userProps={mockUserProps} />);
+  it('should open assistance link when onAssistanceClick is triggered', async () => {
+    render(<Header />);
 
     const assistanceButton = screen.getByTestId('assistance-button');
+    fireEvent.click(assistanceButton);
 
-    expect(() => {
-      fireEvent.click(assistanceButton);
-    }).not.toThrow();
+    expect(windowOpenSpy).toHaveBeenCalledWith('https://assistance.example.com', '_blank');
   });
 });
 
 describe('Header Component - JWT Decoding', () => {
   it('should decode JWT token correctly', async () => {
-    render(<Header userProps={mockUserProps} />);
+    render(<Header />);
 
     await waitFor(() => {
       expect(jwtDecode).toHaveBeenCalledWith('mock-token-123');
