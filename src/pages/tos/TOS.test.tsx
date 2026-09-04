@@ -26,7 +26,7 @@ describe('TOS component', () => {
     render(<TOS />);
 
     const notice = document.querySelector('.otnotice');
-    const backHomeLink = screen.getByRole('link', { name: 'Torna alla home' });
+    const backHomeLink = screen.getByRole('link', { name: 'commons.pages.tos.backHome' });
 
     expect(notice).toBeTruthy();
     expect(notice?.classList.contains('otnotice')).toBe(true);
