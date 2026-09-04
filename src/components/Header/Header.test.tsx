@@ -19,8 +19,7 @@ vi.mock('../../config/keycloak', () => ({
 vi.mock('../../contexts/AuthContext.tsx', () => ({
   useAuth: () => ({
     user: {
-      id: 'test-user-id',
-      email: 'm.rossi@example.com',
+      merchant_id: 'merchant-123',
     },
   }),
 }));
@@ -35,7 +34,6 @@ vi.mock('../../services/merchantService.ts', () => ({
 
 vi.mock('jwt-decode', () => ({
   jwtDecode: vi.fn(() => ({
-    merchant_id: 'merchant-123',
     point_of_sale_id: 'pos-123',
   })),
 }));

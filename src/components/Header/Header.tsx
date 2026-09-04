@@ -1,9 +1,9 @@
-import { HeaderAccount, HeaderProduct } from '@pagopa/mui-italia';
+import { HeaderAccount, HeaderProduct, JwtUser } from '@pagopa/mui-italia';
 import type { DecodedJwtToken } from '../../utils/types';
 import keycloak from '../../config/keycloak';
 import { jwtDecode } from 'jwt-decode';
 import { getPointOfSaleDetails } from '../../services/merchantService.ts';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { authStore } from '../../store/authStore.ts';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext.tsx';
@@ -13,12 +13,16 @@ const Header = () => {
   const token = authStore((state) => state.token);
   const [franchiseName, setFranchiseName] = useState<string>('');
   const { t } = useTranslation()
-  
+
+  const loggedUser: JwtUser | false = useMemo(() => (user ?
+    { id: user?.sub, name: user?.given_name, surname: user?.family_name, email: user?.email } :
+    false), [user])
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         const decodeToken: DecodedJwtToken = jwtDecode(token);
-        const response = await getPointOfSaleDetails(decodeToken?.merchant_id, decodeToken?.point_of_sale_id)
+        const response = await getPointOfSaleDetails(user?.merchant_id, decodeToken?.point_of_sale_id)
         setFranchiseName(response?.franchiseName || '')
       } catch {
         setFranchiseName('')
@@ -38,7 +42,7 @@ const Header = () => {
           ariaLabel: 'PagoPA S.p.A.',
           title: 'PagoPA S.p.A.',
         }}
-        loggedUser={user}
+        loggedUser={loggedUser}
         onDocumentationClick={() => window.open(import.meta.env.VITE_MANUAL_LINK || '', '_blank')}
         onAssistanceClick={() => window.open(import.meta.env.VITE_ASSISTANCE || '', '_blank')}
         onLogout={() => keycloak.logout()}

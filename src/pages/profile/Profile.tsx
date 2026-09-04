@@ -7,13 +7,14 @@ import { getPointOfSaleDetails } from '../../services/merchantService';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
 import { authStore } from '../../store/authStore';
+import { useAuth } from '../../contexts/AuthContext';
 import AlertComponent from '../../components/Alert/AlertComponent';
 
-const fetchDetails = async ({ setLoading, setErrorAlert, token }) => {
+const fetchDetails = async ({ setLoading, setErrorAlert, token, user }) => {
   const decodeToken: DecodedJwtToken = jwtDecode(token);
   setLoading(true);
   try {
-    const response = await getPointOfSaleDetails(decodeToken.merchant_id, decodeToken?.point_of_sale_id);
+    const response = await getPointOfSaleDetails(user.merchant_id, decodeToken?.point_of_sale_id);
     return response;
   } catch {
     setErrorAlert(true);
@@ -22,11 +23,12 @@ const fetchDetails = async ({ setLoading, setErrorAlert, token }) => {
   }
 };
 
-const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token }) => {
+const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user }) => {
   const response = await fetchDetails({
     setLoading,
     setErrorAlert,
-    token
+    token,
+    user,
   });
 
   const mappedResponse = [
@@ -52,6 +54,7 @@ const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token }) => 
 };
 
 const Profile = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState();
   const [errorAlert, setErrorAlert] = useState(false);
@@ -60,9 +63,9 @@ const Profile = () => {
 
   useEffect(() => {
     if (!details) {
-      mapResponse({ setLoading, setErrorAlert, setDetails, token });
+      mapResponse({ setLoading, setErrorAlert, setDetails, token, user });
     }
-  }, [token, details]);
+  }, [token, user, details]);
 
   useEffect(() => {
     if (errorAlert) {

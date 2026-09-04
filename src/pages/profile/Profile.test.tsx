@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import Profile from './Profile';
+import { useAuth } from '../../contexts/AuthContext';
 import { authStore } from '../../store/authStore';
 import { getPointOfSaleDetails } from '../../services/merchantService';
 import { jwtDecode } from 'jwt-decode';
@@ -47,32 +48,35 @@ vi.mock('../../components/Alert/AlertComponent', () => ({
 }));
 
 const mockToken = 'mock-jwt-token';
-const mockMerchantId = 'merchant-123';
+const mockUserId = 'merchant-123';
 const mockPointOfSaleId = 'pos-456';
 
 const mockDecodedToken = {
-  merchant_id: mockMerchantId,
   point_of_sale_id: mockPointOfSaleId,
 };
 
 const mockUserDetails = {
   isAuthenticated: true,
+  user: {
+    merchant_id: mockUserId,
+  },
   token: mockToken,
   login: vi.fn(),
   logout: vi.fn(),
   loading: false,
-};
+} as ReturnType<typeof useAuth>;
 
 const mockAuthState = {
   token: mockToken,
   isAuthenticated: true,
+  user: mockUserDetails.user,
   logoutFn: null,
   setJwtToken: vi.fn(),
   setLogout: vi.fn(),
   executeLogout: vi.fn(),
   setUser: vi.fn(),
   clearToken: vi.fn(),
-};
+} as ReturnType<typeof authStore.getState>;
 
 const mockResponse = {
   id: 'POS123',
@@ -87,12 +91,15 @@ const mockResponse = {
   contactEmail: 'contatto@test.it',
 };
 
+const mockUseAuth = vi.mocked(useAuth);
 const mockGetState = vi.mocked(authStore.getState);
 const mockJwtDecode = vi.mocked(jwtDecode);
 const mockGetPointOfSaleDetails = vi.mocked(getPointOfSaleDetails);
 
 beforeEach(() => {
   vi.useRealTimers();
+
+  mockUseAuth.mockReturnValue(mockUserDetails);
   mockGetState.mockReturnValue(mockAuthState);
   mockJwtDecode.mockReturnValue(mockDecodedToken);
   mockGetPointOfSaleDetails.mockResolvedValue(mockResponse);
@@ -116,7 +123,7 @@ describe('Profile Component (Vitest)', () => {
     });
 
     expect(jwtDecode).toHaveBeenCalledWith(mockToken);
-    expect(getPointOfSaleDetails).toHaveBeenCalledWith(mockMerchantId, mockPointOfSaleId);
+    expect(getPointOfSaleDetails).toHaveBeenCalledWith(mockUserId, mockPointOfSaleId);
 
     expect(screen.getByTestId('details-card-dati-punto-vendita')).toBeInTheDocument();
     expect(screen.getByTestId('details-card-dati-referente')).toBeInTheDocument();
