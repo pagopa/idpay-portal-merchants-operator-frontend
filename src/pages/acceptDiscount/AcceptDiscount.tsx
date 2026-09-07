@@ -49,6 +49,7 @@ const AcceptDiscount = () => {
   const [productsList, setProductsList] = useState<unknown[]>([]);
   const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
+  const [errorAlertMessage, setErrorAlertMessage] = useState('pages.acceptDiscount.errorAlert');
   const [previewIsLoading, setPreviewIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -116,15 +117,22 @@ const AcceptDiscount = () => {
         setPreviewIsLoading(false);
         navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
       } catch (error) {
+        const errorCode = error?.response?.data?.code;
+
         if (
-          error?.response?.data?.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
-          error?.response?.data?.code === 'PAYMENT_ALREADY_AUTHORIZED'
+          errorCode === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
+          errorCode === 'PAYMENT_ALREADY_AUTHORIZED'
         ) {
           const errors: Record<string, boolean> = {};
           errors.discountCodeWrong = true;
           setFieldErrors(errors);
           setPreviewIsLoading(false);
         } else {
+          setErrorAlertMessage(
+            errorCode === 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS'
+              ? 'pages.acceptDiscount.invalidDiscountCode'
+              : 'pages.acceptDiscount.errorAlert'
+          );
           setErrorAlert(true);
           setPreviewIsLoading(false);
         }
@@ -344,7 +352,7 @@ const AcceptDiscount = () => {
         isOpen={errorAlert}
         contentStyle={{ right: '20px' }}
         error
-        message={t('pages.acceptDiscount.errorAlert')}
+        message={t(errorAlertMessage)}
       />
     </>
   );
