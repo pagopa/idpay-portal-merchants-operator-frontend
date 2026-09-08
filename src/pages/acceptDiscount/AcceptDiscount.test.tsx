@@ -222,6 +222,64 @@ describe('AcceptDiscount Component', () => {
     });
   });
 
+  it('displays specific alert message on PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS', async () => {
+    const errorResponse = {
+      response: {
+        data: {
+          code: 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS',
+        },
+      },
+    };
+    vi.mocked(previewPayment).mockRejectedValueOnce(errorResponse);
+
+    render(<AcceptDiscount />);
+
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Sample Item' } });
+
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[1], { target: { value: '10,00' } });
+    fireEvent.change(inputs[2], { target: { value: 'ANY_CODE' } });
+
+    const submitBtn = screen.getByRole('button', { name: 'commons.continueBtn' });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('alert-component')).toHaveTextContent(
+        'pages.acceptDiscount.invalidDiscountCode'
+      );
+    });
+  });
+
+  it('falls back to generic alert for unhandled previewPayment error codes', async () => {
+    const errorResponse = {
+      response: {
+        data: {
+          code: 'SOME_UNHANDLED_ERROR',
+        },
+      },
+    };
+    vi.mocked(previewPayment).mockRejectedValueOnce(errorResponse);
+
+    render(<AcceptDiscount />);
+
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    fireEvent.change(autocompleteInput, { target: { value: 'Sample Item' } });
+
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[1], { target: { value: '10,00' } });
+    fireEvent.change(inputs[2], { target: { value: 'ANY_CODE' } });
+
+    const submitBtn = screen.getByRole('button', { name: 'commons.continueBtn' });
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('alert-component')).toHaveTextContent(
+        'pages.acceptDiscount.errorAlert'
+      );
+    });
+  });
+
   it('displays generic error alert on previewPayment system error', async () => {
     vi.mocked(previewPayment).mockRejectedValueOnce(new Error('Internal error'));
 
