@@ -1,8 +1,12 @@
 import mixpanel, {
+  BeforeSendHookPayload,
+  Dict,
   type AutocaptureConfig,
   type Config,
   type Mixpanel,
 } from 'mixpanel-browser';
+import { store } from '../redux/store';
+import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
 
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLE === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
@@ -28,13 +32,24 @@ const MIXPANEL_CONFIG: Partial<Config> = {
   autocapture: AUTOCAPTURE_CONFIG,
   ip: false,
   property_blacklist: [
+    '$url',
     '$current_url',
     '$initial_referrer',
     '$referrer',
     'current_url_search',
+    'current_url_path',
+    '$pathname'
   ],
   record_sessions_percent: 0,
   record_heatmap_data: false,
+  hooks: {
+    before_send_events: (event: BeforeSendHookPayload) => {
+      const state = store.getState()
+      const initiativeId = currentInitiativeIdSelector(state)
+      const initiative = currentInitiativeSelector(state, initiativeId)
+      return { ...event, properties: { ...event.properties, initiativeId, initiativeName: initiative?.initiativeName}}
+    }
+  }
 };
 
 let analyticsInstance: Mixpanel | undefined;
@@ -75,5 +90,13 @@ export const disableAnalytics = () => {
   if (analyticsInstance && analyticsActive) {
     analyticsInstance.opt_out_tracking();
     analyticsActive = false;
+  }
+};
+
+export const trackAnalytics = (eventName: string, props?: Dict) => {
+  if (!mixpanelEnabled) return;
+
+  if (analyticsInstance && analyticsActive) {
+    analyticsInstance.track(eventName, props);
   }
 };
