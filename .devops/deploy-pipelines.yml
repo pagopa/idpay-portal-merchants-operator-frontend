@@ -119,8 +119,8 @@ variables:
     vite_initiative_id: '$(PROD_VITE_INITIATIVE_ID)'
 
     # MIXPANEL
-    vite_mixpanel_enable: 'PROD_MIXPANEL_ENABLE'
-    vite_mixpanel_debug: 'PROD_MIXPANEL_DEBUG'
+    vite_mixpanel_enable: '$(PROD_MIXPANEL_ENABLE)'
+    vite_mixpanel_debug: '$(PROD_MIXPANEL_DEBUG)'
     vite_mixpanel_token: '$(PROD_MIXPANEL_TOKEN)'
 
   # every branch different from past will be considered as DEV
@@ -175,8 +175,8 @@ variables:
     vite_initiative_id: '$(DEV_VITE_INITIATIVE_ID)'
     
     # MIXPANEL
-    vite_mixpanel_enable: 'DEV_MIXPANEL_ENABLE'
-    vite_mixpanel_debug: 'DEV_MIXPANEL_DEBUG'
+    vite_mixpanel_enable: '$(DEV_MIXPANEL_ENABLE)'
+    vite_mixpanel_debug: '$(DEV_MIXPANEL_DEBUG)'
     vite_mixpanel_token: '$(DEV_MIXPANEL_TOKEN)'
     
 # Automatically triggered on PR
