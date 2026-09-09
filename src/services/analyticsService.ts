@@ -11,6 +11,16 @@ import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLE === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
 
+const eventNamesMap = {
+  couponAcceptanceUXStartFlow: 'IDPAY_COUPON_ACCEPTANCE_UX_START_FLOW',
+  couponInvalidCodeError: 'IDPAY_COUPON_INVALID_CODE_ERROR',
+  couponAcceptanceUXConversion: 'IDPAY_COUPON_ACCEPTANCE_UX_CONVERSION',
+  couponAcceptanceError: 'IDPAY_COUPON_ACCEPTANCE_ERROR',
+  couponPaymentUXSuccess: 'IDPAY_COUPON_PAYMENT_UX_SUCCESS',
+  UXLoadInvoiceStartFlow: 'IDPAY_UX_LOAD_INVOICE_START_FLOW',
+  loadInvoiceUXSuccess: 'IDPAY_LOAD_INVOICE_UX_SUCCESS'
+}
+
 const AUTOCAPTURE_CONFIG: AutocaptureConfig = {
   pageview: 'url-with-path',
   click: true,
@@ -47,7 +57,7 @@ const MIXPANEL_CONFIG: Partial<Config> = {
       const state = store.getState()
       const initiativeId = currentInitiativeIdSelector(state)
       const initiative = currentInitiativeSelector(state, initiativeId)
-      return { ...event, properties: { ...event.properties, initiativeId, initiativeName: initiative?.initiativeName}}
+      return { ...event, properties: { ...event.properties, initiative_id: initiativeId, initiative_name: initiative?.initiativeName}}
     }
   }
 };
@@ -93,10 +103,10 @@ export const disableAnalytics = () => {
   }
 };
 
-export const trackAnalytics = (eventName: string, props?: Dict) => {
+export const trackAnalytics = (eventName: keyof typeof eventNamesMap, props?: Dict) => {
   if (!mixpanelEnabled) return;
 
   if (analyticsInstance && analyticsActive) {
-    analyticsInstance.track(eventName, props);
+    analyticsInstance.track(eventNamesMap[eventName], props);
   }
 };

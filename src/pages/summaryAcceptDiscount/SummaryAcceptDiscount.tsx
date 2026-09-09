@@ -23,6 +23,7 @@ import { utilsStore } from '../../store/utilsStore';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
+import { trackAnalytics } from '../../services/analyticsService';
 
 const SummaryAcceptDiscount = () => {
   const {initiativeId} = useParams();
@@ -54,9 +55,11 @@ const SummaryAcceptDiscount = () => {
       setAuthorizeIsLoading(false);
       setTransactionAuthorized(true);
       navigate(generatePath(ROUTES.BUY_MANAGEMENT, {initiativeId: initiativeId}));
+      trackAnalytics("couponAcceptanceUXConversion")
     } catch {
       setErrorAlert(true);
       setAuthorizeIsLoading(false);
+      trackAnalytics("couponAcceptanceError")
     }
   };
 
