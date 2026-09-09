@@ -16,10 +16,14 @@ vi.mock('../../redux/hooks', () => ({
   useAppSelector: vi.fn((selectorFn) => selectorFn({})),
 }));
 
-vi.mock('../../redux/slices/initiativesSlice', () => ({
-  initiativesListSelector: vi.fn(),
-  currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' })),
-}));
+vi.mock('../../redux/slices/initiativesSlice', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    initiativesListSelector: vi.fn(),
+    currentInitiativeSelector: vi.fn(() => ({ status: 'PUBLISHED' }))
+  }
+});
 
 vi.mock('../../hooks/useInitiativeStatusAction', () => ({
   useInitiativeStatusAction: vi.fn(),
