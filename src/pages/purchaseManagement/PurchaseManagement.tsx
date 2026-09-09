@@ -172,7 +172,7 @@ const PurchaseManagement = () => {
               trackAnalytics("couponAcceptanceUXStartFlow")
             }
           },
-          className: '.mp-no-track'
+          className: 'mp-no-track'
         }}
         isAlertVisible={openDrawer}
         transactionsApi={getInProgressTransactions}
@@ -226,7 +226,7 @@ const PurchaseManagement = () => {
               variant: "contained",
               fullWidth: true,
               disabled: !isActionPermitted,
-              className: selectedTransaction?.status !== 'AUTHORIZED' ? '.mp-no-track' : '',
+              className: selectedTransaction?.status !== 'AUTHORIZED' ? 'mp-no-track' : '',
               onClick: () => {
                 if(isActionPermitted) {
                   if(selectedTransaction?.status === 'AUTHORIZED') {
