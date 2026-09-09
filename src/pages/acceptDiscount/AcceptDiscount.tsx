@@ -22,6 +22,7 @@ import AlertComponent from '../../components/Alert/AlertComponent';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import EuroIcon from '@mui/icons-material/Euro';
 import ROUTES from '../../routes';
+import { trackAnalytics } from '../../services/analyticsService';
 
 interface FormData {
   product: ProductDTO | null;
@@ -84,61 +85,50 @@ const AcceptDiscount = () => {
   };
 
   const handleValidateData = async () => {
-    const errors: Record<string, boolean> = {};
-    let isValid = true;
-
-    if (!formData.product) {
-      errors.product = true;
-      isValid = false;
+    const errors = {
+      ...(!formData.product && { product: true }),
+      ...(!formData.discountCode && { discountCode: true }),
+      ...(!formData.totalAmount && { totalAmount: true }),
     }
-    if (!formData.totalAmount) {
-      errors.totalAmount = true;
-      isValid = false;
+    const isValid = !Object.keys(errors).length
+    setFieldErrors(errors)
+    if (!isValid) {
+      trackAnalytics("couponInvalidCodeError", { reason: `Empty fields: ${Object.keys(errors)}` })
+      return
     }
-    if (!formData.discountCode) {
-      errors.discountCode = true;
-      isValid = false;
-    }
-
-    setFieldErrors(errors);
-    if (isValid) {
-      setPreviewIsLoading(true);
-      try {
-        const response = await previewPayment(initiativeId, {
-          productGtin: formData.product!.gtinCode!,
-          productName: formData.product!.productName!,
-          amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100),
-          discountCode: formData.discountCode.trim()!,
-        });
-        sessionStorage.setItem(
-          'discountCoupon',
-          JSON.stringify({ ...response, product: formData.product })
-        );
+    setPreviewIsLoading(true);
+    try {
+      const response = await previewPayment(initiativeId, {
+        productGtin: formData.product!.gtinCode!,
+        productName: formData.product!.productName!,
+        amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100),
+        discountCode: formData.discountCode.trim()!,
+      });
+      sessionStorage.setItem(
+        'discountCoupon',
+        JSON.stringify({ ...response, product: formData.product })
+      );
+      navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
+    } catch (error) {
+      const errorCode = error?.response?.data?.code;
+      if (
+        errorCode === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
+        errorCode === 'PAYMENT_ALREADY_AUTHORIZED'
+      ) {
+        setFieldErrors({discountCodeWrong: true});
         setPreviewIsLoading(false);
-        navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
-      } catch (error) {
-        const errorCode = error?.response?.data?.code;
-
-        if (
-          errorCode === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
-          errorCode === 'PAYMENT_ALREADY_AUTHORIZED'
-        ) {
-          const errors: Record<string, boolean> = {};
-          errors.discountCodeWrong = true;
-          setFieldErrors(errors);
-          setPreviewIsLoading(false);
-        } else {
-          setErrorAlertMessage(
-            errorCode === 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS'
-              ? 'pages.acceptDiscount.invalidDiscountCode'
-              : 'pages.acceptDiscount.errorAlert'
-          );
-          setErrorAlert(true);
-          setPreviewIsLoading(false);
-        }
+      } else {
+        setErrorAlertMessage(
+          errorCode === 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS'
+            ? 'pages.acceptDiscount.invalidDiscountCode'
+            : 'pages.acceptDiscount.errorAlert'
+        );
+        setErrorAlert(true);
       }
+      trackAnalytics("couponInvalidCodeError", { reason: errorCode })
+    } finally {
+      setPreviewIsLoading(false);
     }
-    return isValid;
   };
 
   const handleFieldChange = (field: keyof FormData, value: string | ProductDTO): void => {

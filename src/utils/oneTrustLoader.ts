@@ -5,11 +5,14 @@ interface OneTrustNoticeApi {
 
 interface OneTrustInstance {
   NoticeApi: OneTrustNoticeApi;
+  OnConsentChanged?: (callback: () => void) => void;
 }
 
 declare global {
   interface Window {
     OneTrust?: OneTrustInstance;
+    OnetrustActiveGroups?: string;
+    OptanonWrapper?: () => void;
   }
 }
 

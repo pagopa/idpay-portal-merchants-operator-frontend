@@ -115,7 +115,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <InitiativesList />
+                <WithInitiativeGuard>
+                  <InitiativesList />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }
@@ -173,7 +175,9 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <Profile />
+                <WithInitiativeGuard>
+                  <Profile />
+                </WithInitiativeGuard>
               </Layout>
             </ProtectedRoute>
           }

@@ -11,7 +11,9 @@ import { initializeCookieOneTrust } from './utils/oneTrustLoader.ts';
 import { logger } from './utils/logger';
 import { Provider } from 'react-redux';
 import { store } from './redux/store.ts';
+import { configureAnalyticsConsent } from './consentAndAnalyticsConfiguration.ts';
 
+configureAnalyticsConsent();
 initializeCookieOneTrust().catch((err) => {
   logger.error('Failed to initialize Cookie OneTrust:', err);
 });
