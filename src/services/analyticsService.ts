@@ -8,7 +8,7 @@ import mixpanel, {
 import { store } from '../redux/store';
 import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
 
-const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLE === 'true';
+const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
 
 const eventNamesMap = {

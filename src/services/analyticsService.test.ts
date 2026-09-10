@@ -48,8 +48,8 @@ describe('Analytics Setup', () => {
   };
 
   describe('initAnalytics', () => {
-    it('should not initialize if VITE_MIXPANEL_ENABLE is not "true"', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'false');
+    it('should not initialize if VITE_MIXPANEL_ENABLED is not "true"', async () => {
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'false');
       
       const { initAnalytics } = await loadAnalyticsModule();
       initAnalytics();
@@ -58,7 +58,7 @@ describe('Analytics Setup', () => {
     });
 
     it('should log a warning and stop if VITE_MIXPANEL_TOKEN is missing', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'true');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'true');
       vi.stubEnv('VITE_MIXPANEL_TOKEN', '');
       
       const { initAnalytics } = await loadAnalyticsModule();
@@ -71,7 +71,7 @@ describe('Analytics Setup', () => {
     });
 
     it('should initialize mixpanel correctly', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'true');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'true');
       vi.stubEnv('VITE_MIXPANEL_TOKEN', 'test-token');
       
       const { initAnalytics } = await loadAnalyticsModule();
@@ -85,7 +85,7 @@ describe('Analytics Setup', () => {
     });
 
     it('should resume tracking if the user had opted out', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'true');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'true');
       vi.stubEnv('VITE_MIXPANEL_TOKEN', 'test-token');
       mockMixpanelInstance.has_opted_out_tracking.mockReturnValue(true);
       
@@ -99,7 +99,7 @@ describe('Analytics Setup', () => {
 
   describe('disableAnalytics', () => {
     it('should call opt_out_tracking if instantiated and active', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'true');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'true');
       vi.stubEnv('VITE_MIXPANEL_TOKEN', 'test-token');
       
       const { initAnalytics, disableAnalytics } = await loadAnalyticsModule();
@@ -112,7 +112,7 @@ describe('Analytics Setup', () => {
 
   describe('trackAnalytics', () => {
     it('should not track anything if mixpanel is not enabled or initialized', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'false');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'false');
       
       const { trackAnalytics } = await loadAnalyticsModule();
       trackAnalytics('couponAcceptanceUXStartFlow');
@@ -121,7 +121,7 @@ describe('Analytics Setup', () => {
     });
 
     it('should track the mapped event with correct props if active', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'true');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'true');
       vi.stubEnv('VITE_MIXPANEL_TOKEN', 'test-token');
       
       const { initAnalytics, trackAnalytics } = await loadAnalyticsModule();
@@ -139,7 +139,7 @@ describe('Analytics Setup', () => {
 
   describe('Mixpanel Config Hooks (before_send_events)', () => {
     it('should enrich event properties with Redux state', async () => {
-      vi.stubEnv('VITE_MIXPANEL_ENABLE', 'true');
+      vi.stubEnv('VITE_MIXPANEL_ENABLED', 'true');
       vi.stubEnv('VITE_MIXPANEL_TOKEN', 'test-token');
       
       const mockState = { some: 'state' };

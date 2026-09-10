@@ -66,7 +66,7 @@ variables:
     vite_initiative_id: '$(UAT_VITE_INITIATIVE_ID)'
 
     # MIXPANEL
-    vite_mixpanel_enable: '$(UAT_MIXPANEL_ENABLE)'
+    vite_mixpanel_enabled: '$(UAT_MIXPANEL_ENABLED)'
     vite_mixpanel_debug: '$(UAT_MIXPANEL_DEBUG)'
     vite_mixpanel_token: '$(UAT_MIXPANEL_TOKEN)'
 
@@ -120,7 +120,7 @@ variables:
     vite_initiative_id: '$(PROD_VITE_INITIATIVE_ID)'
 
     # MIXPANEL
-    vite_mixpanel_enable: '$(PROD_MIXPANEL_ENABLE)'
+    vite_mixpanel_enabled: '$(PROD_MIXPANEL_ENABLED)'
     vite_mixpanel_debug: '$(PROD_MIXPANEL_DEBUG)'
     vite_mixpanel_token: '$(PROD_MIXPANEL_TOKEN)'
 
@@ -177,7 +177,7 @@ variables:
     vite_initiative_id: '$(DEV_VITE_INITIATIVE_ID)'
 
     # MIXPANEL
-    vite_mixpanel_enable: '$(DEV_MIXPANEL_ENABLE)'
+    vite_mixpanel_enabled: '$(DEV_MIXPANEL_ENABLED)'
     vite_mixpanel_debug: '$(DEV_MIXPANEL_DEBUG)'
     vite_mixpanel_token: '$(DEV_MIXPANEL_TOKEN)'
     
@@ -300,7 +300,7 @@ stages:
               VITE_CSV_LINK: $(react_app_csv_link)
 
               # MIXPANEL
-              VITE_MIXPANEL_ENABLE: '$(vite_mixpanel_enable)'
+              VITE_MIXPANEL_ENABLED: '$(vite_mixpanel_enabled)'
               VITE_MIXPANEL_DEBUG: '$(vite_mixpanel_debug)'
               VITE_MIXPANEL_TOKEN: '$(vite_mixpanel_token)'
               VITE_MIXPANEL_API_HOST: 'https://api-eu.mixpanel.com'
