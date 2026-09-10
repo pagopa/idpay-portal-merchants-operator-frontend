@@ -19,6 +19,7 @@ import { downloadFileFromBase64 } from '../../utils/helpers';
 import { useScopedTranslation } from '../../hooks/useScopedTranslation'
 import { PointOfSaleTransactionDTO } from '../../api/generated/data-contracts';
 import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
+import { trackAnalytics } from '../../services/analyticsService';
 
 const PurchaseManagement = () => {
   const navigate = useNavigate();
@@ -101,6 +102,7 @@ const PurchaseManagement = () => {
       const { refundUploadSuccess, reverseUploadSuccess } = location.state;
       if (refundUploadSuccess) {
         setTransactionRefundSuccess(true);
+        trackAnalytics("loadInvoiceUXSuccess")
       }
       if (reverseUploadSuccess) {
         setTransactionReverseSuccess(true);
@@ -133,6 +135,7 @@ const PurchaseManagement = () => {
       setOpenDrawer(false);
       setTransactionCaptured(true);
       setTriggerFetchTransactions(prev => !prev);
+      trackAnalytics("couponPaymentUXSuccess")
     } catch {
       setErrorCaptureTransaction(true);
       setOpenDrawer(true);
@@ -163,7 +166,13 @@ const PurchaseManagement = () => {
           title: 'Accetta buono sconto',
           sx: { textWrap: 'nowrap' },
           startIcon: <QrCodeIcon />,
-          onClick: () => isActionPermitted && navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId })),
+          onClick: () => {
+            if (isActionPermitted) {
+              navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId }))
+              trackAnalytics("couponAcceptanceUXStartFlow")
+            }
+          },
+          className: 'mp-no-track'
         }}
         isAlertVisible={openDrawer}
         transactionsApi={getInProgressTransactions}
@@ -217,9 +226,17 @@ const PurchaseManagement = () => {
               variant: "contained",
               fullWidth: true,
               disabled: !isActionPermitted,
-              onClick: () => isActionPermitted && (selectedTransaction?.status === 'AUTHORIZED'
-                ? handleModal("capture")
-                : handleRedirect(ROUTES.REFUND)),
+              className: selectedTransaction?.status !== 'AUTHORIZED' ? 'mp-no-track' : '',
+              onClick: () => {
+                if(isActionPermitted) {
+                  if(selectedTransaction?.status === 'AUTHORIZED') {
+                    handleModal("capture")
+                  } else {
+                    handleRedirect(ROUTES.REFUND)
+                    trackAnalytics("UXLoadInvoiceStartFlow")
+                  }
+                }
+              },
               title: selectedTransaction?.status === 'AUTHORIZED'
                 ? t('pages.purchaseManagement.drawer.confirmPayment')
                 : t('pages.purchaseManagement.drawer.requestRefund')

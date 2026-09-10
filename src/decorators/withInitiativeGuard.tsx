@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ROUTES from '../routes';
-import { useAppSelector } from '../redux/hooks';
-import { currentInitiativeSelector, initiativesListSelector } from '../redux/slices/initiativesSlice';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { currentInitiativeSelector, initiativesListSelector, setCurrentInitiativeId } from '../redux/slices/initiativesSlice';
 import { matchPath, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useScopedTranslation } from '../hooks/useScopedTranslation';
 import { useInitiativeStatusAction } from '../hooks/useInitiativeStatusAction';
@@ -15,14 +15,18 @@ const WithInitiativeGuard: React.FC<Props> = ({ children }) => {
     const { initiativeId } = useParams()
     const { config } = useScopedTranslation()
     const forbiddenRoutes = config<Array<string>>('commons.permissions.closedRoutes')
+    const dispatch = useAppDispatch()
     const initiatives = useAppSelector(initiativesListSelector);
     const selectedInitiative = useAppSelector((state) => currentInitiativeSelector(state, initiativeId));
     const { isActionPermitted } = useInitiativeStatusAction(initiativeId);
     
-
     const match = (paths) => paths.find((path) => matchPath({ path }, location.pathname))
 
     const isMatched = match(forbiddenRoutes.map((route) => ROUTES?.[route]));
+
+    useEffect(() => {
+        dispatch(setCurrentInitiativeId(initiativeId))
+    }, [dispatch, initiativeId])
 
     useEffect(() => {
         if ((initiativeId && (!selectedInitiative)) || (!isActionPermitted && isMatched)) {
