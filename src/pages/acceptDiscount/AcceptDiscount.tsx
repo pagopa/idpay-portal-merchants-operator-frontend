@@ -33,8 +33,13 @@ interface FormData {
 interface FormErrors {
   product?: boolean;
   totalAmount?: boolean;
-  discountCode?: boolean;
+  discountCode?: string;
   discountCodeWrong?: boolean;
+}
+
+const errorMessage = {
+  PAYMENT_NOT_FOUND_OR_EXPIRED: 'pages.acceptDiscount.discountCodeErrors.notFound',
+  PAYMENT_ALREADY_AUTHORIZED: 'pages.acceptDiscount.discountCodeErrors.alreadyAuthorized'
 }
 
 const AcceptDiscount = () => {
@@ -87,7 +92,7 @@ const AcceptDiscount = () => {
   const handleValidateData = async () => {
     const errors = {
       ...(!formData.product && { product: true }),
-      ...(!formData.discountCode && { discountCode: true }),
+      ...(!formData.discountCode && { discountCode: REQUIRED_FIELD_ERROR }),
       ...(!formData.totalAmount && { totalAmount: true }),
     }
     const isValid = !Object.keys(errors).length
@@ -110,17 +115,14 @@ const AcceptDiscount = () => {
       );
       navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
     } catch (error) {
-      const errorCode = error?.response?.data?.code;
-      if (
-        errorCode === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
-        errorCode === 'PAYMENT_ALREADY_AUTHORIZED'
-      ) {
-        setFieldErrors({discountCodeWrong: true});
+      const errorCode: string = error?.response?.data?.code;
+      if (errorMessage?.[errorCode]) {
+        setFieldErrors({ discountCode: errorMessage?.[errorCode] });
         setPreviewIsLoading(false);
       } else {
         setErrorAlertMessage(
           errorCode === 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS'
-            ? 'pages.acceptDiscount.invalidDiscountCode'
+            ? 'pages.acceptDiscount.discountCodeErrors.notValid'
             : 'pages.acceptDiscount.errorAlert'
         );
         setErrorAlert(true);
@@ -300,14 +302,8 @@ const AcceptDiscount = () => {
                       color: '#5C6E82 !important',
                     },
                   }}
-                  error={!!fieldErrors.discountCode || !!fieldErrors.discountCodeWrong}
-                  helperText={
-                    fieldErrors.discountCode
-                      ? REQUIRED_FIELD_ERROR
-                      : fieldErrors.discountCodeWrong
-                        ? t("pages.acceptDiscount.invalidDiscountCode")
-                        : ''
-                  }
+                  error={!!fieldErrors.discountCode}
+                  helperText={t(fieldErrors.discountCode)}
                   onChange={(e) => handleFieldChange('discountCode', e.target.value)}
                 />
               </AcceptDiscountCard>
