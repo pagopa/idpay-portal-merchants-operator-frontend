@@ -51,7 +51,7 @@ const Products = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
 
-  const elencoProdottiLink = `${window.location.origin}/${initiativeName.toLowerCase().replace(' ', '')}/elencoprodotti`;
+  const elencoProdottiLink = `${window.location.origin}/${initiativeName.toLowerCase().replace(' ', '')}/elenco-prodotti`;
 
   useAutoResetBanner([[errorAlert, setErrorAlert]]);
 
