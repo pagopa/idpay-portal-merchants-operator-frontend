@@ -1,5 +1,6 @@
 import { Box, Button } from '@mui/material';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { ELEMENT_PER_PAGE } from '../../utils/constants';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -15,77 +16,91 @@ import { DynamicFilters } from '../../components/DynamicFilters/DynamicFilters';
 import { theme } from '@pagopa/mui-italia';
 import { useParams } from 'react-router-dom';
 import { plainObj } from '../../utils/helpers';
+import { useAppSelector } from '../../redux/hooks';
+import { currentInitiativeSelector } from '../../redux/slices/initiativesSlice';
 
-const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10)
+const initialPageSize = parseInt(import.meta.env.VITE_PAGINATION_SIZE, 10);
 
 const initialPagination = {
   page: 0,
-  pageSize: isNaN(initialPageSize) ? 10 : initialPageSize
-}
+  pageSize: isNaN(initialPageSize) ? 10 : initialPageSize,
+};
+
+const openExternalLink = (url: string) => window.open(url, '_blank')?.focus();
 
 const Products = () => {
   const { initiativeId } = useParams();
+  const { initiativeName } = useAppSelector((state) =>
+    currentInitiativeSelector(state, initiativeId)
+  );
   const { t, config } = useScopedTranslation();
-  const filtersDef = config<Array<FilterConfigDef>>('pages.products.productsTable.filters')
-  const fieldsDef = config<Array<FieldConfigDef>>('pages.products.drawer')
-  const columnsDef = config<Array<FieldConfigDef>>('pages.products.productsTable.columns')
+  const filtersDef = config<Array<FilterConfigDef>>('pages.products.productsTable.filters');
+  const fieldsDef = config<Array<FieldConfigDef>>('pages.products.drawer');
+  const columnsDef = config<Array<FieldConfigDef>>('pages.products.productsTable.columns');
 
   const [productsList, setProductsList] = useState([]);
   const [productsListIsLoading, setProductsListIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [page, setPage] = useState(initialPagination.page)
-  const [pageSize, setPageSize] = useState(initialPagination.pageSize)
+  const [page, setPage] = useState(initialPagination.page);
+  const [pageSize, setPageSize] = useState(initialPagination.pageSize);
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  const [totalElements, setTotalElements] = useState(0)
+  const [totalElements, setTotalElements] = useState(0);
 
   const [openDrawer, setOpenDrawer] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
 
+  const elencoProdottiLink = `${window.location.origin}/${initiativeName.toLowerCase().replace(' ', '')}/elenco-prodotti`;
+
   useAutoResetBanner([[errorAlert, setErrorAlert]]);
 
-  const mappedProductsList = useMemo(() =>
-    productsList.map((product) => {
-      const plainedProduct = plainObj(product)
-      return {
-        ...plainedProduct,
-        link: plainedProduct?.linkEprel,
-        action: {
-          icon: "arrow",
-          onClick: (row) => {
-            setOpenDrawer(true);
-            setSelectedProduct(row)
-          }
-        }
-      }
-    }),
-    [productsList])
+  const mappedProductsList = useMemo(
+    () =>
+      productsList.map((product) => {
+        const plainedProduct = plainObj(product);
+        return {
+          ...plainedProduct,
+          link: plainedProduct?.linkEprel,
+          action: {
+            icon: 'arrow',
+            onClick: (row) => {
+              setOpenDrawer(true);
+              setSelectedProduct(row);
+            },
+          },
+        };
+      }),
+    [productsList]
+  );
 
-  const fetchProducts = useCallback(async (params: GetProductsParams) => {
-    setProductsListIsLoading(true);
-    try {
-      const { content, totalElements } = await getInitiativeProductsList(initiativeId, {
-        status: 'APPROVED',
-        ...params,
-      });
-      setProductsList(content);
-      setTotalElements(totalElements)
-    } catch {
-      setErrorAlert(true);
-    } finally {
-      setProductsListIsLoading(false)
-    }
-  }, [initiativeId]);
+  const fetchProducts = useCallback(
+    async (params: GetProductsParams) => {
+      setProductsListIsLoading(true);
+      try {
+        const { content, totalElements } = await getInitiativeProductsList(initiativeId, {
+          status: 'APPROVED',
+          ...params,
+        });
+        setProductsList(content);
+        setTotalElements(totalElements);
+      } catch {
+        setErrorAlert(true);
+      } finally {
+        setProductsListIsLoading(false);
+      }
+    },
+    [initiativeId]
+  );
 
   useEffect(() => {
-    const [model] = sortModel
+    const [model] = sortModel;
     const params = {
       size: pageSize,
       page,
       ...filters,
       ...(sortModel.length ? { sort: `${model?.field},${model?.sort}` } : {}),
-    }
+    };
     fetchProducts(params);
   }, [fetchProducts, filters, page, pageSize, sortModel]);
 
@@ -110,20 +125,20 @@ const Products = () => {
         <Button
           variant="contained"
           size="small"
-          startIcon={<FileDownloadIcon />}
-          sx={{ textWrap: 'nowrap' }}
-          onClick={() => window.open(import.meta.env.VITE_CSV_LINK, '_blank')?.focus()}
+          startIcon={<OpenInNewIcon />}
+          sx={{ textWrap: 'nowrap', padding: '0 2.5em' }}
+          onClick={() => openExternalLink(elencoProdottiLink)}
         >
-          Esporta csv
+          {t('pages.products.productList')}
         </Button>
       </Box>
       <Box>
         <DynamicFilters
-          containerStyle={{ paddingY: "2rem" }}
+          containerStyle={{ paddingY: '2rem' }}
           filters={filters}
           filtersDef={filtersDef}
-          setFilters={newFilters => {
-            setPage(0)
+          setFilters={(newFilters) => {
+            setPage(0);
             setFilters(newFilters);
           }}
         />
@@ -135,15 +150,15 @@ const Products = () => {
           isEmpty={!mappedProductsList?.length}
           isLoading={productsListIsLoading}
           rows={mappedProductsList}
-          getRowId={row => row.gtinCode}
+          getRowId={(row) => row.gtinCode}
           paginationModel={{ page, pageSize }}
-          onPaginationModelChange={model => {
-            setPage(model.page)
-            setPageSize(model.pageSize)
+          onPaginationModelChange={(model) => {
+            setPage(model.page);
+            setPageSize(model.pageSize);
           }}
           rowCount={totalElements || 0}
           sortModel={sortModel}
-          sortingMode='server'
+          sortingMode="server"
           paginationMode="server"
           onSortModelChange={setSortModel}
           pageSizeOptions={ELEMENT_PER_PAGE}
