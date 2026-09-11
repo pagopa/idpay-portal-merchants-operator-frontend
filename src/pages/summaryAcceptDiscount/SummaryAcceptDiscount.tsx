@@ -26,9 +26,10 @@ import { useAutoResetBanner } from '../../hooks/useAutoResetBanner';
 import { trackAnalytics } from '../../services/analyticsService';
 
 const SummaryAcceptDiscount = () => {
-  const {initiativeId} = useParams();
+  const { initiativeId } = useParams();
   const [summaryDataObj, setSummaryDataObj] = useState<any>(null);
   const [errorAlert, setErrorAlert] = useState(false);
+  const [errorAlertMsg, setErrorAlertMsg] = useState('')
   const [authorizeIsLoading, setAuthorizeIsLoading] = useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -54,10 +55,14 @@ const SummaryAcceptDiscount = () => {
       sessionStorage.removeItem('discountCoupon');
       setAuthorizeIsLoading(false);
       setTransactionAuthorized(true);
-      navigate(generatePath(ROUTES.BUY_MANAGEMENT, {initiativeId: initiativeId}));
+      navigate(generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiativeId }));
       trackAnalytics("couponAcceptanceUXConversion")
-    } catch {
+    } catch (error) {
+      const errorCode = error?.response?.data?.code
       setErrorAlert(true);
+      setErrorAlertMsg(errorCode === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ?
+        t('pages.acceptDiscount.discountCodeErrors.notFound') :
+        t('pages.acceptDiscount.errorAlert'))
       setAuthorizeIsLoading(false);
       trackAnalytics("couponAcceptanceError")
     }
@@ -81,11 +86,11 @@ const SummaryAcceptDiscount = () => {
               items={[
                 {
                   label: t('pages.acceptDiscount.title'),
-                  path: generatePath(ROUTES.ACCEPT_DISCOUNT, {initiativeId: initiativeId}),
+                  path: generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId }),
                 },
                 {
                   label: t('pages.acceptDiscount.summary'),
-                  path: generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, {initiativeId: initiativeId}),
+                  path: generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }),
                 },
               ]}
             />
@@ -267,14 +272,14 @@ const SummaryAcceptDiscount = () => {
                       sx={{ fontWeight: theme.typography.fontWeightMedium }}
                     >
                       {summaryDataObj?.originalAmountCents ||
-                      summaryDataObj?.originalAmountCents === 0
+                        summaryDataObj?.originalAmountCents === 0
                         ? (Number(summaryDataObj?.originalAmountCents) / 100).toLocaleString(
-                            'it-IT',
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
-                          ) + ' €'
+                          'it-IT',
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        ) + ' €'
                         : MISSING_DATA_PLACEHOLDER}
                     </Typography>
                   </Grid>
@@ -294,9 +299,9 @@ const SummaryAcceptDiscount = () => {
                     >
                       {summaryDataObj?.rewardCents || summaryDataObj?.rewardCents === 0
                         ? (Number(summaryDataObj?.rewardCents) / 100).toLocaleString('it-IT', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }) + ' €'
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }) + ' €'
                         : MISSING_DATA_PLACEHOLDER}
                     </Typography>
                   </Grid>
@@ -315,14 +320,14 @@ const SummaryAcceptDiscount = () => {
                       sx={{ fontWeight: theme.typography.fontWeightMedium }}
                     >
                       {summaryDataObj?.residualAmountCents ||
-                      summaryDataObj?.residualAmountCents === 0
+                        summaryDataObj?.residualAmountCents === 0
                         ? (Number(summaryDataObj?.residualAmountCents) / 100).toLocaleString(
-                            'it-IT',
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
-                          ) + ' €'
+                          'it-IT',
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        ) + ' €'
                         : MISSING_DATA_PLACEHOLDER}
                     </Typography>
                   </Grid>
@@ -346,7 +351,7 @@ const SummaryAcceptDiscount = () => {
             </Grid>
           </Grid>
           <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={4}>
-            <Button variant="outlined" onClick={() => navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, {initiativeId: initiativeId}))}>
+            <Button variant="outlined" onClick={() => navigate(generatePath(ROUTES.ACCEPT_DISCOUNT, { initiativeId: initiativeId }))}>
               {'Indietro'}
             </Button>
             <Button variant="contained" onClick={handleAuthorizeDiscount}>
@@ -359,7 +364,7 @@ const SummaryAcceptDiscount = () => {
         isOpen={errorAlert}
         contentStyle={{ right: '20px' }}
         error
-        message={t('pages.acceptDiscount.errorAlert')}
+        message={errorAlertMsg}
       />
     </>
   );
