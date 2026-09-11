@@ -248,7 +248,11 @@
       "expenditureAmount": "Importo",
       "whatDiscountCode": "Qual è il codice sconto?",
       "discountCode": "Codice sconto",
-      "invalidDiscountCode": "Il codice non è valido",
+      "discountCodeErrors": {
+        "notValid": "Il codice non è valido",
+        "notFound": "Il codice è errato o scaduto",
+        "alreadyAuthorized": "Il codice è già stato utilizzato"
+      },
       "insertDiscountCode": "Inserisci il codice sconto generato dal cliente. Se il codice viene generato su IO, è dinamico e scade dopo 15 minuti.\nSe è scaduto, chiedi al cliente di generare un nuovo codice dall’app IO.",
       "noOptionsText": "Nessun risultato",
       "loadingText": "Caricamento...",

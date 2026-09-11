@@ -218,7 +218,7 @@ describe('AcceptDiscount Component', () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.getByText('pages.acceptDiscount.invalidDiscountCode')).toBeInTheDocument();
+      expect(screen.getByText('pages.acceptDiscount.discountCodeErrors.notFound')).toBeInTheDocument();
     });
   });
 
@@ -246,7 +246,7 @@ describe('AcceptDiscount Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('alert-component')).toHaveTextContent(
-        'pages.acceptDiscount.invalidDiscountCode'
+        'pages.acceptDiscount.discountCodeErrors.notValid'
       );
     });
   });

@@ -25,7 +25,7 @@ const drawerStyle = {
   flexDirection: "column",
   overflow: "hidden",
   maxHeight: "100vh",
-  maxWidth: 375,
+  width: 375,
   height: "100%"
 }
 
