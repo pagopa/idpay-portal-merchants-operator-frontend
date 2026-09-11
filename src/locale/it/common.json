@@ -371,6 +371,7 @@
       "subtitle": "Visualizza tutti i prodotti caricati e i dettagli.",
       "noProducts": "Non ci sono prodotti per questa iniziativa",
       "errorAlert": "Non è stato possibile recuperare i prodotti. Riprova.",
+      "productList": "Lista prodotti da scaricare",
       "drawer": {
         "subTitle": "SCHEDA PRODOTTO",
         "eprelCode": "Codice EPREL",
