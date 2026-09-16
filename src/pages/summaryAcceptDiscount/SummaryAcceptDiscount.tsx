@@ -17,7 +17,7 @@ import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { authPaymentBarCode } from '../../services/merchantService';
 import ROUTES from '../../routes';
 import { useEffect, useState } from 'react';
-import { MISSING_DATA_PLACEHOLDER } from '../../utils/constants';
+import { MISSING_DATA_PLACEHOLDER, PAYMENT_ERROR_MESSAGES } from '../../utils/constants';
 import AlertComponent from '../../components/Alert/AlertComponent';
 import { utilsStore } from '../../store/utilsStore';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -60,9 +60,7 @@ const SummaryAcceptDiscount = () => {
     } catch (error) {
       const errorCode = error?.response?.data?.code
       setErrorAlert(true);
-      setErrorAlertMsg(errorCode === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ?
-        t('pages.acceptDiscount.discountCodeErrors.notFound') :
-        t('pages.acceptDiscount.errorAlert'))
+      setErrorAlertMsg(t(PAYMENT_ERROR_MESSAGES?.[errorCode] ?? 'pages.acceptDiscount.errorAlert'))
       setAuthorizeIsLoading(false);
       trackAnalytics("couponAcceptanceError")
     }
