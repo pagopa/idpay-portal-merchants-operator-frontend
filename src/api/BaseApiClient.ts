@@ -1,14 +1,22 @@
 import { isAxiosError, type AxiosInstance } from 'axios';
 import { ApiConfig } from './generated/http-client';
 import { authStore } from '../store/authStore';
+import keycloak from '../config/keycloak';
 
 type ApiClientWithInstance = {
   instance: AxiosInstance;
 };
 
+let isUnauthorizedLogoutInProgress = false;
+
 const unauthorizedResponseHandler = (error: unknown) => {
-  if (isAxiosError(error) && error.response?.status === 401) {
-    authStore.getState().executeLogout();
+  if (
+    isAxiosError(error)
+    && error.response?.status === 401
+    && !isUnauthorizedLogoutInProgress
+  ) {
+    isUnauthorizedLogoutInProgress = true;
+    void keycloak.logout();
   }
 
   return Promise.reject(error);
