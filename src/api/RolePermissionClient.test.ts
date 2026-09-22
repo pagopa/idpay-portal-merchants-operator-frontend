@@ -2,21 +2,37 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getAuthToken } from './BaseApiClient';
 import { RolePermissionApiClient } from './RolePermissionClient';
 
-const { mockPermissionsInstance, mockConsentInstance } = vi.hoisted(() => ({
+const { mockPermissionsInstance, mockConsentInstance, mockAttachUnauthorizedLogoutInterceptor } = vi.hoisted(() => ({
   mockPermissionsInstance: {
+    instance: {
+      interceptors: {
+        response: {
+          use: vi.fn(),
+        },
+      },
+    },
     setSecurityData: vi.fn(),
     userPermission: vi.fn(),
   },
   mockConsentInstance: {
+    instance: {
+      interceptors: {
+        response: {
+          use: vi.fn(),
+        },
+      },
+    },
     setSecurityData: vi.fn(),
     getPortalConsent: vi.fn(),
     savePortalConsent: vi.fn(),
-  }
+  },
+  mockAttachUnauthorizedLogoutInterceptor: vi.fn(),
 }));
 
 vi.mock('./BaseApiClient', () => ({
   createApiConfig: () => ({baseURL: 'base-url'}),
-  getAuthToken: vi.fn()
+  getAuthToken: vi.fn(),
+  attachUnauthorizedLogoutInterceptor: mockAttachUnauthorizedLogoutInterceptor,
 }));
 
 vi.mock('./generated/permission/Permissions', () => ({
@@ -34,6 +50,7 @@ describe('RolePermissionApiClient', () => {
     vi.clearAllMocks();
     vi.mocked(getAuthToken).mockReturnValue(mockToken);
   });
+
 
   describe('userPermission', () => {
     it('should apply security and return user permissions data', async () => {
