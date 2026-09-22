@@ -8,12 +8,14 @@ import type {
   ReportDTO,
   AuthBarCodePaymentDTO,
 } from './generated/data-contracts';
-import { createApiConfig, getAuthToken } from './BaseApiClient';
+import { attachUnauthorizedLogoutInterceptor, createApiConfig, getAuthToken } from './BaseApiClient';
 import { PointOfSales } from './generated/PointOfSales';
 
 const initiativesApi = new Initiatives<string>(createApiConfig());
 const merchantIdApi = new MerchantId<string>(createApiConfig());
 const pointOfSalesApi = new PointOfSales<string>(createApiConfig());
+
+attachUnauthorizedLogoutInterceptor(initiativesApi, merchantIdApi, pointOfSalesApi);
 
 const applySecurity = () => {
   const token = getAuthToken();

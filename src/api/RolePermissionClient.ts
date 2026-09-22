@@ -1,4 +1,4 @@
-import { createApiConfig, getAuthToken } from "./BaseApiClient";
+import { attachUnauthorizedLogoutInterceptor, createApiConfig, getAuthToken } from "./BaseApiClient";
 import { Consent } from "./generated/permission/Consent";
 import { Permissions } from "./generated/permission/Permissions";
 
@@ -7,6 +7,8 @@ const config = { ...apiConfig, baseURL: `${apiConfig.baseURL}/authorization`}
 
 const permissionsClient = new Permissions(config);
 const consentClient = new Consent(config);
+
+attachUnauthorizedLogoutInterceptor(permissionsClient, consentClient);
 
 const applySecurity = () => {
     const token = getAuthToken();
