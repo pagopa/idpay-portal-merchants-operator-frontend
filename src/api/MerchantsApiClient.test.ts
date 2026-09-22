@@ -3,9 +3,19 @@ const mockGet = vi.fn();
 const mockPut = vi.fn();
 const mockPost = vi.fn();
 const mockDelete = vi.fn();
+const { mockUseResponseInterceptor } = vi.hoisted(() => ({
+  mockUseResponseInterceptor: vi.fn(),
+}));
 
 vi.mock('./generated/Initiatives', () => ({
   Initiatives: class {
+    instance = {
+      interceptors: {
+        response: {
+          use: mockUseResponseInterceptor,
+        },
+      },
+    };
     setSecurityData = vi.fn();
     reversalTransaction = (initiativeId: string, trxCode: string) =>
       mockPost(`/initiatives/${initiativeId}/transactions/${trxCode}/reversal`, new FormData(), {
@@ -55,6 +65,13 @@ vi.mock('./generated/Initiatives', () => ({
 
 vi.mock('./generated/MerchantId', () => ({
   MerchantId: class {
+    instance = {
+      interceptors: {
+        response: {
+          use: mockUseResponseInterceptor,
+        },
+      },
+    };
     setSecurityData = vi.fn();
     getPointOfSale = (merchantId: string, pointOfSaleId: string) =>
       mockGet(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
@@ -64,6 +81,13 @@ vi.mock('./generated/MerchantId', () => ({
 
 vi.mock('./generated/PointOfSales', () => ({
   PointOfSales: class {
+    instance = {
+      interceptors: {
+        response: {
+          use: mockUseResponseInterceptor,
+        },
+      },
+    };
     setSecurityData = vi.fn();
     getPointOfSaleInitiativesDetailed = () =>
       mockGet(`/point-of-sales/initiatives`);
@@ -82,6 +106,7 @@ describe('MerchantApi', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
+
 
   describe('getInitiativeProducts', () => {
     it('should call GET /products with correct parameters', async () => {
