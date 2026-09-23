@@ -131,15 +131,8 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         });
       } catch (error) {
         const errorResponseCode = error?.response?.data?.code;
-
-        let errorMessage = t('pages.reverse.errorAlert');
-
-        if (errorResponseCode === 'REWARD_BATCH_STATUS_NOT_ALLOWED') {
-          errorMessage = t('pages.reverse.deniedSentError');
-        } else if (errorResponseCode === 'REWARD_BATCH_ALREADY_SENT') {
-          errorMessage = t('pages.reverse.alreadySentError');
-        }
-        setErrorAlert({ isOpen: true, message: errorMessage });
+        const errorMessage = errorResponseCode === 'PAYMENT_REWARD_BATCH_ELIGIBILITY_NOT_ALLOWED' ? 'pages.reverse.alreadySentError' : 'pages.reverse.errorAlert'
+        setErrorAlert({ isOpen: true, message: t(errorMessage) });
         setLoadingFile(false);
       }
     }
