@@ -309,3 +309,7 @@ export const plainObj = (obj: Record<string, any>) => {
     return { ...acc, ...(isObj(value) ? plainObj(value) : {[key]: value})}
   }, {}) : obj
 }
+
+export const pathCleaner = (path: string, whiteList: Array<string>) => {
+  return path.split('/').filter(path => whiteList.includes(path)).join('/')
+}

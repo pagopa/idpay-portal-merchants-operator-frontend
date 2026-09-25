@@ -17,6 +17,7 @@ import {
   buildNamespaceKey,
   normalizeObj,
   plainObj,
+  pathCleaner,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -584,5 +585,15 @@ describe("plainObj", () => {
 
     const differentValue = plainObj(123)
     expect(differentValue).toBe(123)
+  })
+})
+
+describe("pathCleaner", () => {
+  it("should correctly clean paths from ids", () => {
+    const validPaths = ['base', 'homepage']
+    const pathWithIds = 'base/1234/homepage/5678'
+    const cleanedPath = pathCleaner(pathWithIds, validPaths)
+
+    expect(cleanedPath).toBe('base/homepage')
   })
 })
