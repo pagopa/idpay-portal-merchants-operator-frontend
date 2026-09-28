@@ -30,7 +30,6 @@ const RefundManagement = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const [downloadInProgress, setDownloadInProgress] = useState(false);
-  const [isDisabledModDocButton, setIsDisabledModDocButton] = useState(false);
   const [areButtonsVisible, setAreButtonsVisible] = useState(false);
   const [errorDownloadAlert, setErrorDownloadAlert] = useState(false);
   const [transactionReverseSuccess, setTransactionReverseSuccess] = useState(false);
@@ -72,7 +71,6 @@ const RefundManagement = () => {
     return transactionsList.map((trx) => {
       const plainedTrx = plainObj(trx)
       const isDowloadVisible = plainedTrx?.status !== 'CANCELLED'
-      const isButtonDisable = plainedTrx?.rewardBatchTrxStatus === 'APPROVED'
       const areButtonsVisible = plainedTrx?.status === 'INVOICED'
       const mappedFieldsDef = fieldsDef.reduce((acc, field) => {
         return [...acc, ...((field.field === "docNumber" || field.field === "filename") && isDowloadVisible ? [{ ...field, headerName: `${field.headerName}.${plainedTrx?.status.toLowerCase()}` }] :
@@ -86,7 +84,6 @@ const RefundManagement = () => {
         action: {
           icon: "arrow",
           onClick: (row) => {
-            setIsDisabledModDocButton(isButtonDisable)
             setAreButtonsVisible(areButtonsVisible)
             setMappedFieldsDef(mappedFieldsDef)
             setOpenDrawer(true);
@@ -146,7 +143,7 @@ const RefundManagement = () => {
         isOpen: openDrawer,
         buttons: areButtonsVisible && [
           {
-            disabled: isDisabledModDocButton || !isActionPermitted,
+            disabled: !isActionPermitted,
             variant: "contained",
             fullWidth: true,
             onClick: () => {

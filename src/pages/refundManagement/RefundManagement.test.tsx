@@ -193,7 +193,7 @@ describe('RefundManagement', () => {
 
   it('opens drawer and maps correct actions for INVOICED transaction', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
-      content: [{ id: 'trx-1', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING', 'Numero fattura': '123' }],
+      content: [{ id: 'trx-1', status: 'INVOICED', 'Numero fattura': '123' }],
       totalElements: 1,
     });
 
@@ -209,30 +209,13 @@ describe('RefundManagement', () => {
     expect(screen.getByTestId('drawer-btn-0')).not.toBeDisabled();
   });
 
-  it('disables modify button when rewardBatchTrxStatus is APPROVED', async () => {
-    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
-      content: [{ id: 'trx-2', status: 'INVOICED', rewardBatchTrxStatus: 'APPROVED' }],
-      totalElements: 1,
-    });
-
-    renderComponent();
-
-    await waitFor(() => {
-      expect(screen.getByTestId('row-action-0')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByTestId('row-action-0'));
-
-    expect(screen.getByTestId('drawer-btn-0')).toBeDisabled();
-  });
-
   it('disables buttons in drawer if user does not have permission', async () => {
     vi.mocked(useInitiativeStatusAction).mockReturnValue({
       isActionPermitted: false,
     });
 
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
-      content: [{ id: 'trx-perm', status: 'INVOICED', rewardBatchTrxStatus: 'PENDING' }],
+      content: [{ id: 'trx-perm', status: 'INVOICED' }],
       totalElements: 1,
     });
 
