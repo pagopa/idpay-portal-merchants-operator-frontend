@@ -306,10 +306,16 @@ export const plainObj = (obj: Record<string, any>) => {
     Object.getPrototypeOf(item) === Object.prototype;
 
   return isObj(obj) ? Object.entries(obj).reduce((acc, [key, value]) => {
-    return { ...acc, ...(isObj(value) ? plainObj(value) : {[key]: value})}
+    return { ...acc, ...(isObj(value) ? plainObj(value) : { [key]: value }) }
   }, {}) : obj
 }
 
 export const pathCleaner = (path: string, whiteList: Array<string>) => {
   return path.split('/').filter(path => whiteList.includes(path)).join('/')
+}
+
+export const keysRemover = (obj: Record<string, any>, keys: Array<string>) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => !keys.includes(key))
+  )
 }

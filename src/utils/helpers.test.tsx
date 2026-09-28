@@ -18,6 +18,7 @@ import {
   normalizeObj,
   plainObj,
   pathCleaner,
+  keysRemover,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -595,5 +596,14 @@ describe("pathCleaner", () => {
     const cleanedPath = pathCleaner(pathWithIds, validPaths)
 
     expect(cleanedPath).toBe('base/homepage')
+  })
+})
+
+describe("keysRemover", () => {
+  it("should correctly remove keys from object", () => {
+    const object = {prop1: 'test', prop2: 1, prop3: 'to-remove'}
+    const cleanedObj = keysRemover(object, ['prop3'])
+
+    expect(cleanedObj).toStrictEqual({prop1: 'test', prop2: 1})
   })
 })
