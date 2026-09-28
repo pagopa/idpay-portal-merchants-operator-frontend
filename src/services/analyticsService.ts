@@ -8,17 +8,15 @@ import mixpanel, {
 import { store } from '../redux/store';
 import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
 import ROUTES from '../routes';
-import { keysRemover, pathCleaner } from '../utils/helpers';
+import { pathCleaner } from '../utils/helpers';
 
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
 
 const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
   const cleanedPath = path.replace(/^(?:.*\/)?([^/:]+).*$|^.*$/, '$1')
-  return [ ...acc, ...(cleanedPath && [cleanedPath])]
+  return [...acc, ...(cleanedPath && [cleanedPath])]
 }, ['esercente'])
-
-const blockedKeys = ['$attr-aria-label', '$classes']
 
 const eventNamesMap = {
   couponAcceptanceUXStartFlow: 'IDPAY_COUPON_ACCEPTANCE_UX_START_FLOW',
@@ -56,8 +54,9 @@ const MIXPANEL_CONFIG: Partial<Config> = {
     '$initial_referrer',
     '$referrer',
     'current_url_search',
-    '$pathname',
-    '$el_classes'
+    '$el_classes',
+    '$elements',
+    '$target'
   ],
   record_sessions_percent: 0,
   record_heatmap_data: false,
@@ -66,18 +65,16 @@ const MIXPANEL_CONFIG: Partial<Config> = {
       const state = store.getState()
       const initiativeId = currentInitiativeIdSelector(state)
       const initiative = currentInitiativeSelector(state, initiativeId)
-      const elements = event?.properties?.$elements
-      const target = event?.properties?.$target
+      const cleanedPath = pathCleaner(event?.properties?.current_url_path || event?.properties?.$pathname || '', [...visiblePaths, initiativeId])
 
       return {
         ...event,
         properties: {
           ...event?.properties,
-          ...(target && {$target: keysRemover(target, blockedKeys)}),
-          ...(elements && {$elements: elements?.map((element) => keysRemover(element, blockedKeys))}),
+          ...(event?.properties?.current_url_path && { current_url_path: cleanedPath }),
+          ...(event?.properties?.$pathname && { $pathname: cleanedPath }),
           initiative_id: initiativeId,
-          initiative_name: initiative?.initiativeName,
-          ...(event?.properties?.current_url_path && { current_url_path: pathCleaner(event?.properties?.current_url_path, [ ...visiblePaths, initiativeId]) })
+          initiative_name: initiative?.initiativeName
         }
       }
     }
