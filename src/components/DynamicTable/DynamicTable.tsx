@@ -58,6 +58,9 @@ export const DynamicTable = ({
         '& .MuiDataGrid-columnHeader:focus-within': {
             outline: 'none',
         },
+        '& .MuiDataGrid-columnHeader * svg': {
+            pointerEvents: 'none'
+        },
         '& .MuiDataGrid-iconButtonContainer button': {
             backgroundColor: 'transparent',
         },

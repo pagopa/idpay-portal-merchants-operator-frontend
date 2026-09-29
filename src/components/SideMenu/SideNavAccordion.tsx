@@ -31,10 +31,7 @@ export const SideNavAccordion = ({ item, isOpen, defaultOpen }: Props) => {
                 '&:before': { backgroundColor: '#fff' },
                 width: '100%'
             }}
-            onChange={(e) => {
-                e.stopPropagation();
-                navigate(generatePath(config[0].route, {initiativeId: initiativeId}), { replace: true })
-            }}
+            onChange={() => navigate(generatePath(config[0].route, {initiativeId: initiativeId}), { replace: true })}
             data-testid="accordion-click-test"
         >
             <AccordionSummary

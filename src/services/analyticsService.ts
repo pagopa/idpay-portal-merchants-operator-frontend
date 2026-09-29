@@ -18,6 +18,8 @@ const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
   return [...acc, ...(cleanedPath && [cleanedPath])]
 }, ['esercente'])
 
+const validElements = 'a, button, input, img, [role="button"], [role="link"], [role="input"], [role="option"]'
+
 const eventNamesMap = {
   couponAcceptanceUXStartFlow: 'IDPAY_COUPON_ACCEPTANCE_UX_START_FLOW',
   couponInvalidCodeError: 'IDPAY_COUPON_INVALID_CODE_ERROR',
@@ -25,7 +27,9 @@ const eventNamesMap = {
   couponAcceptanceError: 'IDPAY_COUPON_ACCEPTANCE_ERROR',
   couponPaymentUXSuccess: 'IDPAY_COUPON_PAYMENT_UX_SUCCESS',
   UXLoadInvoiceStartFlow: 'IDPAY_UX_LOAD_INVOICE_START_FLOW',
-  loadInvoiceUXSuccess: 'IDPAY_LOAD_INVOICE_UX_SUCCESS'
+  loadInvoiceUXSuccess: 'IDPAY_LOAD_INVOICE_UX_SUCCESS',
+  onClick: '$mp_click',
+  onChange: '$mp_input_change'
 }
 
 const AUTOCAPTURE_CONFIG: AutocaptureConfig = {
@@ -36,8 +40,9 @@ const AUTOCAPTURE_CONFIG: AutocaptureConfig = {
   dead_click: true,
   rage_click: true,
   scroll: false,
+  block_selectors: ['.mp-no-track'],
   capture_text_content: true,
-  block_selectors: ['.mp-no-track']
+  allow_element_callback: (element) => !!element.closest(validElements)
 };
 
 const MIXPANEL_CONFIG: Partial<Config> = {
@@ -54,8 +59,8 @@ const MIXPANEL_CONFIG: Partial<Config> = {
     '$initial_referrer',
     '$referrer',
     'current_url_search',
+    '$el_attr__href',
     '$el_classes',
-    '$elements',
     '$target'
   ],
   record_sessions_percent: 0,
@@ -65,14 +70,20 @@ const MIXPANEL_CONFIG: Partial<Config> = {
       const state = store.getState()
       const initiativeId = currentInitiativeIdSelector(state)
       const initiative = currentInitiativeSelector(state, initiativeId)
-      const cleanedPath = pathCleaner(event?.properties?.current_url_path || event?.properties?.$pathname || '', [...visiblePaths, initiativeId])
+
+      const { $elements, $el_text, current_url_path, $pathname, ...rest } = event.properties
+
+      const isSelect = $elements?.some((el) => el?.['$attr-role'] === 'option')
+      const cleanedPath = pathCleaner(current_url_path || $pathname || '', [...visiblePaths, initiativeId])
 
       return {
         ...event,
+        event: isSelect ? eventNamesMap.onChange : event.event,
         properties: {
-          ...event?.properties,
-          ...(event?.properties?.current_url_path && { current_url_path: cleanedPath }),
-          ...(event?.properties?.$pathname && { $pathname: cleanedPath }),
+          ...rest,
+          ...(!isSelect && $el_text && { $el_text }),
+          ...(current_url_path && { current_url_path: cleanedPath }),
+          ...($pathname && { $pathname: cleanedPath }),
           initiative_id: initiativeId,
           initiative_name: initiative?.initiativeName
         }
