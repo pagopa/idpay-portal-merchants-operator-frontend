@@ -46,7 +46,7 @@ export const filtersConfig: Record<
                 )}
             >
                 {templateDef.map(({ label, value }) => (
-                    <MenuItem key={value} value={value}>
+                    <MenuItem className={`name:${id}-filter-select`} key={value} value={value}>
                         {id === "status" ?
                             <StatusChip context={context} value={value?.toLowerCase()} /> :
                             t(label)}
@@ -62,7 +62,7 @@ export const filtersConfig: Record<
             <TextField
                 fullWidth
                 size='small'
-                id={`${id}-text`}
+                id={`${id}-filter`}
                 label={t(label ?? '')}
                 variant="outlined"
                 value={filters?.[id] ?? ''}
@@ -81,7 +81,7 @@ export const filtersConfig: Record<
                     setFilters(id, text.trim());
                     setErrors(id, isError);
                 }}
-                slotProps={{ htmlInput: inputProps }}
+                slotProps={{ htmlInput: { ...inputProps, className: `name:${id}-filter`} }}
             />
         );
     },

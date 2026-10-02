@@ -4,7 +4,7 @@ import { theme } from "@pagopa/mui-italia"
 import { useScopedTranslation } from "../../hooks/useScopedTranslation"
 import { FieldConfigDef } from "../../utils/types"
 import { renderFields } from "../../utils/renderFields"
-import { useMemo, useRef } from "react"
+import { useMemo, useRef, useState } from "react"
 
 export type DynamicTableProps = Pick<DataGridProps, Exclude<keyof DataGridProps, "columns">> & {
     columnsDef: Array<FieldConfigDef>
@@ -25,14 +25,31 @@ export const DynamicTable = ({
     onPaginationModelChange,
     ...props }: DynamicTableProps) => {
     const { t } = useScopedTranslation()
-
     const ref = useRef(false)
+    const [sortModel, setSortModel] = useState({ field: '', sort: '' })
 
     const mappedColumns = useMemo(() => columnsDef.map(({ cell, ...column }) => {
         const { type, tooltip, context, options } = cell
         const fieldConfig = renderFields({ tooltip, context, options })
         return { ...column, headerName: t(column.headerName), renderCell: fieldConfig[type] }
     }), [columnsDef, t])
+
+    const setupGrid = (node) => {
+        if (!node) return
+        const pageBtns = node.querySelectorAll('.MuiTablePaginationActions-root button')
+        const select = node.querySelector('[role="combobox"]')
+        if (pageBtns.length) {
+            const [prev, next] = pageBtns
+            next.classList.add('name:next-page')
+            prev.classList.add('name:previous-page')
+        }
+        if (select) select.addEventListener('mousedown', () => {
+            setTimeout(() => {
+                const menuItems = document.querySelectorAll('[role="option"]');
+                menuItems.forEach((item, index) => item.classList.add(`name:select-page-size-option-${index}`));
+            }, 0)
+        }, true)
+    }
 
     const tableStyle = useMemo(() => ({
         border: 'none',
@@ -104,10 +121,13 @@ export const DynamicTable = ({
             </Paper> :
             <DataGrid
                 {...props}
+                ref={setupGrid}
                 slotProps={{ baseIconButton: { title: "" } }}
                 onSortModelChange={(model, details) => {
                     ref.current = true
+                    const [firstModel] = model
                     onSortModelChange(model, details)
+                    setSortModel(firstModel)
                     setTimeout(() => ref.current = false, 0)
                 }}
                 onPaginationModelChange={(model, details) => {
@@ -118,6 +138,7 @@ export const DynamicTable = ({
                 disableRowSelectionOnClick
                 sortingOrder={['asc', 'desc']}
                 sx={{ ...tableStyle, ...sx }}
+                classes={{ sortButton: `name:sort-${sortModel?.field}-${sortModel?.sort}` }}
                 localeText={{
                     paginationItemAriaLabel: () => "",
                     footerTotalRows: 'Totale righe:',

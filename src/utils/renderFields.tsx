@@ -57,7 +57,7 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
         </Box>,
     action: (params) =>
         <Box display="flex" alignItems="center" justifyContent="end" height="100%">
-            <IconButton onClick={() => params?.value?.onClick(params.row)}>
+            <IconButton className="name:field-action" onClick={() => params?.value?.onClick(params.row)}>
                 {actionIcons[params?.value?.icon]}
             </IconButton>
         </Box>

@@ -150,6 +150,7 @@ export function downloadFileFromBase64(base64: string, fileName: string) {
   const a = document.createElement('a');
   a.href = url;
   a.download = fileName;
+  a.classList.add('name:download-file');
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -318,4 +319,8 @@ export const keysRemover = (obj: Record<string, any>, keys: Array<string>) => {
   return Object.fromEntries(
     Object.entries(obj).filter(([key]) => !keys.includes(key))
   )
+}
+
+export const extractNameMP = (classes: Array<string>) => {
+  return classes?.find((elClass) => elClass?.match(/^name:/))?.replace('name:', '')
 }

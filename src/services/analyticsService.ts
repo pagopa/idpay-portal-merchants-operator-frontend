@@ -8,7 +8,7 @@ import mixpanel, {
 import { store } from '../redux/store';
 import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
 import ROUTES from '../routes';
-import { pathCleaner } from '../utils/helpers';
+import { extractNameMP, pathCleaner } from '../utils/helpers';
 
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
@@ -18,7 +18,7 @@ const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
   return [...acc, ...(cleanedPath && [cleanedPath])]
 }, ['esercente'])
 
-const validElements = 'a, button, input, img, [role="button"], [role="link"], [role="input"], [role="option"]'
+const validElements = ['a', 'button', 'input', 'img', 'option', 'link', '[role="button"]', '[role="link"]', '[role="input"]', '[role="option"]']
 
 const eventNamesMap = {
   couponAcceptanceUXStartFlow: 'IDPAY_COUPON_ACCEPTANCE_UX_START_FLOW',
@@ -42,7 +42,7 @@ const AUTOCAPTURE_CONFIG: AutocaptureConfig = {
   scroll: false,
   block_selectors: ['.mp-no-track'],
   capture_text_content: true,
-  allow_element_callback: (element) => !!element.closest(validElements)
+  allow_element_callback: (element) => !!element.closest(validElements.join(', '))
 };
 
 const MIXPANEL_CONFIG: Partial<Config> = {
@@ -60,30 +60,35 @@ const MIXPANEL_CONFIG: Partial<Config> = {
     '$referrer',
     'current_url_search',
     '$el_attr__href',
-    '$el_classes',
-    '$target'
+    '$el_classes'
   ],
   record_sessions_percent: 0,
   record_heatmap_data: false,
   hooks: {
     before_send_events: (event: BeforeSendHookPayload) => {
+      const { current_url_path, $pathname, $target, $elements, $el_text, ...rest } = event.properties
       const state = store.getState()
       const initiativeId = currentInitiativeIdSelector(state)
       const initiative = currentInitiativeSelector(state, initiativeId)
 
-      const { $elements, $el_text, current_url_path, $pathname, ...rest } = event.properties
+      const targetElement = validElements.includes($target?.['$attr-role']) || validElements.includes($target?.$tag_name) ?
+        $target :
+        $elements?.find((el) => validElements.includes(el?.$tag_name) || validElements.includes(el?.['$attr-role']))
 
-      const isSelect = $elements?.some((el) => el?.['$attr-role'] === 'option')
+      const isOption = targetElement?.['$attr-role'] === 'option'
       const cleanedPath = pathCleaner(current_url_path || $pathname || '', [...visiblePaths, initiativeId])
+      const elementName = extractNameMP(targetElement?.$classes) || targetElement?.$tag_name
+      const elementText = (!isOption && $el_text) || targetElement?.['$attr-aria-label']
 
       return {
         ...event,
-        event: isSelect ? eventNamesMap.onChange : event.event,
+        event: isOption ? eventNamesMap.onChange : event.event,
         properties: {
           ...rest,
-          ...(!isSelect && $el_text && { $el_text }),
           ...(current_url_path && { current_url_path: cleanedPath }),
           ...($pathname && { $pathname: cleanedPath }),
+          ...(elementName && { $el_name: elementName }),
+          ...(elementText && { $el_text: elementText }),
           initiative_id: initiativeId,
           initiative_name: initiative?.initiativeName
         }

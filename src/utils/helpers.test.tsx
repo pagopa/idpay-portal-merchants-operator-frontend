@@ -19,6 +19,8 @@ import {
   plainObj,
   pathCleaner,
   keysRemover,
+  extractNameMP,
+  generateNameMP,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -605,5 +607,14 @@ describe("keysRemover", () => {
     const cleanedObj = keysRemover(object, ['prop3'])
 
     expect(cleanedObj).toStrictEqual({prop1: 'test', prop2: 1})
+  })
+})
+
+describe("extractNameMP", () => {
+  it("should correctly find matching class", () => {
+    const classes = ['name:test', 'string1', 'string2']
+    const extractedClass = extractNameMP(classes)
+
+    expect(extractedClass).toBe('test')
   })
 })

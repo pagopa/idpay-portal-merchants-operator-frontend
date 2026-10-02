@@ -233,6 +233,7 @@ const AcceptDiscount = () => {
                 inputTitle={t('pages.acceptDiscount.selectProductTitle')}
               >
                 <Autocomplete
+                  mpTitle='name:select-product'
                   required
                   options={productsList as ProductDTO[]}
                   onChangeDebounce={(value) => handleChangeAutocomplete(value)}
@@ -265,6 +266,9 @@ const AcceptDiscount = () => {
                   helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ''}
                   onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
                   slotProps={{
+                    htmlInput: {
+                      className: 'name:expenditure-amount-field'
+                    },
                     input: {
                       startAdornment:
                         isExpenditureFocused || formData.totalAmount ? (
@@ -305,6 +309,11 @@ const AcceptDiscount = () => {
                   error={!!fieldErrors.discountCode}
                   helperText={t(fieldErrors.discountCode)}
                   onChange={(e) => handleFieldChange('discountCode', e.target.value)}
+                  slotProps={{
+                    htmlInput: {
+                      className: 'name:discount-code-field'
+                    }
+                  }}
                 />
               </AcceptDiscountCard>
             </Grid>

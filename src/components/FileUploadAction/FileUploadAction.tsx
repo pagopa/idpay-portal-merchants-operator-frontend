@@ -85,6 +85,28 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     }
   }, [fileDocNumber])
 
+  const setupUpload = (node) => {
+    if (!node) return
+
+    const applyAttributes = () => {
+      const uploadBtn = node.querySelector('[data-testid="loadFromPc"]')
+      const uploadTextBtn = node.querySelector('.MuiButtonBase-root')
+      const removeFileBtn = node.querySelector('.MuiIconButton-root')
+      const uploadInput = node.querySelector('.MuiInputBase-input')
+      if (uploadBtn) uploadBtn.classList.add('name:upload-file')
+      if (uploadTextBtn) uploadTextBtn.classList.add('name:upload-file')
+      if (removeFileBtn) removeFileBtn.classList.add('name:remove-selected-file')
+      if(uploadInput) uploadInput.classList.add('name:select-file')
+    }
+    const observer = new MutationObserver(() => {
+      applyAttributes();
+    });
+    observer.observe(node, {
+      childList: true,
+      subtree: true
+    });
+  }
+
   const handleFileSelect = (selectedFile: File) => {
     if (selectedFile) {
       setRequiredFileError(false);
@@ -216,6 +238,9 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                   ? 'Lunghezza minima 2 caratteri'
                   : ''
             }
+            slotProps={{
+              htmlInput: {className: 'name:document-number-input'}
+            }}
           />
         </Box>
 
@@ -262,7 +287,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
               <Alert severity="error">{t('errors.requiredFileError')}</Alert>
             </Box>
           )}
-          <Box mt={1} mb={2}>
+          <Box ref={setupUpload} mt={1} mb={2}>
             <SingleFileInput
               onFileSelected={handleFileSelect}
               onFileRemoved={handleRemoveFile}

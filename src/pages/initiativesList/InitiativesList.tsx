@@ -57,6 +57,7 @@ export const InitiativesList = () => {
           mbSubTitle={2}
         />
         <TextField
+          className="name:search-initiative"
           id="search-initiative"
           placeholder={t('commons.pages.initiativesList.search')}
           variant="outlined"
@@ -84,7 +85,7 @@ export const InitiativesList = () => {
           sortingOrder={['asc', 'desc']}
           hideFooterPagination
           hideFooter
-          />
+        />
       </Box>
     </Box>
   );

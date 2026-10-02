@@ -19,14 +19,14 @@ export default function SideNavItem({
   icon,
   level,
   disabled = false,
-  hideLabels = false,
+  hideLabels = false
 }: Props) {
   return (
     <ListItemButton
       selected={isSelected}
       disabled={disabled}
       onClick={handleClick}
-      className={hideLabels ? styles.sideMenuItem : ''}
+      className={`name:side-menu-item ${hideLabels ?  styles.sideMenuItem : ''}`}
     >
       <ListItemIcon sx={{ ml: level }}>
         {hideLabels ? (

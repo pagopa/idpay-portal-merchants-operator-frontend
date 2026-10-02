@@ -26,6 +26,7 @@ export const DownloadFile = ({ isLoading, onClick, icon, text, tooltip }: Props)
         <Tooltip title={tooltip && (text || MISSING_DATA_PLACEHOLDER)}>
             {text ?
                 <Button
+                    className="name:download-file"
                     data-testid="btn-test"
                     sx={{
                         padding: "0"

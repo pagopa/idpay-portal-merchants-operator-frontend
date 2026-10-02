@@ -56,6 +56,7 @@ export default function DynamicDrawer({
           padding="0.5rem"
         >
           <IconButton
+            className='name:close-drawer' 
             data-testid="close-button"
             onClick={setIsOpen}
             sx={{ color: theme.palette.text.secondary }}

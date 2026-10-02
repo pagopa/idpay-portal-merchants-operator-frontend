@@ -35,6 +35,7 @@ export const SideNavAccordion = ({ item, isOpen, defaultOpen }: Props) => {
             data-testid="accordion-click-test"
         >
             <AccordionSummary
+                className='name:side-menu-initiative'
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls={`panel-${initiativeId}-content`}
                 id={`panel-${initiativeId}-header`}
