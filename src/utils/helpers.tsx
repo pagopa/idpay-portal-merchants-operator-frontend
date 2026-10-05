@@ -150,8 +150,8 @@ export function downloadFileFromBase64(base64: string, fileName: string) {
   const a = document.createElement('a');
   a.href = url;
   a.download = fileName;
-  a.classList.add('name:download-file');
   document.body.appendChild(a);
+  a?.classList?.add('name:download-file');
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
