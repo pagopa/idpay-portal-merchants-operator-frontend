@@ -18,7 +18,7 @@ const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
   return [...acc, ...(cleanedPath && [cleanedPath])]
 }, ['esercente'])
 
-const validElements = ['a', 'button', 'input', 'img', 'option', 'link', '[role="button"]', '[role="link"]', '[role="input"]', '[role="option"]']
+const validElements = ['a', 'button', 'input', 'option', 'link', '[role="button"]', '[role="link"]', '[role="input"]', '[role="option"]']
 
 const eventNamesMap = {
   couponAcceptanceUXStartFlow: 'IDPAY_COUPON_ACCEPTANCE_UX_START_FLOW',

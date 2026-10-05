@@ -90,13 +90,11 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
     const applyAttributes = () => {
       const uploadBtn = node.querySelector('[data-testid="loadFromPc"]')
-      const uploadTextBtn = node.querySelector('.MuiButtonBase-root')
       const removeFileBtn = node.querySelector('.MuiIconButton-root')
-      const uploadInput = node.querySelector('.MuiInputBase-input')
+      const uploadInput = node.querySelector('input')
       if (uploadBtn) uploadBtn.classList.add('name:upload-file')
-      if (uploadTextBtn) uploadTextBtn.classList.add('name:upload-file')
       if (removeFileBtn) removeFileBtn.classList.add('name:remove-selected-file')
-      if(uploadInput) uploadInput.classList.add('name:select-file')
+      if (uploadInput) uploadInput.classList.add('name:select-file')
     }
     const observer = new MutationObserver(() => {
       applyAttributes();
@@ -239,7 +237,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                   : ''
             }
             slotProps={{
-              htmlInput: {className: 'name:document-number-input'}
+              htmlInput: { className: 'name:document-number-input' }
             }}
           />
         </Box>
@@ -316,6 +314,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
 
             {file && (
               <Button
+                aria-label={t(`${i18nBlockKey}.replaceFile`)}
                 data-testid="file-btn-test"
                 variant="naked"
                 startIcon={<FileUploadIcon />}

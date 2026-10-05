@@ -27,6 +27,7 @@ export default function SideNavItem({
       disabled={disabled}
       onClick={handleClick}
       className={`name:side-menu-item ${hideLabels ?  styles.sideMenuItem : ''}`}
+      aria-label={title}
     >
       <ListItemIcon sx={{ ml: level }}>
         {hideLabels ? (
