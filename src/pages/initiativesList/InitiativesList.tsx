@@ -57,12 +57,14 @@ export const InitiativesList = () => {
           mbSubTitle={2}
         />
         <TextField
-          className="name:search-initiative"
           id="search-initiative"
           placeholder={t('commons.pages.initiativesList.search')}
           variant="outlined"
           size="small"
           data-testid='search-initiatives'
+          slotProps={{
+            htmlInput: { className: "name:search-initiative" }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
