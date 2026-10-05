@@ -39,7 +39,7 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
         </Box>,
     link: (params) =>
         <Box display="flex" alignItems="center" height="100%">
-            <Link tooltip={tooltip} label={params.value} href={params?.row?.link} />
+            <Link name={params.field} tooltip={tooltip} label={params.value} href={params?.row?.link} />
         </Box>,
     chip: (params) =>
         <Box display="flex" alignItems="center" height="100%">

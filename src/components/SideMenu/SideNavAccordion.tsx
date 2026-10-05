@@ -39,6 +39,7 @@ export const SideNavAccordion = ({ item, isOpen, defaultOpen }: Props) => {
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls={`panel-${initiativeId}-content`}
                 id={`panel-${initiativeId}-header`}
+                aria-label={initiativeName}
             >
                 {!isOpen ?
                     <Tooltip title={initiativeName}>
