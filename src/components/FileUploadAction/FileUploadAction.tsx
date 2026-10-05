@@ -33,6 +33,11 @@ interface FileUploadActionProps {
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
 
+const errorMessageMap = {
+  PAYMENT_STATUS_NOT_VALID: 'pages.reverse.deniedSentError',
+  PAYMENT_REWARD_BATCH_ELIGIBILITY_NOT_ALLOWED: 'pages.reverse.alreadySentError'
+}
+
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
   titleKey,
   subtitleKey,
@@ -131,15 +136,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         });
       } catch (error) {
         const errorResponseCode = error?.response?.data?.code;
-
-        let errorMessage = t('pages.reverse.errorAlert');
-
-        if (errorResponseCode === 'REWARD_BATCH_STATUS_NOT_ALLOWED') {
-          errorMessage = t('pages.reverse.deniedSentError');
-        } else if (errorResponseCode === 'REWARD_BATCH_ALREADY_SENT') {
-          errorMessage = t('pages.reverse.alreadySentError');
-        }
-        setErrorAlert({ isOpen: true, message: errorMessage });
+        setErrorAlert({ isOpen: true, message: t(errorMessageMap?.[errorResponseCode] ?? 'pages.reverse.errorAlert') });
         setLoadingFile(false);
       }
     }
