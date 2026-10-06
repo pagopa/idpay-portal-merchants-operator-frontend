@@ -264,12 +264,15 @@ const PurchaseManagement = () => {
         onClose={() => {
           setModal("")
         }}
+        style={{
+          width: 'min(600px, calc(100vw - 32px))',
+        }}
       >
         <Box display={'flex'} flexDirection={'column'} gap={2}>
           <Typography variant="h6">
             {t(`pages.purchaseManagement.modal.${modal}.title`)}
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="body1" sx={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             {t(`pages.purchaseManagement.modal.${modal}.description`,
               {
                 amount: formatEuro(selectedTransaction?.residualAmountCents),
