@@ -189,6 +189,7 @@ trigger:
     include:
       - develop
       - uat
+      - main
 
 pr: none
 

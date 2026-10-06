@@ -8,6 +8,50 @@ import { authStore } from '../../store/authStore';
 import { utilsStore } from '../../store/utilsStore';
 import ROUTES from '../../routes';
 import { useInitiativeStatusAction } from '../../hooks/useInitiativeStatusAction';
+import type { PointOfSaleTransactionDTO } from '../../api/generated/data-contracts';
+
+type TransactionRow = {
+  id: string;
+  status?: string;
+  action: {
+    onClick: (row: TransactionRow) => void;
+  };
+  onClick: () => void;
+};
+
+type TransactionsLayoutMockProps = {
+  title: string;
+  additionalButton?: {
+    onClick: () => void;
+    label?: string;
+  };
+  isAlertVisible?: boolean;
+  tableProps?: {
+    rows?: TransactionRow[];
+    onPaginationModelChange?: (pagination: { page: number; pageSize: number }) => void;
+  };
+  drawerProps?: {
+    isOpen?: boolean;
+    fieldsValues?: { id?: string };
+    buttons?: Array<{
+      onClick: () => void;
+      title: string;
+    }>;
+  };
+  filtersProps?: {
+    setFilters?: (filters: Record<string, string>) => void;
+  };
+  transactionsApi?: (initiativeId: string, trxId: string, params: unknown) => Promise<{
+    content: TransactionRow[];
+  }>;
+  setTransactionsList?: (content: TransactionRow[]) => void;
+};
+
+type ModalMockProps = {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+};
 
 const mockNavigate = vi.fn();
 let mockLocationState: Record<string, unknown> = {};
@@ -17,7 +61,7 @@ vi.mock('../../redux/hooks', () => ({
 }));
 
 vi.mock('../../redux/slices/initiativesSlice', async (importOriginal) => {
-  const actual = await importOriginal()
+  const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
     initiativesListSelector: vi.fn(),
@@ -77,6 +121,9 @@ const mockDrawerConfig = [
 vi.mock('../../hooks/useScopedTranslation', () => ({
   useScopedTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
+      if (options?.amount !== undefined && options?.product !== undefined) {
+        return `${key}_${options.amount}_${options.product}`;
+      }
       if (options?.amount !== undefined) return `${key}_${options.amount}`;
       return key;
     },
@@ -90,7 +137,7 @@ vi.mock('../../hooks/useScopedTranslation', () => ({
 }));
 
 vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
-  default: ({
+  default: function MockTransactionsLayout({
     title,
     additionalButton,
     isAlertVisible,
@@ -99,10 +146,10 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
     filtersProps,
     transactionsApi,
     setTransactionsList,
-  }: any) => {
+  }: TransactionsLayoutMockProps) {
     React.useEffect(() => {
       if (transactionsApi && setTransactionsList) {
-        transactionsApi('init-123', 'pos-999', { page: 0, size: 10, sort: 'trxChargeDate,desc' }).then((res: any) => {
+        transactionsApi('init-123', 'pos-999', { page: 0, size: 10, sort: 'trxChargeDate,desc' }).then((res) => {
           setTransactionsList(res.content);
         });
       }
@@ -119,7 +166,10 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
         <div data-testid="alert-drawer-visible">{String(isAlertVisible)}</div>
 
         <div data-testid="dynamic-filters">
-          <button data-testid="apply-filter-btn" onClick={() => filtersProps?.setFilters({ fiscalCode: 'ABCDEF12345' })}>
+          <button
+            data-testid="apply-filter-btn"
+            onClick={() => filtersProps?.setFilters?.({ fiscalCode: 'ABCDEF12345' })}
+          >
             Filter
           </button>
         </div>
@@ -127,7 +177,7 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
         <div data-testid="dynamic-table">
           <table>
             <tbody>
-              {tableProps?.rows?.map((row: any) => (
+              {tableProps?.rows?.map((row) => (
                 <tr key={row.id}>
                   <td>{row.id}</td>
                   <td>{row.status}</td>
@@ -154,7 +204,7 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
         {drawerProps?.isOpen && (
           <div data-testid="dynamic-drawer">
             <span>Drawer for TRX: {drawerProps.fieldsValues?.id}</span>
-            {drawerProps.buttons?.map((btn: any, index: number) => (
+            {drawerProps.buttons?.map((btn, index: number) => (
               <button key={index} data-testid={`drawer-btn-${index}`} onClick={btn.onClick}>
                 {btn.title}
               </button>
@@ -167,15 +217,16 @@ vi.mock('../../components/TransactionsLayout/TransactionsLayout', () => ({
 }));
 
 vi.mock('../../components/Modal/ModalComponent', () => ({
-  default: ({ open, onClose, children }: any) =>
-    open ? (
+  default: function MockModal({ open, onClose, children }: ModalMockProps) {
+    return open ? (
       <div data-testid="modal-component">
         <button data-testid="close-modal-btn" onClick={onClose}>
           X
         </button>
         {children}
       </div>
-    ) : null,
+    ) : null;
+  },
 }));
 
 vi.stubEnv('VITE_PAGINATION_SIZE', '10');
@@ -187,7 +238,7 @@ const mockAuthorizedTransaction = {
   status: 'AUTHORIZED',
   residualAmountCents: 5000,
   productName: 'Washing Machine',
-};
+} as PointOfSaleTransactionDTO & { productName: string };
 
 const mockCapturedTransaction = {
   id: 'trx-2',
@@ -196,7 +247,7 @@ const mockCapturedTransaction = {
   status: 'CAPTURED',
   residualAmountCents: 0,
   productName: 'Fridge',
-};
+} as PointOfSaleTransactionDTO & { productName: string };
 
 describe('PurchaseManagement Component', () => {
   beforeEach(() => {
@@ -211,7 +262,7 @@ describe('PurchaseManagement Component', () => {
     vi.mocked(merchantService.getInProgressTransactions).mockResolvedValue({
       content: [mockAuthorizedTransaction, mockCapturedTransaction],
       totalElements: 2,
-    });
+    } as never);
   });
 
   it('should load and display transactions correctly on mount', async () => {
@@ -248,7 +299,7 @@ describe('PurchaseManagement Component', () => {
     });
 
     it('should successfully handle payment capture (Confirm Payment)', async () => {
-      vi.mocked(merchantService.capturePayment).mockResolvedValue({});
+      vi.mocked(merchantService.capturePayment).mockResolvedValue({} as never);
 
       render(<PurchaseManagement />);
 
@@ -272,7 +323,7 @@ describe('PurchaseManagement Component', () => {
     });
 
     it('should successfully handle transaction cancellation (Cancel Payment)', async () => {
-      vi.mocked(merchantService.deleteTransactionInProgress).mockResolvedValue({});
+      vi.mocked(merchantService.deleteTransactionInProgress).mockResolvedValue(undefined);
 
       render(<PurchaseManagement />);
 
