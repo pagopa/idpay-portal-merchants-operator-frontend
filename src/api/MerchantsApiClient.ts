@@ -1,8 +1,5 @@
-import { Products } from './generated/Products';
-import { Transactions } from './generated/Transactions';
 import { Initiatives } from './generated/Initiatives';
 import { MerchantId } from './generated/MerchantId';
-import { PointOfSaleId } from './generated/PointOfSaleId';
 import type {
   ProductListDTO,
   PreviewPaymentDTO,
@@ -11,48 +8,54 @@ import type {
   ReportDTO,
   AuthBarCodePaymentDTO,
 } from './generated/data-contracts';
-import { createApiConfig, getAuthToken } from './BaseApiClient';
+import { attachUnauthorizedLogoutInterceptor, createApiConfig, getAuthToken } from './BaseApiClient';
+import { PointOfSales } from './generated/PointOfSales';
 
-const productsApi = new Products<string>(createApiConfig());
-const transactionsApi = new Transactions<string>(createApiConfig());
 const initiativesApi = new Initiatives<string>(createApiConfig());
 const merchantIdApi = new MerchantId<string>(createApiConfig());
-const pointOfSaleIdApi = new PointOfSaleId<string>(createApiConfig());
+const pointOfSalesApi = new PointOfSales<string>(createApiConfig());
+
+attachUnauthorizedLogoutInterceptor(initiativesApi, merchantIdApi, pointOfSalesApi);
 
 const applySecurity = () => {
   const token = getAuthToken();
-  productsApi.setSecurityData(token);
-  transactionsApi.setSecurityData(token);
   initiativesApi.setSecurityData(token);
   merchantIdApi.setSecurityData(token);
-  pointOfSaleIdApi.setSecurityData(token);
+  pointOfSalesApi.setSecurityData(token);
 };
 
 export const MerchantApi = {
-  getProducts: async (
-    params: Parameters<typeof productsApi.getProducts>[0]
+
+  getInitiativeProducts: async (
+    initiativeId: string,
+    params: Parameters<typeof initiativesApi.getProducts>[1]
   ): Promise<ProductListDTO> => {
     applySecurity();
-    const response = await productsApi.getProducts(params);
+    const response = await initiativesApi.getProducts(initiativeId, params);
     return response.data;
   },
 
-  previewPayment: async (params: {
+  previewPayment: async (initiativeId: string,
+    params: {
     productGtin: string;
     productName: string;
     amountCents: number;
     discountCode: string;
   }): Promise<PreviewPaymentDTO> => {
     applySecurity();
-    const response = await transactionsApi.previewPayment(params.discountCode, {
-      productGtin: params.productGtin,
-      productName: params.productName,
-      amountCents: params.amountCents,
-    });
+    const response = await initiativesApi.previewPayment(initiativeId, params?.discountCode, {
+      additionalProperties: {
+      productGtin: params?.productGtin,
+      productName: params?.productName,
+      },
+      amountCents: params?.amountCents,
+    }
+  );
     return response.data;
   },
 
-  authPaymentBarCode: async (params: {
+  authPaymentBarCode: async (initiativeId: string,
+    params: {
     trxCode: string;
     amountCents: number;
     idTrxAcquirer: string;
@@ -61,69 +64,71 @@ export const MerchantApi = {
     applySecurity();
 
     const payload: AuthBarCodePaymentDTO = {
-      amountCents: params.amountCents,
-      idTrxAcquirer: params.idTrxAcquirer,
-      additionalProperties: params.additionalProperties,
+      amountCents: params?.amountCents,
+      idTrxAcquirer: params?.idTrxAcquirer,
+      additionalProperties: params?.additionalProperties,
     };
 
-    const response = await transactionsApi.authPaymentBarCode(params.trxCode, payload);
+    const response = await initiativesApi.authPaymentBarCode(initiativeId, params?.trxCode, payload);
     return response.data;
   },
 
-  capturePayment: async (params: { trxCode: string }): Promise<TransactionBarCodeResponse> => {
+  capturePayment: async (initiativeId: string, params: { trxCode: string }): Promise<TransactionBarCodeResponse> => {
     applySecurity();
-    const response = await transactionsApi.capturePayment(params.trxCode);
+    const response = await initiativesApi.capturePayment(initiativeId, params?.trxCode);
     return response.data;
   },
 
-  deleteTransactionInProgress: async (trxId: string): Promise<void> => {
+  deleteTransactionInProgress: async (initiativeId: string, trxId: string): Promise<void> => {
     applySecurity();
-    await transactionsApi.deleteTransaction(trxId);
+    await initiativesApi.deleteTransaction(initiativeId, trxId);
   },
 
-  reverseTransactionApi: async (trxId: string, file: File, docNumber: string): Promise<void> => {
+  reverseTransactionApi: async (initiativeId: string, trxId: string, file: File, docNumber: string): Promise<void> => {
     applySecurity();
-    await transactionsApi.reversalTransaction(trxId, {
+    await initiativesApi.reversalTransaction(initiativeId, trxId, {
       file,
       docNumber,
     });
   },
 
   reverseInvoicedTransactionApi: async (
+    initiativeId: string,
     trxId: string,
     file: File,
     docNumber: string
   ): Promise<void> => {
     applySecurity();
-    await transactionsApi.reversalTransactionInvoiced(trxId, {
+    await initiativesApi.reversalTransactionInvoiced(initiativeId, trxId, {
       file,
       docNumber,
     });
   },
 
-  invoiceTransactionApi: async (trxId: string, file: File, docNumber: string): Promise<void> => {
+  invoiceTransactionApi: async (initiativeId: string, trxId: string, file: File, docNumber: string): Promise<void> => {
     applySecurity();
-    await transactionsApi.invoiceTransaction(trxId, {
+    await initiativesApi.invoiceTransaction(initiativeId, trxId, {
       file,
       docNumber,
     });
   },
 
   updateInvoiceTransactionApi: async (
+    initiativeId: string,
     trxId: string,
     file: File,
     docNumber: string
   ): Promise<void> => {
     applySecurity();
-    await transactionsApi.updateInvoiceTransaction(trxId, {
+    await initiativesApi.updateInvoiceTransaction(initiativeId, trxId, {
       file,
       docNumber,
     });
   },
 
-  getPreviewPdf: async (trxId: string): Promise<ReportDTO> => {
+  getPreviewPdf: async (initiativeId: string, trxId: string): Promise<ReportDTO> => {
     applySecurity();
-    const response = await transactionsApi.getTransactionPreviewPdf(trxId);
+    const response = await initiativesApi.getTransactionPreviewPdf(initiativeId, trxId);
     return response.data;
   },
 
@@ -161,9 +166,15 @@ export const MerchantApi = {
     return response.data;
   },
 
-  downloadInvoiceFileApi: async (pointOfSaleId: string, trxId: string) => {
+  downloadInvoiceFileApi: async (initiativeId: string, pointOfSaleId: string, trxId: string) => {
     applySecurity();
-    const response = await pointOfSaleIdApi.downloadInvoiceFile(pointOfSaleId, trxId);
+    const response = await initiativesApi.downloadInvoiceFile(initiativeId, pointOfSaleId, trxId);
     return response.data;
   },
+
+  getInitiativesList: async () => {
+    applySecurity();
+    const response = await pointOfSalesApi.getPointOfSaleInitiativesDetailed();
+    return response.data;
+  }
 };

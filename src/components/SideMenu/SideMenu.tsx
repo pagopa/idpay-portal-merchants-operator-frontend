@@ -1,15 +1,15 @@
 import { List, Box, Divider, IconButton } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import InventoryIcon from '@mui/icons-material/Inventory';
 import ROUTES from '../../routes';
 import SideNavItem from './SideNavItem';
 import { Person } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { theme } from '@pagopa/mui-italia';
 import styles from './SideMenu.module.css';
+import { useAppSelector } from '../../redux/hooks';
+import { initiativesListSelector } from '../../redux/slices/initiativesSlice'
+import { SideNavAccordion } from './SideNavAccordion';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 /** The side menu of the application */
 export default function SideMenu({
@@ -19,9 +19,10 @@ export default function SideMenu({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useScopedTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const initiativesList = useAppSelector(initiativesListSelector)
 
   return (
     <Box
@@ -38,35 +39,26 @@ export default function SideMenu({
       <Box gridColumn="auto">
         <List data-testid="first-list-test">
           <SideNavItem
-            title={t('sideMenu.purchaseManagement')}
-            handleClick={() => navigate(ROUTES.BUY_MANAGEMENT, { replace: true })}
-            isSelected={location.pathname === ROUTES.BUY_MANAGEMENT}
-            icon={ConfirmationNumberIcon}
+            title={t('commons.sideMenu.initiatives')}
+            handleClick={() => navigate(ROUTES.INITIATIVES_LIST, { replace: true })}
+            isSelected={location.pathname === ROUTES.INITIATIVES_LIST}
+            icon={MenuIcon}
             level={0}
             data-testid="initiativeList-click-test"
             hideLabels={!isOpen}
           />
-          <SideNavItem
-            title={t('sideMenu.refundManagement')}
-            handleClick={() => navigate(ROUTES.REFUNDS_MANAGEMENT, { replace: true })}
-            isSelected={location.pathname === ROUTES.REFUNDS_MANAGEMENT}
-            icon={PaymentsIcon}
-            level={0}
-            data-testid="initiativeList-click-test"
-            hideLabels={!isOpen}
-          />
-          <SideNavItem
-            title={t('sideMenu.products')}
-            handleClick={() => navigate(ROUTES.PRODUCTS, { replace: true })}
-            isSelected={location.pathname === ROUTES.PRODUCTS}
-            icon={InventoryIcon}
-            level={0}
-            data-testid="initiativeList-click-test"
-            hideLabels={!isOpen}
-          />
+          {initiativesList &&
+            initiativesList.map((item) => (
+              <SideNavAccordion
+                key={item?.initiativeId}
+                item={item}
+                isOpen={isOpen}
+                defaultOpen={!(initiativesList.length - 1)}
+              />
+            ))}
           <Divider sx={{ margin: '1rem 0' }} orientation="horizontal" />
           <SideNavItem
-            title={t('sideMenu.profile')}
+            title={t('commons.sideMenu.profile')}
             handleClick={() => navigate(ROUTES.PROFILE, { replace: true })}
             isSelected={location.pathname === ROUTES.PROFILE}
             icon={Person}

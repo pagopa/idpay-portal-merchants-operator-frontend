@@ -1,3 +1,6 @@
+import { GridColDef } from "@mui/x-data-grid";
+import { StatusChipConfigProps } from "../components/StatusChip/StatusChip";
+
 export interface JwtUser {
   id?: string;
   username?: string;
@@ -9,10 +12,15 @@ export interface JwtUser {
 }
 
 export interface LoggedUser {
-  id: string;
-  name?: string;
-  email?: string;
-  surname?: string;
+    sub: string,
+    email_verified: boolean,
+    name: string,
+    merchant_id: string,
+    preferred_username: string,
+    given_name: string,
+    family_name: string,
+    email: string,
+    point_of_sale_id: string
 }
 
 export interface GetProductsParams {
@@ -47,7 +55,7 @@ export interface GetProcessedTransactionsFilters {
 export interface PaginationExtendedModel {
   page: number;
   pageSize: number;
-  totalElements: number;
+  totalElements?: number;
 }
 
 export interface DecodedJwtToken {
@@ -100,4 +108,29 @@ export interface transactionInProgreessDTO {
   trxDate: string;
   trxExpirationSeconds: number;
   updateDate: string;
+}
+
+export type FormatDateProps = {
+  locale?: string,
+  options?: Record<string, string>
+}
+
+export type FieldConfigDef = Omit<GridColDef, 'renderCell'> & { cell: {type: string, tooltip?: boolean, bold?: boolean, context?: string, options?: Record<string, string>} }
+
+export type StatusEnumConfigDef = Record<string, Record<string, StatusChipConfigProps>>
+
+export type TemplateConfigDef = Array<{value: string, label: string}>
+
+export type FilterConfigDef = {
+  id: string;
+  type: 'select' | 'text';
+  label?: string;
+  template?: string;
+  context?: string;
+  defaultValue?: string;
+  regEx?: string;
+  pattern?: {value: string, flag?: string};
+  message?: string;
+  inputProps?: Record<string, unknown>;
+  options?: Array<Record<string, string>>;
 }

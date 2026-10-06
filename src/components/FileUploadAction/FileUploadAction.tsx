@@ -2,7 +2,7 @@ import { Box, Typography, Link, Stack, Button, Alert, TextField } from '@mui/mat
 import BreadcrumbsBox from '../BreadcrumbsBox/BreadcrumbsBox';
 import { useTranslation } from 'react-i18next';
 import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import ROUTES from '../../routes';
 import { SingleFileInput, theme } from '@pagopa/mui-italia';
 import { useState, useRef, useEffect } from 'react';
@@ -19,7 +19,7 @@ interface FileUploadActionProps {
   titleKey: string;
   subtitleKey: string;
   i18nBlockKey: string;
-  apiCall: (trxId: string, file: File, docNumber: string) => Promise<unknown>;
+  apiCall: (initiativeId: string, trxId: string, file: File, docNumber: string) => Promise<unknown>;
   successStateKey: string;
   breadcrumbsLabelKey: string;
   breadcrumbsProp: BreadcrumbsProps;
@@ -32,6 +32,11 @@ interface FileUploadActionProps {
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
+
+const errorMessageMap = {
+  PAYMENT_STATUS_NOT_VALID: 'pages.reverse.deniedSentError',
+  PAYMENT_REWARD_BATCH_ELIGIBILITY_NOT_ALLOWED: 'pages.reverse.alreadySentError'
+}
 
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
   titleKey,
@@ -47,6 +52,11 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   docNumberLabel,
   styleClass,
 }) => {
+  const { trxId, fileDocNumber, initiativeId } = useParams<{
+    trxId: string;
+    fileDocNumber: string;
+    initiativeId: string
+  }>();
   const [file, setFile] = useState<File | null>(null);
   const [requiredFileError, setRequiredFileError] = useState<boolean>(false);
   const [docNumber, setDocNumber] = useState<string>('');
@@ -58,16 +68,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { trxId, fileDocNumber } = useParams<{
-    trxId: string;
-    fileDocNumber: string;
-  }>();
-
-  useEffect(() => {
-    if (fileDocNumber) {
-      setDocNumber(atob(fileDocNumber));
-    }
-  }, [fileDocNumber]);
 
   useEffect(() => {
     if (errorAlert) {
@@ -77,6 +77,13 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
       return () => clearTimeout(timer);
     }
   }, [errorAlert]);
+
+  useEffect(() => {
+    if (fileDocNumber) {
+      const decripted = atob(fileDocNumber)
+      setDocNumber(decripted !== 'undefined' ? decripted : '')
+    }
+  }, [fileDocNumber])
 
   const handleFileSelect = (selectedFile: File) => {
     if (selectedFile) {
@@ -120,7 +127,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
     if (file && trxId && docNumber.trim() && docNumber.trim().length >= 2) {
       setLoadingFile(true);
       try {
-        await apiCall(trxId, file, docNumber);
+        await apiCall(initiativeId, trxId, file, docNumber);
         setLoadingFile(false);
         navigate(breadcrumbsProp?.path, {
           state: {
@@ -129,15 +136,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         });
       } catch (error) {
         const errorResponseCode = error?.response?.data?.code;
-
-        let errorMessage = t('pages.reverse.errorAlert');
-
-        if (errorResponseCode === 'REWARD_BATCH_STATUS_NOT_ALLOWED') {
-          errorMessage = t('pages.reverse.deniedSentError');
-        } else if (errorResponseCode === 'REWARD_BATCH_ALREADY_SENT') {
-          errorMessage = t('pages.reverse.alreadySentError');
-        }
-        setErrorAlert({ isOpen: true, message: errorMessage });
+        setErrorAlert({ isOpen: true, message: t(errorMessageMap?.[errorResponseCode] ?? 'pages.reverse.errorAlert') });
         setLoadingFile(false);
       }
     }
@@ -160,7 +159,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
           backLabel={t('commons.exitBtn')}
           items={[
             { label: breadcrumbsProp?.label, path: breadcrumbsProp?.path },
-            { label: breadcrumbsLabelKey, path: ROUTES.REVERSE },
+            { label: breadcrumbsLabelKey, path: generatePath(ROUTES.REVERSE, { initiativeId: initiativeId, trxId: trxId }) },
           ]}
           active={true}
           onClickBackButton={() => navigate(breadcrumbsProp?.path)}
@@ -201,6 +200,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
                 : setDocNumberError(false);
             }}
             label={docNumberLabel}
+            required
             size="small"
             sx={{
               mt: 2,

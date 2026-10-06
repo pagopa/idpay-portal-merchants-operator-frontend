@@ -4,6 +4,14 @@ import ROUTES from '../../routes';
 import ModifyDocument from './ModifyDocument';
 import * as merchantService from '../../services/merchantService';
 
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useParams: () => ({ initiativeId: 'initiative-1' }),
+  };
+});
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
@@ -96,7 +104,7 @@ describe('ModifyDocument component', () => {
     render(<ModifyDocument />);
 
     expect(screen.getByTestId('breadcrumbs-label')).toHaveTextContent('Rimborso');
-    expect(screen.getByTestId('breadcrumbs-path')).toHaveTextContent(ROUTES.REFUNDS_MANAGEMENT);
+    expect(screen.getByTestId('breadcrumbs-path')).toHaveTextContent('/initiative-1/gestione-rimborsi');
   });
 
   it('passes correct document number related props', () => {

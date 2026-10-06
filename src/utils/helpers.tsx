@@ -1,6 +1,29 @@
 import { Chip, Tooltip, Typography } from '@mui/material';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 import { GridRenderCellParams } from '@mui/x-data-grid';
+import { theme } from '@pagopa/mui-italia';
+import { FormatDateProps } from './types';
+
+export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
+  const sx = {
+    ...(tooltip ? {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    } : {
+      wordWrap: "break-word",
+      maxWidth: "100%"
+    }),
+    ...(bold || !text ? { fontWeight: theme.typography.fontWeightMedium } : {}),
+  }
+  return <Tooltip title={tooltip && (text || MISSING_DATA_PLACEHOLDER)}>
+    <Typography
+      sx={sx}
+    >
+      {text || MISSING_DATA_PLACEHOLDER}
+    </Typography>
+  </Tooltip>
+}
 
 export function getStatusChip(t: any, status: string) {
   const statusMap: Record<string, { label: string; backgroundColor: string; color: string }> = {
@@ -56,12 +79,32 @@ export function getStatusChip(t: any, status: string) {
 
 export function formatEuro(value: number) {
   return (
-    (value / 100).toLocaleString('it-IT', {
+    !isNaN(value) && (value / 100).toLocaleString('it-IT', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }) + '€'
   );
 }
+
+export const formatDate = (
+  value: string | number | Date,
+  props: FormatDateProps = {
+    locale: 'it-IT',
+    options: {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }
+  }
+) => {
+  if (!value) return;
+  const formattedDate = new Date(value)
+    .toLocaleDateString(props.locale, props.options)
+    .replace(',', '');
+  return formattedDate;
+};
 
 export function filterInputWithSpaceRule(value: string): string {
   const alnumCount = (value.match(/[a-zA-Z0-9]/g) || []).length;
@@ -214,20 +257,55 @@ export const checkEuroTooltip = (params: GridRenderCellParams) => {
 
 export const checkDateTooltip = (
   params: GridRenderCellParams,
-  locale: string = 'it-IT',
-  options: Intl.DateTimeFormatOptions = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }
-) => {
+  props?: FormatDateProps) => {
   if (!params?.value) {
     return renderMissingDataWithTooltip();
   }
-  const formattedDate = new Date(params.value as string | number | Date)
-    .toLocaleDateString(locale, options)
-    .replace(',', '');
+  const formattedDate = formatDate(params.value, props);
   return renderCellWithTooltip(formattedDate);
 };
+
+export const replaceValues = (string: string, values: Record<string, string>) => {
+  return Object.entries(values).reduce((acc, [key, value]) => acc.replace(key, value), string)
+}
+
+export function buildNamespaceKey(name: string, startDate: string): string {
+  if (!name || !startDate) {
+    return '';
+  }
+
+  const year = new Date(startDate).getFullYear();
+
+  const words = name.toLowerCase().match(/[a-z0-9]+/g);
+
+  if (!words) {
+    return '';
+  }
+
+  const camelCaseName = words
+    .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join('');
+
+  return `${camelCaseName}${year}`;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const normalizeObj = (obj: Record<string, any>, parentKey?: string) => {
+  const isObj = Object.prototype.toString.call(obj) === "[object Object]" &&
+    Object.getPrototypeOf(obj) === Object.prototype;
+
+  return isObj ? Object.entries(obj).reduce((acc, [key, value]) => {
+    const objKey = parentKey ? `${parentKey}.${key}` : key
+    return { ...acc, ...normalizeObj(value, objKey) }
+  }, {}) : parentKey ? { [parentKey]: obj } : obj
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const plainObj = (obj: Record<string, any>) => {
+  const isObj = (item) => Object.prototype.toString.call(item) === "[object Object]" &&
+    Object.getPrototypeOf(item) === Object.prototype;
+
+  return isObj(obj) ? Object.entries(obj).reduce((acc, [key, value]) => {
+    return { ...acc, ...(isObj(value) ? plainObj(value) : {[key]: value})}
+  }, {}) : obj
+}

@@ -15,13 +15,14 @@ import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import ModalComponent from '../../components/Modal/ModalComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
-import { getProductsList, previewPayment } from '../../services/merchantService';
+import { getInitiativeProductsList, previewPayment } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/data-contracts';
 import AlertComponent from '../../components/Alert/AlertComponent';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import EuroIcon from '@mui/icons-material/Euro';
 import ROUTES from '../../routes';
+import { trackAnalytics } from '../../services/analyticsService';
 
 interface FormData {
   product: ProductDTO | null;
@@ -32,12 +33,18 @@ interface FormData {
 interface FormErrors {
   product?: boolean;
   totalAmount?: boolean;
-  discountCode?: boolean;
+  discountCode?: string;
   discountCodeWrong?: boolean;
+}
+
+const errorMessage = {
+  PAYMENT_NOT_FOUND_OR_EXPIRED: 'pages.acceptDiscount.discountCodeErrors.notFound',
+  PAYMENT_ALREADY_AUTHORIZED: 'pages.acceptDiscount.discountCodeErrors.alreadyAuthorized'
 }
 
 const AcceptDiscount = () => {
   const { t } = useTranslation();
+  const { initiativeId } = useParams();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState<FormData>({
@@ -48,6 +55,7 @@ const AcceptDiscount = () => {
   const [productsList, setProductsList] = useState<unknown[]>([]);
   const [isExpenditureFocused, setIsExpenditureFocused] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
+  const [errorAlertMessage, setErrorAlertMessage] = useState('pages.acceptDiscount.errorAlert');
   const [previewIsLoading, setPreviewIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -74,7 +82,7 @@ const AcceptDiscount = () => {
 
   const fetchProductsList = async (fullProductName?: string) => {
     try {
-      const { content } = await getProductsList({ fullProductName, size: 50 });
+      const { content } = await getInitiativeProductsList(initiativeId, { fullProductName, size: 50 });
       setProductsList([...content]);
     } catch {
       setProductsList([]);
@@ -82,54 +90,47 @@ const AcceptDiscount = () => {
   };
 
   const handleValidateData = async () => {
-    const errors: Record<string, boolean> = {};
-    let isValid = true;
-
-    if (!formData.product) {
-      errors.product = true;
-      isValid = false;
+    const errors = {
+      ...(!formData.product && { product: true }),
+      ...(!formData.discountCode && { discountCode: REQUIRED_FIELD_ERROR }),
+      ...(!formData.totalAmount && { totalAmount: true }),
     }
-    if (!formData.totalAmount) {
-      errors.totalAmount = true;
-      isValid = false;
+    const isValid = !Object.keys(errors).length
+    setFieldErrors(errors)
+    if (!isValid) {
+      trackAnalytics("couponInvalidCodeError", { reason: `Empty fields: ${Object.keys(errors)}` })
+      return
     }
-    if (!formData.discountCode) {
-      errors.discountCode = true;
-      isValid = false;
-    }
-
-    setFieldErrors(errors);
-    if (isValid) {
-      setPreviewIsLoading(true);
-      try {
-        const response = await previewPayment({
-          productGtin: formData.product!.gtinCode!,
-          productName: formData.product!.productName!,
-          amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100),
-          discountCode: formData.discountCode.trim()!,
-        });
-        sessionStorage.setItem(
-          'discountCoupon',
-          JSON.stringify({ ...response, product: formData.product })
-        );
+    setPreviewIsLoading(true);
+    try {
+      const response = await previewPayment(initiativeId, {
+        productGtin: formData.product!.gtinCode!,
+        productName: formData.product!.productName!,
+        amountCents: Math.round(Number(formData.totalAmount.replace(',', '.')) * 100),
+        discountCode: formData.discountCode.trim()!,
+      });
+      sessionStorage.setItem(
+        'discountCoupon',
+        JSON.stringify({ ...response, product: formData.product })
+      );
+      navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
+    } catch (error) {
+      const errorCode: string = error?.response?.data?.code;
+      if (errorMessage?.[errorCode]) {
+        setFieldErrors({ discountCode: errorMessage?.[errorCode] });
         setPreviewIsLoading(false);
-        navigate('/accetta-buono-sconto/riepilogo');
-      } catch (error) {
-        if (
-          error?.response?.data?.code === 'PAYMENT_NOT_FOUND_OR_EXPIRED' ||
-          error?.response?.data?.code === 'PAYMENT_ALREADY_AUTHORIZED'
-        ) {
-          const errors: Record<string, boolean> = {};
-          errors.discountCodeWrong = true;
-          setFieldErrors(errors);
-          setPreviewIsLoading(false);
-        } else {
-          setErrorAlert(true);
-          setPreviewIsLoading(false);
-        }
+      } else {
+        setErrorAlertMessage(
+          errorCode === 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS'
+            ? 'pages.acceptDiscount.discountCodeErrors.notValid'
+            : 'pages.acceptDiscount.errorAlert'
+        );
+        setErrorAlert(true);
       }
+      trackAnalytics("couponInvalidCodeError", { reason: errorCode })
+    } finally {
+      setPreviewIsLoading(false);
     }
-    return isValid;
   };
 
   const handleFieldChange = (field: keyof FormData, value: string | ProductDTO): void => {
@@ -196,7 +197,7 @@ const AcceptDiscount = () => {
 
   const handleExitPage = () => {
     sessionStorage.removeItem('discountCoupon');
-    navigate(ROUTES.BUY_MANAGEMENT);
+    navigate(generatePath(ROUTES.BUY_MANAGEMENT, { initiativeId: initiativeId }));
   };
 
   return (
@@ -232,6 +233,7 @@ const AcceptDiscount = () => {
                 inputTitle={t('pages.acceptDiscount.selectProductTitle')}
               >
                 <Autocomplete
+                  required
                   options={productsList as ProductDTO[]}
                   onChangeDebounce={(value) => handleChangeAutocomplete(value)}
                   onChange={(productObj) => handleFieldChange('product', productObj)}
@@ -247,6 +249,7 @@ const AcceptDiscount = () => {
                 subTitleBox={t('pages.acceptDiscount.insertAmount')}
               >
                 <TextField
+                  required
                   variant="outlined"
                   label={t('pages.acceptDiscount.expenditureAmount')}
                   size="small"
@@ -288,6 +291,7 @@ const AcceptDiscount = () => {
                 inputTitle={'Inserisci codice sconto'}
               >
                 <TextField
+                  required
                   variant="outlined"
                   label={t('pages.acceptDiscount.discountCode')}
                   size="small"
@@ -298,14 +302,8 @@ const AcceptDiscount = () => {
                       color: '#5C6E82 !important',
                     },
                   }}
-                  error={!!fieldErrors.discountCode || !!fieldErrors.discountCodeWrong}
-                  helperText={
-                    fieldErrors.discountCode
-                      ? REQUIRED_FIELD_ERROR
-                      : fieldErrors.discountCodeWrong
-                        ? 'Codice sconto non valido'
-                        : ''
-                  }
+                  error={!!fieldErrors.discountCode}
+                  helperText={t(fieldErrors.discountCode)}
                   onChange={(e) => handleFieldChange('discountCode', e.target.value)}
                 />
               </AcceptDiscountCard>
@@ -340,7 +338,7 @@ const AcceptDiscount = () => {
         isOpen={errorAlert}
         contentStyle={{ right: '20px' }}
         error
-        message={t('pages.acceptDiscount.errorAlert')}
+        message={t(errorAlertMessage)}
       />
     </>
   );

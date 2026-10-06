@@ -14,6 +14,7 @@ type AutocompleteComponentProps = {
   onChange?: (value: ProductDTO | null) => void;
   value?: ProductDTO | null;
   width?: string | number;
+  required?: boolean
 };
 
 const autocompleteSx = (width?: string | number) => ({
@@ -60,6 +61,7 @@ function getVisibleOptions(loading: boolean, inputValue: string, options: Produc
 }
 
 export default function AutocompleteComponent({
+  required,
   options,
   onChangeDebounce,
   inputError,
@@ -172,6 +174,7 @@ export default function AutocompleteComponent({
       renderInput={(params) => (
         <TextField
           {...params}
+          required={required}
           label="Cerca"
           size="small"
           error={inputError}

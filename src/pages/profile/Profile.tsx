@@ -39,7 +39,7 @@ const mapResponse = async ({ setLoading, setErrorAlert, setDetails, token, user 
           response?.zipCode &&
           response?.city &&
           response?.province &&
-          `${response.address} - ${response.zipCode}, ${response.city}, ${response.province}`) ??
+          `${response.address} ${response.streetNumber !== 'SNC' ? 'N. ' : ''}${response.streetNumber}, ${response.zipCode} ${response.city} (${response.province})`) ??
         '',
       Telefono: response?.channelPhone ?? '',
       Email: response?.channelEmail ?? '',

@@ -1,19 +1,36 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import { CustomFooter } from './CustomFooter';
 import { FooterPostLogin, FooterLegal } from '@pagopa/mui-italia';
 import { useTranslation } from 'react-i18next';
-import { CONFIG } from '@pagopa/selfcare-common-frontend/lib/config/env';
+import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 
 vi.mock('@pagopa/mui-italia', () => ({
   FooterPostLogin: vi.fn(() => <div data-testid="footer-postlogin"></div>),
   FooterLegal: vi.fn(() => <div data-testid="footer-legal"></div>),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: vi.fn(),
-  Trans: ({ children }: any) => <>{children}</>,
+vi.mock('react-i18next', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    Trans: ({ children }: any) => <>{children}</>,
+  }
+});
+
+
+vi.mock('../../hooks/useScopedTranslation', () => ({
+  useScopedTranslation: () => ({ t: (key: string) => key }),
 }));
+
+vi.mock('../../redux/hooks', () => ({
+  useAppSelector: vi.fn(),
+}));
+
+vi.mock('../../redux/slices/initiativesSlice', () => ({
+  initiativesListSelector: vi.fn(),
+}));
+
 
 vi.mock('@pagopa/selfcare-common-frontend/lib/config/env', () => ({
   CONFIG: {
@@ -37,9 +54,6 @@ const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (useTranslation as any).mockReturnValue({
-    t: (key: string) => key,
-  });
 });
 
 describe('CustomFooter Component - Rendering', () => {
@@ -98,18 +112,6 @@ describe('CustomFooter Component - Link Behavior', () => {
       link.onClick();
       expect(windowOpenSpy).toHaveBeenCalled();
     }
-  });
-});
-
-describe('CustomFooter Component - i18n integration', () => {
-  it('should call useTranslation and translate labels', async () => {
-    render(<CustomFooter />);
-
-    expect(useTranslation).toHaveBeenCalled();
-
-    await waitFor(() => {
-      expect(screen.getByTestId('footer-postlogin')).toBeInTheDocument();
-    });
   });
 });
 

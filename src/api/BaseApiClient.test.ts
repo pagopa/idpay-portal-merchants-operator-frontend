@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('axios', () => ({
+  isAxiosError: vi.fn(),
+}));
+
+vi.mock('../config/keycloak', () => ({
+  default: {
+    logout: vi.fn(),
+  },
+}));
+
 vi.mock('../store/authStore', () => ({
   authStore: {
     getState: vi.fn(),
@@ -9,6 +19,7 @@ vi.mock('../store/authStore', () => ({
 describe('BaseApiClient', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.clearAllMocks();
   });
 
   it('createApiConfig sets baseURL from env and returns securityWorker', async () => {
@@ -52,6 +63,7 @@ describe('BaseApiClient', () => {
     const { authStore } = await import('../store/authStore');
     (authStore.getState as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       token: 'my_token',
+      executeLogout: vi.fn(),
     });
 
     const { getAuthToken } = await import('./BaseApiClient');
@@ -65,6 +77,7 @@ describe('BaseApiClient', () => {
     const { authStore } = await import('../store/authStore');
     (authStore.getState as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       token: undefined,
+      executeLogout: vi.fn(),
     });
 
     const { getAuthToken } = await import('./BaseApiClient');
@@ -72,5 +85,96 @@ describe('BaseApiClient', () => {
     const token = getAuthToken();
 
     expect(token).toBeNull();
+  });
+
+  it('attachUnauthorizedLogoutInterceptor registers a response interceptor', async () => {
+    const { attachUnauthorizedLogoutInterceptor } = await import('./BaseApiClient');
+    const use = vi.fn();
+
+    attachUnauthorizedLogoutInterceptor({
+      instance: {
+        interceptors: {
+          response: { use },
+        },
+      },
+    } as never);
+
+    expect(use).toHaveBeenCalledTimes(1);
+    expect(use.mock.calls[0][0]).toBeTypeOf('function');
+    expect(use.mock.calls[0][1]).toBeTypeOf('function');
+  });
+
+  it('response interceptor executes logout on axios 401 errors', async () => {
+    const axios = await import('axios');
+    const keycloak = await import('../config/keycloak');
+    const use = vi.fn();
+    const error = { response: { status: 401 } };
+
+    (axios.isAxiosError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+
+    const { attachUnauthorizedLogoutInterceptor } = await import('./BaseApiClient');
+
+    attachUnauthorizedLogoutInterceptor({
+      instance: {
+        interceptors: {
+          response: { use },
+        },
+      },
+    } as never);
+
+    const errorHandler = use.mock.calls[0][1];
+
+    await expect(errorHandler(error)).rejects.toBe(error);
+    expect(keycloak.default.logout).toHaveBeenCalledTimes(1);
+  });
+
+  it('response interceptor does not logout on non-401 errors', async () => {
+    const axios = await import('axios');
+    const keycloak = await import('../config/keycloak');
+    const use = vi.fn();
+    const error = { response: { status: 500 } };
+
+    (axios.isAxiosError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+
+    const { attachUnauthorizedLogoutInterceptor } = await import('./BaseApiClient');
+
+    attachUnauthorizedLogoutInterceptor({
+      instance: {
+        interceptors: {
+          response: { use },
+        },
+      },
+    } as never);
+
+    const errorHandler = use.mock.calls[0][1];
+
+    await expect(errorHandler(error)).rejects.toBe(error);
+    expect(keycloak.default.logout).not.toHaveBeenCalled();
+  });
+
+  it('response interceptor triggers keycloak logout only once for repeated 401 errors', async () => {
+    const axios = await import('axios');
+    const keycloak = await import('../config/keycloak');
+    const use = vi.fn();
+    const error = { response: { status: 401 } };
+
+    (axios.isAxiosError as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+
+    const { attachUnauthorizedLogoutInterceptor } = await import('./BaseApiClient');
+
+    attachUnauthorizedLogoutInterceptor({
+      instance: {
+        interceptors: {
+          response: { use },
+        },
+      },
+    } as never);
+
+    const errorHandler = use.mock.calls[0][1];
+
+    await expect(errorHandler(error)).rejects.toBe(error);
+    await expect(errorHandler(error)).rejects.toBe(error);
+
+    expect(keycloak.default.logout).toHaveBeenCalledTimes(1);
   });
 });

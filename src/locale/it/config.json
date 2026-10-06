@@ -1,0 +1,148 @@
+{
+    "commons": {
+        "permissions": {
+            "initiativeStatus": [
+                "PUBLISHED"
+            ],
+            "closedRoutes": [
+                "ACCEPT_DISCOUNT",
+                "ACCEPT_DISCOUNT_SUMMARY",
+                "REVERSE",
+                "REFUND",
+                "MODIFY_DOCUMENT"
+            ]
+        },
+        "templates": {
+            "transactions": {
+                "purchaseStatus": [
+                    {
+                        "value": "AUTHORIZED",
+                        "label": "commons.statusEnum.transaction.authorized"
+                    },
+                    {
+                        "value": "CAPTURED",
+                        "label": "commons.statusEnum.transaction.captured"
+                    }
+                ],
+                "refundStatus": [
+                    {
+                        "value": "CANCELLED",
+                        "label": "commons.statusEnum.transaction.cancelled"
+                    },
+                    {
+                        "value": "REFUNDED",
+                        "label": "commons.statusEnum.transaction.refunded"
+                    },
+                    {
+                        "value": "REWARDED",
+                        "label": "commons.statusEnum.transaction.rewarded"
+                    },
+                    {
+                        "value": "INVOICED",
+                        "label": "commons.statusEnum.transaction.invoiced"
+                    }
+                ]
+            }
+        },
+        "statusEnum": {
+            "initiative": {
+                "closed": {
+                    "label": "commons.statusEnum.initiative.closed",
+                    "color": "default"
+                },
+                "published": {
+                    "label": "commons.statusEnum.initiative.published",
+                    "color": "success"
+                }
+            },
+            "transaction": {
+                "authorized": {
+                    "label": "commons.statusEnum.transaction.authorized",
+                    "color": "default"
+                },
+                "captured": {
+                    "label": "commons.statusEnum.transaction.captured",
+                    "color": "warning"
+                },
+                "cancelled": {
+                    "label": "commons.statusEnum.transaction.cancelled",
+                    "color": "error"
+                },
+                "refunded": {
+                    "label": "commons.statusEnum.transaction.refunded",
+                    "color": "primary"
+                },
+                "rewarded": {
+                    "label": "commons.statusEnum.transaction.rewarded",
+                    "color": "success"
+                },
+                "invoiced": {
+                    "label": "commons.statusEnum.transaction.invoiced",
+                    "color": "info"
+                }
+            }
+        },
+        "pages": {
+            "initiativesList": {
+                "initiativeTable": {
+                    "columns": [
+                        {
+                            "field": "initiativeName",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.initiativeName",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "navigation",
+                                "tooltip": true
+                            }
+                        },
+                        {
+                            "field": "organizationName",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.organizationName",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "text",
+                                "tooltip": true
+                            }
+                        },
+                        {
+                            "field": "onboardingDate",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.onboardingDate",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "date",
+                                "tooltip": true,
+                                "options": {
+                                    "day": "2-digit",
+                                    "month": "2-digit",
+                                    "year": "numeric"
+                                }
+                            }
+                        },
+                        {
+                            "field": "status",
+                            "headerName": "commons.pages.initiativesList.tableHeaders.status",
+                            "flex": 1,
+                            "sortable": true,
+                            "disableColumnMenu": true,
+                            "resizable": false,
+                            "cell": {
+                                "type": "chip",
+                                "tooltip": true,
+                                "context": "commons.statusEnum.initiative"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

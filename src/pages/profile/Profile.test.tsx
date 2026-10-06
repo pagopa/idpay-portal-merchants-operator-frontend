@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import Profile from './Profile';
 import { useAuth } from '../../contexts/AuthContext';
 import { authStore } from '../../store/authStore';
@@ -7,7 +7,7 @@ import { getPointOfSaleDetails } from '../../services/merchantService';
 import { jwtDecode } from 'jwt-decode';
 
 vi.mock('react-i18next', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('react-i18next')>();
   return {
     ...actual,
     useTranslation: () => ({
@@ -22,7 +22,13 @@ vi.mock('../../services/merchantService');
 vi.mock('jwt-decode');
 
 vi.mock('../../components/DetailsCard/DetailsCard', () => ({
-  default: ({ title, item }) => (
+  default: ({
+    title,
+    item,
+  }: {
+    title: string;
+    item: Record<string, string>;
+  }) => (
     <div data-testid={`details-card-${title.toLowerCase().replace(/\s/g, '-')}`}>
       <h3>{title}</h3>
       <pre>{JSON.stringify(item)}</pre>
@@ -31,7 +37,14 @@ vi.mock('../../components/DetailsCard/DetailsCard', () => ({
 }));
 
 vi.mock('../../components/Alert/AlertComponent', () => ({
-  default: ({ message }) => <div data-testid="alert-component">{message}</div>,
+  default: ({
+    message,
+    isOpen,
+  }: {
+    message: string;
+    isOpen: boolean;
+  }) =>
+    isOpen ? <div data-testid="alert-component">{message}</div> : null,
 }));
 
 const mockToken = 'mock-jwt-token';
@@ -43,10 +56,27 @@ const mockDecodedToken = {
 };
 
 const mockUserDetails = {
+  isAuthenticated: true,
   user: {
     merchant_id: mockUserId,
   },
-};
+  token: mockToken,
+  login: vi.fn(),
+  logout: vi.fn(),
+  loading: false,
+} as ReturnType<typeof useAuth>;
+
+const mockAuthState = {
+  token: mockToken,
+  isAuthenticated: true,
+  user: mockUserDetails.user,
+  logoutFn: null,
+  setJwtToken: vi.fn(),
+  setLogout: vi.fn(),
+  executeLogout: vi.fn(),
+  setUser: vi.fn(),
+  clearToken: vi.fn(),
+} as ReturnType<typeof authStore.getState>;
 
 const mockResponse = {
   id: 'POS123',
@@ -61,13 +91,18 @@ const mockResponse = {
   contactEmail: 'contatto@test.it',
 };
 
+const mockUseAuth = vi.mocked(useAuth);
+const mockGetState = vi.mocked(authStore.getState);
+const mockJwtDecode = vi.mocked(jwtDecode);
+const mockGetPointOfSaleDetails = vi.mocked(getPointOfSaleDetails);
+
 beforeEach(() => {
   vi.useRealTimers();
 
-  useAuth.mockReturnValue(mockUserDetails);
-  authStore.getState.mockReturnValue({ token: mockToken });
-  jwtDecode.mockReturnValue(mockDecodedToken);
-  getPointOfSaleDetails.mockResolvedValue(mockResponse);
+  mockUseAuth.mockReturnValue(mockUserDetails);
+  mockGetState.mockReturnValue(mockAuthState);
+  mockJwtDecode.mockReturnValue(mockDecodedToken);
+  mockGetPointOfSaleDetails.mockResolvedValue(mockResponse);
 });
 
 afterEach(() => {
@@ -98,13 +133,52 @@ describe('Profile Component (Vitest)', () => {
 
   it('should show AlertComponent in case of API error', async () => {
     const mockError = new Error('API Error Test');
-    getPointOfSaleDetails.mockRejectedValue(mockError);
+    mockGetPointOfSaleDetails.mockRejectedValue(mockError);
 
     render(<Profile />);
 
     await waitFor(() => {
       expect(screen.queryByTestId('alert-component')).toBeInTheDocument();
     });
+  });
+
+  it('should format an address with SNC without the N. prefix', async () => {
+    mockGetPointOfSaleDetails.mockResolvedValue({
+      ...mockResponse,
+      streetNumber: 'SNC',
+    });
+
+    render(<Profile />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('details-cards')).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId('details-card-dati-punto-vendita')).toHaveTextContent(
+      'Via Test 1 SNC, 00100 Roma (RM)'
+    );
+    expect(screen.getByTestId('details-card-dati-punto-vendita')).not.toHaveTextContent(
+      'N. SNC'
+    );
+  });
+
+  it('should hide the error alert after five seconds', async () => {
+    vi.useFakeTimers();
+    mockGetPointOfSaleDetails.mockRejectedValue(new Error('API Error Test'));
+
+    render(<Profile />);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('alert-component')).toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(screen.queryByTestId('alert-component')).not.toBeInTheDocument();
   });
 
   it('should handle API returning empty fields', async () => {
@@ -120,7 +194,9 @@ describe('Profile Component (Vitest)', () => {
       contactSurname: null,
       contactEmail: null,
     };
-    getPointOfSaleDetails.mockResolvedValue(emptyResponse);
+    mockGetPointOfSaleDetails.mockResolvedValue(
+      emptyResponse as unknown as Awaited<ReturnType<typeof getPointOfSaleDetails>>
+    );
 
     render(<Profile />);
 

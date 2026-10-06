@@ -1,5 +1,4 @@
-import { Button, Grid } from '@mui/material';
-import { ButtonNaked } from '@pagopa/mui-italia';
+import { Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import React, { cloneElement, isValidElement } from 'react';
 import { FormikProps } from 'formik';
@@ -61,39 +60,29 @@ const FiltersForm = <T extends Record<string, any>>({
   });
 
   return (
-    <Grid sx={{ my: 4, width: '100%' }} container spacing={2}>
-      {enhancedChildren}
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
+    <Box display="flex" flexDirection="row" columnGap="1rem" alignItems="flex-start" width="100%">
+        {enhancedChildren}
+      <Box display="flex" flexDirection="row" alignItems="center" columnGap="1rem" minWidth="fit-content">
         <Button
-          sx={{ height: '44.5px', gridColumn: 'span 1' }}
+          sx={{ minWidth: 'fit-content' }}
           variant="outlined"
-          fullWidth
-          size="small"
           onClick={handleApplyFilters}
           disabled={formik.isSubmitting || !filtersApplied}
           data-testid="apply-filters-test"
         >
           {t('commons.filterBtn')}
         </Button>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3, lg: 1 }}>
-        <ButtonNaked
-          component="button"
-          sx={{
-            color: 'primary.main',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            gridColumn: 'span 1',
-            height: '44.5px',
-          }}
+        <Button
+          sx={{ minWidth: 'fit-content' }}
+          variant="naked"
           onClick={handleResetFilters}
           disabled={formik.isSubmitting || (!filtersApplied && !filtersAppliedOnce)}
           data-testid="reset-filters-test"
         >
           {t('commons.removeFiltersBtn')}
-        </ButtonNaked>
-      </Grid>
-    </Grid>
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

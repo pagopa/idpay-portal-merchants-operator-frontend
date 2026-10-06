@@ -27,6 +27,7 @@ const Layout = ({ children }: Props) => {
 
   const isMatched = match([
     ROUTES.HOME,
+    ROUTES.INITIATIVES_LIST,
     ROUTES.PROFILE,
     ROUTES.BUY_MANAGEMENT,
     ROUTES.PRODUCTS,

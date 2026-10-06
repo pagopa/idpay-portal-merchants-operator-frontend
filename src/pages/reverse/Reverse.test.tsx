@@ -9,9 +9,14 @@ import {
 } from '../../services/merchantService';
 import ROUTES from '../../routes';
 
-vi.mock('react-router-dom', () => ({
-  useLocation: vi.fn(),
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useParams: () => ({ initiativeId: 'id-123' }),
+    useLocation: vi.fn(),
+  };
+});
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
@@ -76,7 +81,7 @@ describe('Reverse Component', () => {
 
       expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent(ROUTES.REFUNDS_MANAGEMENT);
       expect(screen.getByTestId('breadcrumb-label')).toHaveTextContent('Refund Management');
-      expect(screen.getByTestId('api-call')).toHaveTextContent('reverseInvoicedTransactionApi');
+      expect(screen.getByTestId('api-call')).toHaveTextContent('reverseTransactionApi2');
     });
 
     it('should use reverseTransactionApi when breadcrumbsProp.path is BUY_MANAGEMENT', () => {
@@ -124,11 +129,11 @@ describe('Reverse Component', () => {
       render(<Reverse />);
 
       expect(mockT).toHaveBeenCalledWith('routes.refundManagement');
-      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent(ROUTES.REFUNDS_MANAGEMENT);
+      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent('/id-123/gestione-acquisti');
       expect(screen.getByTestId('breadcrumb-label')).toHaveTextContent(
-        'translated_routes.refundManagement'
+        'translated_routes.buyManagement'
       );
-      expect(screen.getByTestId('api-call')).toHaveTextContent('reverseInvoicedTransactionApi');
+      expect(screen.getByTestId('api-call')).toHaveTextContent('reverseTransactionApi2');
     });
 
     it('should use reverseTransactionApi when backTo is BUY_MANAGEMENT', () => {
@@ -141,7 +146,7 @@ describe('Reverse Component', () => {
       render(<Reverse />);
 
       expect(mockT).toHaveBeenCalledWith('routes.buyManagement');
-      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent(ROUTES.BUY_MANAGEMENT);
+      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent('/id-123/gestione-acquisti');
       expect(screen.getByTestId('breadcrumb-label')).toHaveTextContent(
         'translated_routes.buyManagement'
       );
@@ -158,7 +163,7 @@ describe('Reverse Component', () => {
       render(<Reverse />);
 
       expect(mockT).toHaveBeenCalledWith('routes.buyManagement');
-      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent(ROUTES.BUY_MANAGEMENT);
+      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent('/id-123/gestione-acquisti');
       expect(screen.getByTestId('api-call')).toHaveTextContent('reverseTransactionApi');
     });
   });
@@ -172,7 +177,7 @@ describe('Reverse Component', () => {
       render(<Reverse />);
 
       expect(mockT).toHaveBeenCalledWith('routes.buyManagement');
-      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent(ROUTES.BUY_MANAGEMENT);
+      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent('/id-123/gestione-acquisti');
       expect(screen.getByTestId('api-call')).toHaveTextContent('reverseTransactionApi');
     });
 
@@ -184,7 +189,7 @@ describe('Reverse Component', () => {
       render(<Reverse />);
 
       expect(mockT).toHaveBeenCalledWith('routes.buyManagement');
-      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent(ROUTES.BUY_MANAGEMENT);
+      expect(screen.getByTestId('breadcrumb-path')).toHaveTextContent('/id-123/gestione-acquisti');
       expect(screen.getByTestId('api-call')).toHaveTextContent('reverseTransactionApi');
     });
 

@@ -3,6 +3,7 @@ export const testToken = '';
 const IS_DEVELOP = import.meta.env.DEV;
 export const MOCK_USER = IS_DEVELOP;
 export const LOG_REDUX_ACTIONS = IS_DEVELOP;
+export const BASE_ROUTE = '/esercente'
 
 export const DEBUG_CONSOLE = false;
 

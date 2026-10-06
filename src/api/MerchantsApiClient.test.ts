@@ -3,46 +3,46 @@ const mockGet = vi.fn();
 const mockPut = vi.fn();
 const mockPost = vi.fn();
 const mockDelete = vi.fn();
-
-vi.mock('./generated/Products', () => ({
-  Products: class {
-    setSecurityData = vi.fn();
-    getProducts = (params: Record<string, unknown>) =>
-      mockGet('/products', {
-        params: Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined)),
-      });
-  },
-}));
-
-vi.mock('./generated/Transactions', () => ({
-  Transactions: class {
-    setSecurityData = vi.fn();
-    previewPayment = (code: string, body: Record<string, unknown>) =>
-      mockPut(`/transactions/bar-code/${code}/preview`, body);
-    authPaymentBarCode = (trxCode: string, body: Record<string, unknown>) =>
-      mockPut(`/transactions/bar-code/${trxCode}/authorize`, body);
-    capturePayment = (trxCode: string) =>
-      mockPut(`/transactions/bar-code/${trxCode}/capture`, { trxCode });
-    deleteTransaction = (trxCode: string) => mockDelete(`/transactions/${trxCode}`);
-    reversalTransaction = (trxCode: string) =>
-      mockPost(`/transactions/${trxCode}/reversal`, new FormData(), {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-    reversalTransactionInvoiced = (trxCode: string) =>
-      mockPost(`/transactions/${trxCode}/reversal-invoiced`, new FormData(), {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-    invoiceTransaction = (trxCode: string, body: Record<string, unknown>) =>
-      mockPost(`/transactions/${trxCode}/invoice`, body);
-    updateInvoiceTransaction = (trxCode: string, body: Record<string, unknown>) =>
-      mockPut(`/transactions/${trxCode}/invoice/update`, body);
-    getTransactionPreviewPdf = (trxCode: string) => mockGet(`/transactions/${trxCode}/preview-pdf`);
-  },
+const { mockUseResponseInterceptor } = vi.hoisted(() => ({
+  mockUseResponseInterceptor: vi.fn(),
 }));
 
 vi.mock('./generated/Initiatives', () => ({
   Initiatives: class {
+    instance = {
+      interceptors: {
+        response: {
+          use: mockUseResponseInterceptor,
+        },
+      },
+    };
     setSecurityData = vi.fn();
+    reversalTransaction = (initiativeId: string, trxCode: string) =>
+      mockPost(`/initiatives/${initiativeId}/transactions/${trxCode}/reversal`, new FormData(), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    reversalTransactionInvoiced = (initiativeId: string, trxCode: string) =>
+      mockPost(`/initiatives/${initiativeId}/transactions/${trxCode}/reversal-invoiced`, new FormData(), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    invoiceTransaction = (initiativeId: string, trxCode: string, body: Record<string, unknown>) =>
+      mockPost(`/initiatives/${initiativeId}/transactions/${trxCode}/invoice`, body);
+    updateInvoiceTransaction = (initiativeId: string, trxCode: string, body: Record<string, unknown>) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/${trxCode}/invoice/update`, body);
+    getTransactionPreviewPdf = (initiativeId: string, trxCode: string) => mockGet(`/initiatives/${initiativeId}/transactions/${trxCode}/preview-pdf`);
+    downloadInvoiceFile = (initiativeId: string, pointOfSaleId: string, trxId: string) =>
+      mockGet(`/initiatives/${initiativeId}/${pointOfSaleId}/transactions/${trxId}/download`);
+    previewPayment = (initiativeId: string, code: string, body: Record<string, unknown>) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/bar-code/${code}/preview`, body);
+    authPaymentBarCode = (initiativeId: string, trxCode: string, body: Record<string, unknown>) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/bar-code/${trxCode}/authorize`, body);
+    capturePayment = (initiativeId: string, trxCode: string) =>
+      mockPut(`/initiatives/${initiativeId}/transactions/bar-code/${trxCode}/capture`, { trxCode });
+    deleteTransaction = (initiativeId: string, trxCode: string) => mockDelete(`/initiatives/${initiativeId}/transactions/${trxCode}`);
+    getProducts = (initiativeId: string, params: Record<string, unknown>) =>
+      mockGet(initiativeId, {
+        params: Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== undefined)),
+      });
     getPointOfSaleTransactions = (
       initiativeId: string,
       pointOfSaleId: string,
@@ -65,17 +65,32 @@ vi.mock('./generated/Initiatives', () => ({
 
 vi.mock('./generated/MerchantId', () => ({
   MerchantId: class {
+    instance = {
+      interceptors: {
+        response: {
+          use: mockUseResponseInterceptor,
+        },
+      },
+    };
     setSecurityData = vi.fn();
     getPointOfSale = (merchantId: string, pointOfSaleId: string) =>
       mockGet(`/${merchantId}/point-of-sales/${pointOfSaleId}`);
   },
 }));
 
-vi.mock('./generated/PointOfSaleId', () => ({
-  PointOfSaleId: class {
+
+vi.mock('./generated/PointOfSales', () => ({
+  PointOfSales: class {
+    instance = {
+      interceptors: {
+        response: {
+          use: mockUseResponseInterceptor,
+        },
+      },
+    };
     setSecurityData = vi.fn();
-    downloadInvoiceFile = (pointOfSaleId: string, trxId: string) =>
-      mockGet(`${pointOfSaleId}/transactions/${trxId}/download`);
+    getPointOfSaleInitiativesDetailed = () =>
+      mockGet(`/point-of-sales/initiatives`);
   },
 }));
 
@@ -92,19 +107,20 @@ describe('MerchantApi', () => {
     vi.clearAllMocks();
   });
 
-  describe('getProducts', () => {
+
+  describe('getInitiativeProducts', () => {
     it('should call GET /products with correct parameters', async () => {
       const mockResponse = { data: { products: [], total: 0 } };
       mockGet.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.getProducts({
+      const result = await MerchantApi.getInitiativeProducts('init-123', {
         page: 1,
         size: 10,
         status: 'ACTIVE',
         eprelCode: undefined,
       });
 
-      expect(mockGet).toHaveBeenCalledWith('/products', {
+      expect(mockGet).toHaveBeenCalledWith('init-123', {
         params: {
           page: 1,
           size: 10,
@@ -118,7 +134,7 @@ describe('MerchantApi', () => {
     it('should throw error if API fails', async () => {
       mockGet.mockRejectedValue(new Error('API Error'));
 
-      await expect(MerchantApi.getProducts({})).rejects.toThrow('API Error');
+      await expect(MerchantApi.getInitiativeProducts('init-123', {})).rejects.toThrow('API Error');
     });
   });
 
@@ -133,13 +149,15 @@ describe('MerchantApi', () => {
       const mockResponse = { data: { previewed: true } };
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.previewPayment(mockData);
+      const result = await MerchantApi.previewPayment('init-1', mockData);
 
       expect(mockPut).toHaveBeenCalledWith(
-        `/transactions/bar-code/${mockData.discountCode}/preview`,
+        `/initiatives/init-1/transactions/bar-code/${mockData.discountCode}/preview`,
         {
-          productGtin: mockData.productGtin,
-          productName: mockData.productName,
+          additionalProperties: {
+            productGtin: mockData.productGtin,
+            productName: mockData.productName,
+          },
           amountCents: mockData.amountCents,
         }
       );
@@ -157,9 +175,9 @@ describe('MerchantApi', () => {
       const mockResponse = { data: { authorized: true } };
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.authPaymentBarCode(params);
+      const result = await MerchantApi.authPaymentBarCode('init-1', params);
 
-      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/authorize`, {
+      expect(mockPut).toHaveBeenCalledWith(`/initiatives/init-1/transactions/bar-code/${params.trxCode}/authorize`, {
         amountCents: params.amountCents,
         idTrxAcquirer: undefined,
         additionalProperties: params.additionalProperties,
@@ -184,9 +202,9 @@ describe('MerchantApi', () => {
 
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.capturePayment(params);
+      const result = await MerchantApi.capturePayment('init-1', params);
 
-      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/capture`, {
+      expect(mockPut).toHaveBeenCalledWith(`/initiatives/init-1/transactions/bar-code/${params.trxCode}/capture`, {
         trxCode: params.trxCode,
       });
 
@@ -203,11 +221,11 @@ describe('MerchantApi', () => {
 
       mockPut.mockRejectedValue(apiError);
 
-      const promise = MerchantApi.capturePayment(params);
+      const promise = MerchantApi.capturePayment('init-1', params);
 
       await expect(promise).rejects.toThrow('400 Bad Request: Capture Failed');
 
-      expect(mockPut).toHaveBeenCalledWith(`/transactions/bar-code/${params.trxCode}/capture`, {
+      expect(mockPut).toHaveBeenCalledWith(`/initiatives/init-1/transactions/bar-code/${params.trxCode}/capture`, {
         trxCode: params.trxCode,
       });
     });
@@ -350,7 +368,7 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockPost.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.invoiceTransactionApi(trxID, testFile, 'DOC789');
+      const result = await MerchantApi.invoiceTransactionApi('init-123', trxID, testFile, 'DOC789');
 
       expect(mockPost).toHaveBeenCalledTimes(1);
       expect(result).toBeUndefined();
@@ -364,7 +382,7 @@ describe('MerchantApi', () => {
       const apiError = new Error('404 Not Found from API');
       mockPost.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.invoiceTransactionApi(trxId, testFile)).rejects.toThrow(
+      await expect(MerchantApi.invoiceTransactionApi('init-123', trxId, testFile)).rejects.toThrow(
         '404 Not Found from API'
       );
     });
@@ -380,7 +398,7 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.updateInvoiceTransactionApi(trxId, testFile, docNumber);
+      const result = await MerchantApi.updateInvoiceTransactionApi('init-123', trxId, testFile, docNumber);
 
       expect(mockPut).toHaveBeenCalledTimes(1);
       expect(result).toBeUndefined();
@@ -396,7 +414,7 @@ describe('MerchantApi', () => {
       mockPut.mockRejectedValue(apiError);
 
       await expect(
-        MerchantApi.updateInvoiceTransactionApi(trxId, testFile, docNumber)
+        MerchantApi.updateInvoiceTransactionApi('init-123', trxId, testFile, docNumber)
       ).rejects.toThrow('404 Not Found from API');
 
       expect(mockPut).toHaveBeenCalledTimes(1);
@@ -411,7 +429,7 @@ describe('MerchantApi', () => {
       const mockResponse = { data: { updated: true }, status: 200 };
       mockPut.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.updateInvoiceTransactionApi(trxId, testFile, docNumber);
+      const result = await MerchantApi.updateInvoiceTransactionApi('init-123', trxId, testFile, docNumber);
 
       expect(mockPut).toHaveBeenCalledTimes(1);
       expect(result).toBeUndefined();
@@ -428,13 +446,13 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockPost.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.reverseTransactionApi(trxID, testFile, docNumber);
+      const result = await MerchantApi.reverseTransactionApi('init-123', trxID, testFile, docNumber);
 
       expect(mockPost).toHaveBeenCalledTimes(1);
 
       const [url, body, config] = mockPost.mock.calls[0];
 
-      expect(url).toBe(`/transactions/${trxID}/reversal`);
+      expect(url).toBe(`/initiatives/init-123/transactions/${trxID}/reversal`);
       expect(body).toBeInstanceOf(FormData);
       expect(config).toEqual({
         headers: {
@@ -453,7 +471,7 @@ describe('MerchantApi', () => {
       const apiError = new Error('404 Not Found from API');
       mockPost.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.reverseTransactionApi(trxId, testFile, 'DOC789')).rejects.toThrow(
+      await expect(MerchantApi.reverseTransactionApi('init-123', trxId, testFile, 'DOC789')).rejects.toThrow(
         '404 Not Found from API'
       );
     });
@@ -467,9 +485,9 @@ describe('MerchantApi', () => {
 
       mockGet.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId);
+      const result = await MerchantApi.downloadInvoiceFileApi('init-123', pointOfSaleId, trxId);
 
-      expect(mockGet).toHaveBeenCalledWith(`${pointOfSaleId}/transactions/${trxId}/download`);
+      expect(mockGet).toHaveBeenCalledWith(`/initiatives/init-123/${pointOfSaleId}/transactions/${trxId}/download`);
       expect(result).toEqual(mockResponse.data);
     });
 
@@ -480,7 +498,7 @@ describe('MerchantApi', () => {
 
       mockGet.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.downloadInvoiceFileApi(pointOfSaleId, trxId)).rejects.toThrow(
+      await expect(MerchantApi.downloadInvoiceFileApi('init-123', pointOfSaleId, trxId)).rejects.toThrow(
         'Download failed'
       );
     });
@@ -496,11 +514,11 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockPost.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.reverseInvoicedTransactionApi(trxId, testFile, docNumber);
+      const result = await MerchantApi.reverseInvoicedTransactionApi('init-123', trxId, testFile, docNumber);
 
       const [url, body, config] = mockPost.mock.calls[0];
 
-      expect(url).toBe(`/transactions/${trxId}/reversal-invoiced`);
+      expect(url).toBe(`/initiatives/init-123/transactions/${trxId}/reversal-invoiced`);
       expect(body).toBeInstanceOf(FormData);
       expect(config).toEqual({
         headers: {
@@ -520,7 +538,7 @@ describe('MerchantApi', () => {
       mockPost.mockRejectedValue(apiError);
 
       await expect(
-        MerchantApi.reverseInvoicedTransactionApi(trxId, testFile, 'DOC789')
+        MerchantApi.reverseInvoicedTransactionApi('init-123', trxId, testFile, 'DOC789')
       ).rejects.toThrow('Reversal-invoiced failed');
     });
   });
@@ -532,9 +550,9 @@ describe('MerchantApi', () => {
       const mockResponse = { data: {}, status: 204 };
       mockDelete.mockResolvedValue(mockResponse);
 
-      await expect(MerchantApi.deleteTransactionInProgress(trxId)).resolves.toBeUndefined();
+      await expect(MerchantApi.deleteTransactionInProgress('init-1', trxId)).resolves.toBeUndefined();
 
-      expect(mockDelete).toHaveBeenCalledWith(`/transactions/${trxId}`);
+      expect(mockDelete).toHaveBeenCalledWith(`/initiatives/init-1/transactions/${trxId}`);
       expect(mockDelete).toHaveBeenCalledTimes(1);
     });
 
@@ -543,10 +561,10 @@ describe('MerchantApi', () => {
       const apiError = new Error('DELETE API Error');
       mockDelete.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.deleteTransactionInProgress(trxId)).rejects.toThrow(
+      await expect(MerchantApi.deleteTransactionInProgress('init-1', trxId)).rejects.toThrow(
         'DELETE API Error'
       );
-      expect(mockDelete).toHaveBeenCalledWith(`/transactions/${trxId}`);
+      expect(mockDelete).toHaveBeenCalledWith(`/initiatives/init-1/transactions/${trxId}`);
     });
   });
 
@@ -557,9 +575,9 @@ describe('MerchantApi', () => {
       const mockResponse = { data: 'base64pdfdata' };
       mockGet.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.getPreviewPdf(trxId);
+      const result = await MerchantApi.getPreviewPdf('init-123', trxId);
 
-      expect(mockGet).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
+      expect(mockGet).toHaveBeenCalledWith(`/initiatives/init-123/transactions/${trxId}/preview-pdf`);
       expect(mockGet).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockResponse.data);
     });
@@ -568,9 +586,9 @@ describe('MerchantApi', () => {
       const mockResponse = { data: '' };
       mockGet.mockResolvedValue(mockResponse);
 
-      const result = await MerchantApi.getPreviewPdf('');
+      const result = await MerchantApi.getPreviewPdf('init-123', '');
 
-      expect(mockGet).toHaveBeenCalledWith(`/transactions//preview-pdf`);
+      expect(mockGet).toHaveBeenCalledWith(`/initiatives/init-123/transactions//preview-pdf`);
       expect(result).toEqual(mockResponse.data);
     });
 
@@ -578,9 +596,18 @@ describe('MerchantApi', () => {
       const apiError = new Error('PDF not found');
       mockGet.mockRejectedValue(apiError);
 
-      await expect(MerchantApi.getPreviewPdf(trxId)).rejects.toThrow('PDF not found');
-      expect(mockGet).toHaveBeenCalledWith(`/transactions/${trxId}/preview-pdf`);
+      await expect(MerchantApi.getPreviewPdf('init-123', trxId)).rejects.toThrow('PDF not found');
+      expect(mockGet).toHaveBeenCalledWith(`/initiatives/init-123/transactions/${trxId}/preview-pdf`);
       expect(mockGet).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('getInitiativesList', () => {
+    it('should call getInitiativesList', async () => {
+      const mockResponse = { data: { Initiatives: [{ initiativeId: 'id-1', initiativeName: 'Test Initiative' }] } }
+      mockGet.mockResolvedValue(mockResponse)
+      const result = await MerchantApi.getInitiativesList()
+      expect(result).toEqual(mockResponse.data)
+    })
+  })
 });

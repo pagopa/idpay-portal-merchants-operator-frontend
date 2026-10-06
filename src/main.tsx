@@ -9,7 +9,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import './locale';
 import { initializeCookieOneTrust } from './utils/oneTrustLoader.ts';
 import { logger } from './utils/logger';
+import { Provider } from 'react-redux';
+import { store } from './redux/store.ts';
+import { configureAnalyticsConsent } from './consentAndAnalyticsConfiguration.ts';
 
+configureAnalyticsConsent();
 initializeCookieOneTrust().catch((err) => {
   logger.error('Failed to initialize Cookie OneTrust:', err);
 });
@@ -18,11 +22,13 @@ const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
 createRoot(rootElement).render(
   <AuthProvider>
-    <BrowserRouter basename="/esercente">
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter basename="/esercente">
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </BrowserRouter>
+    </Provider>
   </AuthProvider>
 );
