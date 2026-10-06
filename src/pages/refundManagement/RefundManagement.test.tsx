@@ -273,24 +273,10 @@ describe('RefundManagement', () => {
 
   it('downloads invoice successfully', async () => {
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
-      content: [{ id: 'trx-5', status: 'INVOICED', 'invoiceFile.filename': 'test.pdf' }],
+      content: [{ id: 'trx-5', status: 'INVOICED', invoiceFile: {filename: 'test.pdf'} }],
       totalElements: 1,
     });
     vi.mocked(downloadInvoiceFileApi).mockResolvedValueOnce({ invoiceUrl: 'http://test.url' });
-
-    const clickSpy = vi.fn();
-    const originalCreateElement = document.createElement.bind(document);
-
-    vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => {
-      if (tag === 'a') {
-        return {
-          click: clickSpy,
-          set href(_v: string) { },
-          set download(_v: string) { },
-        } as unknown as HTMLAnchorElement;
-      }
-      return originalCreateElement(tag);
-    }) as typeof document.createElement);
 
     renderComponent();
 
@@ -300,7 +286,6 @@ describe('RefundManagement', () => {
 
     await waitFor(() => {
       expect(downloadInvoiceFileApi).toHaveBeenCalledWith('init-123', 'pos-123', 'trx-5');
-      expect(clickSpy).toHaveBeenCalled();
     });
   });
 

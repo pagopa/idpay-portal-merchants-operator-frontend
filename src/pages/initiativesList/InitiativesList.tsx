@@ -79,6 +79,9 @@ export const InitiativesList = () => {
           variant="outlined"
           size="small"
           data-testid='search-initiatives'
+          slotProps={{
+            htmlInput: { className: "name:search-initiative" }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -101,7 +104,7 @@ export const InitiativesList = () => {
           sortingOrder={['asc', 'desc']}
           hideFooterPagination
           hideFooter
-          />
+        />
       </Box>
     </Box>
   );
