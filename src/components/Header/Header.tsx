@@ -20,12 +20,15 @@ const Header = () => {
     false), [user])
 
   const setupHeader = (node) => {
-    if(!node) return
-    const docBtn = node.querySelector('[data-testid="MenuBookIcon"]')?.closest('button')
-    const assistanceBtn = node.querySelector('[data-testid="HelpOutlineRoundedIcon"]')?.closest('button')
+    if (!node) return
+    const buttons: Array<HTMLButtonElement> = [...node.querySelectorAll('button')]
+    if (buttons.length) {
+      const docBtn = buttons.find(btn => btn.textContent === 'Manuale operativo')
+      const assistanceBtn = buttons.find(btn => btn.textContent === 'Assistenza')
 
-    if(docBtn) docBtn.setAttribute('aria-label', 'Manuale operativo')
-    if(assistanceBtn) assistanceBtn.setAttribute('aria-label', 'Assistenza')
+      if (docBtn) docBtn.setAttribute('aria-label', 'Manuale operativo')
+      if (assistanceBtn) assistanceBtn.setAttribute('aria-label', 'Assistenza')
+    }
   }
 
   useEffect(() => {

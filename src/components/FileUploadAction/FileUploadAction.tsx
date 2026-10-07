@@ -5,7 +5,7 @@ import { TitleBox } from '@pagopa/selfcare-common-frontend/lib';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import ROUTES from '../../routes';
 import { SingleFileInput, theme } from '@pagopa/mui-italia';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AlertComponent from '../Alert/AlertComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants.ts';
@@ -68,6 +68,31 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const observerRef = useRef(null);
+
+  const setupUpload = useCallback((node) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+    if (!node) return
+    const applyAttributes = () => {
+      const uploadBtn = node.querySelector('.MuiBox-root button')
+      const removeFileBtn = node.querySelector('.MuiIconButton-root')
+      const uploadInput = node.querySelector('input')
+      if (uploadBtn) uploadBtn.setAttribute('aria-label', t(`${i18nBlockKey}.uploadFile`))
+      if (removeFileBtn) removeFileBtn.setAttribute('aria-label', 'Rimuovi file')
+      if (uploadInput) uploadInput.classList.add('name:select-file')
+    }
+    applyAttributes();
+    const observer = new MutationObserver(() => {
+      applyAttributes();
+    });
+    observer.observe(node, {
+      childList: true,
+      subtree: true
+    });
+  }, [i18nBlockKey, t])
 
   useEffect(() => {
     if (errorAlert) {
@@ -84,26 +109,6 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
       setDocNumber(decripted !== 'undefined' ? decripted : '')
     }
   }, [fileDocNumber])
-
-  const setupUpload = (node) => {
-    if (!node) return
-
-    const applyAttributes = () => {
-      const uploadBtn = node.querySelector('[data-testid="loadFromPc"]')
-      const removeFileBtn = node.querySelector('.MuiIconButton-root')
-      const uploadInput = node.querySelector('input')
-      if (uploadBtn) uploadBtn.classList.add('name:upload-file')
-      if (removeFileBtn) removeFileBtn.classList.add('name:remove-selected-file')
-      if (uploadInput) uploadInput.classList.add('name:select-file')
-    }
-    const observer = new MutationObserver(() => {
-      applyAttributes();
-    });
-    observer.observe(node, {
-      childList: true,
-      subtree: true
-    });
-  }
 
   const handleFileSelect = (selectedFile: File) => {
     if (selectedFile) {
