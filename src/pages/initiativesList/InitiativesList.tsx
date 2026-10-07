@@ -11,12 +11,29 @@ import { DynamicTable } from "../../components/DynamicTable/DynamicTable";
 import ROUTES from "../../routes";
 import { FieldConfigDef } from "../../utils/types";
 import { generatePath } from "react-router-dom";
+import type { StatusChipConfigProps } from "../../components/StatusChip/StatusChip";
 
 export const InitiativesList = () => {
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'initiativeName', sort: 'asc' }]);
   const [initiativeListFiltered, setInitiativeListFiltered] = useState([]);
   const { t, config } = useScopedTranslation();
   const columns = config<Array<FieldConfigDef>>('commons.pages.initiativesList.initiativeTable.columns')
+  const localizedColumns = useMemo(() => columns.map((column) => {
+    if (column.field !== 'status') return column;
+
+    const getStatusLabel = (status?: string) => {
+      if (!status) return '';
+      const chip = config<StatusChipConfigProps>(`${column.cell.context}.${status.toLowerCase()}`);
+      return chip?.label ? t(chip.label) : '';
+    };
+
+    return {
+      ...column,
+      sortComparator: (a: string, b: string) => getStatusLabel(a).localeCompare(
+        getStatusLabel(b), 'it', { sensitivity: 'base' }
+      ),
+    };
+  }), [columns, config, t]);
   const initiativesList = useAppSelector(initiativesListSelector);
   const mappedInitiativesList = useMemo(() =>
     initiativesList.map((initiative) =>
@@ -62,6 +79,9 @@ export const InitiativesList = () => {
           variant="outlined"
           size="small"
           data-testid='search-initiatives'
+          slotProps={{
+            htmlInput: { className: "name:search-initiative" }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -74,7 +94,7 @@ export const InitiativesList = () => {
           }}
         />
         <DynamicTable
-          columnsDef={columns}
+          columnsDef={localizedColumns}
           rows={initiativeListFiltered}
           getRowId={row => row.initiativeId}
           emptyText={t('commons.pages.initiativesList.emptyList')}
@@ -84,7 +104,7 @@ export const InitiativesList = () => {
           sortingOrder={['asc', 'desc']}
           hideFooterPagination
           hideFooter
-          />
+        />
       </Box>
     </Box>
   );
