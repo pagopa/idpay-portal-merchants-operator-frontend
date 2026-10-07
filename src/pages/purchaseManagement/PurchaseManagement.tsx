@@ -264,9 +264,6 @@ const PurchaseManagement = () => {
         onClose={() => {
           setModal("")
         }}
-        style={{
-          width: 'min(600px, calc(100vw - 32px))',
-        }}
       >
         <Box display={'flex'} flexDirection={'column'} gap={2}>
           <Typography variant="h6">
