@@ -76,7 +76,7 @@ const MIXPANEL_CONFIG: Partial<Config> = {
         $elements?.find((el) => validElements.includes(el?.$tag_name) || validElements.includes(el?.['$attr-role']))
 
       const isOption = targetElement?.['$attr-role'] === 'option'
-      const cleanedPath = pathCleaner(current_url_path || $pathname || '', [...visiblePaths, initiativeId])
+      const cleanedPath = pathCleaner(current_url_path || $pathname || '', visiblePaths)
       const elementName = extractNameMP(targetElement?.$classes) || targetElement?.$tag_name
       const elementText = (!isOption && $el_text) || targetElement?.['$attr-aria-label']
 

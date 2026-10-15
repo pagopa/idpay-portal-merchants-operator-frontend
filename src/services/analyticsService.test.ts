@@ -256,7 +256,7 @@ describe('Analytics Setup', () => {
 
       const result = beforeSendHook(inputEvent);
 
-      expect(pathCleaner).toHaveBeenCalledWith('/path/123', expect.arrayContaining(['esercente', 'init-123']));
+      expect(pathCleaner).toHaveBeenCalledWith('/path/123', expect.arrayContaining(['esercente']));
       expect(extractNameMP).toHaveBeenCalledWith('btn-primary');
 
       expect(result).toEqual({
