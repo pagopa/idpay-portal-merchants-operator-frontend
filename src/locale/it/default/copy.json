@@ -57,7 +57,7 @@
                 },
                 "capture": {
                     "title": "Hai ricevuto il pagamento del bene?",
-                    "description": "Hai ricevuto {{amount}} dal cliente per il prodotto {{product}}? Confermando la transazione passerà nello stato ",
+                    "description": "Hai ricevuto {{amount}} dal cliente per il prodotto {{product}}? Confermando, la transazione passerà nello stato ",
                     "detail": "Fattura da caricare",
                     "exitBtn": "Indietro",
                     "confirmBtn": "Conferma"

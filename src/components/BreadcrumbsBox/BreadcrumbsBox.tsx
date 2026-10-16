@@ -36,6 +36,7 @@ const BreadcrumbsBox = ({ backLabel, items, active, onClickBackButton, backButto
           sx={{ color: 'primary.main', fontSize: '1rem', marginBottom: '3px' }}
           weight="default"
           data-testid="back-btn-test"
+          aria-label={backLabel}
         >
           {backLabel}
         </ButtonNaked>

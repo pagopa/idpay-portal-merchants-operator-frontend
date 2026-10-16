@@ -14,7 +14,8 @@ type AutocompleteComponentProps = {
   onChange?: (value: ProductDTO | null) => void;
   value?: ProductDTO | null;
   width?: string | number;
-  required?: boolean
+  required?: boolean;
+  mpTitle?: string;
 };
 
 const autocompleteSx = (width?: string | number) => ({
@@ -68,6 +69,7 @@ export default function AutocompleteComponent({
   onChange,
   value,
   width,
+  mpTitle
 }: AutocompleteComponentProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -171,6 +173,10 @@ export default function AutocompleteComponent({
       clearOnBlur={false}
       selectOnFocus
       handleHomeEndKeys
+      renderOption={(props, option) =>
+        <li {...props} className={`${props.className} name:selected-option`}>
+          {option.fullProductName}
+        </li>}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -182,6 +188,12 @@ export default function AutocompleteComponent({
           sx={{ marginTop: 2 }}
           onBlur={handleBlur}
           onPaste={handlePaste}
+          slotProps={{
+            htmlInput: {
+              ...params.inputProps,
+              className: `${params.inputProps.className} ${mpTitle}`
+            }
+          }}
           InputProps={{
             ...params.InputProps,
             sx: {

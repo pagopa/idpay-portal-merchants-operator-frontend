@@ -57,9 +57,12 @@ const RefundManagement = () => {
       );
       const filename = transaction?.invoiceFile?.filename || 'fattura.pdf';
       const link = document.createElement('a');
+      link.classList.add('name:download-file');
       link.href = invoiceUrl;
       link.download = filename;
+      document.body.appendChild(link);
       link.click();
+      link.remove();
     } catch {
       setErrorDownloadAlert(true);
     } finally {

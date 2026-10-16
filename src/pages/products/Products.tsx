@@ -128,6 +128,7 @@ const Products = () => {
           startIcon={<OpenInNewIcon />}
           sx={{ textWrap: 'nowrap', padding: '0 2.5em' }}
           onClick={() => openExternalLink(elencoProdottiLink)}
+          aria-label={t('pages.products.productList')}
         >
           {t('pages.products.productList')}
         </Button>

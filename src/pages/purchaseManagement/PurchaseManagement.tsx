@@ -269,7 +269,7 @@ const PurchaseManagement = () => {
           <Typography variant="h6">
             {t(`pages.purchaseManagement.modal.${modal}.title`)}
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="body1" sx={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
             {t(`pages.purchaseManagement.modal.${modal}.description`,
               {
                 amount: formatEuro(selectedTransaction?.residualAmountCents),

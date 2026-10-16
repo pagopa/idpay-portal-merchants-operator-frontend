@@ -74,6 +74,7 @@ export default function SideMenu({
           orientation="horizontal"
         />
         <IconButton
+          className='name:close-side-menu'
           sx={{ width: '3.813rem', aspectRatio: '1', marginBottom: '1rem' }}
           onClick={() => setIsOpen(!isOpen)}
         >

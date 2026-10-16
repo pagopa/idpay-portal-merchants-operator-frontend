@@ -14,7 +14,7 @@ import AcceptDiscountCard from './AcceptDiscountCard';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import ModalComponent from '../../components/Modal/ModalComponent';
-import { REQUIRED_FIELD_ERROR } from '../../utils/constants';
+import { PAYMENT_ERROR_MESSAGES, REQUIRED_FIELD_ERROR } from '../../utils/constants';
 import { getInitiativeProductsList, previewPayment } from '../../services/merchantService';
 import Autocomplete from '../../components/Autocomplete/AutocompleteComponent';
 import { ProductDTO } from '../../api/generated/data-contracts';
@@ -35,11 +35,6 @@ interface FormErrors {
   totalAmount?: boolean;
   discountCode?: string;
   discountCodeWrong?: boolean;
-}
-
-const errorMessage = {
-  PAYMENT_NOT_FOUND_OR_EXPIRED: 'pages.acceptDiscount.discountCodeErrors.notFound',
-  PAYMENT_ALREADY_AUTHORIZED: 'pages.acceptDiscount.discountCodeErrors.alreadyAuthorized'
 }
 
 const AcceptDiscount = () => {
@@ -116,15 +111,11 @@ const AcceptDiscount = () => {
       navigate(generatePath(ROUTES.ACCEPT_DISCOUNT_SUMMARY, { initiativeId: initiativeId }));
     } catch (error) {
       const errorCode: string = error?.response?.data?.code;
-      if (errorMessage?.[errorCode]) {
-        setFieldErrors({ discountCode: errorMessage?.[errorCode] });
+      if (PAYMENT_ERROR_MESSAGES?.[errorCode]) {
+        setFieldErrors({ discountCode: PAYMENT_ERROR_MESSAGES?.[errorCode] });
         setPreviewIsLoading(false);
       } else {
-        setErrorAlertMessage(
-          errorCode === 'PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS'
-            ? 'pages.acceptDiscount.discountCodeErrors.notValid'
-            : 'pages.acceptDiscount.errorAlert'
-        );
+        setErrorAlertMessage('pages.acceptDiscount.errorAlert');
         setErrorAlert(true);
       }
       trackAnalytics("couponInvalidCodeError", { reason: errorCode })
@@ -233,6 +224,7 @@ const AcceptDiscount = () => {
                 inputTitle={t('pages.acceptDiscount.selectProductTitle')}
               >
                 <Autocomplete
+                  mpTitle='name:select-product'
                   required
                   options={productsList as ProductDTO[]}
                   onChangeDebounce={(value) => handleChangeAutocomplete(value)}
@@ -265,6 +257,9 @@ const AcceptDiscount = () => {
                   helperText={fieldErrors.totalAmount ? REQUIRED_FIELD_ERROR : ''}
                   onChange={(e) => handleFieldChange('totalAmount', e.target.value)}
                   slotProps={{
+                    htmlInput: {
+                      className: 'name:expenditure-amount-field'
+                    },
                     input: {
                       startAdornment:
                         isExpenditureFocused || formData.totalAmount ? (
@@ -305,6 +300,11 @@ const AcceptDiscount = () => {
                   error={!!fieldErrors.discountCode}
                   helperText={t(fieldErrors.discountCode)}
                   onChange={(e) => handleFieldChange('discountCode', e.target.value)}
+                  slotProps={{
+                    htmlInput: {
+                      className: 'name:discount-code-field'
+                    }
+                  }}
                 />
               </AcceptDiscountCard>
             </Grid>

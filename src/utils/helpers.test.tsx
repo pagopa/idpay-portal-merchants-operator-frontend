@@ -17,6 +17,10 @@ import {
   buildNamespaceKey,
   normalizeObj,
   plainObj,
+  pathCleaner,
+  keysRemover,
+  extractNameMP,
+  generateNameMP,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -584,5 +588,33 @@ describe("plainObj", () => {
 
     const differentValue = plainObj(123)
     expect(differentValue).toBe(123)
+  })
+})
+
+describe("pathCleaner", () => {
+  it("should correctly clean paths from ids", () => {
+    const validPaths = ['base', 'homepage']
+    const pathWithIds = 'base/1234/homepage/5678'
+    const cleanedPath = pathCleaner(pathWithIds, validPaths)
+
+    expect(cleanedPath).toBe('base/homepage')
+  })
+})
+
+describe("keysRemover", () => {
+  it("should correctly remove keys from object", () => {
+    const object = {prop1: 'test', prop2: 1, prop3: 'to-remove'}
+    const cleanedObj = keysRemover(object, ['prop3'])
+
+    expect(cleanedObj).toStrictEqual({prop1: 'test', prop2: 1})
+  })
+})
+
+describe("extractNameMP", () => {
+  it("should correctly find matching class", () => {
+    const classes = ['name:test', 'string1', 'string2']
+    const extractedClass = extractNameMP(classes)
+
+    expect(extractedClass).toBe('test')
   })
 })
