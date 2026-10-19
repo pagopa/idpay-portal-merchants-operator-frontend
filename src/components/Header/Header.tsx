@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { authStore } from '../../store/authStore.ts';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext.tsx';
+import { Box } from '@mui/material';
 
 const Header = () => {
   const { user } = useAuth()
@@ -17,6 +18,18 @@ const Header = () => {
   const loggedUser: JwtUser | false = useMemo(() => (user ?
     { id: user?.sub, name: user?.given_name, surname: user?.family_name, email: user?.email } :
     false), [user])
+
+  const setupHeader = (node) => {
+    if (!node) return
+    const buttons: Array<HTMLButtonElement> = [...node.querySelectorAll('button')]
+    if (buttons.length) {
+      const docBtn = buttons.find(btn => btn.textContent === 'Manuale operativo')
+      const assistanceBtn = buttons.find(btn => btn.textContent === 'Assistenza')
+
+      if (docBtn) docBtn.setAttribute('aria-label', 'Manuale operativo')
+      if (assistanceBtn) assistanceBtn.setAttribute('aria-label', 'Assistenza')
+    }
+  }
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -34,7 +47,7 @@ const Header = () => {
   }, [user, token]);
 
   return (
-    <>
+    <Box ref={setupHeader}>
       <HeaderAccount
         rootLink={{
           href: 'https://www.pagopa.it/it/',
@@ -66,7 +79,7 @@ const Header = () => {
         ]}
         partyId="party-idpay-merchants"
       />
-    </>
+    </Box>
   );
 };
 export default Header;

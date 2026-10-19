@@ -7,9 +7,18 @@ import mixpanel, {
 } from 'mixpanel-browser';
 import { store } from '../redux/store';
 import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
+import ROUTES from '../routes';
+import { extractNameMP, pathCleaner } from '../utils/helpers';
 
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
+
+const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
+  const cleanedPath = path.replace(/^(?:.*\/)?([^/:]+).*$|^.*$/, '$1')
+  return [...acc, ...(cleanedPath && [cleanedPath])]
+}, ['esercente'])
+
+const validElements = ['a', 'button', 'input', 'option', 'link', '[role="button"]', '[role="link"]', '[role="input"]', '[role="option"]']
 
 const eventNamesMap = {
   couponAcceptanceUXStartFlow: 'IDPAY_COUPON_ACCEPTANCE_UX_START_FLOW',
@@ -18,7 +27,9 @@ const eventNamesMap = {
   couponAcceptanceError: 'IDPAY_COUPON_ACCEPTANCE_ERROR',
   couponPaymentUXSuccess: 'IDPAY_COUPON_PAYMENT_UX_SUCCESS',
   UXLoadInvoiceStartFlow: 'IDPAY_UX_LOAD_INVOICE_START_FLOW',
-  loadInvoiceUXSuccess: 'IDPAY_LOAD_INVOICE_UX_SUCCESS'
+  loadInvoiceUXSuccess: 'IDPAY_LOAD_INVOICE_UX_SUCCESS',
+  onClick: '$mp_click',
+  onChange: '$mp_input_change'
 }
 
 const AUTOCAPTURE_CONFIG: AutocaptureConfig = {
@@ -29,8 +40,9 @@ const AUTOCAPTURE_CONFIG: AutocaptureConfig = {
   dead_click: true,
   rage_click: true,
   scroll: false,
-  capture_text_content: false,
   block_selectors: ['.mp-no-track'],
+  capture_text_content: true,
+  allow_element_callback: (element) => !!element.closest(validElements.join(', '))
 };
 
 const MIXPANEL_CONFIG: Partial<Config> = {
@@ -47,17 +59,40 @@ const MIXPANEL_CONFIG: Partial<Config> = {
     '$initial_referrer',
     '$referrer',
     'current_url_search',
-    'current_url_path',
-    '$pathname'
+    '$el_attr__href',
+    '$el_classes'
   ],
   record_sessions_percent: 0,
   record_heatmap_data: false,
   hooks: {
     before_send_events: (event: BeforeSendHookPayload) => {
+      const { current_url_path, $pathname, $target, $elements, $el_text, ...rest } = event.properties
       const state = store.getState()
       const initiativeId = currentInitiativeIdSelector(state)
       const initiative = currentInitiativeSelector(state, initiativeId)
-      return { ...event, properties: { ...event.properties, initiative_id: initiativeId, initiative_name: initiative?.initiativeName}}
+
+      const targetElement = validElements.includes($target?.['$attr-role']) || validElements.includes($target?.$tag_name) ?
+        $target :
+        $elements?.find((el) => validElements.includes(el?.$tag_name) || validElements.includes(el?.['$attr-role']))
+
+      const isOption = targetElement?.['$attr-role'] === 'option'
+      const cleanedPath = pathCleaner(current_url_path || $pathname || '', [...visiblePaths, initiativeId])
+      const elementName = extractNameMP(targetElement?.$classes) || targetElement?.$tag_name
+      const elementText = (!isOption && $el_text) || targetElement?.['$attr-aria-label']
+
+      return {
+        ...event,
+        event: isOption ? eventNamesMap.onChange : event.event,
+        properties: {
+          ...rest,
+          ...(current_url_path && { current_url_path: cleanedPath }),
+          ...($pathname && { $pathname: cleanedPath }),
+          ...(elementName && { $el_name: elementName }),
+          ...(elementText && { $el_text: elementText }),
+          initiative_id: initiativeId,
+          initiative_name: initiative?.initiativeName
+        }
+      }
     }
   }
 };
