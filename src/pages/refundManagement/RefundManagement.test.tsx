@@ -271,7 +271,22 @@ describe('RefundManagement', () => {
     );
   });
 
+  it.each(['INVOICED', 'REFUNDED'])('handles missing storage document for %s', async (status) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404 }));
+    const open = vi.spyOn(window, 'open');
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({ content: [{ id: 'trx-missing', status, invoiceFile: { filename: 'missing.pdf' } }], totalElements: 1 });
+    vi.mocked(downloadInvoiceFileApi).mockResolvedValueOnce({ invoiceUrl: 'https://test/missing.pdf' });
+    renderComponent();
+    fireEvent.click(await screen.findByTestId('row-download-0'));
+    await waitFor(() => expect(screen.getByTestId('alert-download')).toHaveTextContent('true'));
+    expect(open).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
   it('downloads invoice successfully', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(['invoice']) }));
+    URL.createObjectURL = vi.fn().mockReturnValue('blob:invoice');
+    URL.revokeObjectURL = vi.fn();
     vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
       content: [{ id: 'trx-5', status: 'INVOICED', invoiceFile: {filename: 'test.pdf'} }],
       totalElements: 1,

@@ -56,12 +56,23 @@ const RefundManagement = () => {
         transaction?.id
       );
       const filename = transaction?.invoiceFile?.filename || 'fattura.pdf';
+      if (!invoiceUrl) {
+        setErrorDownloadAlert(true);
+        return;
+      }
+      const documentResponse = await fetch(invoiceUrl);
+      if (!documentResponse.ok) {
+        setErrorDownloadAlert(true);
+        return;
+      }
+      const blobUrl = URL.createObjectURL(await documentResponse.blob());
       const link = document.createElement('a');
       link.classList.add('name:download-file');
-      link.href = invoiceUrl;
+      link.href = blobUrl;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
       link.remove();
     } catch {
       setErrorDownloadAlert(true);
@@ -121,11 +132,14 @@ const RefundManagement = () => {
         [transactionRefundSuccess, setTransactionRefundSuccess],
         [errorDownloadAlert, setErrorDownloadAlert],
       ]}
+      alertTitles={{
+        errorDownloadAlert: t('pages.refundManagement.feedbackMessages.errors.downloadPdfTitle'),
+      }}
       alertMessages={{
         error: t('pages.refundManagement.feedbackMessages.errors.generic'),
         transactionRefundSuccess: t('pages.refundManagement.feedbackMessages.success.refundUpload'),
         transactionReverseSuccess: t('pages.refundManagement.feedbackMessages.success.reverseUpload'),
-        errorDownloadAlert: t('pages.refundManagement.feedbackMessages.errors.downloadPdf'),
+        errorDownloadAlert: t('pages.refundManagement.feedbackMessages.errors.downloadPdfDescription'),
       }}
       externalState={{
         transactionRefundSuccess,
