@@ -352,7 +352,7 @@
       "tableTitle": "Transazioni",
       "refundSuccessUpload": "Richiesta inviata correttamente",
       "reverseSuccessUpload": "Richiesta inviata correttamente",
-      "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova.",
+      "errorDownloadAlert": "Non è stato possibile scaricare il documento. Riprova più tardi.",
       "drawer": {
         "title": "Dettaglio transazione",
         "product": "Prodotto",

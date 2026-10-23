@@ -1,4 +1,4 @@
-import { Alert, Box, Slide, SxProps, Theme } from '@mui/material';
+import { Alert, AlertTitle, Box, Slide, SxProps, Theme } from '@mui/material';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 
@@ -6,11 +6,12 @@ interface AlertProps {
   isOpen?: boolean;
   error?: boolean;
   message: string;
+  title?: string;
   containerStyle?: SxProps<Theme>;
   contentStyle?: SxProps<Theme>;
 }
 
-const AlertComponent = ({ isOpen, error, message, containerStyle, contentStyle }: AlertProps) => {
+const AlertComponent = ({ isOpen, error, message, title, containerStyle, contentStyle }: AlertProps) => {
   return (
     <Slide direction="left" in={isOpen} mountOnEnter unmountOnExit>
       <Box
@@ -44,6 +45,7 @@ const AlertComponent = ({ isOpen, error, message, containerStyle, contentStyle }
             ...contentStyle,
           }}
         >
+          {title && <AlertTitle>{title}</AlertTitle>}
           {message}
         </Alert>
       </Box>
