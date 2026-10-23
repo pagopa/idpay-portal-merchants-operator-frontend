@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import RefundManagement from './RefundManagement';
@@ -152,6 +152,24 @@ const renderComponent = () =>
   );
 
 describe('RefundManagement', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('shows a download error when the API returns no document URL', async () => {
+    const fetchDocument = vi.fn();
+    vi.stubGlobal('fetch', fetchDocument);
+    vi.mocked(getProcessedTransactions).mockResolvedValueOnce({
+      content: [{ id: 'trx-no-url', status: 'INVOICED' }], totalElements: 1,
+    });
+    vi.mocked(downloadInvoiceFileApi).mockResolvedValueOnce({ invoiceUrl: '' });
+    renderComponent();
+    fireEvent.click(await screen.findByTestId('row-download-0'));
+    await waitFor(() => expect(screen.getByTestId('alert-download')).toHaveTextContent('true'));
+    expect(fetchDocument).not.toHaveBeenCalled();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocationState = undefined;
