@@ -11,6 +11,12 @@ const successSetup = (isOpen: boolean, message: string) => {
 };
 
 describe('ErrorAlert', () => {
+  it('renders the download error title and description', () => {
+    render(<AlertComponent isOpen error title="Errore download file" message="Riprova più tardi." />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Errore download file');
+    expect(screen.getByRole('alert')).toHaveTextContent('Riprova più tardi.');
+  });
+
   it('should render the component with the correct message', () => {
     const testMessage = 'This is a test error message.';
     errorSetup(true, testMessage);
