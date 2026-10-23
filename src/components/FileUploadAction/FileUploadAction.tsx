@@ -33,11 +33,6 @@ interface FileUploadActionProps {
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
 
-const errorMessageMap = {
-  PAYMENT_STATUS_NOT_VALID: 'pages.reverse.deniedSentError',
-  PAYMENT_REWARD_BATCH_ELIGIBILITY_NOT_ALLOWED: 'pages.reverse.alreadySentError'
-}
-
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
   titleKey,
   subtitleKey,
@@ -69,6 +64,12 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const observerRef = useRef(null);
+
+  const errorMessageMap = {
+    PAYMENT_STATUS_NOT_VALID: `${i18nBlockKey}.deniedSentError`,
+    PAYMENT_REWARD_BATCH_ELIGIBILITY_NOT_ALLOWED: `${i18nBlockKey}.alreadySentError`,
+    PAYMENT_INVOICE_NOT_FOUND: `${i18nBlockKey}.documentNotFound`
+  }
 
   const setupUpload = useCallback((node) => {
     if (observerRef.current) {
@@ -161,7 +162,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
         });
       } catch (error) {
         const errorResponseCode = error?.response?.data?.code;
-        setErrorAlert({ isOpen: true, message: t(errorMessageMap?.[errorResponseCode] ?? 'pages.reverse.errorAlert') });
+        setErrorAlert({ isOpen: true, message: t(errorMessageMap?.[errorResponseCode] ?? `${i18nBlockKey}.errorAlert`) });
         setLoadingFile(false);
       }
     }
