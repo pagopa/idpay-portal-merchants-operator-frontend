@@ -18,3 +18,8 @@ export const PAYMENT_ERROR_MESSAGES = {
   PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: 'pages.acceptDiscount.discountCodeErrors.notValid',
   PAYMENT_USER_UNSUBSCRIBED: 'pages.acceptDiscount.discountCodeErrors.notFound'
 }
+
+export const INITIATIVES_NAMESPACES = {
+  '69e0fa95e21efa516c7b8dec': 'BonusDecoder2026',
+  '68dd003ccce8c534d1da22bc': 'BonusElettrodomestici2025'
+}
