@@ -143,7 +143,11 @@
       "uploadFileButton": "selezionalo dal tuo computer",
       "invoiceTitle": "Qual è il numero  della fattura?",
       "insertInvoice": "Inserisci il numero della fattura",
-      "invoiceLabel": "Numero della fattura"
+      "invoiceLabel": "Numero della fattura",
+      "documentNotFound": "Non è stato possibile modificare il documento. Riprova più tardi.",
+      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova.",
+      "deniedSentError": "Non puoi modificare questo documento.",
+      "alreadySentError": "Non puoi procedere con il caricamento di questo documento perché la transazione è già stata inviata per il rimborso."
     },
     "refund": {
       "title": "Carica la fattura",
@@ -158,7 +162,11 @@
       "uploadFileButton": "selezionalo dal tuo computer",
       "invoiceTitle": "Qual è il numero  della fattura?",
       "insertInvoice": "Inserisci il numero della fattura",
-      "invoiceLabel": "Numero della fattura"
+      "invoiceLabel": "Numero della fattura",
+      "errorAlert": "Il caricamento del file non è andato a buon fine. Riprova.",
+      "documentNotFound": "Non è stato possibile caricare il documento. Riprova più tardi.",
+      "deniedSentError": "Non puoi modificare questo documento.",
+      "alreadySentError": "Non puoi procedere con il caricamento di questo documento perché la transazione è già stata inviata per il rimborso."
     },
     "assistanceRequest": {
       "exitModalBody": "Il team di Assistenza non riceverà la tua richiesta.",
@@ -344,7 +352,7 @@
       "tableTitle": "Transazioni",
       "refundSuccessUpload": "Richiesta inviata correttamente",
       "reverseSuccessUpload": "Richiesta inviata correttamente",
-      "errorDownloadAlert": "Non è stato possibile scaricare il file. Riprova.",
+      "errorDownloadAlert": "Non è stato possibile scaricare il documento. Riprova più tardi.",
       "drawer": {
         "title": "Dettaglio transazione",
         "product": "Prodotto",
@@ -401,7 +409,8 @@
       "deniedSentError": "Non puoi modificare questo documento.",
       "creditNoteTitle": "Qual è il numero della nota di credito?",
       "insertCreditNote": "Inserisci il numero della nota di credito",
-      "creditNoteLabel": "Numero della nota di credito"
+      "creditNoteLabel": "Numero della nota di credito",
+      "documentNotFound": "Non è stato possibile caricare il documento. Riprova più tardi."
     }
   },
   "roles": {

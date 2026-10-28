@@ -33,6 +33,7 @@ type TransactionsLayoutProps = {
   tableTitle?: string
   additionalButton?: ButtonProps;
   alerts: Array<[boolean, (value: boolean) => void]>
+  alertTitles?: Record<string, string>;
   alertMessages?: {
     error?: string
     [key: string]: string | undefined
@@ -65,6 +66,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
   additionalButton,
   alerts,
   alertMessages,
+  alertTitles,
   isAlertVisible,
   externalState = {},
 }) => {
@@ -158,7 +160,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
         .filter(([key]) => key.includes('error'))
         .map(
           ([key, value]) =>
-            alertMessages[key] && (
+            (alertMessages[key] || alertTitles?.[key]) && (
               <AlertComponent
                 containerStyle={{
                   height: 'fit-content',
@@ -171,6 +173,7 @@ const TransactionsLayout: React.FC<TransactionsLayoutProps> = ({
                 isOpen={value && isAlertVisible}
                 key={key}
                 error
+                title={alertTitles?.[key]}
                 message={alertMessages[key]}
               />
             )
