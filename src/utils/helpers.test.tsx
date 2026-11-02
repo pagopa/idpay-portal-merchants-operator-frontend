@@ -21,6 +21,7 @@ import {
   keysRemover,
   extractNameMP,
   generateNameMP,
+  trimFilename,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
 
@@ -618,3 +619,33 @@ describe("extractNameMP", () => {
     expect(extractedClass).toBe('test')
   })
 })
+
+describe('trimFilename', () => {
+  it('should truncate the filename if it exceeds the specified length', () => {
+    const filename = 'longFilenameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.pdf';
+    const result = trimFilename(filename, 10);
+    
+    expect(result).toBe('longFilena... .pdf');
+  });
+
+  it('should return the original filename if the length is less than or equal to the limit', () => {
+    const filename = 'short.pdf';
+    const result = trimFilename(filename, 10);
+    
+    expect(result).toBe('short.pdf');
+  });
+
+  it('should use the default length value (10) if none is provided', () => {
+    const filename = 'longFilenameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png';
+    const result = trimFilename(filename);
+    
+    expect(result).toBe('longFilena... .png');
+  });
+
+  it('should not trim mid dots', () => {
+    const filename = 'unusualExtensionFile.tar.gz';
+    const result = trimFilename(filename, 10);
+    
+    expect(result).toBe('unusualExt... .gz');
+  });
+});
