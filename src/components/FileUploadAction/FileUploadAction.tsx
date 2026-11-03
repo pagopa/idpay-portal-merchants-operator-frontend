@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AlertComponent from '../Alert/AlertComponent';
 import { REQUIRED_FIELD_ERROR } from '../../utils/constants.ts';
+import { trimFilename } from '../../utils/helpers.tsx';
 
 interface BreadcrumbsProps {
   label: string;
@@ -295,7 +296,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             <SingleFileInput
               onFileSelected={handleFileSelect}
               onFileRemoved={handleRemoveFile}
-              value={file}
+              value={file && new File([file], trimFilename(file.name, 20))}
               dropzoneLabel={t(`${i18nBlockKey}.uploadFile`)}
               dropzoneButton={t(`${i18nBlockKey}.uploadFileButton`)}
               rejectedLabel={t(`${i18nBlockKey}.fileNotSupported`)}
