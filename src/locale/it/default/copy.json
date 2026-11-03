@@ -158,7 +158,9 @@
                 },
                 "errors": {
                     "generic": "Non è stato possibile recuperare le transazioni. Riprova.",
-                    "downloadPdf": "Non è stato possibile scaricare il file. Riprova."
+                    "downloadPdf": "Non è stato possibile scaricare il documento. Riprova più tardi.",
+                    "downloadPdfTitle": "Errore download file",
+                    "downloadPdfDescription": "Non è stato possibile scaricare il documento. Riprova più tardi."
                 }
             }
         },

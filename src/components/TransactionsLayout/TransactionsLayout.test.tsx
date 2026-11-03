@@ -22,8 +22,8 @@ vi.mock('@pagopa/selfcare-common-frontend/lib', () => ({
 }));
 
 vi.mock('../Alert/AlertComponent', () => ({
-  default: vi.fn(({ message, isOpen }) =>
-    isOpen ? <div data-testid="alert-component">{message}</div> : null
+  default: vi.fn(({ message, title, isOpen }) =>
+    isOpen ? <div data-testid="alert-component">{title}{message}</div> : null
   ),
 }));
 
@@ -117,6 +117,19 @@ describe('TransactionsLayout component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockTransactionsApi.mockResolvedValue({ content: [{ id: '1' }], totalElements: 1 });
+  });
+
+  it.each([
+    ['Download failed', 'Errore download file'],
+    ['', 'Errore download file'],
+    ['Download failed', undefined],
+  ])('renders lowercase error state with message %s and title %s', (message, title) => {
+    render(<TransactionsLayout {...defaultProps}
+      externalState={{ errorDownloadAlert: true }}
+      alertMessages={{ errorDownloadAlert: message }}
+      alertTitles={title ? { errorDownloadAlert: title } : undefined}
+    />);
+    expect(screen.getByTestId('alert-component')).toHaveTextContent(`${title || ''}${message}`);
   });
 
   it('renders correctly and fetches transactions on mount', async () => {
