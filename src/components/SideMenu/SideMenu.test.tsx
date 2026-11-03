@@ -4,7 +4,6 @@ import SideMenu from './SideMenu';
 import { useAppSelector } from '../../redux/hooks';
 
 const mockNavigate = vi.fn();
-const mockSetIsOpen = vi.fn();
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
@@ -27,20 +26,6 @@ vi.mock('../../routes', () => ({
     default: {
         INITIATIVES_LIST: '/initiatives-route',
         PROFILE: '/profile-route',
-    },
-}));
-
-vi.mock('@pagopa/mui-italia', () => ({
-    theme: {
-        palette: {
-            text: { primary: '#000000' },
-        },
-    },
-}));
-
-vi.mock('./SideMenu.module.css', () => ({
-    default: {
-        sideMenuBurger: 'mock-burger-class',
     },
 }));
 
@@ -68,7 +53,7 @@ describe('SideMenu Component', () => {
     });
 
     it('renders correctly when isOpen is true', () => {
-        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        render(<SideMenu isOpen={true} />);
         
         expect(screen.getByTestId('first-list-test')).toBeInTheDocument();
         expect(screen.getByTestId('sidenav-item-commons.sideMenu.initiatives')).toBeInTheDocument();
@@ -76,13 +61,13 @@ describe('SideMenu Component', () => {
     });
 
     it('renders correctly when isOpen is false', () => {
-        render(<SideMenu isOpen={false} setIsOpen={mockSetIsOpen} />);
+        render(<SideMenu isOpen={false} />);
         
         expect(screen.getByTestId('first-list-test')).toBeInTheDocument();
     });
 
     it('navigates to initiatives list when the initiatives item is clicked', () => {
-        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        render(<SideMenu isOpen={true} />);
         
         const initiativesButton = screen.getByTestId('sidenav-item-commons.sideMenu.initiatives');
         fireEvent.click(initiativesButton);
@@ -91,7 +76,7 @@ describe('SideMenu Component', () => {
     });
 
     it('navigates to profile when the profile item is clicked', () => {
-        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        render(<SideMenu isOpen={true} />);
         
         const profileButton = screen.getByTestId('sidenav-item-commons.sideMenu.profile');
         fireEvent.click(profileButton);
@@ -106,7 +91,7 @@ describe('SideMenu Component', () => {
         ];
         (useAppSelector as Mock).mockReturnValue(mockInitiativesList);
 
-        render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        render(<SideMenu isOpen={true} />);
         
         expect(screen.getByTestId('accordion-id-1')).toBeInTheDocument();
         expect(screen.getByTestId('accordion-id-2')).toBeInTheDocument();

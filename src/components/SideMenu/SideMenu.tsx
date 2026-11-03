@@ -1,11 +1,9 @@
-import { List, Box, Divider, IconButton } from '@mui/material';
+import { List, Box, Divider } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ROUTES from '../../routes';
 import SideNavItem from './SideNavItem';
 import { Person } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { theme } from '@pagopa/mui-italia';
-import styles from './SideMenu.module.css';
 import { useAppSelector } from '../../redux/hooks';
 import { initiativesListSelector } from '../../redux/slices/initiativesSlice'
 import { SideNavAccordion } from './SideNavAccordion';
@@ -14,10 +12,8 @@ import { useScopedTranslation } from '../../hooks/useScopedTranslation';
 /** The side menu of the application */
 export default function SideMenu({
   isOpen = true,
-  setIsOpen,
 }: {
   isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
 }) {
   const { t } = useScopedTranslation();
   const navigate = useNavigate();
@@ -67,19 +63,6 @@ export default function SideMenu({
             hideLabels={!isOpen}
           />
         </List>
-      </Box>
-      <Box className={!isOpen ? styles.sideMenuBurger : ''}>
-        <Divider
-          sx={{ margin: '1rem 0', justifySelf: 'flex-end', width: '100%' }}
-          orientation="horizontal"
-        />
-        <IconButton
-          className='name:close-side-menu'
-          sx={{ width: '3.813rem', aspectRatio: '1', marginBottom: '1rem' }}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <MenuIcon sx={{ color: theme.palette.text.primary }} />
-        </IconButton>
       </Box>
     </Box>
   );
