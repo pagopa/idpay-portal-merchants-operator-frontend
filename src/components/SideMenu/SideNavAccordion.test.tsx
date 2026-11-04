@@ -59,6 +59,7 @@ describe('SideNavAccordion', () => {
         render(<SideNavAccordion item={mockItem} defaultOpen={true} />);
         const accordionHeader = screen.getByRole('button', { name: 'Point Of Sale Initiative' });
         expect(accordionHeader).toHaveAttribute('aria-expanded', 'true');
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it('expands accordion automatically when location pathname includes initiativeId', () => {
