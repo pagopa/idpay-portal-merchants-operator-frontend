@@ -33,6 +33,7 @@ interface FileUploadActionProps {
 
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 const VALID_MIME_TYPES = ['application/pdf', 'application/xml', 'text/xml'];
+const FILE_NAME_MAX_LENGTH = 40;
 
 const FileUploadAction: React.FC<FileUploadActionProps> = ({
   titleKey,
@@ -296,7 +297,7 @@ const FileUploadAction: React.FC<FileUploadActionProps> = ({
             <SingleFileInput
               onFileSelected={handleFileSelect}
               onFileRemoved={handleRemoveFile}
-              value={file && new File([file], trimFilename(file.name, 20))}
+              value={file && new File([file], trimFilename(file.name, FILE_NAME_MAX_LENGTH))}
               dropzoneLabel={t(`${i18nBlockKey}.uploadFile`)}
               dropzoneButton={t(`${i18nBlockKey}.uploadFileButton`)}
               rejectedLabel={t(`${i18nBlockKey}.fileNotSupported`)}
