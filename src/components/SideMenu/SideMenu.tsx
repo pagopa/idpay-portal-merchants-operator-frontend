@@ -44,12 +44,12 @@ export default function SideMenu({
             hideLabels={!isOpen}
           />
           {initiativesList &&
-            initiativesList.map((item) => (
+            initiativesList.map((item, index) => (
               <SideNavAccordion
                 key={item?.initiativeId}
                 item={item}
                 isOpen={isOpen}
-                defaultOpen={!(initiativesList.length - 1)}
+                defaultOpen={location.pathname === ROUTES.INITIATIVES_LIST && index === 0}
               />
             ))}
           <Divider sx={{ margin: '1rem 0' }} orientation="horizontal" />
