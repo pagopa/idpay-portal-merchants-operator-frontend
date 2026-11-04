@@ -56,25 +56,25 @@ describe('SideMenu Component', () => {
 
     it('defaults only the first initiative open on landing after loading, without navigating', () => {
         (useLocation as Mock).mockReturnValue({ pathname: '/initiatives-route' });
-        const { rerender } = render(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        const { rerender } = render(<SideMenu isOpen={true} />);
         (useAppSelector as Mock).mockReturnValue([
             { initiativeId: 'id-1', initiativeName: 'Initiative 1' },
             { initiativeId: 'id-2', initiativeName: 'Initiative 2' },
         ]);
-        rerender(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        rerender(<SideMenu isOpen={true} />);
         expect(screen.getByTestId('accordion-id-1')).toHaveAttribute('data-default-open', 'true');
         expect(screen.getByTestId('accordion-id-2')).toHaveAttribute('data-default-open', 'false');
         expect(mockNavigate).not.toHaveBeenCalled();
 
         (useLocation as Mock).mockReturnValue({ pathname: '/id-2/details' });
-        rerender(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        rerender(<SideMenu isOpen={true} />);
         expect(screen.getByTestId('accordion-id-1')).toHaveAttribute('data-default-open', 'false');
         expect(screen.getByTestId('accordion-id-2')).toHaveAttribute('data-default-open', 'false');
         (useLocation as Mock).mockReturnValue({ pathname: '/initiatives-route' });
-        rerender(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        rerender(<SideMenu isOpen={true} />);
         expect(screen.getByTestId('accordion-id-1')).toHaveAttribute('data-default-open', 'true');
         (useLocation as Mock).mockReturnValue({ pathname: '/profile-route' });
-        rerender(<SideMenu isOpen={true} setIsOpen={mockSetIsOpen} />);
+        rerender(<SideMenu isOpen={true} />);
         expect(screen.getByTestId('accordion-id-1')).toHaveAttribute('data-default-open', 'false');
         expect(mockNavigate).not.toHaveBeenCalled();
     });
