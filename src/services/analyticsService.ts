@@ -13,6 +13,9 @@ import { extractNameMP, pathCleaner } from '../utils/helpers';
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
 
+const appDomain = import.meta.env.VITE_CDN_DOMAINS;
+const appName = 'Portale punto vendita';
+
 const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
   const cleanedPath = path.replace(/^(?:.*\/)?([^/:]+).*$|^.*$/, '$1')
   return [...acc, ...(cleanedPath && [cleanedPath])]
@@ -111,8 +114,8 @@ const resumeAnalytics = (instance: Mixpanel) => {
   }
   instance.register({
     DOMAIN_NAME: {
-      name: 'Portale punto vendita',
-      domain_URL: 'pari.pagopa.it'
+      name: appName,
+      domain_URL: appDomain
     }
   });
   analyticsActive = true;
