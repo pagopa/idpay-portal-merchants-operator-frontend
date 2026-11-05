@@ -329,5 +329,5 @@ export const trimFilename = (filename: string, length: number = 10) => {
   const regex = /^(.+)(\.[^.]+)$/;
   const match = filename.match(regex);
   const [, name, extension] = match;
-  return name.length > length ? `${name.substring(0, length)}... ${extension}` : filename
+  return name.length > length ? `${name.substring(0, length)}${extension}` : filename
 }

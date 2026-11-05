@@ -625,7 +625,7 @@ describe('trimFilename', () => {
     const filename = 'longFilenameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.pdf';
     const result = trimFilename(filename, 10);
     
-    expect(result).toBe('longFilena... .pdf');
+    expect(result).toBe('longFilena.pdf');
   });
 
   it('should return the original filename if the length is less than or equal to the limit', () => {
@@ -639,13 +639,13 @@ describe('trimFilename', () => {
     const filename = 'longFilenameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png';
     const result = trimFilename(filename);
     
-    expect(result).toBe('longFilena... .png');
+    expect(result).toBe('longFilena.png');
   });
 
   it('should not trim mid dots', () => {
     const filename = 'unusualExtensionFile.tar.gz';
     const result = trimFilename(filename, 10);
     
-    expect(result).toBe('unusualExt... .gz');
+    expect(result).toBe('unusualExt.gz');
   });
 });
