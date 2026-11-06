@@ -291,7 +291,7 @@ stages:
 
               VITE_CSV_LINK: $(react_app_csv_link)
 
-              VITE_CDN_DOMAINS: ${cdn_domains}
+              VITE_CDN_DOMAINS: $(cdn_domains)
 
               # MIXPANEL
               VITE_MIXPANEL_ENABLED: '$(vite_mixpanel_enabled)'
