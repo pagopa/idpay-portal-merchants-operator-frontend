@@ -10,16 +10,8 @@
                 "label": "templates.categories.dt"
             },
             {
-                "value": "DTC",
-                "label": "templates.categories.dtc"
-            },
-            {
                 "value": "DTS",
                 "label": "templates.categories.dts"
-            },
-            {
-                "value": "DTSC",
-                "label": "templates.categories.dtsc"
             }
         ]
     },
@@ -67,6 +59,43 @@
                     "headerName": "pages.products.drawer.productCode",
                     "cell": {
                         "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "scart",
+                    "headerName": "pages.products.drawer.scart",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true,
+                        "options": {
+                            "true": "Sì",
+                            "false": "No"
+                        }
+                    }
+                },
+                {
+                    "field": "connectivity",
+                    "headerName": "pages.products.drawer.connectivity",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true,
+                        "options": {
+                            "LAN": "LAN",
+                            "WIFI": "WI-FI",
+                            "LAN e WIFI": "LAN e WI-FI",
+                            "Nessuna": "Nessuna"
+                        }
+                    }
+                },
+                {
+                    "field": "technicalSheetUrl",
+                    "headerName": "pages.products.drawer.technicalSheetUrl",
+                    "cell": {
+                        "type": "externalLink",
                         "tooltip": true,
                         "bold": true
                     }
