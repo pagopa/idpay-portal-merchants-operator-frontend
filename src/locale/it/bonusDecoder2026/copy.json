@@ -2,11 +2,9 @@
     "initiativeName": "Bonus Decoder",
     "templates": {
         "categories": {
-            "ds": "Satellitare",
-            "dt": "Terrestre",
-            "dtc": "Terrestre via cavo",
-            "dts": "Terrestre e Satellitare",
-            "dtsc": "Terrestre, Satellitare e via cavo"
+            "ds": "Decoder Satellitare",
+            "dt": "Decoder Terrestre",
+            "dts": "Decoder Terrestre e Satellitare"
         }
     },
     "pages": {
@@ -181,7 +179,10 @@
                 "productCode": "Codice prodotto",
                 "category": "Categoria",
                 "brand": "Marca",
-                "model": "Modello"
+                "model": "Modello",
+                "scart": "Presa SCART",
+                "connectivity": "Connessione IP",
+                "technicalSheetUrl": "Scheda tecnica"
             },
             "filters": {
                 "category": "Categoria",
