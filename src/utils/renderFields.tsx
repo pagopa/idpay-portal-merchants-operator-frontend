@@ -5,6 +5,7 @@ import { formatDate, formatEuro, renderText } from "./helpers";
 import { Box, IconButton } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { ExternalLink } from "../components/Link/ExternalLink";
 import { Link } from "../components/Link/Link";
 
 const actionIcons = {
@@ -21,7 +22,7 @@ type Props = {
 
 export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
     text: (params) => <Box display="flex" alignItems="center" height="100%">
-        {renderText(params.value, tooltip, bold)}
+        {renderText(options && params.value != null ? (options[String(params.value)] ?? params.value) : params.value, tooltip, bold)}
     </Box>,
     date: (params) => <Box display="flex" alignItems="center" height="100%">
         {renderText(formatDate(params.value, { options }), tooltip, bold)}
@@ -41,6 +42,7 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
         <Box display="flex" alignItems="center" height="100%">
             <Link name={params.field} tooltip={tooltip} label={params.value} href={params?.row?.link} />
         </Box>,
+    externalLink: (params) => <ExternalLink value={params.value} tooltip={tooltip} />,
     chip: (params) =>
         <Box display="flex" alignItems="center" height="100%">
             <StatusChip tooltip={tooltip} context={context} value={params?.value?.toLowerCase()} />
