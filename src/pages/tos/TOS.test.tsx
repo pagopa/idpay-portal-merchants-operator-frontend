@@ -20,13 +20,17 @@ describe('TOS component', () => {
       'VITE_ONE_TRUST_TOS_JSON_URL',
       'https://privacyportalde-cdn.onetrust.com/storage-container/test/privacy-notice.json'
     );
+
+    vi.mocked(useOneTrustNotice).mockImplementation((_, __, setContentLoaded) => {
+      queueMicrotask(() => setContentLoaded(true));
+    });
   });
 
-  test('renders the OneTrust notice container and back link', () => {
+  test('renders the OneTrust notice container and back link', async () => {
     render(<TOS />);
 
     const notice = document.querySelector('.otnotice');
-    const backHomeLink = screen.getByRole('link', { name: 'commons.pages.tos.backHome' });
+    const backHomeLink = await screen.findByRole('link', { name: 'commons.pages.tos.backHome' });
 
     expect(notice).toBeTruthy();
     expect(notice?.classList.contains('otnotice')).toBe(true);

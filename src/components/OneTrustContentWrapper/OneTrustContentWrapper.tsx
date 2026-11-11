@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 interface OneTrustContentWrapperProps {
   idSelector: string;
+  isContentLoaded: boolean;
 }
 
 const OneTrustContentWrapper = ({
   idSelector,
+  isContentLoaded
 }: OneTrustContentWrapperProps) => {
   const { t } = useTranslation();
 
@@ -21,11 +23,13 @@ const OneTrustContentWrapper = ({
         <Grid
           sx={{ display: 'grid', gridColumn: 'span 2', mt: 5, justifyContent: 'center' }}
         ></Grid>
-        <Grid sx={{ display: 'grid', gridColumn: 'span 10', mt: 5, justifyContent: 'center' }}>
-          <Link underline="hover" href={ROUTES.HOME}>
-            {t('commons.pages.tos.backHome')}
-          </Link>
-        </Grid>
+        {isContentLoaded &&
+          <Grid sx={{ display: 'grid', gridColumn: 'span 10', mt: 5, justifyContent: 'center' }}>
+            <Link underline="hover" href={ROUTES.HOME}>
+              {t('commons.pages.tos.backHome')}
+            </Link>
+          </Grid>
+        }
       </Box>
     </>
   );
