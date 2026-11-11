@@ -324,3 +324,10 @@ export const keysRemover = (obj: Record<string, any>, keys: Array<string>) => {
 export const extractNameMP = (classes: Array<string>) => {
   return classes?.find((elClass) => elClass?.match(/^name:/))?.replace('name:', '')
 }
+
+export const trimFilename = (filename: string, length: number = 10) => {
+  const regex = /^(.+)(\.[^.]+)$/;
+  const match = filename.match(regex);
+  const [, name, extension] = match;
+  return name.length > length ? `${name.substring(0, length)}${extension}` : filename
+}

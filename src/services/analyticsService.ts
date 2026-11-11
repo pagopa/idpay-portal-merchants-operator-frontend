@@ -13,6 +13,9 @@ import { extractNameMP, pathCleaner } from '../utils/helpers';
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
 
+const appDomain = import.meta.env.VITE_CDN_DOMAINS;
+const appName = 'Portale punto vendita';
+
 const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
   const cleanedPath = path.replace(/^(?:.*\/)?([^/:]+).*$|^.*$/, '$1')
   return [...acc, ...(cleanedPath && [cleanedPath])]
@@ -60,7 +63,11 @@ const MIXPANEL_CONFIG: Partial<Config> = {
     '$referrer',
     'current_url_search',
     '$el_attr__href',
-    '$el_classes'
+    '$el_classes',
+    '$referring_domain',
+    'current_domain',
+    '$initial_referring_domain',
+    '$host'
   ],
   record_sessions_percent: 0,
   record_heatmap_data: false,
@@ -105,6 +112,12 @@ const resumeAnalytics = (instance: Mixpanel) => {
     instance.clear_opt_in_out_tracking();
     instance.set_config({ autocapture: AUTOCAPTURE_CONFIG });
   }
+  instance.register({
+    DOMAIN_NAME: {
+      name: appName,
+      domain_URL: appDomain
+    }
+  });
   analyticsActive = true;
 };
 
