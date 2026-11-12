@@ -1,5 +1,7 @@
+const BASE_URL = import.meta.env.BASE_URL
+
 const ROUTES = {
-  HOME: '/',
+  HOME: BASE_URL,
   INITIATIVES_LIST: '/iniziative',
   ACCEPT_DISCOUNT: '/:initiativeId/accetta-buono-sconto',
   ACCEPT_DISCOUNT_SUMMARY: '/:initiativeId/accetta-buono-sconto/riepilogo',
