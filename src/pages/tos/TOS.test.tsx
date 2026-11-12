@@ -34,7 +34,7 @@ describe('TOS component', () => {
 
     expect(notice).toBeTruthy();
     expect(notice?.classList.contains('otnotice')).toBe(true);
-    expect(backHomeLink.getAttribute('href')).toBe('/');
+    expect(backHomeLink.getAttribute('href')).toBe('/esercente/');
   });
 
   test('initializes the OneTrust notice with the configured URL and route prefix', () => {
