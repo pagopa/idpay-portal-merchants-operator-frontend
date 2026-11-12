@@ -15,7 +15,7 @@ const TOS = () => {
     ROUTES.TOS
   );
 
-  return <OneTrustContentWrapper idSelector={TOS_NOTICE_ID} />;
+  return <OneTrustContentWrapper idSelector={TOS_NOTICE_ID} isContentLoaded={contentLoaded} />;
 };
 
 export default TOS;
