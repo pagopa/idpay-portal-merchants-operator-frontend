@@ -2,9 +2,11 @@
     "initiativeName": "Bonus Decoder",
     "templates": {
         "categories": {
-            "ds": "Decoder Satellitare",
-            "dt": "Decoder Terrestre",
-            "dts": "Decoder Terrestre e Satellitare"
+            "ds": "Satellitare",
+            "dt": "Terrestre",
+            "dtc": "Terrestre via cavo",
+            "dts": "Terrestre e Satellitare",
+            "dtsc": "Terrestre, Satellitare e via cavo"
         }
     },
     "pages": {

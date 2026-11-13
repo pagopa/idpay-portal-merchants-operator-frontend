@@ -1,17 +1,19 @@
 import { useTranslation } from "react-i18next"
-import { useAppSelector } from "../redux/hooks"
-import { currentInitiativeSelector } from "../redux/slices/initiativesSlice"
 import { useParams } from "react-router-dom"
 import { DEFAULT_LANG, i18n } from "../locale"
-import { buildNamespaceKey } from "../utils/helpers"
+import { BONUS_DECODER_2026, BONUS_ELETTRODOMESTICI_2025 } from "../utils/constants"
+
+export const initiativeConfigMap = {
+  [BONUS_ELETTRODOMESTICI_2025]: 'bonusElettrodomestici2025',
+  [BONUS_DECODER_2026]: 'bonusDecoder2026'
+}
 
 export const useScopedTranslation = () => {
     const { initiativeId } = useParams();
     const { t: translation } = useTranslation()
 
-    const currentInitiative = useAppSelector(state => currentInitiativeSelector(state, initiativeId))
+    const namespace = initiativeConfigMap?.[initiativeId]
 
-    const namespace = buildNamespaceKey(currentInitiative?.initiativeName, currentInitiative?.startDate)
     const existentNamespaces = {
         copy: i18n.hasResourceBundle(DEFAULT_LANG, `${namespace}/copy`) ? `${namespace}/copy` : 'default/copy',
         config: i18n.hasResourceBundle(DEFAULT_LANG, `${namespace}/config`) ? `${namespace}/config` : 'default/config'
