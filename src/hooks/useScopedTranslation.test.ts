@@ -3,21 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useScopedTranslation } from './useScopedTranslation';
 
 const mocks = vi.hoisted(() => ({
-  currentInitiative: {
-    initiativeId: 'initiative-1',
-    initiativeName: 'Bonus Elettrodomestici',
-    startDate: '2025-09-01',
-  },
   hasResourceBundle: vi.fn(),
   translation: vi.fn(),
-  buildNamespaceKey: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
-    useParams: () => ({ initiativeId: 'initiative-1' }),
+    useParams: () => ({ initiativeId: 'bonus-elettrodomestici-2025' }),
   };
 });
 
@@ -27,10 +21,6 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('../redux/hooks', () => ({
-  useAppSelector: () => mocks.currentInitiative,
-}));
-
 vi.mock('../locale', () => ({
   DEFAULT_LANG: 'it',
   i18n: {
@@ -38,21 +28,14 @@ vi.mock('../locale', () => ({
   },
 }));
 
-vi.mock('../utils/helpers.tsx', () => ({
-  buildNamespaceKey: () => mocks.buildNamespaceKey(),
+vi.mock('../utils/constants', () => ({
+  BONUS_ELETTRODOMESTICI_2025: 'bonus-elettrodomestici-2025',
+  BONUS_DECODER_2026: 'bonus-decoder-2026',
 }));
 
 describe('useScopedTranslation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.currentInitiative = {
-      initiativeId: 'initiative-1',
-      initiativeName: 'Bonus Elettrodomestici',
-      startDate: '2025-09-01',
-    };
-    
-    mocks.buildNamespaceKey.mockReturnValue('bonusElettrodomestici2025');
-    
     mocks.translation.mockImplementation((key: string) => `translated_${key}`);
   });
 
@@ -107,7 +90,7 @@ describe('useScopedTranslation', () => {
     });
   });
 
-  it('falls back to common namespace if specific translation is missing (returns key)', () => {
+  it('falls back to common namespace if specific translation is missing', () => {
     mocks.hasResourceBundle.mockReturnValue(true);
     
     mocks.translation.mockImplementation((key: string) => key); 
