@@ -95,7 +95,7 @@
                     "field": "technicalSheetUrl",
                     "headerName": "pages.products.drawer.technicalSheetUrl",
                     "cell": {
-                        "type": "externalLink",
+                        "type": "optionalLink",
                         "tooltip": true,
                         "bold": true
                     }

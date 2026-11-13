@@ -4,7 +4,7 @@ import { GridRenderCellParams } from '@mui/x-data-grid';
 import { theme } from '@pagopa/mui-italia';
 import { FormatDateProps } from './types';
 
-export const renderText = (text: string, tooltip?: boolean, bold?: boolean) => {
+export const renderText = ({text, tooltip, bold}: {text: string, tooltip?: boolean, bold?: boolean}) => {
   const sx = {
     ...(tooltip ? {
       overflow: 'hidden',
