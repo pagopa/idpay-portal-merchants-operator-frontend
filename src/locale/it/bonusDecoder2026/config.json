@@ -10,8 +10,16 @@
                 "label": "templates.categories.dt"
             },
             {
+                "value": "DTC",
+                "label": "templates.categories.dtc"
+            },
+            {
                 "value": "DTS",
                 "label": "templates.categories.dts"
+            },
+            {
+                "value": "DTSC",
+                "label": "templates.categories.dtsc"
             }
         ]
     },

@@ -12,6 +12,9 @@ variables:
 
 
   # global variables
+  vite_bonus_elettrodomestici_2025_id: '$(BONUS_ELETTRODOMESTICI_2025_ID)'
+  vite_bonus_decoder_2026_id: '$(BONUS_DECODER_2026_ID)'
+  
   react_app_pagopa_help_email: '$(REACT_APP_ASSISTANCE_EMAIL)'
   REACT_APP_ONE_TRUST_BASE_URL_GLOBAL: https://cdn.cookielaw.org
   REACT_APP_ONE_TRUST_OTNOTICE_CDN_URL_GLOBAL: https://privacyportalde-cdn.onetrust.com/privacy-notice-scripts/otnotice-1.0.min.js
@@ -298,6 +301,9 @@ stages:
               VITE_MIXPANEL_DEBUG: '$(vite_mixpanel_debug)'
               VITE_MIXPANEL_TOKEN: '$(vite_mixpanel_token)'
               VITE_MIXPANEL_API_HOST: 'https://api-eu.mixpanel.com'
+
+              VITE_BONUS_ELETTRODOMESTICI_2025_ID: '$(vite_bonus_elettrodomestici_2025_id)'
+              VITE_BONUS_DECODER_2026_ID: '$(vite_bonus_decoder_2026_id)'
               
           - bash: |
               printf "$EXECUTION_ID\n$(git name-rev --name-only FETCH_HEAD) $(git rev-parse HEAD)" > $(System.DefaultWorkingDirectory)/dist/build.info
