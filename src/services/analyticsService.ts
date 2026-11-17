@@ -7,8 +7,8 @@ import mixpanel, {
 } from 'mixpanel-browser';
 import { store } from '../redux/store';
 import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
-import ROUTES from '../routes';
-import { extractNameMP, pathCleaner } from '../utils/helpers';
+import ROUTES, { BASE_URL } from '../routes';
+import { extractNameMP } from '../utils/helpers';
 
 const mixpanelEnabled = import.meta.env.VITE_MIXPANEL_ENABLED === 'true';
 const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
@@ -16,10 +16,14 @@ const mixpanelToken = import.meta.env.VITE_MIXPANEL_TOKEN;
 const appDomain = import.meta.env.VITE_CDN_DOMAINS;
 const appName = 'Portale punto vendita';
 
-const visiblePaths = Object.values(ROUTES).reduce((acc, path) => {
-  const cleanedPath = path.replace(/^(?:.*\/)?([^/:]+).*$|^.*$/, '$1')
-  return [...acc, ...(cleanedPath && [cleanedPath])]
-}, ['esercente'])
+const formattedRoutes: Array<{route: string, regex: RegExp}> = Object.values(ROUTES).map((route) => {
+  const formattedRoute = `${route === BASE_URL ? '' : '/esercente'}${route}`
+  return {
+    route: formattedRoute,
+    regex: new RegExp(`^${formattedRoute.replace(/:([^/]+)/g, "([^/]+)")}$`)
+  }
+});
+const pathFormatter = (path: string) => formattedRoutes.find(({regex}) => regex.test(path))?.route
 
 const validElements = ['a', 'button', 'input', 'option', 'link', '[role="button"]', '[role="link"]', '[role="input"]', '[role="option"]']
 
@@ -83,7 +87,7 @@ const MIXPANEL_CONFIG: Partial<Config> = {
         $elements?.find((el) => validElements.includes(el?.$tag_name) || validElements.includes(el?.['$attr-role']))
 
       const isOption = targetElement?.['$attr-role'] === 'option'
-      const cleanedPath = pathCleaner(current_url_path || $pathname || '', visiblePaths)
+      const cleanedPath = pathFormatter(current_url_path || $pathname || '')
       const elementName = extractNameMP(targetElement?.$classes) || targetElement?.$tag_name
       const elementText = (!isOption && $el_text) || targetElement?.['$attr-aria-label']
 
