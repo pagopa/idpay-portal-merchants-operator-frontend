@@ -5,8 +5,8 @@ import { formatDate, formatEuro, renderText } from "./helpers";
 import { Box, IconButton } from "@mui/material";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { ExternalLink } from "../components/Link/ExternalLink";
 import { Link } from "../components/Link/Link";
+import { OptionalLink } from "../components/Link/OptionalLink";
 
 const actionIcons = {
     info: <InfoOutlinedIcon color="primary" fontSize="inherit" />,
@@ -18,17 +18,18 @@ type Props = {
     bold?: boolean
     options?: Record<string, string>
     context?: string
+    fieldName?: string
 }
 
-export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
+export const renderFields = ({ tooltip, bold, options, context, fieldName }: Props) => ({
     text: (params) => <Box display="flex" alignItems="center" height="100%">
-        {renderText(options && params.value != null ? (options[String(params.value)] ?? params.value) : params.value, tooltip, bold)}
+        {renderText({text: options && params.value != null ? (options[String(params.value)] ?? params.value) : params.value, tooltip, bold})}
     </Box>,
     date: (params) => <Box display="flex" alignItems="center" height="100%">
-        {renderText(formatDate(params.value, { options }), tooltip, bold)}
+        {renderText({text: formatDate(params.value, { options }), tooltip, bold})}
     </Box>,
     euro: (params) => <Box display="flex" alignItems="center" height="100%">
-        {renderText(formatEuro(params.value), tooltip, bold)}
+        {renderText({text: formatEuro(params.value), tooltip, bold})}
     </Box>,
     navigation: (params) =>
         <Box display="flex" alignItems="center" height="100%">
@@ -40,9 +41,12 @@ export const renderFields = ({ tooltip, bold, options, context }: Props) => ({
         </Box>,
     link: (params) =>
         <Box display="flex" alignItems="center" height="100%">
-            <Link name={params.field} tooltip={tooltip} label={params.value} href={params?.row?.link} />
+            <Link name={params?.field ?? fieldName} tooltip={tooltip} label={params.value} href={params?.row?.link} />
         </Box>,
-    externalLink: (params) => <ExternalLink value={params.value} tooltip={tooltip} />,
+    optionalLink: (params) =>
+        <Box display="flex" alignItems="center" height="100%">
+            <OptionalLink value={params.value} name={params?.field ?? fieldName} tooltip={tooltip} />
+        </Box>,
     chip: (params) =>
         <Box display="flex" alignItems="center" height="100%">
             <StatusChip tooltip={tooltip} context={context} value={params?.value?.toLowerCase()} />
