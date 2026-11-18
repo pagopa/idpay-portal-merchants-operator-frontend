@@ -10,6 +10,7 @@ const mockMixpanelInstance = {
   set_config: vi.fn(),
   opt_out_tracking: vi.fn(),
   track: vi.fn(),
+  register: vi.fn()
 };
 
 vi.mock('mixpanel-browser', () => ({

@@ -1449,9 +1449,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransactionErrorDTO"
-              example:
-                code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
-                message: "Cannot find transaction with transactionId [%s]"
+              examples:
+                transactionNotFoundOrExpired:
+                  summary: Transaction not found or expired
+                  value:
+                    code: "PAYMENT_NOT_FOUND_OR_EXPIRED"
+                    message: "Cannot find transaction with transactionId [%s]"
+                invoiceNotFound:
+                  summary: Invoice document not found in storage
+                  value:
+                    code: "PAYMENT_INVOICE_NOT_FOUND"
+                    message: "Invoice document not found in storage"
         "429":
           description: Too many requests
           headers:
@@ -1894,6 +1902,10 @@ components:
           maximum: 1000000
     ProductDTO:
       type: object
+      required:
+        - scart
+        - connectivity
+        - technicalSheetUrl
       properties:
         organizationId:
           type: string
@@ -2005,6 +2017,25 @@ components:
           description: 'ENG: The name of the product with GTIN (for merchant)  <br> IT: Nome del prodotto con GTIN (per esercenti)'
           maxLength: 255
           pattern: .*
+        scart:
+          type: boolean
+          description: 'ENG: Indicates whether the decoder has a SCART socket <br> IT: Indica se il decoder dispone di una presa SCART'
+          nullable: false
+        connectivity:
+          type: string
+          description: 'ENG: Decoder IP connectivity support <br> IT: Connessione IP supportata dal decoder'
+          enum:
+            - LAN
+            - WIFI
+            - LAN e WIFI
+            - Nessuna
+          nullable: false
+        technicalSheetUrl:
+          type: string
+          description: 'ENG: Required decoder technical sheet URL. HTTP/HTTPS URLs and addresses starting with www. are accepted. <br> IT: URL obbligatorio della scheda tecnica del decoder. Sono accettati URL HTTP/HTTPS e indirizzi che iniziano con www.'
+          maxLength: 255
+          format: uri
+          nullable: false
         motivation:
           type: string
           maxLength: 200

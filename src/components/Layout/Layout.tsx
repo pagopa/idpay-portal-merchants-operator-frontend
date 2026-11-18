@@ -9,11 +9,10 @@ type Props = {
 //components
 import Header from '../Header/Header';
 import SideMenu from '../SideMenu/SideMenu';
-import { useState } from 'react';
 import { CustomFooter } from '../Footer/CustomFooter.tsx';
 
 const Layout = ({ children }: Props) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const isOpen = true;
   const location = useLocation();
 
   const match = (paths) => {
@@ -42,7 +41,7 @@ const Layout = ({ children }: Props) => {
       {isMatched ? (
         <Grid container flexDirection="row" flexWrap="nowrap" flexGrow="1">
           <Box width={isOpen ? '300px' : 'min-content'}>
-            <SideMenu isOpen={isOpen} setIsOpen={setIsOpen} />
+            <SideMenu isOpen={isOpen} />
           </Box>
           <Grid
             container
