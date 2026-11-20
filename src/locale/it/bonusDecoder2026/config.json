@@ -90,13 +90,7 @@
                     "cell": {
                         "type": "text",
                         "tooltip": true,
-                        "bold": true,
-                        "options": {
-                            "LAN": "LAN",
-                            "WIFI": "WIFI",
-                            "LAN e WIFI": "LAN e WIFI",
-                            "Nessuna": "Nessuna"
-                        }
+                        "bold": true
                     }
                 },
                 {
