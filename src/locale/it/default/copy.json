@@ -46,7 +46,8 @@
                 "householdAppliance": "Prodotto",
                 "document": "Documento di pre-autorizzazione",
                 "transactionId": "ID transazione",
-                "trxCode": "Codice sconto"
+                "trxCode": "Codice sconto",
+                "productGtin": "Codice GTIN/EAN"
             },
             "modal": {
                 "cancel": {
@@ -149,7 +150,8 @@
                     "authorized": "Numero fattura"
                 },
                 "transactionId": "ID transazione",
-                "trxCode": "Codice sconto"
+                "trxCode": "Codice sconto",
+                "productGtin": "Codice GTIN/EAN"
             },
             "feedbackMessages": {
                 "success": {
