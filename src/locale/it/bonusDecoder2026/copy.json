@@ -2,9 +2,11 @@
     "initiativeName": "Bonus Decoder",
     "templates": {
         "categories": {
-            "ds": "Decoder Satellitare",
-            "dt": "Decoder Terrestre",
-            "dts": "Decoder Terrestre e Satellitare"
+            "ds": "Satellitare",
+            "dt": "Terrestre",
+            "dtc": "Terrestre via cavo",
+            "dts": "Terrestre e Satellitare",
+            "dtsc": "Terrestre, Satellitare e via cavo"
         }
     },
     "pages": {
@@ -50,7 +52,8 @@
                 "householdAppliance": "Prodotto",
                 "document": "Documento di pre-autorizzazione",
                 "transactionId": "ID transazione",
-                "trxCode": "Codice sconto"
+                "trxCode": "Codice sconto",
+                "productGtin": "Codice GTIN/EAN"
             },
             "modal": {
                 "cancel": {
@@ -153,7 +156,8 @@
                     "authorized": "Numero fattura"
                 },
                 "transactionId": "ID transazione",
-                "trxCode": "Codice sconto"
+                "trxCode": "Codice sconto",
+                "productGtin": "Codice GTIN/EAN"
             },
             "feedbackMessages": {
                 "success": {

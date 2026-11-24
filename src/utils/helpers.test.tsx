@@ -20,10 +20,63 @@ import {
   pathCleaner,
   keysRemover,
   extractNameMP,
-  generateNameMP,
   trimFilename,
+  renderText,
 } from './helpers';
 import { MISSING_DATA_PLACEHOLDER } from './constants';
+vi.mock("@pagopa/mui-italia", async () => {
+  const actual = await vi.importActual('@pagopa/mui-italia')
+  return {
+    ...actual,
+    theme: {
+      typography: {
+        fontWeightMedium: 500,
+      },
+    }
+  }
+});
+describe("renderText", () => {
+  it("renders provided text with default styles when tooltip and bold are false", () => {
+    render(renderText({ text: "Hello World" }));
+
+    const element = screen.getByText("Hello World");
+    expect(element).toBeInTheDocument();
+    expect(element).toHaveStyle({
+      wordWrap: "break-word",
+      maxWidth: "100%",
+    });
+  });
+
+  it("renders with ellipsis and tooltip title when tooltip is true", () => {
+    render(renderText({ text: "Long text here", tooltip: true }));
+
+    const element = screen.getByText("Long text here");
+    expect(element).toHaveStyle({
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    });
+  });
+
+  it("applies fontWeightMedium when bold is true", () => {
+    render(renderText({ text: "Bold text", bold: true }));
+
+    const element = screen.getByText("Bold text");
+    expect(element).toHaveStyle({
+      fontWeight: 500,
+    });
+  });
+
+  it("renders MISSING_DATA_PLACEHOLDER and applies font weight when text is missing", () => {
+    render(renderText({ text: "" }));
+
+    const element = screen.getByText("-");
+    expect(element).toBeInTheDocument();
+    expect(element).toHaveStyle({
+      fontWeight: 500,
+    });
+  });
+});
 
 describe('getStatusChip', () => {
   const mockT = (key: string) => key;
@@ -604,10 +657,10 @@ describe("pathCleaner", () => {
 
 describe("keysRemover", () => {
   it("should correctly remove keys from object", () => {
-    const object = {prop1: 'test', prop2: 1, prop3: 'to-remove'}
+    const object = { prop1: 'test', prop2: 1, prop3: 'to-remove' }
     const cleanedObj = keysRemover(object, ['prop3'])
 
-    expect(cleanedObj).toStrictEqual({prop1: 'test', prop2: 1})
+    expect(cleanedObj).toStrictEqual({ prop1: 'test', prop2: 1 })
   })
 })
 
@@ -624,28 +677,28 @@ describe('trimFilename', () => {
   it('should truncate the filename if it exceeds the specified length', () => {
     const filename = 'longFilenameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.pdf';
     const result = trimFilename(filename, 10);
-    
+
     expect(result).toBe('longFilena.pdf');
   });
 
   it('should return the original filename if the length is less than or equal to the limit', () => {
     const filename = 'short.pdf';
     const result = trimFilename(filename, 10);
-    
+
     expect(result).toBe('short.pdf');
   });
 
   it('should use the default length value (10) if none is provided', () => {
     const filename = 'longFilenameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png';
     const result = trimFilename(filename);
-    
+
     expect(result).toBe('longFilena.png');
   });
 
   it('should not trim mid dots', () => {
     const filename = 'unusualExtensionFile.tar.gz';
     const result = trimFilename(filename, 10);
-    
+
     expect(result).toBe('unusualExt.gz');
   });
 });

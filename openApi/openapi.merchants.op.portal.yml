@@ -2026,8 +2026,8 @@ components:
           description: 'ENG: Decoder IP connectivity support <br> IT: Connessione IP supportata dal decoder'
           enum:
             - LAN
-            - WIFI
-            - LAN e WIFI
+            - WI-FI
+            - LAN e WI-FI
             - Nessuna
           nullable: false
         technicalSheetUrl:

@@ -88,6 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           .updateToken(70)
           .then((refreshed) => {
             if (refreshed) {
+              authStore.getState().setJwtToken(keycloak.token || null);
               setToken(keycloak.token || null);
             }
           })

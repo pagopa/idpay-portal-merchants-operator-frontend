@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { waitFor } from '@testing-library/react';
+import { AxiosError } from 'axios';
 import useErrorDispatcher from '@pagopa/selfcare-common-frontend/lib/hooks/useErrorDispatcher';
 import { useTranslation } from 'react-i18next';
 import useTCAgreement from './useTCAgreement';
@@ -99,6 +100,41 @@ describe('useTCAgreement', () => {
     await waitFor(() => {
       expect(result.current.isTOSAccepted).toBe(true);
     });
+  });
+
+  it.each([
+    [401, true],
+    [500, false],
+  ])('handles consent status %s after token refresh with accepted state %s', async (status, expected) => {
+    const { result, rerender } = setupHook({});
+    await waitFor(() => expect(result.current.isTOSAccepted).toBe(true));
+
+    mockedGetPortalConsent.mockRejectedValue(
+      Object.assign(new AxiosError('Consent request failed'), { response: { status } })
+    );
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      token: 'refreshed-token',
+    } as ReturnType<typeof useAuth>);
+
+    await act(async () => {
+      rerender();
+    });
+
+    expect(mockedGetPortalConsent).toHaveBeenCalledTimes(2);
+    expect(result.current.isTOSAccepted).toBe(expected);
+    if (status === 401) {
+      expect(result.all.some((state) => !(state instanceof Error) && state.isTOSAccepted === false)).toBe(false);
+    }
+  });
+
+  it('does not show TOS when the initial consent check returns 401', async () => {
+    const error = Object.assign(new AxiosError('Unauthorized'), { response: { status: 401 } });
+    const { result } = setupHook(error);
+    await act(async () => {});
+
+    expect(mockedGetPortalConsent).toHaveBeenCalledTimes(1);
+    expect(result.current.isTOSAccepted).toBeUndefined();
   });
 
   it('calls savePortalConsent and updates state on success', async () => {

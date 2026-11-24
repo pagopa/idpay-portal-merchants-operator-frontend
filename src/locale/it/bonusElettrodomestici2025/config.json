@@ -417,6 +417,15 @@
                     }
                 },
                 {
+                    "field": "productGtin",
+                    "headerName": "pages.purchaseManagement.drawer.productGtin",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
                     "field": "fiscalCode",
                     "headerName": "pages.purchaseManagement.drawer.fiscalCode",
                     "cell": {
@@ -659,6 +668,15 @@
                 {
                     "field": "productName",
                     "headerName": "pages.refundManagement.drawer.householdAppliance",
+                    "cell": {
+                        "type": "text",
+                        "tooltip": true,
+                        "bold": true
+                    }
+                },
+                {
+                    "field": "productGtin",
+                    "headerName": "pages.purchaseManagement.drawer.productGtin",
                     "cell": {
                         "type": "text",
                         "tooltip": true,

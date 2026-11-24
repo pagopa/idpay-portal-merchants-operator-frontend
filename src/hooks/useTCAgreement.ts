@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
 import { getPortalConsent, savePortalConsent } from '../services/rolePermissionService';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -19,7 +20,10 @@ const useTCAgreement = () => {
           setAcceptedTOS(true);
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (isAxiosError(error) && error.response?.status === 401) {
+          return;
+        }
         setAcceptedTOS(false);
       });
     }

@@ -42,7 +42,7 @@ export default function DynamicDrawer({
 
   const mappedFields = useMemo(() => fieldsDef.map(({ cell, ...field }) => {
     const { type, tooltip, bold, context, options } = cell
-    const fieldsConfig = renderFields({ tooltip, bold, context, options })
+    const fieldsConfig = renderFields({ tooltip, bold, context, options, fieldName: field.field })
     return { ...field, headerName: t(field.headerName), renderCell: fieldsConfig[type] }
   }), [fieldsDef, t])
 

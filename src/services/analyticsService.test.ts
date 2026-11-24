@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import mixpanel from 'mixpanel-browser';
 import { store } from '../redux/store';
 import { currentInitiativeIdSelector, currentInitiativeSelector } from '../redux/slices/initiativesSlice';
-import { pathCleaner, extractNameMP } from '../utils/helpers';
+import { extractNameMP } from '../utils/helpers';
 
 const mockMixpanelInstance = {
   has_opted_out_tracking: vi.fn(),
@@ -31,14 +31,14 @@ vi.mock('../redux/slices/initiativesSlice', () => ({
 }));
 
 vi.mock('../utils/helpers', () => ({
-  pathCleaner: vi.fn((path: string) => `/cleaned${path}`),
-  extractNameMP: vi.fn((classes?: string) => (classes ? 'extracted-element-name' : undefined)),
+  extractNameMP: vi.fn((classes) => (classes ? 'extracted-element-name' : undefined)),
 }));
 
 vi.mock('../routes', () => ({
+  BASE_URL: '/',
   default: {
     HOME: '/home',
-    INITIATIVE: '/initiative/:id',
+    INITIATIVE: '/:id',
   },
 }));
 
@@ -246,9 +246,11 @@ describe('Analytics Setup', () => {
       const inputEvent = {
         event: '$mp_click',
         properties: {
-          current_url_path: '/path/123',
-          $pathname: '/path/123',$target: {
-            $tag_name: 'button',$classes: 'btn-primary',
+          current_url_path: '/esercente/home',
+          $pathname: '/esercente/home',
+          $target: {
+            $tag_name: 'button',
+            $classes: 'btn-primary',
           },
           $el_text: 'Click Me',
           unrelatedProp: 'keep_me',
@@ -257,33 +259,34 @@ describe('Analytics Setup', () => {
 
       const result = beforeSendHook(inputEvent);
 
-      expect(pathCleaner).toHaveBeenCalledWith('/path/123', expect.arrayContaining(['esercente']));
       expect(extractNameMP).toHaveBeenCalledWith('btn-primary');
 
       expect(result).toEqual({
         event: '$mp_click',
         properties: {
           unrelatedProp: 'keep_me',
-          current_url_path: '/cleaned/path/123',
-          $pathname: '/cleaned/path/123',
-          $el_name: 'extracted-element-name',$el_text: 'Click Me',
+          current_url_path: '/esercente/home',
+          $pathname: '/esercente/home',
+          $el_name: 'extracted-element-name',
+          $el_text: 'Click Me',
           initiative_id: 'init-123',
           initiative_name: 'Initiative Alpha',
         },
       });
     });
 
-    it('should resolve target from $elements if$target is not a valid element', async () => {
+    it('should resolve target from $elements if $target is not a valid element', async () => {
       const beforeSendHook = await setupHook();
 
       const inputEvent = {
         event: '$mp_click',
         properties: {
-          $target: {$tag_name: 'div',
+          $target: {
+            $tag_name: 'div',
           },
           $elements: [
             { $tag_name: 'span' },
-            { $tag_name: 'a',$classes: 'link-class' },
+            { $tag_name: 'a', $classes: 'link-class' },
           ],
           $el_text: 'Link Text',
         },
@@ -322,7 +325,8 @@ describe('Analytics Setup', () => {
       const inputEvent = {
         event: '$mp_click',
         properties: {
-          $target: {$tag_name: 'button',
+          $target: {
+            $tag_name: 'button',
           },
         },
       } as any;

@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
     ROUTES.PRIVACY_POLICY
   );
 
-  return <OneTrustContentWrapper idSelector={PRIVACY_POLICY_NOTICE_ID} />;
+  return <OneTrustContentWrapper idSelector={PRIVACY_POLICY_NOTICE_ID} isContentLoaded={contentLoaded} />;
 };
 
 export default PrivacyPolicy;

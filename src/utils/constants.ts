@@ -18,3 +18,6 @@ export const PAYMENT_ERROR_MESSAGES = {
   PAYMENT_NOT_ALLOWED_FOR_TRX_STATUS: 'pages.acceptDiscount.discountCodeErrors.notValid',
   PAYMENT_USER_UNSUBSCRIBED: 'pages.acceptDiscount.discountCodeErrors.notFound'
 }
+
+export const BONUS_ELETTRODOMESTICI_2025 = import.meta.env.VITE_BONUS_ELETTRODOMESTICI_2025_ID;
+export const BONUS_DECODER_2026 = import.meta.env.VITE_BONUS_DECODER_2026_ID;
